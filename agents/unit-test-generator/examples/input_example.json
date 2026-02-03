@@ -1,0 +1,51 @@
+{
+    "title": "HU-GAM-01 — Award Points for Donation",
+    "user_story": "As a registered user, I want to earn points when I donate an item, so that I feel rewarded and motivated to reuse items.",
+    "detailed_description": "When a user completes a donation action, the system should calculate and assign points based on the item category. The system must enforce a daily limit of points and prevent invalid actions from awarding points.",
+    "acceptance_criteria": [
+        "Points are awarded when a valid donation is completed",
+        "Points are not awarded if the donation action is invalid",
+        "Daily points limit is enforced",
+        "User total points are updated correctly",
+        "The system prevents awarding points with non-positive values"
+    ],
+    "implementation_details": {
+        "backend": [
+            "Function under test: award_points(user_id, action, points_to_add, repo)",
+            "Repository dependency: points_repo with get_points_today, add_points, get_total_points",
+            "Valid actions include: donate_item"
+        ],
+        "frontend": [
+            "No UI tests required"
+        ],
+        "database": [
+            "No real database access in unit tests"
+        ]
+    },
+    "testing_notes": [
+        "Use pytest",
+        "Use mocks for repository methods",
+        "Focus on business rules and validation"
+    ],
+    "test_data_required": {
+        "user_ids": [
+            "user_1"
+        ],
+        "actions": [
+            "donate_item",
+            "invalid_action"
+        ],
+        "points_values": [
+            10,
+            0,
+            -5,
+            100
+        ]
+    },
+    "potential_mocks": [
+        "points_repo"
+    ],
+    "dependencies": [
+        "points_repo"
+    ]
+}
