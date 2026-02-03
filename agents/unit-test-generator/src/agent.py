@@ -295,6 +295,50 @@ def build_output_markdown(payload: dict) -> str:
     gaps.append(
         "Consider adding tests for idempotency (e.g., prevent double-awarding points for same donation event) if applicable."
     )
+    
+    happy_md = chr(10).join([
+        "### {}\n- Objective: {}\n- Input: {}\n- Expected: {}\n".format(
+            t["name"], t["objective"], t["input"], t["expected"]
+        )
+        for t in test_cases["happy_path"]
+    ])
+
+    edge_md = chr(10).join([
+        "### {}\n- Objective: {}\n- Input: {}\n- Expected: {}\n".format(
+            t["name"], t["objective"], t["input"], t["expected"]
+        )
+        for t in test_cases["edge_cases"]
+    ])
+
+    negative_md = chr(10).join([
+        "### {}\n- Objective: {}\n- Input: {}\n- Expected: {}\n".format(
+            t["name"], t["objective"], t["input"], t["expected"]
+        )
+        for t in test_cases["negative_cases"]
+    ])
+    
+    assumptions_md = chr(10).join(f"- {a}" for a in assumptions) or "- No additional assumptions."
+
+    functions_md = chr(10).join(f"- {fn}" for fn in functions_under_test)
+
+    ac_md = (
+        chr(10).join(f"- {ac}" for ac in acceptance_criteria)
+        if acceptance_criteria
+        else "- Derived from description + standard validations"
+    )
+
+    mock_md = chr(10).join(
+        "- **{}**\n  - Why: {}\n  - How: {}".format(m["mock"], m["why"], m["how"])
+        for m in mock_strategy
+    )
+
+    ac_map_md = (
+        chr(10).join(f"- {k} → {v}" for k, v in ac_map.items())
+        if ac_map
+        else "- No acceptance criteria provided to map."
+    )
+
+    gaps_md = chr(10).join(f"- {g}" for g in gaps)
 
     md = f"""# Unit Test Output — {title}
 
@@ -320,7 +364,7 @@ def build_output_markdown(payload: dict) -> str:
 - Framework-level behavior (FastAPI/Django routing)
 
 ## Assumptions made
-{chr(10).join([f"- {a}" for a in assumptions]) if assumptions else "- No additional assumptions."}
+{assumptions_md}
 
 ## Risks detected
 - If business rules are ambiguous or incomplete, tests may not match expected behavior
@@ -331,7 +375,7 @@ def build_output_markdown(payload: dict) -> str:
 # 2️⃣ Unit Test Scope
 
 ## Functions / methods under test
-{chr(10).join([f"- {fn}" for fn in functions_under_test])}
+{functions_md}
 
 ## Business rules covered
 {chr(10).join([f"- {ac}" for ac in acceptance_criteria]) if acceptance_criteria else "- Derived from description + standard validations"}
@@ -346,13 +390,13 @@ def build_output_markdown(payload: dict) -> str:
 # 3️⃣ Test Cases Definition
 
 ## Happy Path
-{chr(10).join([f"### {t['name']}\n- Objective: {t['objective']}\n- Input: {t['input']}\n- Expected: {t['expected']}\n" for t in test_cases['happy_path']])}
+{happy_md}
 
 ## Edge Cases
-{chr(10).join([f"### {t['name']}\n- Objective: {t['objective']}\n- Input: {t['input']}\n- Expected: {t['expected']}\n" for t in test_cases['edge_cases']])}
+{edge_md}
 
 ## Negative / Error Cases
-{chr(10).join([f"### {t['name']}\n- Objective: {t['objective']}\n- Input: {t['input']}\n- Expected: {t['expected']}\n" for t in test_cases['negative_cases']])}
+{negative_md}
 
 ---
 
@@ -366,13 +410,13 @@ def build_output_markdown(payload: dict) -> str:
 
 # 5️⃣ Mock Strategy
 
-{chr(10).join([f"- **{m['mock']}**\n  - Why: {m['why']}\n  - How: {m['how']}" for m in mock_strategy])}
+{mock_md}
 
 ---
 
 # 6️⃣ Coverage Mapping (AC → Tests)
 
-{chr(10).join([f"- {k} → {v}" for k, v in ac_map.items()]) if ac_map else "- No acceptance criteria provided to map."}
+{ac_map_md}
 
 ---
 
@@ -392,7 +436,7 @@ def build_output_markdown(payload: dict) -> str:
 
 # 8️⃣ Gaps & Recommendations
 
-{chr(10).join([f"- {g}" for g in gaps])}
+{gaps_md}
 
 ---
 Generated at: {datetime.utcnow().isoformat()}Z
