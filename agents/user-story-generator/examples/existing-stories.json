@@ -1,0 +1,38 @@
+[
+  {
+    "id": "US-001",
+    "title": "User authentication with ITESO credentials",
+    "domain": "Core",
+    "description": "Users must authenticate using their ITESO email and password"
+  },
+  {
+    "id": "US-002",
+    "title": "User profile creation and management",
+    "domain": "Core",
+    "description": "Users can create and update their profile information"
+  },
+  {
+    "id": "US-003",
+    "title": "User can view home feed",
+    "domain": "Core",
+    "description": "Users see a personalized feed of recent items"
+  },
+  {
+    "id": "US-010",
+    "title": "User can search for items",
+    "domain": "Marketplace",
+    "description": "Users can search items by keywords and filters"
+  },
+  {
+    "id": "US-011",
+    "title": "User can view item details",
+    "domain": "Marketplace",
+    "description": "Users can see full details of a published item"
+  },
+  {
+    "id": "US-020",
+    "title": "User earns points for actions",
+    "domain": "Gamification",
+    "description": "Users receive points for publishing, donating, and exchanging items"
+  }
+]
