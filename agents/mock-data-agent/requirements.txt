@@ -1,0 +1,10 @@
+# Mock & Test Data Agent - Requirements
+# Python 3.8+
+
+# No external dependencies required - uses only Python standard library
+# - re (regex)
+# - json
+# - uuid
+# - datetime
+# - pathlib
+# - typing
