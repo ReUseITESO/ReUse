@@ -1,0 +1,29 @@
+{
+  "name": "reuse",
+  "version": "1.0.0",
+  "description": "app to share or sell used stuff",
+  "homepage": "https://github.com/ReUseITESO/ReUse#readme",
+  "bugs": {
+    "url": "https://github.com/ReUseITESO/ReUse/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReUseITESO/ReUse.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0",
+    "typescript-eslint": "^8.54.0"
+  },
+  "dependencies": {
+    "black": "^0.3.0"
+  }
+}
