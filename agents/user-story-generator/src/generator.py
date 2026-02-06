@@ -439,9 +439,31 @@ def main():
     parser.add_argument("--interactive", action="store_true", help="Interactive mode")
     parser.add_argument("--example", action="store_true", help="Generate example story")
     
+    # GitHub integration options
+    parser.add_argument("--github", action="store_true", help="Create GitHub Issue from story")
+    parser.add_argument("--project", help="GitHub Project name or number to link issue")
+    parser.add_argument("--labels", help="Comma-separated labels for GitHub Issue")
+    parser.add_argument("--assignee", help="GitHub username to assign the issue")
+    
     args = parser.parse_args()
     
     generator = UserStoryGenerator()
+    
+    def maybe_create_github_issue(story):
+        """Helper to create GitHub issue if --github flag is set"""
+        if args.github:
+            from github_integration import create_issue_from_story
+            
+            labels = args.labels.split(",") if args.labels else ["user-story"]
+            success, message = create_issue_from_story(
+                story=story,
+                labels=labels,
+                project=args.project,
+                assignee=args.assignee
+            )
+            print(message)
+            return success
+        return True
     
     # Example mode
     if args.example:
@@ -471,6 +493,38 @@ def main():
             print("\n⚠️ Validation errors:")
             for error in errors:
                 print(f"  - {error}")
+        
+        # Ask to save file
+        save_file = input("\n💾 Save to file? (y/n): ").lower().strip()
+        if save_file == 'y':
+            filename = input("Filename (default: generated-story.md): ").strip()
+            if not filename:
+                filename = "generated-story.md"
+            with open(filename, 'w') as f:
+                f.write(story.to_markdown())
+            print(f"✅ Saved to {filename}")
+        
+        # Ask to create GitHub issue
+        create_issue = input("\n🐙 Create GitHub Issue? (y/n): ").lower().strip()
+        if create_issue == 'y':
+            from github_integration import create_issue_from_story, check_github_setup
+            
+            ready, msg = check_github_setup()
+            if not ready:
+                print(f"❌ {msg}")
+            else:
+                project = input("Project name (press Enter to skip): ").strip() or None
+                assignee = input("Assignee GitHub username (press Enter to skip): ").strip() or None
+                labels_input = input("Labels comma-separated (default: user-story): ").strip()
+                labels = labels_input.split(",") if labels_input else ["user-story"]
+                
+                success, message = create_issue_from_story(
+                    story=story,
+                    labels=labels,
+                    project=project,
+                    assignee=assignee
+                )
+                print(message)
         
         return
     
@@ -507,6 +561,9 @@ def main():
         else:
             print(output)
         
+        # Create GitHub issue if requested
+        maybe_create_github_issue(story)
+        
         return
     
     # Direct arguments mode
@@ -520,6 +577,9 @@ def main():
             print(f"✅ Story generated: {args.output}")
         else:
             print(output)
+        
+        # Create GitHub issue if requested
+        maybe_create_github_issue(story)
         
         return
     
