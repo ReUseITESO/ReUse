@@ -1,0 +1,28 @@
+{
+  "title": "User can sign in / log in to the platform",
+  "domain": "Authentication",
+  "description": "Users need to be able to sign in to the ReUse platform using their ITESO credentials. The system should validate their credentials, create a secure session, and redirect them to their dashboard. This is a critical feature that enables access to all platform functionality including publishing items, making exchanges, and managing their profile.",
+  "context": {
+    "user_type": "ITESO community member (student, faculty, or staff)",
+    "platform": "web",
+    "priority": "critical",
+    "complexity": "medium",
+    "security_requirements": "OAuth 2.0 / SAML integration with ITESO SSO"
+  },
+  "acceptance_criteria": [
+    "User can enter their ITESO credentials (username and password)",
+    "System validates credentials against ITESO authentication service",
+    "Upon successful authentication, user is redirected to dashboard",
+    "System creates secure session with appropriate timeout",
+    "Failed login attempts are logged and displayed with clear error messages",
+    "Account lockout after multiple failed attempts",
+    "Remember me option for trusted devices",
+    "Password reset functionality available"
+  ],
+  "technical_considerations": {
+    "authentication_method": "ITESO Single Sign-On (SSO)",
+    "session_management": "JWT tokens with 24-hour expiration",
+    "security": "HTTPS only, CSRF protection, rate limiting"
+  },
+  "existing_stories": []
+}
