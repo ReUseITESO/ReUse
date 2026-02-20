@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "django_filters",
+    "drf_spectacular",
     "core",
     "marketplace",
 ]
@@ -118,7 +119,56 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "ReUseITESO API",
+    "DESCRIPTION": (
+        "REST API for ReUseITESO — a second-hand marketplace platform"
+        "for ITESO students. Modules: <br> Core (auth, users), <br>"
+        "Marketplace (products, categories, transactions), <br>"
+        "Gamification (points, badges, rankings).<br>"
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "TAGS": [
+        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
+        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
+        # {"name": "Core > Users", "description": "User profile endpoints."},
+        # {"name": "Gamification > Points", "description": "Points and rewards endpoints."},
+        # {"name": "Gamification > Badges", "description": "Badge and achievement endpoints."},
+    ],
+    "CONTACT": {
+        "name": "ReUseITESO Team",
+    },
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": False,
+        "filter": True,
+    },
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "ConditionEnum": "marketplace.models.product.Products.CONDITION_CHOICES",
+        "TransactionTypeEnum": "marketplace.models.product.Products.TRANSACTION_TYPE_CHOICES",
+        "StatusEnum": "marketplace.models.product.Products.STATUS_CHOICES",
+    },
+    "SECURITY": [
+        {"BearerAuth": []},
+    ],
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "JWT access token obtained from POST /api/auth/login/",
+            }
+        }
+    },
 }
 
 # SIMPLE_JWT = {
