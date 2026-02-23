@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "marketplace",
+    # TODO: uncomment when gamification app has models and migrations ready
+    # "gamification",
 ]
 
 MIDDLEWARE = [
@@ -66,9 +68,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "reuseiteso"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
+        "NAME": os.environ.get("DB_NAME", "reuse_iteso_dev"),
+        "USER": os.environ.get("DB_USER", "reuse_dev"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "local_dev_password"),
         "HOST": os.environ.get("DB_HOST", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
     }
@@ -105,8 +107,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# TODO: Change to 'core.User' when core module is implemented
-# AUTH_USER_MODEL = 'core.User'
+# TODO: activate when core.User model is ready with proper AbstractUser setup
+# AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -136,6 +138,7 @@ SPECTACULAR_SETTINGS = {
     "TAGS": [
         {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
         {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        # TODO: uncomment as each module is implemented
         # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
         # {"name": "Core > Users", "description": "User profile endpoints."},
         # {"name": "Gamification > Points", "description": "Points and rewards endpoints."},
@@ -171,6 +174,7 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
+# TODO: uncomment when JWT auth is wired in core.urls
 # SIMPLE_JWT = {
 #     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
 #     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
