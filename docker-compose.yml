@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: reuse_iteso_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-reuse_iteso_dev}
+      POSTGRES_USER: ${DB_USER:-reuse_dev}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-local_dev_password}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=es_MX.UTF-8"
+      TZ: America/Mexico_City
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/seeds:/docker-entrypoint-initdb.d:ro
+    networks:
+      - reuse_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-reuse_dev} -d ${DB_NAME:-reuse_iteso_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:latest
+    container_name: reuse_iteso_adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - reuse_network
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: pepa-linha
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  reuse_network:
+    driver: bridge
