@@ -1,69 +1,79 @@
 # Database Standards - ReUseITESO
 
-**DBA:** Daniel  
-**Fecha:** 15 de febrero de 2026
+**DBA:** Daniel
+**Date:** 24 February 2026
 
 ---
 
 ## Naming Conventions
 
-### Tablas
-- snake_case, plural
-- Ejemplos: `users`, `products`, `forum_questions`
+### Tables
 
-### Columnas
-- snake_case, singular
-- Ejemplos: `seller_id`, `created_at`, `transaction_type`
+* Format: `{app}_{model}` — generated automatically by Django
+* snake_case, plural
+* Examples: `core_user`, `marketplace_products`, `marketplace_forumquestion`
+
+### Columns
+
+* snake_case, singular
+* Examples: `seller_id`, `created_at`, `transaction_type`
 
 ### Foreign Keys
-- Formato: `{tabla_referenciada}_id`
-- Constraint: `fk_{tabla_origen}_{tabla_destino}_{columna}`
+
+* Format: `{referenced_model}_id`
+* Constraint: `fk_{origin_table}_{target_table}_{column}`
+
 ```sql
-CONSTRAINT fk_products_users_seller_id 
-  FOREIGN KEY (seller_id) REFERENCES users(id)
+CONSTRAINT fk_marketplace_products_core_user_seller_id
+  FOREIGN KEY (seller_id) REFERENCES core_user(id)
 ```
 
-### Índices
-- Formato: `idx_{tabla}_{columna(s)}`
+### Indexes
+
+* Format: `idx_{table}_{column(s)}`
+
 ```sql
-CREATE INDEX idx_products_seller ON products(seller_id);
+CREATE INDEX idx_marketplace_products_seller ON marketplace_products(seller_id);
 ```
 
 ---
 
-## Tipos de Datos
+## Data Types
 
-| Uso | Tipo |
-|-----|------|
-| IDs | SERIAL |
-| Texto corto | VARCHAR(n) |
-| Texto largo | TEXT |
-| Email | VARCHAR(255) |
-| Números enteros | INTEGER |
-| Decimales | DECIMAL(10,2) |
-| Booleanos | BOOLEAN |
-| Timestamps | TIMESTAMP |
-| URLs | VARCHAR(500) |
+| Use        | Type          |
+| ---------- | ------------- |
+| IDs        | BIGSERIAL     |
+| Short text | VARCHAR(n)    |
+| Long text  | TEXT          |
+| Email      | VARCHAR(254)  |
+| Integers   | INTEGER       |
+| Decimals   | DECIMAL(10,2) |
+| Booleans   | BOOLEAN       |
+| Timestamps | TIMESTAMP     |
+| URLs       | VARCHAR(500)  |
 
 ---
 
 ## Constraints
 
 ### Primary Keys
+
 ```sql
-id SERIAL PRIMARY KEY
+id BIGSERIAL PRIMARY KEY
 ```
 
 ### Foreign Keys
-```sql
--- RESTRICT (default): No permitir delete si hay dependientes
-seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT
 
--- CASCADE: Delete en cascada
-products_id INTEGER REFERENCES products(id) ON DELETE CASCADE
+```sql
+-- RESTRICT: Do not allow delete if dependents exist
+seller_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE RESTRICT
+
+-- CASCADE: Delete dependents automatically
+product_id BIGINT REFERENCES marketplace_products(id) ON DELETE CASCADE
 ```
 
 ### Check Constraints
+
 ```sql
 CHECK (price >= 0)
 CHECK (email ~* '@iteso\.mx$')
@@ -71,56 +81,68 @@ CHECK (status IN ('disponible', 'en_proceso', 'completado', 'cancelado'))
 ```
 
 ### Unique
+
 ```sql
-email VARCHAR(255) UNIQUE NOT NULL
-UNIQUE(user_id, badges_id)
+email VARCHAR(254) UNIQUE NOT NULL
+UNIQUE(user_id, badge_id)
 ```
 
 ---
 
-## Timestamps Estándar
+## Standard Timestamps
 
-Todas las tablas:
+All tables include:
+
 ```sql
 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ```
 
+`core_user` uses `date_joined` (inherited from Django AbstractUser) instead of `created_at`.
+
 ---
 
-## Índices
+## Indexes
 
-Crear índices en:
-- Foreign Keys
-- Columnas en WHERE frecuente
-- Columnas en ORDER BY
-- Full-text search (GIN)
+Create indexes on:
+
+* Foreign key columns
+* Columns used frequently in WHERE clauses
+* Columns used in ORDER BY
+* Full-text search columns (GIN)
 
 ```sql
 -- Simple
-CREATE INDEX idx_products_seller ON products(seller_id);
+CREATE INDEX idx_marketplace_products_seller ON marketplace_products(seller_id);
 
--- Compuesto
-CREATE INDEX idx_products_category_status ON products(category_id, status);
+-- Composite
+CREATE INDEX idx_marketplace_products_category_status ON marketplace_products(category_id, status);
 
--- Parcial
-CREATE INDEX idx_products_available ON products(status) 
+-- Partial
+CREATE INDEX idx_marketplace_products_available ON marketplace_products(status)
   WHERE status = 'disponible';
 
 -- Full-text
-CREATE INDEX idx_products_search ON products 
+CREATE INDEX idx_marketplace_products_search ON marketplace_products
   USING GIN(to_tsvector('spanish', title || ' ' || description));
 ```
 
 ---
 
-## Validaciones
+## Validations
 
-**En Base de Datos:**
-- NOT NULL
-- UNIQUE
-- CHECK (validaciones de dominio)
-- Foreign Keys
+**At database level:**
 
-**En Django:**
-- Validaciones de negocio complejas
-- Validaciones custom
+* NOT NULL
+* UNIQUE
+* CHECK (domain validations)
+* Foreign keys with appropriate ON DELETE behavior
+
+**At Django level:**
+
+* Complex business validations (e.g. seller != buyer)
+* Cross-field validations in `clean()` methods
+
+---
+
+**Last updated:** 24 February 2026
+**Responsible:** Daniel (DBA)

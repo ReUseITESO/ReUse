@@ -1,63 +1,71 @@
 # Database Governance - ReUseITESO
 
-**DBA:** Daniel  
-**Fecha:** 15 de febrero de 2026
+**DBA:** Daniel
+**Date:** 24 February 2026
 
 ---
 
-## Autoridad del DBA
+## DBA Authority
 
-**DBA decide:**
-- Schema (tablas, columnas, tipos)
-- Constraints (PK, FK, CHECK, UNIQUE)
-- Índices
-- Aprobación de migraciones
+**DBA decides:**
 
-**Backend team decide:**
-- Implementación de Django models
-- Queries en código
-- API design
+* Schema (tables, columns, types)
+* Constraints (PK, FK, CHECK, UNIQUE)
+* Indexes
+* Migration approval
+
+**Backend team decides:**
+
+* Django model implementation
+* Queries in code
+* API design
 
 ---
 
-## Tipos de Cambios
+## Change Types
 
-### Minor (auto-aprobación con review)
-- Agregar columna NULLABLE
-- Agregar índice
-- Modificar DEFAULT
+### Minor (self-approval with review)
 
-**Proceso:**
-1. Crear PR con migración
+* Add nullable column
+* Add index
+* Modify DEFAULT value
+
+**Process:**
+
+1. Open PR with migration
 2. Tag @dba
-3. DBA aprueba <24hrs
+3. DBA approves within 24hrs
 4. Merge
 
-### Moderate (requiere issue)
-- Agregar tabla
-- Agregar columna NOT NULL
-- Modificar tipo de columna
-- Renombrar tabla/columna
+### Moderate (requires issue)
 
-**Proceso:**
-1. Crear issue con template
-2. Discusión 48-72hrs
-3. DBA aprueba
-4. Implementar migración
+* Add table
+* Add NOT NULL column
+* Modify column type
+* Rename table or column
+
+**Process:**
+
+1. Open issue using the template below
+2. Discussion period 48-72hrs
+3. DBA approves
+4. Implement migration
 5. PR + review
 6. Merge
 
-### Major (requiere RFC)
-- Reestructuración
-- Cambios destructivos
-- Data migrations complejas
+### Major (requires RFC)
 
-**Proceso:**
-1. Crear RFC en `docs/database/rfc/`
-2. Discusión 3-5 días
-3. Meeting si necesario
-4. DBA documenta decisión
-5. Implementación supervisada
+* Schema restructuring
+* Destructive changes
+* Complex data migrations
+
+**Process:**
+
+1. Create RFC in `docs/database/rfc/`
+2. Discussion period 3-5 days
+3. Meeting if needed
+4. DBA documents decision
+5. Supervised implementation
 6. PR + review
 7. Merge
 
@@ -65,23 +73,23 @@
 
 ## SLAs
 
-| Tipo | Respuesta | Decisión |
-|------|-----------|----------|
-| Minor | 12hrs | 24hrs |
-| Moderate | 24hrs | 3 días |
-| Major | 48hrs | 7 días |
-| Hotfix | 2hrs | 6hrs |
+| Type     | Response | Decision |
+| -------- | -------- | -------- |
+| Minor    | 12hrs    | 24hrs    |
+| Moderate | 24hrs    | 3 days   |
+| Major    | 48hrs    | 7 days   |
+| Hotfix   | 2hrs     | 6hrs     |
 
 ---
 
-## Template de Issue
+## Issue Template
 
 ```markdown
-## Cambio Propuesto
+## Proposed Change
 
-**Tipo:** [ ] Minor [ ] Moderate [ ] Major
+**Type:** [ ] Minor [ ] Moderate [ ] Major
 
-**Razón:**
+**Reason:**
 ...
 
 **Schema changes:**
@@ -93,25 +101,35 @@ ALTER TABLE ...
 ...
 
 **Checklist:**
-- [ ] Migración probada
-- [ ] Tests actualizados
-- [ ] Seed data actualizado
+
+* [ ] Migration tested locally
+* [ ] Tests updated
+* [ ] Seed data updated
+
 ```
 
 ---
 
-## Hotfix (Emergencia)
+## Hotfix (Emergency)
 
-Permitido sin pre-aprobación:
-1. Aplicar fix mínimo
-2. Notificar @dba inmediatamente
-3. Crear PR post-facto
-4. Documentar en postmortem
+Allowed without prior approval:
+
+1. Apply minimal fix
+2. Notify @dba immediately
+3. Open post-facto PR
+4. Document in postmortem
 
 ---
 
 ## Audit Trail
 
-Cambios registrados en:
-- Git history de migraciones
+All changes are recorded in:
+
+- Git history of migrations
 - `docs/database/changes.md`
+
+---
+
+**Last updated:** 24 February 2026
+**Responsible:** Daniel (DBA)
+```
