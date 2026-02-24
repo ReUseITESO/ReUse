@@ -1,68 +1,74 @@
 # Local Setup - ReUseITESO
 
-**DBA:** Daniel  
-**Fecha:** 16 de febrero de 2026  
-**Versión:** 1.1
+**DBA:** Daniel
+**Date:** 24 February 2026
+**Version:** 1.2
 
 ---
 
-## Prerequisitos
+## Prerequisites
 
-- Docker Desktop
-- Python 3.12+
-- Git
+* Docker Desktop
+* Python 3.10+
+* Git
 
 ---
 
-## Setup Rápido
+## Quick Setup
 
-### 1. Clonar Repo
+### 1. Clone Repo
+
 ```bash
-git clone https://github.com/ReUseITESO/infrastucture.git
-cd infrastucture
+git clone https://github.com/ReUseITESO/ReUse.git
+cd ReUse
 ```
 
-### 2. Levantar PostgreSQL
+### 2. Start PostgreSQL
+
 ```bash
 docker-compose up -d db
 
-# Verificar que esté corriendo
-docker-compose logs db | tail -20
-# Debes ver: "database system is ready to accept connections"
+# Verify it is running
+docker-compose ps
+# Status must show: healthy
 ```
 
-### 3. Configurar Backend
+### 3. Configure Backend
 
 ```bash
 cd backend
 
-# Crear entorno virtual
-python3 -m venv venv
+# Create virtual environment
+python -m venv venv
 
-# Activar
+# Activate
 source venv/bin/activate  # Mac/Linux
-# venv\Scripts\activate   # Windows
+venv\Scripts\activate     # Windows
 ```
 
-### 4. Instalar Dependencias
+### 4. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**Dependencias clave:**
-- Django 5.0.1
-- djangorestframework 3.14.0
-- psycopg2-binary 2.9.9
-- python-dotenv 1.0.0 (para cargar variables de entorno)
+Key dependencies:
 
-### 5. Configurar Variables de Entorno
+* Django 5.0.1
+* djangorestframework 3.14.0
+* psycopg2-binary 2.9.9
+* python-dotenv 1.0.0
 
-**Crear archivo `.env`:**
+### 5. Configure Environment Variables
+
+Create the `.env` file inside `backend/`:
+
 ```bash
 cp .env.example .env
 ```
 
-**El archivo `.env` debe contener:**
+The `.env` file must contain:
+
 ```dotenv
 DEBUG=True
 SECRET_KEY=django-insecure-change-this-in-production
@@ -75,355 +81,322 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-**⚠️ Importante:** Las credenciales deben coincidir con `docker-compose.yml`
+Credentials must match `docker-compose.yml`.
 
-### 6. Crear Carpetas de Migraciones
-
-```bash
-# Crear carpetas si no existen
-mkdir -p core/migrations
-mkdir -p marketplace/migrations
-mkdir -p gamification/migrations
-
-# Crear archivos __init__.py
-touch core/migrations/__init__.py
-touch marketplace/migrations/__init__.py
-touch gamification/migrations/__init__.py
-```
-
-### 7. Generar y Aplicar Migraciones
+### 6. Apply Migrations
 
 ```bash
-# Generar migraciones
-python manage.py makemigrations
-
-# Deberías ver:
-# Migrations for 'core':
-#   core/migrations/0001_initial.py
-#     - Create model User
-# Migrations for 'marketplace':
-#   marketplace/migrations/0001_initial.py
-#     - Create model Category
-#     - Create model Products
-#     ...
-# Migrations for 'gamification':
-#   gamification/migrations/0001_initial.py
-#     - Create model Badges
-#     ...
-
-# Aplicar migraciones
 python manage.py migrate
-
-# Deberías ver:
-# Running migrations:
-#   Applying core.0001_initial... OK
-#   Applying marketplace.0001_initial... OK
-#   Applying gamification.0001_initial... OK
 ```
 
-### 8. Cargar Seed Data
+Expected output:
+
+```
+Applying core.0001_initial... OK
+Applying marketplace.0001_initial... OK
+...
+```
+
+### 7. Load Seed Data
+
+Gamification is not yet active. Load the partial seed (excludes gamification):
+
+```bash
+python -c "
+import json
+with open('seeds/seed_v1.json') as f:
+    data = json.load(f)
+
+filtered = []
+for obj in data:
+    if obj['model'].startswith('gamification'):
+        continue
+    if obj['model'] == 'core.user':
+        fields = obj['fields']
+        if 'created_at' in fields:
+            fields['date_joined'] = fields.pop('created_at')
+        fields['username'] = fields['email'].split('@')[0]
+        fields['password'] = 'pbkdf2_sha256\$600000\$test\$test='
+        fields['is_active'] = True
+        fields['is_staff'] = False
+        fields['is_superuser'] = False
+    filtered.append(obj)
+
+with open('seeds/seed_partial.json', 'w') as f:
+    json.dump(filtered, f, indent=2)
+print(f'Objects: {len(filtered)}')
+"
+
+python manage.py loaddata seeds/seed_partial.json
+# Expected: Installed 32 object(s) from 1 fixture(s)
+```
+
+When gamification models are activated, use the full seed:
 
 ```bash
 python manage.py loaddata seeds/seed_v1.json
-
-# Deberías ver:
-# Installed 44 object(s) from 1 fixture(s)
+# Expected: Installed 44 object(s) from 1 fixture(s)
 ```
 
-**Seed data incluye:**
-- 6 usuarios (@iteso.mx)
-- 5 categorías
-- 10 productos
-- 3 transacciones
-- 3 badges
-- Y más...
+### 8. Create Superuser
 
-### 9. Crear Superuser
+Promote the existing admin user from the seed:
 
 ```bash
-python manage.py shell
+python manage.py shell -c "
+from core.models import User
+u = User.objects.get(email='admin@iteso.mx')
+u.is_superuser = True
+u.is_staff = True
+u.set_password('admin1234')
+u.save()
+print('Done')
+"
 ```
 
-Dentro del shell:
-```python
-from django.contrib.auth.models import User as AuthUser
-
-AuthUser.objects.create_superuser(
-    username='admin',
-    email='admin@iteso.mx',
-    password='admin123'
-)
-
-print("Superuser creado")
-exit()
-```
-
-### 10. Iniciar Servidor
+### 9. Start Server
 
 ```bash
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver
 ```
 
-**Acceder a:**
-- Admin: http://localhost:8000/admin/
-  - Username: `admin`
-  - Password: `admin123`
+Access:
+
+* Admin panel: http://127.0.0.1:8000/admin/
+  * Email: `admin@iteso.mx`
+  * Password: `admin1234`
+* API docs: http://127.0.0.1:8000/api/schema/swagger-ui/
 
 ---
 
-## Comandos Útiles
-
-### Docker
+## Verify Installation
 
 ```bash
-# Ver status
+python manage.py shell -c "
+from core.models import User
+from marketplace.models import Products, Category, Transaction, Images, ForumQuestion
+
+print('Users:', User.objects.count())          # 6
+print('Categories:', Category.objects.count()) # 5
+print('Products:', Products.objects.count())   # 10
+print('Transactions:', Transaction.objects.count()) # 3
+print('Images:', Images.objects.count())       # 3
+print('ForumQuestions:', ForumQuestion.objects.count()) # 5
+"
+```
+
+---
+
+## Useful Commands
+
+### Docker (run from project root)
+
+```bash
+# View status
 docker-compose ps
 
-# Ver logs en tiempo real
+# View logs
 docker-compose logs -f db
 
-# Detener servicios
+# Stop services
 docker-compose down
 
-# Reset completo (⚠️ BORRA TODOS LOS DATOS)
+# Full reset (WARNING: deletes all data)
 docker-compose down -v
 docker-compose up -d db
-sleep 10
-cd backend
-python manage.py migrate
-python manage.py loaddata seeds/seed_v1.json
 ```
 
-### Django
+### Django (run from backend/)
 
 ```bash
-# Aplicar migraciones
+# Apply migrations
 python manage.py migrate
 
-# Ver estado de migraciones
+# View migration status
 python manage.py showmigrations
 
-# Ver SQL de una migración
+# View SQL for a migration
 python manage.py sqlmigrate core 0001
 
-# Django shell (Python interactivo)
+# Django shell
 python manage.py shell
 
-# PostgreSQL shell directo
+# PostgreSQL shell
 python manage.py dbshell
 
-# Crear nueva migración
+# Generate new migration
 python manage.py makemigrations
-
-# Crear fixture (exportar datos)
-python manage.py dumpdata core.User --indent 2 > usuarios.json
 ```
 
 ---
 
-## Acceso Directo a la Base de Datos
+## Direct Database Access
 
-### Opción 1: Adminer (GUI Web)
+### Option 1: Adminer (Web GUI)
 
 ```bash
-# Levantar Adminer
 docker-compose up -d adminer
 ```
 
-**Acceder:** http://localhost:8080
+Access: http://localhost:8080
 
-**Credenciales:**
-- System: `PostgreSQL`
-- Server: `db`
-- Username: `reuse_dev`
-- Password: `local_dev_password`
-- Database: `reuse_iteso_dev`
+Credentials:
 
-### Opción 2: psql (Terminal)
+* System: PostgreSQL
+* Server: db
+* Username: reuse_dev
+* Password: local_dev_password
+* Database: reuse_iteso_dev
+
+### Option 2: psql (Terminal)
 
 ```bash
-# Entrar al container
 docker exec -it reuse_iteso_db psql -U reuse_dev -d reuse_iteso_dev
 
-# Comandos útiles en psql:
-\dt                    # Listar tablas
-\d users              # Describir tabla users
-\d+ products          # Describir tabla products con detalles
+# Useful psql commands:
+\dt                   # List tables
+\d users              # Describe users table
 SELECT * FROM users;  # Query
-\q                    # Salir
-```
-
-### Opción 3: Django dbshell
-
-```bash
-cd backend
-python manage.py dbshell
-
-# Ahora estás en psql
-\dt
-```
-
----
-
-## Verificar Instalación
-
-### Checklist Completo
-
-```bash
-# 1. PostgreSQL corriendo
-docker-compose ps
-# ✅ reuse_iteso_db debe estar "Up"
-
-# 2. Conexión a DB funcional
-python manage.py dbshell
-\dt
-\q
-
-# 3. Ver las 9 tablas
-python manage.py dbshell
-\dt
-# ✅ Debes ver:
-# - users
-# - categories
-# - products
-# - images
-# - transactions
-# - forum_questions
-# - badges
-# - user_badges
-# - environment_impact
-
-# 4. Verificar datos del seed
-python manage.py shell
-```
-
-```python
-from core.models import User
-from marketplace.models import Products, Category
-from gamification.models import Badges
-
-print(f"Usuarios: {User.objects.count()}")  # Debe ser 6
-print(f"Productos: {Products.objects.count()}")  # Debe ser 10
-print(f"Categorías: {Category.objects.count()}")  # Debe ser 5
-print(f"Badges: {Badges.objects.count()}")  # Debe ser 3
-exit()
+\q                    # Exit
 ```
 
 ---
 
 ## Troubleshooting
 
-### Error: "Port 5432 already in use"
+### Port 5432 already in use
 
-**Opción A:** Cambiar puerto en `.env`
+If another PostgreSQL instance is running locally (common on Windows), it may conflict with Docker on port 5432.
+
+Check which processes are using the port:
+
+```bash
+# Windows
+netstat -ano | findstr :5432
+tasklist | findstr <PID>
+```
+
+Stop the local PostgreSQL service:
+
+```bash
+# Windows
+net stop postgresql
+# Or find the exact service name:
+Get-Service | Where-Object {$_.Name -like "*postgres*"}
+```
+
+If you cannot stop the local service, change the Docker port in `docker-compose.yml`:
+
+```yaml
+ports:
+  - "0.0.0.0:5433:5432"
+```
+
+And update `.env`:
+
 ```dotenv
 DB_PORT=5433
 ```
 
-Actualizar `docker-compose.yml`:
-```yaml
-ports:
-  - "5433:5432"
-```
+### Connection refused
 
-**Opción B:** Detener proceso en 5432
+PostgreSQL is not running:
+
 ```bash
-# Linux/Mac
-sudo lsof -i :5432
-sudo kill -9 <PID>
-
-# Windows
-netstat -ano | findstr :5432
-taskkill /PID <PID> /F
+docker-compose up -d db
+docker-compose ps
+# Wait for status: healthy
 ```
 
-### Error: "No module named 'dotenv'"
+### No module named 'dotenv'
 
 ```bash
 pip install python-dotenv
 ```
 
-### Error: "password authentication failed"
+### Password authentication failed
 
-Verificar que `.env` tenga las mismas credenciales que `docker-compose.yml`:
+Verify `.env` credentials match `docker-compose.yml`:
 
 ```bash
-# Ver credenciales de Docker
-cat docker-compose.yml | grep -A 5 "POSTGRES"
-
-# Ver credenciales de Django
-cat .env | grep DB_
+# Windows
+type .env
+type docker-compose.yml
 ```
 
-Deben coincidir:
-- `DB_NAME=reuse_iteso_dev`
-- `DB_USER=reuse_dev`
-- `DB_PASSWORD=local_dev_password`
+Both must have the same values for `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
 
-### Error: "connection refused"
-
-PostgreSQL no está corriendo:
-```bash
-docker-compose up -d db
-sleep 10
-docker-compose logs db | tail -20
-```
-
-### Carpeta migrations/ no existe
+### migrations/ folder does not exist
 
 ```bash
+# Mac/Linux
 mkdir -p core/migrations marketplace/migrations gamification/migrations
 touch core/migrations/__init__.py
 touch marketplace/migrations/__init__.py
 touch gamification/migrations/__init__.py
+
+# Windows
+New-Item -ItemType Directory -Path core\migrations, marketplace\migrations, gamification\migrations
+New-Item -ItemType File -Path core\migrations\__init__.py, marketplace\migrations\__init__.py, gamification\migrations\__init__.py
 ```
 
-### "No changes detected" al hacer makemigrations
-
-Verificar que los modelos estén correctamente importados:
+### Full reset
 
 ```bash
-python manage.py shell
+# From project root
+docker-compose down -v
+docker-compose up -d db
+
+# From backend/
+python manage.py migrate
+python manage.py loaddata seeds/seed_partial.json
 ```
 
-```python
-from core.models import User
-from marketplace.models import Category, Products
-from gamification.models import Badges
-print("✅ Modelos se importan correctamente")
-exit()
-```
+---
+
+## Database Architecture
+
+**Engine:** PostgreSQL 15
+**ORM:** Django ORM
+**Migrations:** Django Migrations
+**Containerization:** Docker Compose
+
+Active tables (6):
+
+1. `core_user` - ITESO users (AbstractUser)
+2. `marketplace_category` - Product categories
+3. `marketplace_products` - Listed items
+4. `marketplace_images` - Product image gallery
+5. `marketplace_transaction` - Delivery coordination
+6. `marketplace_forumquestion` - Public Q&A per product
+
+Pending activation (gamification module):
+
+7. `gamification_badges` - Available achievements
+8. `gamification_userbadges` - Badges earned by users
+9. `gamification_environmentimpact` - Sustainability metrics
 
 ---
 
-## Arquitectura de la Base de Datos
+## User Model Notes
 
-**Motor:** PostgreSQL 15  
-**ORM:** Django ORM  
-**Migraciones:** Django Migrations  
-**Containerización:** Docker Compose
+The `User` model extends Django's `AbstractUser`. This means:
 
-**9 Tablas Principales:**
-1. `users` - Usuarios ITESO
-2. `categories` - Categorías de productos
-3. `products` - Items publicados
-4. `images` - Galería de imágenes por producto
-5. `transactions` - Coordinación de entregas
-6. `forum_questions` - Foro público Q&A
-7. `badges` - Logros disponibles
-8. `user_badges` - Badges obtenidos por usuarios
-9. `environment_impact` - Métricas de sostenibilidad
+* Authentication fields are included: `password`, `last_login`, `is_active`, `is_staff`, `is_superuser`
+* `AUTH_USER_MODEL = "core.User"` is set in `settings.py`
+* `date_joined` replaces `created_at` from the ERD
+* `USERNAME_FIELD = 'email'` — login uses email, not username
 
 ---
 
-## Próximos Pasos
+## Next Steps
 
-1. Explorar el admin: http://localhost:8000/admin/
-2. Revisar los modelos en `backend/core/models/`, `backend/marketplace/models/`, `backend/gamification/models/`
-3. Leer `docs/database/erd_v1.md` para entender las relaciones
-4. Revisar `docs/database/governance.md` antes de hacer cambios al schema
+1. Explore the admin panel: http://127.0.0.1:8000/admin/
+2. Review models in `backend/core/models/` and `backend/marketplace/models/`
+3. Read `docs/database/erd_v1.md` for relationship details
+4. Read `docs/database/governance.md` before making schema changes
 
 ---
 
-**Última actualización:** 16 de febrero de 2026  
-**Responsable:** Daniel (DBA)
+**Last updated:** 24 February 2026
+**Responsible:** Daniel (DBA)
