@@ -108,7 +108,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # TODO: activate when core.User model is ready with proper AbstractUser setup
-# AUTH_USER_MODEL = "core.User"
+AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [

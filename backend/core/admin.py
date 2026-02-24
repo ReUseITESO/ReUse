@@ -1,11 +1,9 @@
-# Scaffolding: admin registration for core models.
-# Customize list_display, search_fields, etc. as the User model evolves.
 from django.contrib import admin
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from core.models import User
 
-
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "email", "points", "created_at"]
+class UserAdmin(BaseUserAdmin):
+    list_display = ["id", "name", "email", "points", "date_joined"]
     search_fields = ["name", "email"]
+    ordering = ["-date_joined"]

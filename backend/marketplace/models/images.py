@@ -1,18 +1,11 @@
 from django.db import models
 
-from marketplace.models.product import Products
-
 
 class Images(models.Model):
-    """Product images — one product can have multiple images with an order number.
+    """Product images — one product can have multiple images with an order number."""
 
-    This is a scaffolding model based on docs/database/erd_v1.md.
-    The team can modify fields, constraints, and Meta options as needed.
-    Remember to run makemigrations after changes.
-    """
-
-    products = models.ForeignKey(
-        Products,
+    product = models.ForeignKey(
+        'marketplace.Products',
         on_delete=models.CASCADE,
         related_name="images",
         db_column="products_id",
@@ -22,13 +15,12 @@ class Images(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "images"
         verbose_name_plural = "Images"
-        unique_together = [["products", "order_number"]]
-        ordering = ["products", "order_number"]
+        unique_together = [["product", "order_number"]]
+        ordering = ["product", "order_number"]
         indexes = [
-            models.Index(fields=["products", "order_number"]),
+            models.Index(fields=["product", "order_number"]),
         ]
 
-    def __str__(self):
-        return f"Image {self.order_number} of {self.products.title}"
+    def __str__(self) -> str:
+        return f"Image {self.order_number} of {self.product.title}"

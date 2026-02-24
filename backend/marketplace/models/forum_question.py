@@ -1,25 +1,17 @@
 from django.db import models
 
-from core.models.user import User
-from marketplace.models.product import Products
-
 
 class ForumQuestion(models.Model):
-    """Public Q&A thread on a product listing. Supports nested replies via parent_id.
-
-    This is a scaffolding model based on docs/database/erd_v1.md.
-    The team can modify fields, constraints, and Meta options as needed.
-    Remember to run makemigrations after changes.
-    """
+    """Public Q&A thread on a product listing. Supports nested replies via parent."""
 
     user = models.ForeignKey(
-        User,
+        'core.User',
         on_delete=models.CASCADE,
         related_name="forum_questions",
         db_column="user_id",
     )
-    products = models.ForeignKey(
-        Products,
+    product = models.ForeignKey(
+        'marketplace.Products',
         on_delete=models.CASCADE,
         related_name="forum_questions",
         db_column="products_id",
@@ -36,13 +28,12 @@ class ForumQuestion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "forum_questions"
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["products"]),
+            models.Index(fields=["product"]),
             models.Index(fields=["user"]),
             models.Index(fields=["parent"]),
         ]
 
-    def __str__(self):
-        return f"Question on {self.products.title} by {self.user.name}"
+    def __str__(self) -> str:
+        return f"Question on {self.product.title} by {self.user.name}"
