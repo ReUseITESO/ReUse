@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django_filters",
     "core",
     "marketplace",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -120,6 +121,14 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ],
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "ReUseITESO API",
+    "DESCRIPTION": "API del marketplace de segunda mano para la comunidad ITESO.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 # SIMPLE_JWT = {
