@@ -1,3 +1,6 @@
+// TODO: uncomment when auth module is implemented
+// import { getAccessToken } from '@/lib/auth';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 const MOCK_USER_STORAGE_KEY = 'mock_user_id';
@@ -25,12 +28,16 @@ export async function apiClient<T>(
   if (mockUserId) {
     authHeaders['X-Mock-User-Id'] = mockUserId;
   }
+  // TODO: uncomment when JWT auth is wired in
+  // const token = getAccessToken();
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
       ...authHeaders,
+      // TODO: uncomment when JWT auth is wired in
+      // ...(token && { Authorization: `Bearer ${token}` }),
       ...options?.headers,
     },
   });

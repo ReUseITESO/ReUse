@@ -27,9 +27,12 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "django_filters",
+    "drf_spectacular",
     "core",
     "marketplace",
     "drf_spectacular",
+    # TODO: uncomment when gamification app has models and migrations ready
+    # "gamification",
 ]
 
 MIDDLEWARE = [
@@ -67,9 +70,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "reuseiteso"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
+        "NAME": os.environ.get("DB_NAME", "reuse_iteso_dev"),
+        "USER": os.environ.get("DB_USER", "reuse_dev"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "local_dev_password"),
         "HOST": os.environ.get("DB_HOST", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
     }
@@ -106,8 +109,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# TODO: Change to 'core.User' when core module is implemented
-# AUTH_USER_MODEL = 'core.User'
+# TODO: activate when core.User model is ready with proper AbstractUser setup
+AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -120,6 +123,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -131,6 +135,56 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "ReUseITESO API",
+    "DESCRIPTION": (
+        "REST API for ReUseITESO — a second-hand marketplace platform"
+        "for ITESO students. Modules: <br> Core (auth, users), <br>"
+        "Marketplace (products, categories, transactions), <br>"
+        "Gamification (points, badges, rankings).<br>"
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "TAGS": [
+        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
+        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        # TODO: uncomment as each module is implemented
+        # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
+        # {"name": "Core > Users", "description": "User profile endpoints."},
+        # {"name": "Gamification > Points", "description": "Points and rewards endpoints."},
+        # {"name": "Gamification > Badges", "description": "Badge and achievement endpoints."},
+    ],
+    "CONTACT": {
+        "name": "ReUseITESO Team",
+    },
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": False,
+        "filter": True,
+    },
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "ConditionEnum": "marketplace.models.product.Products.CONDITION_CHOICES",
+        "TransactionTypeEnum": "marketplace.models.product.Products.TRANSACTION_TYPE_CHOICES",
+        "StatusEnum": "marketplace.models.product.Products.STATUS_CHOICES",
+    },
+    "SECURITY": [
+        {"BearerAuth": []},
+    ],
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "JWT access token obtained from POST /api/auth/login/",
+            }
+        }
+    },
+}
+
+# TODO: uncomment when JWT auth is wired in core.urls
 # SIMPLE_JWT = {
 #     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
 #     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),

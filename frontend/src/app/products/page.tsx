@@ -1,6 +1,12 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import ProductList from '@/components/products/ProductList';
+
+export const metadata: Metadata = {
+  title: 'Productos disponibles | ReUseITESO',
+  description: 'Explora productos de segunda mano disponibles entre estudiantes del ITESO',
+};
 
 export default function ProductsPage() {
   return (

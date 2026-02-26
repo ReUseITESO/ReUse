@@ -5,7 +5,8 @@ from marketplace.serializers.category import CategorySerializer
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    """ Serializador para la lista de productos (Obj -> JSON). """
+    """Serializer for the product list representation."""
+
     category = CategorySerializer(read_only=True)
     seller_name = serializers.CharField(
         source='seller.name', read_only=True
