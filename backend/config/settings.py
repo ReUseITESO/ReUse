@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "marketplace",
-    "drf_spectacular",
     # TODO: uncomment when gamification app has models and migrations ready
     # "gamification",
 ]
@@ -125,14 +124,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "ReUseITESO API",
-    "DESCRIPTION": "API del marketplace de segunda mano para la comunidad ITESO.",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SPECTACULAR_SETTINGS = {

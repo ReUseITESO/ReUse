@@ -7,14 +7,6 @@ from marketplace.models import Products
 from marketplace.serializers import ProductCreateSerializer, ProductListSerializer
 
 
-class ProductViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
-    viewsets.GenericViewSet,
-):
-    """ViewSet para listar, ver detalle y crear productos."""
-
 @extend_schema_view(
     list=extend_schema(
         summary="List available products",
@@ -70,11 +62,23 @@ class ProductViewSet(
         description="Returns the full detail of a single product by its ID.",
         tags=["Marketplace > Products"],
     ),
+    create=extend_schema(
+        summary="Publish a product",
+        description=(
+            "Creates a new product listing for the authenticated user. <br>"
+            "Requires the `X-Mock-User-Id` header until real auth is implemented."
+        ),
+        tags=["Marketplace > Products"],
+    ),
 )
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet for listing and retrieving available marketplace products."""
+class ProductViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    """ViewSet for listing, retrieving, and creating marketplace products."""
 
-    serializer_class = ProductListSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description", "category__name"]
     ordering_fields = ["created_at", "price", "title"]
