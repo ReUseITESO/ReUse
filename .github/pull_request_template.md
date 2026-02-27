@@ -15,6 +15,13 @@ Mark the relevant option(s):
 
 ---
 
+## 🏗 GitFlow Verification
+- [ ] This branch was created from `develop`.
+- [ ] Branch name follows `feature-[name]` format.
+- [ ] I have **NOT** attempted a `--force` push to master.
+
+---
+
 ## 🧩 Scope
 Which part of the project is affected?
 
@@ -54,15 +61,13 @@ Link to related issues, discussions, or decisions (if any).
 
 ---
 
-## ✅ Checklist
-Before requesting a review, confirm that:
+## ✅ Quality Checklist
 
-- [ ] Code builds and runs locally
-- [ ] Changes are small and focused
-- [ ] Code follows agreed standards
-- [ ] Documentation was updated if needed
-- [ ] No unrelated changes are included
-- [ ] AI-generated content was reviewed and understood
+- [ ] **Biome/Ruff Format:** Code is pretty and follows style rules.
+- [ ] **Biome/Ruff Lint:** No syntax or "smelly code" warnings.
+- [ ] **ESLint/Mypy Check:** Logical and Type-level static analysis passed.
+- [ ] **Build Check:** `npm run build` (Next.js) or Django migrations successful.
+- [ ] **Impacted Areas:** I have verified this doesn't break other team files.
 
 ---
 
