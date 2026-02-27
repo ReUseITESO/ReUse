@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Category(models.Model):
-    """Product categories"""
+    """Product categories"""    
 
     name = models.CharField(max_length=100)
     icon = models.CharField(max_length=500, blank=True, null=True)
