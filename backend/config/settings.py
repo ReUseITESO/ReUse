@@ -43,9 +43,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "core.middleware.MockAuthMiddleware",
 ]
 
+if DEBUG or os.environ.get("ENABLE_MOCK_AUTH", "False") == "True":
+    MIDDLEWARE.append("core.middleware.MockAuthMiddleware")
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
