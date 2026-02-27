@@ -45,6 +45,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+if DEBUG:
+    MIDDLEWARE.append("core.middleware.MockAuthMiddleware")
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [

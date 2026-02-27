@@ -23,3 +23,13 @@ export interface Product {
   seller_name: string;
   created_at: string;
 }
+
+export interface ProductCreatePayload {
+  title: string;
+  description: string;
+  condition: ProductCondition;
+  transaction_type: TransactionType;
+  price?: number | null;
+  image_url?: string;
+  category: number;
+}
