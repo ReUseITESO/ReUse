@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api';
 
@@ -8,21 +8,29 @@ import type { PaginatedResponse } from '@/types/api';
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchCategories = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    apiClient<PaginatedResponse<Category>>('/marketplace/categories/')
-      .then((data) => setCategories(data.results))
-      .catch((err: unknown) => {
-        const normalizedError =
-          err instanceof Error ? err : new Error('Failed to load categories');
-        setError(normalizedError);
-        setCategories([]);
-      })
-      .finally(() => setIsLoading(false));
+
+    try {
+      const data = await apiClient<PaginatedResponse<Category>>(
+        '/marketplace/categories/',
+      );
+      setCategories(data.results);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Error al cargar categorías';
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return { categories, isLoading, error };
 }
