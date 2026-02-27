@@ -5,12 +5,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path('api/auth/', include('core.urls')),
-
-    # API: Marketplace | api/marketplace/products  api/marketplace/categories
+    path('api/auth/', include('core.urls')),
     path("api/marketplace/", include("marketplace.urls")),
-
-    # path('api/gamification/', include('gamification.urls')),
 ]
 
 if settings.DEBUG:
