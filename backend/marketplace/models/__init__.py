@@ -1,5 +1,7 @@
 from .category import Category
 from .product import Products
+from .images import Images
+from .transaction import Transaction
+from .forum_question import ForumQuestion
 
-# Importar otros modelos aquí
-__all__ = ["Category", "Products"]
+__all__ = ["Category", "Products", "Images", "Transaction", "ForumQuestion"]
