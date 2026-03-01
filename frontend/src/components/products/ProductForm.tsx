@@ -20,6 +20,7 @@ interface FormValues {
   transaction_type: TransactionType;
   price: string;
   image_url: string;
+  images: string[];
 }
 
 const CONDITION_LABELS: Record<ProductCondition, string> = {
@@ -62,11 +63,25 @@ export default function ProductForm() {
       transaction_type: 'sale',
       price: '',
       image_url: '',
+      images: [],
     },
   });
 
   const transactionType = watch('transaction_type');
+  const images = watch('images');
   const showPrice = transactionType === 'sale';
+
+  function addImage() {
+    const imageUrl = watch('image_url');
+    if (imageUrl && !images.includes(imageUrl)) {
+      setValue('images', [...images, imageUrl]);
+      setValue('image_url', '');
+    }
+  }
+
+  function removeImage(index: number) {
+    setValue('images', images.filter((_, i) => i !== index));
+  }
 
   async function onSubmit(data: FormValues) {
     const result = await createProduct({
@@ -76,7 +91,8 @@ export default function ProductForm() {
       condition: data.condition,
       transaction_type: data.transaction_type,
       price: showPrice ? Number(data.price) : null,
-      image_url: data.image_url || undefined,
+      image_url: data.images.length > 0 ? data.images[0] : (data.image_url || undefined),
+      images: data.images.length > 0 ? data.images : undefined,
     });
 
     if (result) {
@@ -265,24 +281,71 @@ export default function ProductForm() {
 
         <section className="space-y-5">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imagen
+            Imágenes
           </h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
               URL de imagen
             </label>
-            <input
-              id="image_url"
-              type="url"
-              {...register('image_url')}
-              className={inputClass}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
+            <div className="flex gap-2">
+              <input
+                id="image_url"
+                type="url"
+                {...register('image_url')}
+                className={`${inputClass} flex-1`}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addImage();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={addImage}
+                disabled={!watch('image_url')}
+              >
+                Agregar
+              </Button>
+            </div>
             <p className="mt-1.5 text-xs text-gray-500">
-              Opcional. Pega la URL de una imagen del artículo.
+              Agrega URLs de imágenes del artículo. Se mostrarán en orden.
             </p>
           </div>
+
+          {images.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">
+                Imágenes agregadas ({images.length})
+              </p>
+              <div className="space-y-2">
+                {images.map((url, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 truncate text-sm text-gray-600">{url}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="text-red-600 hover:text-red-700"
+                      title="Eliminar imagen"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <div className="flex items-center gap-3 border-t border-gray-200 pt-6">

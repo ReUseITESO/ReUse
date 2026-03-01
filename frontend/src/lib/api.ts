@@ -51,3 +51,9 @@ export async function apiClient<T>(
 
   return response.json();
 }
+
+// ===== Marketplace Products =====
+
+export async function getProductById(id: string | number) {
+  return apiClient(`/marketplace/products/${id}/`);
+}

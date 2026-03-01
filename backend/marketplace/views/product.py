@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiPara
 from drf_spectacular.types import OpenApiTypes
 
 from marketplace.models import Products
-from marketplace.serializers import ProductCreateSerializer, ProductListSerializer
+from marketplace.serializers import ProductCreateSerializer, ProductListSerializer, ProductDetailSerializer
 
 
 @extend_schema_view(
@@ -87,10 +87,12 @@ class ProductViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return ProductCreateSerializer
+        elif self.action == "retrieve":
+            return ProductDetailSerializer
         return ProductListSerializer
 
     def get_queryset(self):
-        queryset = Products.objects.select_related("category", "seller")
+        queryset = Products.objects.select_related("category", "seller").prefetch_related("images")
 
         if self.action in ("list", "retrieve"):
             queryset = queryset.filter(status="disponible")

@@ -1,7 +1,15 @@
 from rest_framework import serializers
 
-from marketplace.models import Products
+from marketplace.models import Products, Images
 from marketplace.serializers.category import CategorySerializer
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    """Serializer for product images."""
+    
+    class Meta:
+        model = Images
+        fields = ["id", "image_url", "order_number"]
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -30,6 +38,12 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     """Serializador para crear productos (JSON -> Obj)."""
+    images = serializers.ListField(
+        child=serializers.URLField(),
+        required=False,
+        allow_empty=True,
+        help_text="Array de URLs de imágenes para el producto"
+    )
 
     class Meta:
         model = Products
@@ -42,6 +56,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             "price",
             "image_url",
             "category",
+            "images",
         ]
         read_only_fields = ["id"]
 
@@ -60,3 +75,17 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+    def create(self, validated_data):
+        images_data = validated_data.pop('images', [])
+        product = Products.objects.create(**validated_data)
+        
+        # Create Images objects for each URL
+        for index, image_url in enumerate(images_data):
+            Images.objects.create(
+                product=product,
+                image_url=image_url,
+                order_number=index
+            )
+        
+        return product

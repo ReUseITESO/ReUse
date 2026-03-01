@@ -10,6 +10,12 @@ export interface Category {
   icon: string;
 }
 
+export interface ProductImage {
+  id: number;
+  image_url: string;
+  order_number: number;
+}
+
 export interface Product {
   id: number;
   title: string;
@@ -24,6 +30,11 @@ export interface Product {
   created_at: string;
 }
 
+export interface ProductDetail extends Product {
+  seller_email: string;
+  images: ProductImage[];
+}
+
 export interface ProductCreatePayload {
   title: string;
   description: string;
@@ -32,4 +43,5 @@ export interface ProductCreatePayload {
   price?: number | null;
   image_url?: string;
   category: number;
+  images?: string[];
 }
