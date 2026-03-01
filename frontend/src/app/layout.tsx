@@ -34,6 +34,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   >
                     Dashboard
                   </Link>
+                  <Link
+                    href="/profile"
+                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    Perfil
+                  </Link>
                 </nav>
               </div>
               <MockUserSelector />
