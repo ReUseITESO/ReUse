@@ -28,6 +28,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   >
                     Productos
                   </Link>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    Dashboard
+                  </Link>
                 </nav>
               </div>
               <MockUserSelector />
