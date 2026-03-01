@@ -29,3 +29,7 @@ export interface GamificationSummary {
   badges: UserBadge[];
   impact: EnvironmentImpact | null;
 }
+
+export interface UserPoints {
+  points: number;
+}

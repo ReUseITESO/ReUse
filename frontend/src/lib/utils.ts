@@ -1,5 +1,12 @@
 import type { TransactionType } from '@/types/product';
 
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
+}
+
 const TRANSACTION_LABELS: Record<TransactionType, string> = {
     donation: 'Donacion',
     sale: 'Venta',
