@@ -32,9 +32,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="flex h-44 items-center justify-center bg-gray-100">
-        {product.image_url ? (
+        {product.images[0] ? (
           <img
-            src={product.image_url}
+            src={product.images[0].image_url}
             alt={product.title}
             className="h-full w-full object-cover"
           />

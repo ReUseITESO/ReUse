@@ -31,10 +31,12 @@ export async function apiClient<T>(
   // TODO: uncomment when JWT auth is wired in
   // const token = getAccessToken();
 
+  const isFormData = options?.body instanceof FormData;
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...authHeaders,
       // TODO: uncomment when JWT auth is wired in
       // ...(token && { Authorization: `Bearer ${token}` }),
