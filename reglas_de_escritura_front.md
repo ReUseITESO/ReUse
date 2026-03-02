@@ -353,11 +353,12 @@ src/
 
 ### Herramientas obligatorias
 
-- **ESLint** con configuración de Next.js (`next/core-web-vitals`).
-- **Prettier** como formatter automático. No se discute estilo: Prettier decide.
+- **Biome** Formatter y linter principal para el frontend. Gestiona estilo, espacios y organización de archivos.
+- **ESLint** Limitado exclusivamente a Análisis Estático (lógica, bugs y reglas de Next.js). Configurado para no intervenir en el formato.
+- **Ruff** Herramienta integral para el backend (Python) para linting y formateo automático.
 - **TypeScript** en modo estricto.
 
-### Configuración de Prettier (.prettierrc)
+### Configuración de Biome (.prettierrc)
 
 ```json
 {
@@ -369,17 +370,6 @@ src/
   "arrowParens": "avoid"
 }
 ```
-
-### Reglas de ESLint adicionales
-
-- No unused variables (error, no warning).
-- No unused imports.
-- No `console.log` (se permite `console.error` y `console.warn` con justificación).
-- React hooks rules enforced (exhaustive-deps).
-
-Estas herramientas se ejecutan en CI. Si el código no pasa ESLint + Prettier + TypeScript, el pipeline falla.
-
----
 
 ## 8. Imports
 
@@ -403,7 +393,6 @@ import { useProducts } from '@/hooks/useProducts';
 // 5. Utilidades y tipos
 import { formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
-```
 
 **Reglas:**
 - Usar path alias `@/` para imports del proyecto (configurado en `tsconfig.json`).

@@ -1,31 +1,38 @@
 {
-  "name": "reuseiteso-frontend",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\""
-  },
-  "dependencies": {
-    "clsx": "^2.1.0",
-    "next": "^14.2.35",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "autoprefixer": "^10.4.17",
-    "eslint": "^4.1.1",
-    "eslint-config-next": "^0.2.4",
-    "postcss": "^8.4.35",
-    "prettier": "^3.2.0",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.0"
-  }
+	"name": "reuseiteso-frontend",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"format": "prettier --write \"src/**/*.{ts,tsx,json,css}\""
+	},
+	"dependencies": {
+		"biome": "^0.3.3",
+		"clsx": "^2.1.0",
+		"core-js": "^3.48.0",
+		"next": "^14.2.35",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-hook-form": "^7.51.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.4",
+		"@eslint/compat": "^2.0.2",
+		"@types/node": "^20.11.0",
+		"@types/react": "^18.2.0",
+		"@types/react-dom": "^18.2.0",
+		"autoprefixer": "^10.4.17",
+		"eslint": "10.0.2",
+		"eslint-config-next": "^16.1.6",
+		"eslint-config-prettier": "10.1.8",
+		"jiti": "^2.6.1",
+		"postcss": "^8.4.35",
+		"prettier": "^3.2.0",
+		"tailwindcss": "^3.4.1",
+		"typescript": "^5.3.0",
+		"typescript-eslint": "^8.56.1"
+	}
 }

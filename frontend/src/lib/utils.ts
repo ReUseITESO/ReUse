@@ -1,19 +1,19 @@
-import type { TransactionType } from '@/types/product';
+import type { TransactionType } from "@/types/product";
 
 const TRANSACTION_LABELS: Record<TransactionType, string> = {
-    donation: 'Donacion',
-    sale: 'Venta',
-    swap: 'Intercambio',
+	donation: "Donacion",
+	sale: "Venta",
+	swap: "Intercambio",
 };
 
 export function formatTransactionLabel(type: TransactionType): string {
-    return TRANSACTION_LABELS[type];
+	return TRANSACTION_LABELS[type];
 }
 
 export function formatPrice(price: string): string {
-    const numeric = parseFloat(price);
-    if (isNaN(numeric) || numeric === 0) return '';
-    return `$${numeric.toLocaleString('es-MX')}`;
+	const numeric = parseFloat(price);
+	if (isNaN(numeric) || numeric === 0) return "";
+	return `$${numeric.toLocaleString("es-MX")}`;
 }
 
 const SECONDS_IN_MINUTE = 60;
@@ -22,26 +22,26 @@ const SECONDS_IN_DAY = 86_400;
 const SECONDS_IN_WEEK = 604_800;
 
 export function formatTimeAgo(isoDate: string): string {
-    const now = Date.now();
-    const then = new Date(isoDate).getTime();
-    const diffSeconds = Math.floor((now - then) / 1_000);
+	const now = Date.now();
+	const then = new Date(isoDate).getTime();
+	const diffSeconds = Math.floor((now - then) / 1_000);
 
-    if (diffSeconds < SECONDS_IN_MINUTE) return 'Hace un momento';
-    if (diffSeconds < SECONDS_IN_HOUR) {
-        const minutes = Math.floor(diffSeconds / SECONDS_IN_MINUTE);
-        return `Hace ${minutes} min`;
-    }
-    if (diffSeconds < SECONDS_IN_DAY) {
-        const hours = Math.floor(diffSeconds / SECONDS_IN_HOUR);
-        return `Hace ${hours} hora${hours !== 1 ? 's' : ''}`;
-    }
-    if (diffSeconds < SECONDS_IN_WEEK) {
-        const days = Math.floor(diffSeconds / SECONDS_IN_DAY);
-        return `Hace ${days} dia${days !== 1 ? 's' : ''}`;
-    }
+	if (diffSeconds < SECONDS_IN_MINUTE) return "Hace un momento";
+	if (diffSeconds < SECONDS_IN_HOUR) {
+		const minutes = Math.floor(diffSeconds / SECONDS_IN_MINUTE);
+		return `Hace ${minutes} min`;
+	}
+	if (diffSeconds < SECONDS_IN_DAY) {
+		const hours = Math.floor(diffSeconds / SECONDS_IN_HOUR);
+		return `Hace ${hours} hora${hours !== 1 ? "s" : ""}`;
+	}
+	if (diffSeconds < SECONDS_IN_WEEK) {
+		const days = Math.floor(diffSeconds / SECONDS_IN_DAY);
+		return `Hace ${days} dia${days !== 1 ? "s" : ""}`;
+	}
 
-    return new Date(isoDate).toLocaleDateString('es-MX', {
-        day: 'numeric',
-        month: 'short',
-    });
+	return new Date(isoDate).toLocaleDateString("es-MX", {
+		day: "numeric",
+		month: "short",
+	});
 }

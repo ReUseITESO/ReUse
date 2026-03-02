@@ -5,7 +5,7 @@ class Images(models.Model):
     """Product images — one product can have multiple images with an order number."""
 
     product = models.ForeignKey(
-        'marketplace.Products',
+        "marketplace.Products",
         on_delete=models.CASCADE,
         related_name="images",
         db_column="products_id",

@@ -256,9 +256,8 @@ class TestProductCreation(APITestCase):
 
 - **PEP 8** es obligatorio.
 - Líneas de máximo **88 caracteres** (configuración de Black).
-- Se usa **Black** como formatter automático. No se discute estilo de formato: Black decide.
-- Se usa **isort** para ordenar imports.
-- Se usa **flake8** para linting.
+- **Ruff** Herramienta integral para el backend. Sustituye a Black, isort y flake8; gestiona formateo, orden de imports y linting básico.
+- **Mypy** Herramienta obligatoria para Análisis Estático de Tipos. Verifica la integridad de los type hints en el proyecto.
 
 ### Imports
 

@@ -2,7 +2,7 @@
 Tests for marketplace filters: category, condition, transaction_type.
 Covers individual filters, combined filters, text search, and edge cases.
 """
-from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -62,7 +62,8 @@ class ProductFilterSetupMixin:
 
         # Books - sale, new
         cls.p_libro_nuevo = make_product(
-            cls.seller, cls.cat_libros,
+            cls.seller,
+            cls.cat_libros,
             title="Cálculo Stewart 8va",
             condition="new",
             transaction_type="sale",
@@ -70,7 +71,8 @@ class ProductFilterSetupMixin:
         )
         # Books - swap, good
         cls.p_libro_swap = make_product(
-            cls.seller, cls.cat_libros,
+            cls.seller,
+            cls.cat_libros,
             title="Marketing Kotler",
             condition="good",
             transaction_type="swap",
@@ -78,7 +80,8 @@ class ProductFilterSetupMixin:
         )
         # Electronics - sale, good
         cls.p_mouse = make_product(
-            cls.seller, cls.cat_electronica,
+            cls.seller,
+            cls.cat_electronica,
             title="Mouse Logitech MX Master 3",
             condition="good",
             transaction_type="sale",
@@ -86,7 +89,8 @@ class ProductFilterSetupMixin:
         )
         # Electronics - sale, like_new
         cls.p_teclado = make_product(
-            cls.seller, cls.cat_electronica,
+            cls.seller,
+            cls.cat_electronica,
             title="Teclado Mecánico Redragon",
             condition="like_new",
             transaction_type="sale",
@@ -94,7 +98,8 @@ class ProductFilterSetupMixin:
         )
         # Clothing - donation, used
         cls.p_sudadera = make_product(
-            cls.seller, cls.cat_ropa,
+            cls.seller,
+            cls.cat_ropa,
             title="Sudadera ITESO Gris",
             condition="used",
             transaction_type="donation",
@@ -102,7 +107,8 @@ class ProductFilterSetupMixin:
         )
         # Inactive product (must be excluded from all filters)
         cls.p_inactivo = make_product(
-            cls.seller, cls.cat_libros,
+            cls.seller,
+            cls.cat_libros,
             title="Libro Inactivo",
             condition="new",
             transaction_type="sale",
@@ -114,7 +120,6 @@ class ProductFilterSetupMixin:
 # 1. General listing
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductListTests(ProductFilterSetupMixin, APITestCase):
-
     def test_list_returns_only_available(self):
         """Only products with status='available' are returned."""
         response = self.client.get(PRODUCTS_URL)
@@ -138,9 +143,17 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
         response = self.client.get(PRODUCTS_URL)
         product = response.data["results"][0]
         expected_fields = {
-            "id", "title", "description", "condition",
-            "transaction_type", "status", "price",
-            "image_url", "category", "seller_name", "created_at",
+            "id",
+            "title",
+            "description",
+            "condition",
+            "transaction_type",
+            "status",
+            "price",
+            "image_url",
+            "category",
+            "seller_name",
+            "created_at",
         }
         self.assertTrue(expected_fields.issubset(product.keys()))
 
@@ -149,7 +162,6 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
 # 2. Filter by category
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByCategoryTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_by_libros_returns_two_products(self):
         """Filtering by Books returns exactly 2 available books."""
         response = self.client.get(PRODUCTS_URL, {"category": self.cat_libros.id})
@@ -181,7 +193,6 @@ class ProductFilterByCategoryTests(ProductFilterSetupMixin, APITestCase):
 # 3. Filter by condition
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByConditionTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_condition_nuevo(self):
         """Filtering by 'new' returns only the new book."""
         response = self.client.get(PRODUCTS_URL, {"condition": "new"})
@@ -219,7 +230,6 @@ class ProductFilterByConditionTests(ProductFilterSetupMixin, APITestCase):
 # 4. Filter by transaction type
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByTransactionTypeTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_transaction_sale(self):
         """Filtering by 'sale' returns 3 products (new book, mouse, keyboard)."""
         response = self.client.get(PRODUCTS_URL, {"transaction_type": "sale"})
@@ -251,50 +261,66 @@ class ProductFilterByTransactionTypeTests(ProductFilterSetupMixin, APITestCase):
 # 5. Combined filters
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductCombinedFilterTests(ProductFilterSetupMixin, APITestCase):
-
     def test_category_and_condition(self):
         """Books + good -> only 'Marketing Kotler'."""
-        response = self.client.get(PRODUCTS_URL, {
-            "category": self.cat_libros.id,
-            "condition": "good",
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "category": self.cat_libros.id,
+                "condition": "good",
+            },
+        )
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["title"], "Marketing Kotler")
 
     def test_category_and_transaction_type(self):
         """Electronics + sale -> mouse and keyboard (2 products)."""
-        response = self.client.get(PRODUCTS_URL, {
-            "category": self.cat_electronica.id,
-            "transaction_type": "sale",
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "category": self.cat_electronica.id,
+                "transaction_type": "sale",
+            },
+        )
         self.assertEqual(response.data["count"], 2)
 
     def test_condition_and_transaction_type(self):
         """good + sale -> only the mouse."""
-        response = self.client.get(PRODUCTS_URL, {
-            "condition": "good",
-            "transaction_type": "sale",
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "condition": "good",
+                "transaction_type": "sale",
+            },
+        )
         self.assertEqual(response.data["count"], 1)
-        self.assertEqual(response.data["results"][0]["title"], "Mouse Logitech MX Master 3")
+        self.assertEqual(
+            response.data["results"][0]["title"], "Mouse Logitech MX Master 3"
+        )
 
     def test_all_three_filters(self):
         """Books + new + sale -> only 'Calculo Stewart 8va'."""
-        response = self.client.get(PRODUCTS_URL, {
-            "category": self.cat_libros.id,
-            "condition": "new",
-            "transaction_type": "sale",
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "category": self.cat_libros.id,
+                "condition": "new",
+                "transaction_type": "sale",
+            },
+        )
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["title"], "Cálculo Stewart 8va")
 
     def test_filters_with_no_matching_results(self):
         """Combining filters with no matches returns an empty list without errors."""
-        response = self.client.get(PRODUCTS_URL, {
-            "category": self.cat_ropa.id,
-            "condition": "new",
-            "transaction_type": "sale",
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "category": self.cat_ropa.id,
+                "condition": "new",
+                "transaction_type": "sale",
+            },
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
 
@@ -303,7 +329,6 @@ class ProductCombinedFilterTests(ProductFilterSetupMixin, APITestCase):
 # 6. Text search
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductSearchTests(ProductFilterSetupMixin, APITestCase):
-
     def test_search_by_title(self):
         """Searching 'mouse' finds the Mouse Logitech product."""
         response = self.client.get(PRODUCTS_URL, {"search": "mouse"})
@@ -329,10 +354,13 @@ class ProductSearchTests(ProductFilterSetupMixin, APITestCase):
 
     def test_search_combined_with_filter(self):
         """Searching 'stewart' within Books returns exactly 1 result."""
-        response = self.client.get(PRODUCTS_URL, {
-            "search": "stewart",
-            "category": self.cat_libros.id,
-        })
+        response = self.client.get(
+            PRODUCTS_URL,
+            {
+                "search": "stewart",
+                "category": self.cat_libros.id,
+            },
+        )
         self.assertEqual(response.data["count"], 1)
         self.assertIn("Stewart", response.data["results"][0]["title"])
 
@@ -346,7 +374,6 @@ class ProductSearchTests(ProductFilterSetupMixin, APITestCase):
 # 7. Categories endpoint
 # ─────────────────────────────────────────────────────────────────────────────
 class CategoryEndpointTests(ProductFilterSetupMixin, APITestCase):
-
     def test_list_categories(self):
         """Listing categories returns the 3 categories created in setup."""
         response = self.client.get(CATEGORIES_URL)

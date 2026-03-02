@@ -1,4 +1,3 @@
-from datetime import timedelta
 from pathlib import Path
 
 import os
@@ -138,8 +137,14 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "TAGS": [
-        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
-        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        {
+            "name": "Marketplace > Products",
+            "description": "Product listing and detail endpoints.",
+        },
+        {
+            "name": "Marketplace > Categories",
+            "description": "Product category endpoints.",
+        },
         # TODO: uncomment as each module is implemented
         # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
         # {"name": "Core > Users", "description": "User profile endpoints."},

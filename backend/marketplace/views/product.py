@@ -113,11 +113,13 @@ class ProductViewSet(
         mock_user = getattr(request, "mock_user", None)
         if mock_user is None:
             return Response(
-                {"error": {
-                    "code": "AUTHENTICATION_ERROR",
-                    "message": "Debes iniciar sesión para publicar un producto.",
-                    "details": {},
-                }},
+                {
+                    "error": {
+                        "code": "AUTHENTICATION_ERROR",
+                        "message": "Debes iniciar sesión para publicar un producto.",
+                        "details": {},
+                    }
+                },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
