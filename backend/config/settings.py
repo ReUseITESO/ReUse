@@ -30,8 +30,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "marketplace",
-    # TODO: uncomment when gamification app has models and migrations ready
-    # "gamification",
+    "gamification",
 ]
 
 MIDDLEWARE = [

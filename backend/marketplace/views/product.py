@@ -6,6 +6,10 @@ from drf_spectacular.types import OpenApiTypes
 from marketplace.models import Products
 from marketplace.serializers import ProductCreateSerializer, ProductListSerializer
 
+## Gamification imports for awarding points when a product is published
+from gamification.services.point_service import award_points
+from gamification.models.point_rule import PointAction
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -123,8 +127,17 @@ class ProductViewSet(
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(seller=mock_user)
+        
+        product = serializer.save(seller=mock_user)
 
+        # Award points for publishing a product
+        
+        award_points(
+            user=mock_user,
+            action=PointAction.PUBLISH_ITEM,
+            reference_id=product.id,
+        )
+        
         response_serializer = ProductListSerializer(
             serializer.instance,
             context=self.get_serializer_context(),

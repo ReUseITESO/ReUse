@@ -10,6 +10,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, default='')
     points = models.IntegerField(default=0)
     profile_picture = models.CharField(max_length=500, blank=True, null=True)
+    points_balance = models.IntegerField(default=0)
 
     email = models.EmailField(
         unique=True,
