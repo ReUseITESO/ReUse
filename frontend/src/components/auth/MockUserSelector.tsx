@@ -17,8 +17,8 @@ export default function MockUserSelector() {
   return (
     <div className="flex items-center gap-2.5">
       {isAuthenticated && (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-medium text-emerald-300 ring-1 ring-inset ring-emerald-400/30">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
           {currentUser?.name}
         </span>
       )}
@@ -27,11 +27,13 @@ export default function MockUserSelector() {
         aria-label="Seleccionar usuario"
         value={currentUser?.id ?? ''}
         onChange={handleChange}
-        className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white transition-colors focus:border-white/40 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/20"
       >
-        <option value="">Sin usuario</option>
-        {availableUsers.map((user) => (
-          <option key={user.id} value={user.id}>
+        <option value="" className="bg-iteso-900 text-white">
+          Sin usuario
+        </option>
+        {availableUsers.map(user => (
+          <option key={user.id} value={user.id} className="bg-iteso-900 text-white">
             {user.name}
           </option>
         ))}
