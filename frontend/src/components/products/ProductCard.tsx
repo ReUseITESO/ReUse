@@ -8,14 +8,14 @@ interface ProductCardProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Libros: 'bg-iteso-500/10 text-iteso-600',
-  Electronica: 'bg-purple-500/10 text-purple-600',
-  'Ropa ITESO': 'bg-pink-500/10 text-pink-600',
-  Calculadoras: 'bg-amber-500/10 text-amber-600',
-  Apuntes: 'bg-emerald-500/10 text-emerald-600',
+  Libros: 'bg-[#2B7FFF]/10 text-[#2B7FFF]',
+  'Electronica': 'bg-[#AD46FF]/10 text-[#AD46FF]',
+  'Ropa ITESO': 'bg-[#F6339A]/10 text-[#F6339A]',
+  Calculadoras: 'bg-[#FF6900]/10 text-[#FF6900]',
+  Apuntes: 'bg-[#10B981]/10 text-[#10B981]',
 };
 
-const DEFAULT_CATEGORY_CLASS = 'bg-slate-100 text-slate-600';
+const DEFAULT_CATEGORY_CLASS = 'bg-gray-100 text-gray-700';
 
 function getCategoryClass(categoryName: string): string {
   return CATEGORY_COLORS[categoryName] ?? DEFAULT_CATEGORY_CLASS;
@@ -30,8 +30,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const categoryClass = getCategoryClass(product.category.name);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <div className="flex h-44 items-center justify-center bg-slate-100">
+    <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex h-44 items-center justify-center bg-gray-100">
         {product.image_url ? (
           <img
             src={product.image_url}
@@ -39,8 +39,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="text-sm text-slate-400">
-            {product.category.name}
+          <span className="text-sm text-gray-400">
+            {product.category.name} - Imagen
           </span>
         )}
       </div>
@@ -48,18 +48,18 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <Badge className={categoryClass}>{product.category.name}</Badge>
 
-        <h3 className="line-clamp-2 text-base font-semibold text-slate-900">
+        <h3 className="line-clamp-2 text-base font-semibold text-gray-900">
           {product.title}
         </h3>
 
-        <p className="text-lg font-bold text-iteso-800">{transactionDisplay}</p>
+        <p className="text-lg font-bold text-blue-600">{transactionDisplay}</p>
 
-        <div className="mt-auto flex flex-col gap-1 text-xs text-slate-400">
+        <div className="mt-auto flex flex-col gap-1 text-xs text-gray-500">
           <span className="flex items-center gap-1">{timeAgo}</span>
         </div>
 
-        <div className="mt-2 flex items-center gap-2 border-t border-slate-100 pt-3">
-          <span className="text-sm text-slate-600">{product.seller_name}</span>
+        <div className="mt-2 flex items-center gap-2 border-t border-gray-100 pt-3">
+          <span className="text-sm text-gray-700">{product.seller_name}</span>
         </div>
       </div>
     </article>

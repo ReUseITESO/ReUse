@@ -13,9 +13,6 @@ urlpatterns = [
     # TODO: uncomment when core auth endpoints are implemented
     # path("api/auth/", include("core.urls")),
 
-    # API: Core | api/core/dashboard
-    path("api/core/", include("core.urls")),
-
     # API: Marketplace | api/marketplace/products  api/marketplace/categories
     path("api/marketplace/", include("marketplace.urls")),
 

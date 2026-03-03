@@ -79,12 +79,12 @@ export default function ProductList() {
                             type="button"
                             disabled={!hasPrevPage}
                             onClick={() => goToPage(currentPage - 1)}
-                            className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             ← Anterior
                         </button>
 
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-gray-500">
                             Página {currentPage} &nbsp;·&nbsp; {totalCount} productos
                         </span>
 
@@ -92,7 +92,7 @@ export default function ProductList() {
                             type="button"
                             disabled={!hasNextPage}
                             onClick={() => goToPage(currentPage + 1)}
-                            className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                             Siguiente →
                         </button>
