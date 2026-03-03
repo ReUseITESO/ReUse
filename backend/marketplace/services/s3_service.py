@@ -5,15 +5,24 @@ from botocore.exceptions import BotoCoreError, ClientError
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
+_s3_client = None
+
+
+def _get_s3_client():
+    global _s3_client
+    if _s3_client is None:
+        _s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME,
+        )
+    return _s3_client
+
 
 def upload_product_images(product_id: int, files: list) -> list[str]:
     """Upload image files to S3 under products/{product_id}/ and return their URLs."""
-    client = boto3.client(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME,
-    )
+    client = _get_s3_client()
     urls = []
     for file in files:
         extension = file.name.rsplit(".", 1)[-1].lower() if "." in file.name else "jpg"
