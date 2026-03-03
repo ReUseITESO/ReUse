@@ -17,7 +17,7 @@ urlpatterns = [
     path("api/marketplace/", include("marketplace.urls")),
 
     # TODO: uncomment when gamification endpoints are implemented
-    # path("api/gamification/", include("gamification.urls")),
+    path("api/gamification/", include("gamification.urls")),
 
     # API Documentation (Swagger / OpenAPI)
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
