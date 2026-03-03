@@ -40,6 +40,26 @@ export default function SignUpPage() {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
+  const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
+  const PHONE_REGEX = /^\+?\d{10,15}$/;
+
+  const getPasswordStrength = (pw: string): { label: string; color: string; width: string } => {
+    if (!pw) return { label: '', color: '', width: '0%' };
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/\d/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    if (score <= 1) return { label: 'Débil', color: 'bg-red-500', width: '20%' };
+    if (score === 2) return { label: 'Regular', color: 'bg-orange-500', width: '40%' };
+    if (score === 3) return { label: 'Aceptable', color: 'bg-yellow-500', width: '60%' };
+    if (score === 4) return { label: 'Fuerte', color: 'bg-green-500', width: '80%' };
+    return { label: 'Muy fuerte', color: 'bg-green-600', width: '100%' };
+  };
+
+  const passwordStrength = getPasswordStrength(form.password);
+
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -49,25 +69,52 @@ export default function SignUpPage() {
       newErrors.email = 'Debe ser un correo @iteso.mx';
     }
 
-    if (!form.first_name.trim() || form.first_name.trim().length < 2) {
+    const firstName = form.first_name.trim();
+    if (!firstName) {
+      newErrors.first_name = 'El nombre es obligatorio.';
+    } else if (firstName.length < 2) {
       newErrors.first_name = 'El nombre debe tener al menos 2 caracteres.';
+    } else if (firstName.length > 50) {
+      newErrors.first_name = 'El nombre no puede exceder 50 caracteres.';
+    } else if (!NAME_REGEX.test(firstName)) {
+      newErrors.first_name = 'El nombre solo puede contener letras y espacios.';
     }
 
-    if (!form.last_name.trim() || form.last_name.trim().length < 2) {
+    const lastName = form.last_name.trim();
+    if (!lastName) {
+      newErrors.last_name = 'El apellido es obligatorio.';
+    } else if (lastName.length < 2) {
       newErrors.last_name = 'El apellido debe tener al menos 2 caracteres.';
+    } else if (lastName.length > 50) {
+      newErrors.last_name = 'El apellido no puede exceder 50 caracteres.';
+    } else if (!NAME_REGEX.test(lastName)) {
+      newErrors.last_name = 'El apellido solo puede contener letras y espacios.';
     }
 
-    if (form.phone.trim() && !/^\+?\d{7,20}$/.test(form.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Número de teléfono inválido.';
+    const phone = form.phone.replace(/[\s()-]/g, '');
+    if (!phone) {
+      newErrors.phone = 'El teléfono es obligatorio.';
+    } else if (!PHONE_REGEX.test(phone)) {
+      newErrors.phone = 'Ingresa un número válido (10-15 dígitos, puede iniciar con +).';
     }
 
     if (!form.password) {
       newErrors.password = 'La contraseña es obligatoria.';
     } else if (form.password.length < 8) {
       newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+    } else if (form.password.length > 128) {
+      newErrors.password = 'La contraseña no puede exceder 128 caracteres.';
+    } else if (!/[A-Z]/.test(form.password)) {
+      newErrors.password = 'Debe contener al menos una mayúscula.';
+    } else if (!/[a-z]/.test(form.password)) {
+      newErrors.password = 'Debe contener al menos una minúscula.';
+    } else if (!/\d/.test(form.password)) {
+      newErrors.password = 'Debe contener al menos un número.';
     }
 
-    if (form.password !== form.password_confirm) {
+    if (!form.password_confirm) {
+      newErrors.password_confirm = 'Debes confirmar la contraseña.';
+    } else if (form.password !== form.password_confirm) {
       newErrors.password_confirm = 'Las contraseñas no coinciden.';
     }
 
@@ -173,7 +220,7 @@ export default function SignUpPage() {
 
           <div>
             <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
-              Teléfono
+              Teléfono <span className="text-red-500">*</span>
             </label>
             <input
               id="phone"
@@ -202,6 +249,19 @@ export default function SignUpPage() {
               disabled={isSubmitting}
               className={inputClass(errors.password)}
             />
+            {form.password && (
+              <div className="mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 flex-1 rounded-full bg-gray-200">
+                    <div
+                      className={`h-1.5 rounded-full transition-all ${passwordStrength.color}`}
+                      style={{ width: passwordStrength.width }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-500">{passwordStrength.label}</span>
+                </div>
+              </div>
+            )}
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
           </div>
 
