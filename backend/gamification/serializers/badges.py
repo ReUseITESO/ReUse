@@ -6,9 +6,8 @@ class BadgeWithStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Badges
-        fields = ['id', 'name', 'description', 'icon_url', 'rarity', 'points', 'earned_at']
+        fields = ['id', 'name', 'description', 'icon', 'points', 'rarity', 'earned_at']
 
     def get_earned_at(self, obj):
-        # Retrieve the dictionary passed from the view context
         earned_dict = self.context.get('earned_dict', {})
         return earned_dict.get(obj.id, None)
