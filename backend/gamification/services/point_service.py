@@ -18,7 +18,7 @@ def award_points(user, action, reference_id=None):
             reference_id=reference_id,
         )
 
-        user.points_balance += rule.points
-        user.save(update_fields=['points_balance', 'updated_at'])
+        user.points += rule.points
+        user.save(update_fields=['points'])
 
     return point_transaction
