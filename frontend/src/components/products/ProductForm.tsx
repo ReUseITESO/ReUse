@@ -288,12 +288,12 @@ export default function ProductForm() {
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
               URL de imagen
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 min-w-0">
               <input
                 id="image_url"
                 type="url"
                 {...register('image_url')}
-                className={`${inputClass} flex-1`}
+                className={`${inputClass} flex-1 min-w-0`}
                 placeholder="https://ejemplo.com/imagen.jpg"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -307,6 +307,7 @@ export default function ProductForm() {
                 variant="secondary"
                 onClick={addImage}
                 disabled={!watch('image_url')}
+                className="flex-shrink-0"
               >
                 Agregar
               </Button>
@@ -325,16 +326,16 @@ export default function ProductForm() {
                 {images.map((url, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+                    className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
                   >
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
                       {index + 1}
                     </span>
-                    <span className="flex-1 truncate text-sm text-gray-600">{url}</span>
+                    <span className="flex-1 text-sm text-gray-600 break-all overflow-wrap-anywhere">{url}</span>
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="text-red-600 hover:text-red-700"
+                      className="flex-shrink-0 text-red-600 hover:text-red-700"
                       title="Eliminar imagen"
                     >
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

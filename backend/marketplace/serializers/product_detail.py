@@ -1,15 +1,8 @@
 from rest_framework import serializers
 
-from marketplace.models import Products, Images
+from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    """Serializer for product images."""
-    
-    class Meta:
-        model = Images
-        fields = ["id", "image_url", "order_number"]
+from marketplace.serializers.product import ImageSerializer
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
