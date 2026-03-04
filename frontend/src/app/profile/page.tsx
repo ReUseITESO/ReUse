@@ -2,7 +2,6 @@
 // See reglas_de_escritura_front.md section 3 (Pages) for page conventions.
 'use client';
 
-import type { Metadata } from 'next';
 import { useMockAuth } from '@/context/MockAuthContext';
 import PointsBalance from '@/components/gamification/PointsBalance';
 
