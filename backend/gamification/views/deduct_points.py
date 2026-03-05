@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 
 from core.models import User
-from gamification.models.point_transaction import PointTransaction
+from gamification.services.point_service import deduct_points
 from gamification.serializers.deduct_points import DeductPointsSerializer
 
 
@@ -23,22 +23,10 @@ class DeductPointsView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = get_object_or_404(User, id=serializer.validated_data["user_id"])
-        points = serializer.validated_data["points"]
 
-        if user.points < points:
-            return Response(
-                {"error": "User does not have enough points"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user.points -= points
-        user.save(update_fields=["points"])
-
-        PointTransaction.objects.create(
+        deduct_points(
             user=user,
-            action="points_deduction",
-            points=-points,
-            reference_id=None
+            points=serializer.validated_data["points"],
         )
 
         return Response(

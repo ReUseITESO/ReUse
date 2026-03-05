@@ -22,9 +22,6 @@ class UserBadgesAdmin(admin.ModelAdmin):
 @admin.register(EnvironmentImpact)
 class EnvironmentImpactAdmin(admin.ModelAdmin):
      list_display = ["id", "user", "kg_co2_saved", "reused_products"]
-
-class EnvironmentImpactAdmin(admin.ModelAdmin):
-     list_display = ["id", "user", "kg_co2_saved", "reused_products"]
      
 @admin.register(PointRule)
 class PointRuleAdmin(admin.ModelAdmin):
