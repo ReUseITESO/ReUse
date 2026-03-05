@@ -5,13 +5,13 @@ class ForumQuestion(models.Model):
     """Public Q&A thread on a product listing. Supports nested replies via parent."""
 
     user = models.ForeignKey(
-        'core.User',
+        "core.User",
         on_delete=models.CASCADE,
         related_name="forum_questions",
         db_column="user_id",
     )
     product = models.ForeignKey(
-        'marketplace.Products',
+        "marketplace.Products",
         on_delete=models.CASCADE,
         related_name="forum_questions",
         db_column="products_id",
