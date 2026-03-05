@@ -176,6 +176,7 @@ class ProductViewSet(
             serializer.instance,
             context=self.get_serializer_context(),
         )
+
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
