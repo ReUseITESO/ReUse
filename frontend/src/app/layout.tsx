@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
   title: 'ReUseITESO',
-  description: 'Plataforma de compraventa de artículos de segunda mano para estudiantes del ITESO',
+  description: 'Plataforma compraventa de artículos de segunda mano para estudiantes del ITESO',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
