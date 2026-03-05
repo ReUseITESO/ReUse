@@ -3,5 +3,9 @@
 # See docs/architecture/modules.md for the expected endpoint list.
 # When ready, uncomment the path in config/urls.py to wire this in.
 from django.urls import path
+from gamification.views.points import CurrentUserPointsView, UserPointsView
 
-urlpatterns = []
+urlpatterns = [
+	path('points/', CurrentUserPointsView.as_view(), name='current-user-points'),
+	path('points/<int:user_id>/', UserPointsView.as_view(), name='user-points'),
+]
