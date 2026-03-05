@@ -29,7 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     Productos
                   </Link>
                   <Link
-<<<<<<< HEAD
                     href="/dashboard"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
                   >
@@ -40,12 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
                   >
                     Perfil
-=======
+                  </Link>
+                  <Link
                     href="/products/my"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
                   >
                     Mis artículos
->>>>>>> origin/feature/hu-gam-02-earn-points
                   </Link>
                 </nav>
               </div>

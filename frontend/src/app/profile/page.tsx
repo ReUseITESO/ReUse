@@ -57,9 +57,7 @@ export default function ProfilePage() {
         {/* - Transaction history */}
         {/* - Badges earned */}
         {/* - Account settings */}
-      </div>
-      <h1 className="mb-6 text-2xl font-bold">Mi perfil</h1>
-
+      </div>  
       <section className="mt-8">
         <h2 className="mb-4 text-xl font-semibold border-b pb-2">Logros y Medallas</h2>
         <BadgesList />
