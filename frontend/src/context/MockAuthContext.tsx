@@ -38,13 +38,13 @@ export function MockAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedId = getMockUserId();
     if (storedId) {
-      const user = MOCK_USERS.find((u) => u.id === Number(storedId));
+      const user = MOCK_USERS.find(u => u.id === Number(storedId));
       if (user) setCurrentUser(user);
     }
   }, []);
 
   const login = useCallback((userId: number) => {
-    const user = MOCK_USERS.find((u) => u.id === userId);
+    const user = MOCK_USERS.find(u => u.id === userId);
     if (user) {
       setMockUserId(String(user.id));
       setCurrentUser(user);

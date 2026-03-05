@@ -123,9 +123,7 @@ export default function ProductForm() {
               className={inputClass}
               placeholder="Ej: Libro de Cálculo Diferencial"
             />
-            {errors.title && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>}
           </div>
 
           <div>
@@ -162,7 +160,7 @@ export default function ProductForm() {
                   className={selectClass}
                 >
                   <option value="">Seleccionar categoría</option>
-                  {categories.map((cat) => (
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -204,9 +202,12 @@ export default function ProductForm() {
           </h2>
 
           <div>
-            <input type="hidden" {...register('transaction_type', { required: 'Selecciona el tipo' })} />
+            <input
+              type="hidden"
+              {...register('transaction_type', { required: 'Selecciona el tipo' })}
+            />
             <div className="grid gap-3 sm:grid-cols-3">
-              {TRANSACTION_OPTIONS.map((option) => {
+              {TRANSACTION_OPTIONS.map(option => {
                 const isSelected = transactionType === option.value;
                 return (
                   <button
@@ -219,10 +220,14 @@ export default function ProductForm() {
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <span className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <span
+                      className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}
+                    >
                       {option.label}
                     </span>
-                    <span className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                    <span
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
+                    >
                       {option.description}
                     </span>
                   </button>
@@ -264,9 +269,7 @@ export default function ProductForm() {
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imagen
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Imagen</h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
