@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import ProductDetail from '@/components/products/ProductDetail';
 
 export const metadata: Metadata = {
   title: 'Detalle del producto | ReUseITESO',
@@ -7,8 +8,7 @@ export const metadata: Metadata = {
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold">Detalle del producto {params.id}</h1>
-      {/* TODO: add ProductDetail component with full product data */}
+      <ProductDetail productId={params.id} />
     </main>
   );
 }
