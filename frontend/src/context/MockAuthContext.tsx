@@ -11,15 +11,19 @@ export interface MockUser {
 }
 
 const MOCK_USER_IDS = {
-  ANA_GARCIA: 1,
-  CARLOS_LOPEZ: 2,
-  MARIA_TORRES: 3,
+  MARIA_GARCIA: 2,
+  JUAN_LOPEZ: 3,
+  ANA_MARTINEZ: 4,
+  CARLOS_RODRIGUEZ: 5,
+  LUCIA_FERNANDEZ: 6,
 } as const;
 
 const MOCK_USERS: MockUser[] = [
-  { id: MOCK_USER_IDS.ANA_GARCIA, name: 'Ana García', email: 'ana.garcia@iteso.mx' },
-  { id: MOCK_USER_IDS.CARLOS_LOPEZ, name: 'Carlos López', email: 'carlos.lopez@iteso.mx' },
-  { id: MOCK_USER_IDS.MARIA_TORRES, name: 'María Torres', email: 'maria.torres@iteso.mx' },
+  { id: MOCK_USER_IDS.MARIA_GARCIA, name: 'María García Pérez', email: 'maria.garcia@iteso.mx' },
+  { id: MOCK_USER_IDS.JUAN_LOPEZ, name: 'Juan López Sánchez', email: 'juan.lopez@iteso.mx' },
+  { id: MOCK_USER_IDS.ANA_MARTINEZ, name: 'Ana Martínez Ruiz', email: 'ana.martinez@iteso.mx' },
+  { id: MOCK_USER_IDS.CARLOS_RODRIGUEZ, name: 'Carlos Rodríguez Torres', email: 'carlos.rodriguez@iteso.mx' },
+  { id: MOCK_USER_IDS.LUCIA_FERNANDEZ, name: 'Lucía Fernández Gómez', email: 'lucia.fernandez@iteso.mx' },
 ];
 
 interface MockAuthContextValue {

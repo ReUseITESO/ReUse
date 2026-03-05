@@ -15,7 +15,8 @@ urlpatterns = [
 
     # API: Marketplace | api/marketplace/products  api/marketplace/categories
     path("api/marketplace/", include("marketplace.urls")),
-
+    
+    # TODO: uncomment when gamification endpoints are implemented
     path("api/gamification/", include("gamification.urls")),
 
     # API Documentation (Swagger / OpenAPI)
