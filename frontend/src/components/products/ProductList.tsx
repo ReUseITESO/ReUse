@@ -58,9 +58,9 @@ export default function ProductList() {
 
                 {!isLoading && !error && products.length === 0 && (
                     <EmptyState
-                        message="No se encontraron productos"
-                        actionLabel="Mostrar todos"
-                        onAction={handleShowAll}
+                        message={hasFilters ? 'No se encontraron productos con esos filtros' : 'No se ha registrado ningun articulo o producto'}
+                        actionLabel={hasFilters ? 'Mostrar todos' : undefined}
+                        onAction={hasFilters ? handleShowAll : undefined}
                     />
                 )}
 

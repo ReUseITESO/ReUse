@@ -9,42 +9,19 @@ import { useCreateProduct } from '@/hooks/useCreateProduct';
 
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
+import {
+  CONDITION_LABELS,
+  INPUT_CLASS,
+  SELECT_CLASS,
+  TRANSACTION_OPTIONS,
+} from '@/components/products/formConstants';
 
-import type { ProductCondition, TransactionType } from '@/types/product';
-
-interface FormValues {
-  title: string;
-  description: string;
-  category: string;
-  condition: ProductCondition;
-  transaction_type: TransactionType;
-  price: string;
-  image_url: string;
-}
-
-const CONDITION_LABELS: Record<ProductCondition, string> = {
-  nuevo: 'Nuevo',
-  como_nuevo: 'Como nuevo',
-  buen_estado: 'Buen estado',
-  usado: 'Usado',
-};
-
-const TRANSACTION_OPTIONS: { value: TransactionType; label: string; description: string }[] = [
-  { value: 'sale', label: 'Venta', description: 'Establece un precio' },
-  { value: 'donation', label: 'Donación', description: 'Regala a quien lo necesite' },
-  { value: 'swap', label: 'Intercambio', description: 'Cambia por otro artículo' },
-];
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
-
-const selectClass =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+import type { FormValues } from '@/types/product';
 
 export default function ProductForm() {
   const router = useRouter();
   const { isAuthenticated } = useMockAuth();
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
 
   const {
@@ -120,7 +97,7 @@ export default function ProductForm() {
                 required: 'El título es obligatorio',
                 maxLength: { value: 255, message: 'Máximo 255 caracteres' },
               })}
-              className={inputClass}
+              className={INPUT_CLASS}
               placeholder="Ej: Libro de Cálculo Diferencial"
             />
             {errors.title && (
@@ -138,7 +115,7 @@ export default function ProductForm() {
               {...register('description', {
                 required: 'La descripción es obligatoria',
               })}
-              className={inputClass}
+              className={INPUT_CLASS}
               placeholder="Describe el artículo que deseas publicar..."
             />
             {errors.description && (
@@ -153,13 +130,17 @@ export default function ProductForm() {
               </label>
               {categoriesLoading ? (
                 <Spinner />
+              ) : categoriesError ? (
+                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                  No se pudieron cargar las categorias.
+                </p>
               ) : (
                 <select
                   id="category"
                   {...register('category', {
                     required: 'Selecciona una categoría',
                   })}
-                  className={selectClass}
+                  className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
                   {categories.map((cat) => (
@@ -183,7 +164,7 @@ export default function ProductForm() {
                 {...register('condition', {
                   required: 'Selecciona la condición',
                 })}
-                className={selectClass}
+                className={SELECT_CLASS}
               >
                 {Object.entries(CONDITION_LABELS).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -252,7 +233,7 @@ export default function ProductForm() {
                     required: showPrice ? 'El precio es obligatorio para ventas' : false,
                     min: { value: 0.01, message: 'El precio debe ser mayor a 0' },
                   })}
-                  className={`${inputClass} pl-8`}
+                  className={`${INPUT_CLASS} pl-8`}
                   placeholder="0.00"
                 />
               </div>
@@ -276,7 +257,7 @@ export default function ProductForm() {
               id="image_url"
               type="url"
               {...register('image_url')}
-              className={inputClass}
+              className={INPUT_CLASS}
               placeholder="https://ejemplo.com/imagen.jpg"
             />
             <p className="mt-1.5 text-xs text-gray-500">
