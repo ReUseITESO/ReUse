@@ -33,3 +33,12 @@ export interface GamificationSummary {
 export interface UserPoints {
   points: number;
 }
+export interface BadgeWithStatus {
+  id: number;
+  name: string;
+  description: string;
+  icon_url: string;
+  rarity: string;
+  points: number;
+  earned_at: string | null;
+}
