@@ -31,22 +31,34 @@ export async function apiClient<T>(
   // TODO: uncomment when JWT auth is wired in
   // const token = getAccessToken();
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders,
-      // TODO: uncomment when JWT auth is wired in
-      // ...(token && { Authorization: `Bearer ${token}` }),
-      ...options?.headers,
-    },
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        // TODO: uncomment when JWT auth is wired in
+        // ...(token && { Authorization: `Bearer ${token}` }),
+        ...options?.headers,
+      },
+    });
+  } catch {
+    throw new Error(
+      'No se pudo conectar con el servidor.',
+    );
+  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const message =
       body?.error?.message ?? `Error ${response.status}`;
     throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return null as T;
   }
 
   return response.json();

@@ -56,7 +56,7 @@ export function useProducts() {
       setHasPrevPage(Boolean(data.previous));
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Error loading products';
+        err instanceof Error ? err.message : 'No se pudieron cargar los productos';
       setError(message);
     } finally {
       setIsLoading(false);
