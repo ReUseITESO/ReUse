@@ -5,11 +5,11 @@ import Spinner from '@/components/ui/Spinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import EmptyState from '@/components/ui/EmptyState';
 
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useMyProducts } from '@/hooks/useMyProducts';
 
 export default function MyProductList() {
-  const { isAuthenticated } = useMockAuth();
+  const { isAuthenticated } = useAuth();
 
   const {
     products,

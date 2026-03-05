@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import './globals.css';
-
-import { MockAuthProvider } from '@/context/MockAuthContext';
-import MockUserSelector from '@/components/auth/MockUserSelector';
+import { AuthProvider } from '@/hooks/useAuth';
+import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
   title: 'ReUseITESO',
-  description: 'Plataforma de compraventa de artículos de segunda mano para estudiantes del ITESO',
+  description: 'Plataforma compraventa de artículos de segunda mano para estudiantes del ITESO',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,10 +27,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     Productos
                   </Link>
                   <Link
-                    href="/products/my"
+                    href="/dashboard"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
                   >
-                    Mis artículos
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    Perfil
                   </Link>
                 </nav>
               </div>
@@ -40,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </header>
           <div className="mx-auto max-w-6xl">{children}</div>
-        </MockAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useUpdateProduct } from '@/hooks/useUpdateProduct';
 
@@ -28,7 +28,7 @@ import type {
 
 export default function ProductEditForm({ productId }: ProductEditFormProps) {
   const router = useRouter();
-  const { isAuthenticated } = useMockAuth();
+  const { isAuthenticated } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { updateProduct, isLoading: submitting, error: submitError } = useUpdateProduct();
 

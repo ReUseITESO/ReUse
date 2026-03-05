@@ -1,31 +1,159 @@
-// Scaffolding: JWT token management utilities.
-// This file handles storing and retrieving JWT tokens from localStorage.
-// Wire this into api.ts when the backend core auth endpoints are ready.
-// See docs/architecture/contracts.md section 1.5 for the JWT contract.
+import type { AuthResponse, SignInRequest, SignUpRequest, User, AuthTokens } from '@/types/auth';
 
-const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
-export function getAccessToken(): string | null {
+const ACCESS_KEY = 'reuse_access_token';
+const REFRESH_KEY = 'reuse_refresh_token';
+
+export function getStoredTokens(): AuthTokens | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  const access = localStorage.getItem(ACCESS_KEY);
+  const refresh = localStorage.getItem(REFRESH_KEY);
+  if (!access || !refresh) return null;
+  return { access, refresh };
 }
 
-export function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
-export function setTokens(access: string, refresh: string): void {
-  localStorage.setItem(ACCESS_TOKEN_KEY, access);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
+export function storeTokens(tokens: AuthTokens): void {
+  localStorage.setItem(ACCESS_KEY, tokens.access);
+  localStorage.setItem(REFRESH_KEY, tokens.refresh);
 }
 
 export function clearTokens(): void {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
 }
 
-export function isAuthenticated(): boolean {
-  return getAccessToken() !== null;
+async function authFetch<T>(
+  endpoint: string,
+  options?: RequestInit,
+): Promise<T> {
+  const tokens = getStoredTokens();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
+  };
+
+  if (tokens?.access) {
+    headers['Authorization'] = `Bearer ${tokens.access}`;
+  }
+
+  let response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (response.status === 401 && tokens?.refresh) {
+    const refreshed = await refreshAndStore(tokens.refresh);
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${refreshed.access}`;
+      response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers,
+      });
+    } else {
+      clearTokens();
+      throw new Error('La sesión ha expirado. Inicia sesión de nuevo.');
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const message =
+      body?.error?.message ??
+      body?.message ??
+      `Error ${response.status}`;
+    throw new Error(message);
+  }
+
+  return response.json();
 }
+
+export async function refreshAndStore(
+  refreshToken: string,
+): Promise<AuthTokens | null> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const tokens: AuthTokens = {
+      access: data.access,
+      refresh: data.refresh ?? refreshToken,
+    };
+    storeTokens(tokens);
+    return tokens;
+  } catch {
+    return null;
+  }
+}
+
+export async function signIn(credentials: SignInRequest): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE}/auth/signin/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const message =
+      body?.error?.message ??
+      'Correo o contraseña incorrectos.';
+    throw new Error(message);
+  }
+
+  const data: AuthResponse = await response.json();
+  storeTokens(data.tokens);
+  return data;
+}
+
+export async function signUp(payload: SignUpRequest): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE}/auth/signup/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+
+    if (body?.error?.details) {
+      const details = body.error.details;
+      const messages = Object.values(details).flat();
+      throw new Error((messages as string[]).join(' '));
+    }
+
+    throw new Error(
+      body?.error?.message ?? 'Error al crear la cuenta.',
+    );
+  }
+
+  const data: AuthResponse = await response.json();
+  storeTokens(data.tokens);
+  return data;
+}
+
+export async function signOut(): Promise<void> {
+  const tokens = getStoredTokens();
+  if (tokens?.refresh) {
+    try {
+      await authFetch('/auth/signout/', {
+        method: 'POST',
+        body: JSON.stringify({ refresh: tokens.refresh }),
+      });
+    } catch {
+    }
+  }
+  clearTokens();
+}
+
+export async function getProfile(): Promise<User> {
+  return authFetch<User>('/auth/profile/');
+}
+
+export { authFetch };
