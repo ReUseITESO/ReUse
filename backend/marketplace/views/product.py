@@ -1,4 +1,3 @@
-from django.db import transaction
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
@@ -6,7 +5,6 @@ from drf_spectacular.types import OpenApiTypes
 
 from marketplace.models import Products
 from marketplace.serializers import ProductCreateSerializer, ProductListSerializer
-from marketplace.services import attach_images_to_product
 
 
 @extend_schema_view(
@@ -68,7 +66,6 @@ from marketplace.services import attach_images_to_product
         summary="Publish a product",
         description=(
             "Creates a new product listing for the authenticated user. <br>"
-            "Accepts `multipart/form-data`. Include `images` (up to 5 files: JPEG, PNG or WebP). <br>"
             "Requires the `X-Mock-User-Id` header until real auth is implemented."
         ),
         tags=["Marketplace > Products"],
@@ -93,7 +90,7 @@ class ProductViewSet(
         return ProductListSerializer
 
     def get_queryset(self):
-        queryset = Products.objects.select_related("category", "seller").prefetch_related("images")
+        queryset = Products.objects.select_related("category", "seller")
 
         if self.action in ("list", "retrieve"):
             queryset = queryset.filter(status="disponible")
@@ -126,12 +123,7 @@ class ProductViewSet(
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        with transaction.atomic():
-            serializer.save(seller=mock_user)
-            images = request.FILES.getlist("images")
-            if images:
-                attach_images_to_product(serializer.instance, images)
+        serializer.save(seller=mock_user)
 
         response_serializer = ProductListSerializer(
             serializer.instance,

@@ -10,12 +10,6 @@ export interface Category {
   icon: string;
 }
 
-export interface ProductImage {
-  id: number;
-  image_url: string;
-  order_number: number;
-}
-
 export interface Product {
   id: number;
   title: string;
@@ -24,7 +18,7 @@ export interface Product {
   transaction_type: TransactionType;
   status: ProductStatus;
   price: string;
-  images: ProductImage[];
+  image_url: string;
   category: Category;
   seller_name: string;
   created_at: string;
@@ -36,5 +30,6 @@ export interface ProductCreatePayload {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price?: number | null;
+  image_url?: string;
   category: number;
 }
