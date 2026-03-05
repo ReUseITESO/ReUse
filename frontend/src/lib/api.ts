@@ -19,10 +19,7 @@ export function setMockUserId(userId: string | null): void {
   }
 }
 
-export async function apiClient<T>(
-  endpoint: string,
-  options?: RequestInit,
-): Promise<T> {
+export async function apiClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const mockUserId = getMockUserId();
   const authHeaders: Record<string, string> = {};
   if (mockUserId) {
@@ -44,8 +41,7 @@ export async function apiClient<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message =
-      body?.error?.message ?? `Error ${response.status}`;
+    const message = body?.error?.message ?? `Error ${response.status}`;
     throw new Error(message);
   }
 

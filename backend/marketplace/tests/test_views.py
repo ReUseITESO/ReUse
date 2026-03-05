@@ -105,9 +105,13 @@ class ProductViewSetTests(APITestCase):
 
     def test_list_returns_only_available_products(self):
         self._auth()
-        self.client.post(self.PRODUCTS_URL, self._payload(title="Disponible"), format="json")
+        self.client.post(
+            self.PRODUCTS_URL, self._payload(title="Disponible"), format="json"
+        )
         Products.objects.filter(title="Disponible").update(status="en_proceso")
-        self.client.post(self.PRODUCTS_URL, self._payload(title="Visible"), format="json")
+        self.client.post(
+            self.PRODUCTS_URL, self._payload(title="Visible"), format="json"
+        )
 
         self.client.credentials()  # remove auth header for listing
         response = self.client.get(self.PRODUCTS_URL)

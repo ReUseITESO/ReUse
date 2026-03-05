@@ -1,7 +1,7 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from drf_spectacular.types import OpenApiTypes
 
 from marketplace.models import Products
 from marketplace.serializers import ProductCreateSerializer, ProductListSerializer
@@ -113,11 +113,13 @@ class ProductViewSet(
         mock_user = getattr(request, "mock_user", None)
         if mock_user is None:
             return Response(
-                {"error": {
-                    "code": "AUTHENTICATION_ERROR",
-                    "message": "Debes iniciar sesión para publicar un producto.",
-                    "details": {},
-                }},
+                {
+                    "error": {
+                        "code": "AUTHENTICATION_ERROR",
+                        "message": "Debes iniciar sesión para publicar un producto.",
+                        "details": {},
+                    }
+                },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
