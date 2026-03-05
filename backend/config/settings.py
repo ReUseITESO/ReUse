@@ -25,13 +25,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
     "core",
     "marketplace",
-    # TODO: uncomment when gamification app has models and migrations ready
-    # "gamification",
 ]
 
 MIDDLEWARE = [
@@ -45,8 +44,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-if DEBUG:
-    MIDDLEWARE.append("core.middleware.MockAuthMiddleware")
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -109,12 +106,18 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# TODO: activate when core.User model is ready with proper AbstractUser setup
 AUTH_USER_MODEL = "core.User"
 
+AUTHENTICATION_BACKENDS = [
+    "core.backends.EmailBackend",
+]
+
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
@@ -127,10 +130,19 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "UPDATE_LAST_LOGIN": True,
+}
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "ReUseITESO API",
     "DESCRIPTION": (
-        "REST API for ReUseITESO — a second-hand marketplace platform"
+        "REST API for ReUseITESO — a second-hand marketplace platform "
         "for ITESO students. Modules: <br> Core (auth, users), <br>"
         "Marketplace (products, categories, transactions), <br>"
         "Gamification (points, badges, rankings).<br>"
@@ -138,13 +150,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "TAGS": [
+        {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
         {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
         {"name": "Marketplace > Categories", "description": "Product category endpoints."},
-        # TODO: uncomment as each module is implemented
-        # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
-        # {"name": "Core > Users", "description": "User profile endpoints."},
-        # {"name": "Gamification > Points", "description": "Points and rewards endpoints."},
-        # {"name": "Gamification > Badges", "description": "Badge and achievement endpoints."},
     ],
     "CONTACT": {
         "name": "ReUseITESO Team",
@@ -170,20 +178,11 @@ SPECTACULAR_SETTINGS = {
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "description": "JWT access token obtained from POST /api/auth/login/",
+                "description": "JWT access token obtained from POST /api/auth/signin/",
             }
         }
     },
 }
-
-# TODO: uncomment when JWT auth is wired in core.urls
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-#     "ROTATE_REFRESH_TOKENS": True,
-#     "BLACKLIST_AFTER_ROTATION": True,
-#     "AUTH_HEADER_TYPES": ("Bearer",),
-# }
 
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
