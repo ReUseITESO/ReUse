@@ -1,14 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
-import { useCreateProduct } from '@/hooks/useCreateProduct';
+import { useUpdateProduct } from '@/hooks/useUpdateProduct';
 
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 import {
   CONDITION_LABELS,
   INPUT_CLASS,
@@ -16,37 +18,67 @@ import {
   TRANSACTION_OPTIONS,
 } from '@/components/products/formConstants';
 
-import type { FormValues } from '@/types/product';
+import { apiClient } from '@/lib/api';
 
-export default function ProductForm() {
+import type {
+  Product,
+  EditFormValues,
+  ProductEditFormProps,
+} from '@/types/product';
+
+export default function ProductEditForm({ productId }: ProductEditFormProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
-  const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
+  const { updateProduct, isLoading: submitting, error: submitError } = useUpdateProduct();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: {
-      title: '',
-      description: '',
-      category: '',
-      condition: 'buen_estado',
-      transaction_type: 'sale',
-      price: '',
-      image_url: '',
-    },
-  });
+  } = useForm<EditFormValues>();
 
   const transactionType = watch('transaction_type');
   const showPrice = transactionType === 'sale';
 
-  async function onSubmit(data: FormValues) {
-    const result = await createProduct({
+  useEffect(() => {
+    async function fetchProduct() {
+      setIsLoadingProduct(true);
+      setLoadError(null);
+
+      try {
+        const data = await apiClient<Product>(`/marketplace/products/${productId}/`);
+        setProduct(data);
+        reset({
+          title: data.title,
+          description: data.description,
+          category: String(data.category.id),
+          condition: data.condition,
+          transaction_type: data.transaction_type,
+          price: data.price ?? '',
+          image_url: data.image_url ?? '',
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar el producto';
+        setLoadError(message);
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    }
+
+    fetchProduct();
+  }, [productId, reset]);
+
+  async function onSubmit(data: EditFormValues) {
+    const result = await updateProduct(productId, {
       title: data.title,
       description: data.description,
       category: Number(data.category),
@@ -57,7 +89,7 @@ export default function ProductForm() {
     });
 
     if (result) {
-      router.push('/products');
+      router.push('/products/my');
     }
   }
 
@@ -66,10 +98,22 @@ export default function ProductForm() {
       <div className="mx-auto max-w-md rounded-lg border border-amber-200 bg-amber-50 p-8 text-center">
         <p className="text-lg font-medium text-amber-900">Selecciona un usuario</p>
         <p className="mt-2 text-sm text-amber-700">
-          Usa el selector en la parte superior para elegir un usuario antes de publicar.
+          Usa el selector en la parte superior para elegir un usuario antes de editar.
         </p>
       </div>
     );
+  }
+
+  if (isLoadingProduct) {
+    return <Spinner />;
+  }
+
+  if (loadError) {
+    return <ErrorMessage message={loadError} onRetry={() => window.location.reload()} />;
+  }
+
+  if (!product) {
+    return <ErrorMessage message="Producto no encontrado" />;
   }
 
   return (
@@ -98,7 +142,6 @@ export default function ProductForm() {
                 maxLength: { value: 255, message: 'Máximo 255 caracteres' },
               })}
               className={INPUT_CLASS}
-              placeholder="Ej: Libro de Cálculo Diferencial"
             />
             {errors.title && (
               <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>
@@ -116,7 +159,6 @@ export default function ProductForm() {
                 required: 'La descripción es obligatoria',
               })}
               className={INPUT_CLASS}
-              placeholder="Describe el artículo que deseas publicar..."
             />
             {errors.description && (
               <p className="mt-1.5 text-sm text-red-600">{errors.description.message}</p>
@@ -185,7 +227,10 @@ export default function ProductForm() {
           </h2>
 
           <div>
-            <input type="hidden" {...register('transaction_type', { required: 'Selecciona el tipo' })} />
+            <input
+              type="hidden"
+              {...register('transaction_type', { required: 'Selecciona el tipo' })}
+            />
             <div className="grid gap-3 sm:grid-cols-3">
               {TRANSACTION_OPTIONS.map((option) => {
                 const isSelected = transactionType === option.value;
@@ -200,10 +245,14 @@ export default function ProductForm() {
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <span className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <span
+                      className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}
+                    >
                       {option.label}
                     </span>
-                    <span className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                    <span
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
+                    >
                       {option.description}
                     </span>
                   </button>
@@ -268,7 +317,7 @@ export default function ProductForm() {
 
         <div className="flex items-center gap-3 border-t border-gray-200 pt-6">
           <Button type="submit" disabled={submitting}>
-            {submitting ? 'Publicando...' : 'Publicar artículo'}
+            {submitting ? 'Guardando...' : 'Guardar cambios'}
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.back()}>
             Cancelar

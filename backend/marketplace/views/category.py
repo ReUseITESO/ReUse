@@ -18,7 +18,7 @@ from marketplace.serializers import CategorySerializer
     ),
 )
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet for listing and retrieving product categories."""
+    """ViewSet for listing and retrieving marketplace categories."""
 
     serializer_class = CategorySerializer
     queryset = Category.objects.all()

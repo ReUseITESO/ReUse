@@ -30,6 +30,15 @@ export default function Navbar() {
             Productos
           </Link>
 
+          {isAuthenticated && (
+            <Link
+              href="/products/my"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+            >
+              Mis artículos
+            </Link>
+          )}
+
           {isLoading ? (
             <div className="h-8 w-20 animate-pulse rounded-lg bg-gray-200" />
           ) : isAuthenticated ? (

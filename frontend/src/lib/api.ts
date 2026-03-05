@@ -16,16 +16,28 @@ export async function apiClient<T>(
     headers['Authorization'] = `Bearer ${tokens.access}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      'No se pudo conectar con el servidor.',
+    );
+  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const message =
       body?.error?.message ?? `Error ${response.status}`;
     throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return null as T;
   }
 
   return response.json();
