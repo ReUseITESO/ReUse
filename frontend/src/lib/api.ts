@@ -1,4 +1,4 @@
-import { getStoredTokens } from '@/lib/auth';
+import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
@@ -27,6 +27,24 @@ export async function apiClient<T>(
     throw new Error(
       'No se pudo conectar con el servidor.',
     );
+  }
+
+  if (response.status === 401 && tokens?.refresh) {
+    const refreshed = await refreshAndStore(tokens.refresh);
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${refreshed.access}`;
+      try {
+        response = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers,
+        });
+      } catch {
+        throw new Error('No se pudo conectar con el servidor.');
+      }
+    } else {
+      clearTokens();
+      throw new Error('La sesión ha expirado. Inicia sesión de nuevo.');
+    }
   }
 
   if (!response.ok) {

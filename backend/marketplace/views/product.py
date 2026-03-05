@@ -26,8 +26,8 @@ from marketplace.services import (
             "Supports filtering by category, condition, and transaction type via query params. <br>"
             "Results can be searched by **title**, **description**, or **category** name,"
             "and ordered by created_at, price, or title. <br><br>"
-            "Use `?seller=me` with `X-Mock-User-Id` header to list all products "
-            "owned by the authenticated user (any status)."
+            "Use `?seller=me` to list all products "
+            "owned by the authenticated user (any status). Requires JWT authentication."
         ),
         parameters=[
             OpenApiParameter(
@@ -87,7 +87,7 @@ from marketplace.services import (
         summary="Publish a product",
         description=(
             "Creates a new product listing for the authenticated user. <br>"
-            "Requires the `X-Mock-User-Id` header until real auth is implemented."
+            "Requires JWT authentication."
         ),
         tags=["Marketplace > Products"],
     ),
@@ -96,7 +96,7 @@ from marketplace.services import (
         description=(
             "Partially updates a product owned by the authenticated user. <br>"
             "Only products with status **disponible** can be edited. <br>"
-            "Requires the `X-Mock-User-Id` header."
+            "Requires JWT authentication."
         ),
         tags=["Marketplace > Products"],
     ),
@@ -105,7 +105,7 @@ from marketplace.services import (
         description=(
             "Permanently deletes a product owned by the authenticated user. <br>"
             "Only products with status **disponible** can be deleted. <br>"
-            "Requires the `X-Mock-User-Id` header."
+            "Requires JWT authentication."
         ),
         tags=["Marketplace > Products"],
     ),
@@ -135,25 +135,6 @@ class ProductViewSet(
             return ProductStatusSerializer
         return ProductListSerializer
 
-    def _get_mock_user_or_401(self):
-        mock_user = getattr(self.request, "mock_user", None)
-        if mock_user is None:
-            return None
-        return mock_user
-
-    def _require_auth(self):
-        mock_user = self._get_mock_user_or_401()
-        if mock_user is None:
-            return None, Response(
-                {"error": {
-                    "code": "AUTHENTICATION_ERROR",
-                    "message": "Debes iniciar sesión para realizar esta acción.",
-                    "details": {},
-                }},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        return mock_user, None
-
     def get_queryset(self):
         queryset = Products.objects.select_related("category", "seller")
 
@@ -162,9 +143,8 @@ class ProductViewSet(
 
         if self.action in ("list", "retrieve"):
             if is_my_products:
-                mock_user = getattr(self.request, "mock_user", None)
-                if mock_user is not None:
-                    queryset = queryset.filter(seller=mock_user)
+                if self.request.user.is_authenticated:
+                    queryset = queryset.filter(seller=self.request.user)
                 else:
                     return Products.objects.none()
             else:
@@ -185,13 +165,9 @@ class ProductViewSet(
         return queryset
 
     def create(self, request, *args, **kwargs):
-        mock_user, error_response = self._require_auth()
-        if error_response:
-            return error_response
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(seller=mock_user)
+        serializer.save(seller=request.user)
 
         response_serializer = ProductListSerializer(
             serializer.instance,
@@ -200,10 +176,6 @@ class ProductViewSet(
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
-        mock_user, error_response = self._require_auth()
-        if error_response:
-            return error_response
-
         product = self.get_object()
         serializer = self.get_serializer(
             product, data=request.data, partial=True
@@ -211,7 +183,7 @@ class ProductViewSet(
         serializer.is_valid(raise_exception=True)
 
         updated_product = update_product(
-            product, serializer.validated_data, mock_user
+            product, serializer.validated_data, request.user
         )
 
         response_serializer = ProductListSerializer(
@@ -221,12 +193,8 @@ class ProductViewSet(
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
-        mock_user, error_response = self._require_auth()
-        if error_response:
-            return error_response
-
         product = self.get_object()
-        delete_product(product, mock_user)
+        delete_product(product, request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @extend_schema(
@@ -235,7 +203,7 @@ class ProductViewSet(
             "Changes the status of a product owned by the authenticated user. <br>"
             "Valid transitions: `disponible` → `en_proceso` | `cancelado`, "
             "`en_proceso` → `disponible` | `completado` | `cancelado`. <br>"
-            "Requires the `X-Mock-User-Id` header."
+            "Requires JWT authentication."
         ),
         request=ProductStatusSerializer,
         responses={200: ProductListSerializer},
@@ -243,16 +211,12 @@ class ProductViewSet(
     )
     @action(detail=True, methods=["patch"], url_path="status")
     def change_status(self, request, pk=None):
-        mock_user, error_response = self._require_auth()
-        if error_response:
-            return error_response
-
         product = self.get_object()
         serializer = ProductStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         updated_product = change_product_status(
-            product, serializer.validated_data["status"], mock_user
+            product, serializer.validated_data["status"], request.user
         )
 
         response_serializer = ProductListSerializer(

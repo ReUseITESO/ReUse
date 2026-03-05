@@ -43,7 +43,7 @@ async function authFetch<T>(
   });
 
   if (response.status === 401 && tokens?.refresh) {
-    const refreshed = await refreshAccessToken(tokens.refresh);
+    const refreshed = await refreshAndStore(tokens.refresh);
     if (refreshed) {
       headers['Authorization'] = `Bearer ${refreshed.access}`;
       response = await fetch(`${API_BASE}${endpoint}`, {
@@ -68,7 +68,7 @@ async function authFetch<T>(
   return response.json();
 }
 
-async function refreshAccessToken(
+export async function refreshAndStore(
   refreshToken: string,
 ): Promise<AuthTokens | null> {
   try {
