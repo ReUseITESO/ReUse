@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from core.models import User
-from marketplace.models import Category, Products
+from marketplace.models import Category
 from marketplace.serializers import ProductCreateSerializer
 
 

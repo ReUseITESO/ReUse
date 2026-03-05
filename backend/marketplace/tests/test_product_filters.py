@@ -2,14 +2,12 @@
 Tests for marketplace filters: category, condition, transaction_type.
 Covers individual filters, combined filters, text search, and edge cases.
 """
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core.models.user import User
 from marketplace.models.category import Category
 from marketplace.models.product import Products
-
 
 PRODUCTS_URL = "/api/marketplace/products/"
 CATEGORIES_URL = "/api/marketplace/categories/"

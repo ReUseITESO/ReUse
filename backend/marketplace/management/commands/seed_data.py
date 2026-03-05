@@ -1,8 +1,8 @@
 ﻿from django.core.management.base import BaseCommand
+
+from core.models.user import User
 from marketplace.models.category import Category
 from marketplace.models.product import Products
-from core.models.user import User
-
 
 CATEGORIES = [
     {"name": "Libros",        "icon": "book"},
