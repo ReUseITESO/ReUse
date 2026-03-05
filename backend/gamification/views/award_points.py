@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 from drf_spectacular.utils import extend_schema
 
@@ -21,7 +22,7 @@ class AwardPointsView(APIView):
         serializer = AwardPointsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = User.objects.get(id=serializer.validated_data["user_id"])
+        user = get_object_or_404(User, id=serializer.validated_data["user_id"])
 
         award_points(
             user=user,
