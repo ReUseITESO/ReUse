@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
@@ -12,6 +13,9 @@ import Spinner from '@/components/ui/Spinner';
 
 import type { ProductCondition, TransactionType } from '@/types/product';
 
+const MAX_IMAGES = 5;
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 interface FormValues {
   title: string;
   description: string;
@@ -19,7 +23,6 @@ interface FormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
 }
 
 const CONDITION_LABELS: Record<ProductCondition, string> = {
@@ -47,6 +50,22 @@ export default function ProductForm() {
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
 
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    previewsRef.current = previews;
+  }, [previews]);
+
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -61,23 +80,54 @@ export default function ProductForm() {
       condition: 'buen_estado',
       transaction_type: 'sale',
       price: '',
-      image_url: '',
     },
   });
 
   const transactionType = watch('transaction_type');
   const showPrice = transactionType === 'sale';
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setImageError(null);
+    const selected = Array.from(e.target.files ?? []);
+    e.target.value = '';
+
+    const invalid = selected.find((f) => !ACCEPTED_TYPES.includes(f.type));
+    if (invalid) {
+      setImageError('Solo se aceptan imágenes JPEG, PNG o WebP.');
+      return;
+    }
+
+    const remaining = MAX_IMAGES - images.length;
+    const toAdd = selected.slice(0, remaining);
+
+    if (selected.length > remaining) {
+      setImageError(`Solo puedes agregar ${remaining} imagen${remaining === 1 ? '' : 'es'} más.`);
+    }
+
+    const newPreviews = toAdd.map((f) => URL.createObjectURL(f));
+    setImages((prev) => [...prev, ...toAdd]);
+    setPreviews((prev) => [...prev, ...newPreviews]);
+  }
+
+  function removeImage(index: number) {
+    URL.revokeObjectURL(previews[index]);
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    setImageError(null);
+  }
+
   async function onSubmit(data: FormValues) {
-    const result = await createProduct({
-      title: data.title,
-      description: data.description,
-      category: Number(data.category),
-      condition: data.condition,
-      transaction_type: data.transaction_type,
-      price: showPrice ? Number(data.price) : null,
-      image_url: data.image_url || undefined,
-    });
+    const result = await createProduct(
+      {
+        title: data.title,
+        description: data.description,
+        category: Number(data.category),
+        condition: data.condition,
+        transaction_type: data.transaction_type,
+        price: showPrice ? Number(data.price) : null,
+      },
+      images,
+    );
 
     if (result) {
       router.push('/products');
@@ -264,25 +314,78 @@ export default function ProductForm() {
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imagen
-          </h2>
-
-          <div>
-            <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
-              URL de imagen
-            </label>
-            <input
-              id="image_url"
-              type="url"
-              {...register('image_url')}
-              className={inputClass}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-            <p className="mt-1.5 text-xs text-gray-500">
-              Opcional. Pega la URL de una imagen del artículo.
-            </p>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Imágenes
+            </h2>
+            <span className="text-xs text-gray-400">{images.length}/{MAX_IMAGES}</span>
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {images.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <svg
+                className="h-8 w-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 16v-8m0 0-3 3m3-3 3 3M6.5 19h11a2.5 2.5 0 0 0 0-5h-.2A5.5 5.5 0 1 0 6.5 19Z"
+                />
+              </svg>
+              <span className="text-sm font-medium text-gray-600">
+                Haz clic para agregar imágenes
+              </span>
+              <span className="text-xs text-gray-400">JPEG, PNG o WebP · Máximo {MAX_IMAGES}</span>
+            </button>
+          )}
+
+          {imageError && (
+            <p className="text-sm text-red-600">{imageError}</p>
+          )}
+
+          {previews.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+              {previews.map((url, index) => (
+                <div key={url} className="group relative aspect-square">
+                  <img
+                    src={url}
+                    alt={`Vista previa ${index + 1}`}
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
+                    aria-label="Eliminar imagen"
+                  >
+                    ×
+                  </button>
+                  {index === 0 && (
+                    <span className="absolute bottom-1 left-1 rounded bg-black/50 px-1 py-0.5 text-xs text-white">
+                      Principal
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <div className="flex items-center gap-3 border-t border-gray-200 pt-6">

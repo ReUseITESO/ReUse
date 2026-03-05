@@ -2,14 +2,13 @@ from rest_framework import serializers
 
 from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.images import ImageSerializer
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    """Serializer for the product list (Object -> JSON)."""
     category = CategorySerializer(read_only=True)
-    seller_name = serializers.CharField(
-        source='seller.name', read_only=True
-    )
+    seller_name = serializers.CharField(source="seller.name", read_only=True)
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Products
@@ -21,7 +20,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
             "seller_name",
             "created_at",
@@ -29,8 +28,6 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
-    """Serializador para crear productos (JSON -> Obj)."""
-
     class Meta:
         model = Products
         fields = [
@@ -40,7 +37,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             "condition",
             "transaction_type",
             "price",
-            "image_url",
             "category",
         ]
         read_only_fields = ["id"]
