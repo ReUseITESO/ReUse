@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api';
 
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 import type { Product } from '@/types/product';
 import type { PaginatedResponse } from '@/types/api';
 
 export function useMyProducts() {
-  const { currentUser } = useMockAuth();
-  const userId = currentUser?.id;
+  const { user } = useAuth();
+  const userId = user?.id;
   const [products, setProducts] = useState<Product[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);

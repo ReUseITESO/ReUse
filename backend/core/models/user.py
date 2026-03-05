@@ -1,32 +1,32 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import EmailValidator, RegexValidator
+from django.db import models
 
 
 class User(AbstractUser):
-    """ITESO students using the platform"""
+    """Miembros de la comunidad ITESO que usan la plataforma"""
 
-    name = models.CharField(max_length=255, default='')
-    phone = models.CharField(max_length=20, default='')
-    points = models.IntegerField(default=0)
-    profile_picture = models.CharField(max_length=500, blank=True, null=True)
-
+    username = None
     email = models.EmailField(
         unique=True,
         validators=[
             EmailValidator(),
             RegexValidator(
                 regex=r'^[^@]+@iteso\.mx$',
-                message='Email must be from @iteso.mx domain'
+                message='Email debe ser del dominio @iteso.mx'
             )
         ]
     )
+    phone = models.CharField(max_length=20, blank=True, default='')
+    points = models.IntegerField(default=0)
+    profile_picture = models.CharField(max_length=500, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'name', 'phone']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     class Meta:
         db_table = 'users'
+        ordering = ['-date_joined']
 
     def __str__(self):
-        return f"{self.name} ({self.email})"
+        return f"{self.get_full_name()} ({self.email})"

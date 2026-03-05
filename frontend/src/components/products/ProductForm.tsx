@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateProduct } from '@/hooks/useCreateProduct';
 
@@ -20,7 +20,7 @@ import type { FormValues } from '@/types/product';
 
 export default function ProductForm() {
   const router = useRouter();
-  const { isAuthenticated } = useMockAuth();
+  const { isAuthenticated } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
 

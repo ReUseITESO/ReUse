@@ -10,10 +10,7 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # TODO: uncomment when core auth endpoints are implemented
-    # path("api/auth/", include("core.urls")),
-
-    # API: Marketplace | api/marketplace/products  api/marketplace/categories
+    path("api/auth/", include("core.urls")),
     path("api/marketplace/", include("marketplace.urls")),
 
     path("api/gamification/", include("gamification.urls")),
