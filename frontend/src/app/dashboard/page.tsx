@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import PointsBalance from '@/components/gamification/PointsBalance';
 import TestPointsButtons from '@/components/gamification/TestPointsButtons';
+import BadgesList from '@/components/gamification/BadgesList';
 
 export default function DashboardPage() {
   const [pointsVersion, setPointsVersion] = useState(0);
@@ -19,6 +20,11 @@ export default function DashboardPage() {
             <PointsBalance refreshTrigger={pointsVersion} />
           </div>
           <TestPointsButtons onPointsUpdated={() => setPointsVersion((v) => v + 1)} />
+          
+          <div>
+            <h2 className="mb-4 text-lg font-semibold text-slate-800">Insignias</h2>
+            <BadgesList />
+          </div>
         </section>
       </div>
     </main>

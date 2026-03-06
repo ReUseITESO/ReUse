@@ -8,7 +8,7 @@ export interface Badge {
   name: string;
   description: string;
   icon_url: string;
-  criteria: string;
+  criteria?: string;
 }
 
 export interface UserBadge {
@@ -30,6 +30,15 @@ export interface GamificationSummary {
   impact: EnvironmentImpact | null;
 }
 
+export interface BadgeWithStatus {
+  id: number;
+  name: string;
+  description: string;
+  icon_url: string;
+  rarity: string;
+  points: number;
+  earned_at: string | null;
+}
 export interface UserPoints {
   points: number;
 }

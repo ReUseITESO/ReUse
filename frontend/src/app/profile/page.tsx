@@ -4,6 +4,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import PointsBalance from '@/components/gamification/PointsBalance';
+import BadgesList from '@/components/gamification/BadgesList';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -32,10 +33,10 @@ export default function ProfilePage() {
     );
   }
 
-  return (
-    <main className="min-h-screen bg-slate-50 p-6">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-8 text-3xl font-bold text-slate-900">Mi Perfil</h1>
+ return (
+        <main className="min-h-screen bg-slate-50 p-6">
+            <div className="mx-auto max-w-4xl">
+                <h1 className="mb-8 text-3xl font-bold text-slate-900">Mi Perfil</h1>
 
         {/* User Info Card */}
         <section className="mb-6 rounded-lg bg-white border border-slate-200 p-6 shadow-sm">
@@ -67,7 +68,19 @@ export default function ProfilePage() {
         {/* - Transaction history */}
         {/* - Badges earned */}
         {/* - Account settings */}
-      </div>
-    </main>
-  );
+                  <section>
+                    {/* Logros y Medallas (Su trabajo) */}
+                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mt-6">
+                        <h2 className="mb-4 text-xl font-semibold border-b pb-2 text-slate-800">Logros y Medallas</h2>
+                        <BadgesList />
+                    </div>
+                </section>
+
+                {/* TODO: Add more profile sections */}
+                {/* - Published items */}
+                {/* - Transaction history */}
+                {/* - Account settings */}
+            </div>
+        </main>
+    );
 }
