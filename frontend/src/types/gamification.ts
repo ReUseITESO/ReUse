@@ -48,3 +48,13 @@ export interface LevelProgression {
   points_to_next_level: number;
   is_max_level: boolean;
 }
+
+export interface BadgeWithStatus {
+  id: number;
+  name: string;
+  description: string;
+  icon_url: string;
+  rarity: string;
+  points: number;
+  earned_at: string | null;
+}

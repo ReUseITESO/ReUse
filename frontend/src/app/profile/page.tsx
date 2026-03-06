@@ -1,8 +1,8 @@
 // Scaffolding: profile page stub. Add user profile component when core module is ready.
 // See reglas_de_escritura_front.md section 3 (Pages) for page conventions.
 'use client';
-
 import { useAuth } from '@/hooks/useAuth';
+import BadgesList from '@/components/gamification/BadgesList';
 import PointsBalance from '@/components/gamification/PointsBalance';
 
 export default function ProfilePage() {
@@ -48,7 +48,7 @@ export default function ProfilePage() {
               <p className="text-sm text-slate-600 mt-1">{user?.email}</p>
               <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                Usuario activo
+                <span>Usuario activo</span>
               </div>
             </div>
           </div>
@@ -59,6 +59,10 @@ export default function ProfilePage() {
           <div>
             <h2 className="mb-4 text-lg font-semibold text-slate-800">Gamificación</h2>
             <PointsBalance />
+          </div>
+          <div>
+            <h2 className="mb-4 text-lg font-semibold text-slate-800">Logros y medallas</h2>
+            <BadgesList />
           </div>
         </section>
       </div>

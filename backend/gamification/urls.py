@@ -10,6 +10,7 @@ from gamification.views.points import (
 )
 from gamification.views.award_points import AwardPointsView
 from gamification.views.deduct_points import DeductPointsView
+from gamification.views.badges import UserBadgesStatusView
 
 urlpatterns = [
 	path("points/", CurrentUserPointsView.as_view(), name="current-user-points"),
@@ -19,6 +20,7 @@ urlpatterns = [
 		CurrentUserLevelProgressionView.as_view(),
 		name="current-user-level-progression",
 	),
-	path("award-points/", AwardPointsView.as_view(), name="award-points"),
-	path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
+    path("award-points/", AwardPointsView.as_view(), name="award-points"),
+    path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
+	path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),
 ]
