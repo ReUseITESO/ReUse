@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Badge from '@/components/ui/Badge';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
@@ -30,8 +31,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const categoryClass = getCategoryClass(product.category.name);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex h-44 items-center justify-center bg-gray-100">
+    <Link href={`/products/${product.id}`}>
+      <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md cursor-pointer">
+        <div className="flex h-44 items-center justify-center bg-gray-100">
         {product.image_url ? (
           <img src={product.image_url} alt={product.title} className="h-full w-full object-cover" />
         ) : (
@@ -55,5 +57,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
     </article>
+    </Link>
   );
 }

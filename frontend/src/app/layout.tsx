@@ -1,20 +1,19 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import './globals.css';
-
-import { MockAuthProvider } from '@/context/MockAuthContext';
-import MockUserSelector from '@/components/auth/MockUserSelector';
+import { AuthProvider } from '@/hooks/useAuth';
+import Navbar from '@/components/layout/Navbar';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'ReUseITESO',
-  description: 'Plataforma de compraventa de artículos de segunda mano para estudiantes del ITESO',
+  description: 'Plataforma compraventa de artículos de segunda mano para estudiantes del ITESO',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body className="bg-gray-50 text-gray-900">
-        <MockAuthProvider>
+        <AuthProvider>
           <header className="border-b border-gray-200 bg-white">
             <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
               <div className="flex items-center gap-6">
@@ -28,13 +27,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   >
                     Productos
                   </Link>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    Perfil
+                  </Link>
                 </nav>
               </div>
-              <MockUserSelector />
+              {/* <MockUserSelector /> */}
             </div>
           </header>
           <div className="mx-auto max-w-6xl">{children}</div>
-        </MockAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

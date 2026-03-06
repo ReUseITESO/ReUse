@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
@@ -45,8 +46,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-if DEBUG:
-    MIDDLEWARE.append("core.middleware.MockAuthMiddleware")
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -109,12 +108,18 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# TODO: activate when core.User model is ready with proper AbstractUser setup
 AUTH_USER_MODEL = "core.User"
 
+AUTHENTICATION_BACKENDS = [
+    "core.backends.EmailBackend",
+]
+
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
@@ -127,10 +132,19 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "UPDATE_LAST_LOGIN": True,
+}
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "ReUseITESO API",
     "DESCRIPTION": (
-        "REST API for ReUseITESO — a second-hand marketplace platform"
+        "REST API for ReUseITESO — a second-hand marketplace platform "
         "for ITESO students. Modules: <br> Core (auth, users), <br>"
         "Marketplace (products, categories, transactions), <br>"
         "Gamification (points, badges, rankings).<br>"
@@ -138,19 +152,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "TAGS": [
-        {
-            "name": "Marketplace > Products",
-            "description": "Product listing and detail endpoints.",
-        },
-        {
-            "name": "Marketplace > Categories",
-            "description": "Product category endpoints.",
-        },
-        # TODO: uncomment as each module is implemented
-        # {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
-        # {"name": "Core > Users", "description": "User profile endpoints."},
-        # {"name": "Gamification > Points", "description": "Points and rewards endpoints."},
-        # {"name": "Gamification > Badges", "description": "Badge and achievement endpoints."},
+        {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
+        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
+        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
     ],
     "CONTACT": {
         "name": "ReUseITESO Team",
@@ -176,23 +180,77 @@ SPECTACULAR_SETTINGS = {
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
-                "description": "JWT access token obtained from POST /api/auth/login/",
+                "description": "JWT access token obtained from POST /api/auth/signin/",
             }
         }
     },
 }
 
-# TODO: uncomment when JWT auth is wired in core.urls
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-#     "ROTATE_REFRESH_TOKENS": True,
-#     "BLACKLIST_AFTER_ROTATION": True,
-#     "AUTH_HEADER_TYPES": ("Bearer",),
-# }
-
 CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001"
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "x-mock-user-id",
+]
+
+# LOGGING CONFIGURATION
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'timestamp_format': {
+            'format': '%(asctime)s - %(levelname)s - %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'app.log',
+            'mode': 'a',
+            'formatter': 'timestamp_format',
+        },
+    },
+    'root': { 
+        'handlers': ['file'],
+        'level': 'INFO',
+    },
+}
+
+import logging
+logger = logging.getLogger(__name__)
+logger.info("Application started")
+
+FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
+EMAIL_VERIFICATION_EXPIRES_MINUTES = int(os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30"))
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "apikey")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@reuse.com")
