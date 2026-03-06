@@ -9,8 +9,9 @@ class TestUserBadgesStatusView(APITestCase):
     def setUp(self):
         # Crear usuario de prueba
         self.user = User.objects.create_user(
-            username='testuser',
             email='test@iteso.mx',
+            first_name='Test',
+            last_name='User',
             password='testpass123'
         )
         
@@ -42,11 +43,13 @@ class TestUserBadgesStatusView(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_get_badges_authenticated_returns_200(self):
-        response = self.client.get(self.url, HTTP_X_MOCK_USER_ID=str(self.user.id))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_get_badges_returns_correct_earned_and_locked_status(self):
-        response = self.client.get(self.url, HTTP_X_MOCK_USER_ID=str(self.user.id))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
         self.assertEqual(len(response.data), 2)
         
         earned_badge = next(b for b in response.data if b['id'] == self.badge_earned.id)

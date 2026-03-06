@@ -1,14 +1,20 @@
 'use client';
 
 import { useUserPoints } from '@/hooks/useUserPoints';
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
-export default function PointsBalance() {
-  const { currentUser, isAuthenticated } = useMockAuth();
-  const { points, isLoading, error, refetch } = useUserPoints(currentUser?.id ?? null);
+interface PointsBalanceProps {
+  refreshTrigger?: number;
+}
 
-  if (isLoading) {
+export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { points, isLoading, error, refetch } = useUserPoints(isAuthenticated, refreshTrigger);
+
+  const isInitialLoading = authLoading || (isLoading && points === null && !error);
+
+  if (isInitialLoading) {
     return (
       <div className="h-24 w-full rounded-lg bg-gradient-to-r from-slate-100 to-slate-50 animate-pulse">
         <div className="flex items-center justify-center h-full">
@@ -24,9 +30,9 @@ export default function PointsBalance() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-sm text-yellow-900 font-medium">Sin usuario seleccionado</p>
+            <p className="text-sm text-yellow-900 font-medium">Usuario no autenticado</p>
             <p className="mt-1 text-xs text-yellow-700">
-              Selecciona un usuario del menú superior para ver tus puntos
+              Inicia sesión para ver tus puntos acumulados
             </p>
           </div>
         </div>

@@ -1,5 +1,4 @@
 from rest_framework.test import APITestCase
-from django.urls import reverse
 
 from core.models import User
 from gamification.models.point_rule import PointRule, PointAction
@@ -9,7 +8,14 @@ class AwardPointsAPITest(APITestCase):
 
     def setUp(self):
 
-        self.user = User.objects.create(username="testuser", points=0)
+        self.user = User.objects.create(
+            email="test.user@iteso.mx",
+            first_name="Test",
+            last_name="User",
+            points=0,
+        )
+
+        self.client.force_authenticate(user=self.user)
 
         PointRule.objects.create(
             action=PointAction.PUBLISH_ITEM,

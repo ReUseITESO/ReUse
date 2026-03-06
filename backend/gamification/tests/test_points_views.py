@@ -13,29 +13,29 @@ class CurrentUserPointsViewTests(APITestCase):
         """Create test users with different point balances"""
         self.user_ana = User.objects.create(
             email="ana.garcia@iteso.mx",
-            username="ana.garcia@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
             points=150,
         )
         self.user_carlos = User.objects.create(
             email="carlos.lopez@iteso.mx",
-            username="carlos.lopez@iteso.mx",
-            name="Carlos López",
+            first_name="Carlos",
+            last_name="López",
             phone="3387654321",
             points=80,
         )
         self.user_zero_points = User.objects.create(
             email="maria.torres@iteso.mx",
-            username="maria.torres@iteso.mx",
-            name="María Torres",
+            first_name="María",
+            last_name="Torres",
             phone="3356781234",
             points=0,
         )
 
     def _auth(self, user):
-        """Set the mock auth header for subsequent requests"""
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(user.pk))
+        """Authenticate requests as a specific user"""
+        self.client.force_authenticate(user=user)
 
     # --- Authentication tests ---
 
@@ -43,11 +43,12 @@ class CurrentUserPointsViewTests(APITestCase):
         """Unauthenticated request should return 401"""
         response = self.client.get(self.POINTS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertIn("detail", response.data)
-        self.assertIn("Authentication required", response.data["detail"])
+        self.assertIn("error", response.data)
+        self.assertIn("details", response.data["error"])
+        self.assertIn("detail", response.data["error"]["details"])
 
     def test_get_points_with_invalid_user_id_returns_401(self):
-        """Request with non-existent user ID should return 401"""
+        """Request with mock header but no auth should still return 401"""
         self.client.credentials(HTTP_X_MOCK_USER_ID="99999")
         response = self.client.get(self.POINTS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -114,8 +115,8 @@ class UserPointsViewTests(APITestCase):
         """Create test user"""
         self.user = User.objects.create(
             email="ana.garcia@iteso.mx",
-            username="ana.garcia@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
             points=200,
         )
