@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from marketplace.views import ProductViewSet, CategoryViewSet
+from marketplace.views import CategoryViewSet, ProductViewSet
 
 # Crear el router y registrar los ViewSets ( los Endpoints de la API )
 router = DefaultRouter()

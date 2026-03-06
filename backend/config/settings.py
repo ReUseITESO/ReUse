@@ -1,7 +1,6 @@
-from datetime import timedelta
+import os
 from pathlib import Path
 
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,7 +30,9 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "marketplace",
-    "gamification",
+    "notifications",
+    # TODO: uncomment when gamification app has models and migrations ready
+    # "gamification",
 ]
 
 MIDDLEWARE = [
