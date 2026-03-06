@@ -39,3 +39,6 @@ export interface BadgeWithStatus {
   points: number;
   earned_at: string | null;
 }
+export interface UserPoints {
+  points: number;
+}

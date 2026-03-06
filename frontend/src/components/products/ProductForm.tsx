@@ -3,48 +3,25 @@
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateProduct } from '@/hooks/useCreateProduct';
 
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
+import {
+  CONDITION_LABELS,
+  INPUT_CLASS,
+  SELECT_CLASS,
+  TRANSACTION_OPTIONS,
+} from '@/components/products/formConstants';
 
-import type { ProductCondition, TransactionType } from '@/types/product';
-
-interface FormValues {
-  title: string;
-  description: string;
-  category: string;
-  condition: ProductCondition;
-  transaction_type: TransactionType;
-  price: string;
-  image_url: string;
-}
-
-const CONDITION_LABELS: Record<ProductCondition, string> = {
-  nuevo: 'Nuevo',
-  como_nuevo: 'Como nuevo',
-  buen_estado: 'Buen estado',
-  usado: 'Usado',
-};
-
-const TRANSACTION_OPTIONS: { value: TransactionType; label: string; description: string }[] = [
-  { value: 'sale', label: 'Venta', description: 'Establece un precio' },
-  { value: 'donation', label: 'Donación', description: 'Regala a quien lo necesite' },
-  { value: 'swap', label: 'Intercambio', description: 'Cambia por otro artículo' },
-];
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
-
-const selectClass =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+import type { FormValues } from '@/types/product';
 
 export default function ProductForm() {
   const router = useRouter();
-  const { isAuthenticated } = useMockAuth();
-  const { categories, isLoading: categoriesLoading } = useCategories();
+  const { isAuthenticated } = useAuth();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
 
   const {
@@ -62,11 +39,25 @@ export default function ProductForm() {
       transaction_type: 'sale',
       price: '',
       image_url: '',
+      images: [],
     },
   });
 
   const transactionType = watch('transaction_type');
+  const images = watch('images');
   const showPrice = transactionType === 'sale';
+
+  function addImage() {
+    const imageUrl = watch('image_url');
+    if (imageUrl && !images.includes(imageUrl)) {
+      setValue('images', [...images, imageUrl]);
+      setValue('image_url', '');
+    }
+  }
+
+  function removeImage(index: number) {
+    setValue('images', images.filter((_, i) => i !== index));
+  }
 
   async function onSubmit(data: FormValues) {
     const result = await createProduct({
@@ -76,7 +67,8 @@ export default function ProductForm() {
       condition: data.condition,
       transaction_type: data.transaction_type,
       price: showPrice ? Number(data.price) : null,
-      image_url: data.image_url || undefined,
+      image_url: data.images.length > 0 ? data.images[0] : (data.image_url || undefined),
+      images: data.images.length > 0 ? data.images : undefined,
     });
 
     if (result) {
@@ -120,7 +112,7 @@ export default function ProductForm() {
                 required: 'El título es obligatorio',
                 maxLength: { value: 255, message: 'Máximo 255 caracteres' },
               })}
-              className={inputClass}
+              className={INPUT_CLASS}
               placeholder="Ej: Libro de Cálculo Diferencial"
             />
             {errors.title && (
@@ -138,7 +130,7 @@ export default function ProductForm() {
               {...register('description', {
                 required: 'La descripción es obligatoria',
               })}
-              className={inputClass}
+              className={INPUT_CLASS}
               placeholder="Describe el artículo que deseas publicar..."
             />
             {errors.description && (
@@ -153,13 +145,17 @@ export default function ProductForm() {
               </label>
               {categoriesLoading ? (
                 <Spinner />
+              ) : categoriesError ? (
+                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                  No se pudieron cargar las categorias.
+                </p>
               ) : (
                 <select
                   id="category"
                   {...register('category', {
                     required: 'Selecciona una categoría',
                   })}
-                  className={selectClass}
+                  className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
                   {categories.map((cat) => (
@@ -183,7 +179,7 @@ export default function ProductForm() {
                 {...register('condition', {
                   required: 'Selecciona la condición',
                 })}
-                className={selectClass}
+                className={SELECT_CLASS}
               >
                 {Object.entries(CONDITION_LABELS).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -252,7 +248,7 @@ export default function ProductForm() {
                     required: showPrice ? 'El precio es obligatorio para ventas' : false,
                     min: { value: 0.01, message: 'El precio debe ser mayor a 0' },
                   })}
-                  className={`${inputClass} pl-8`}
+                  className={`${INPUT_CLASS} pl-8`}
                   placeholder="0.00"
                 />
               </div>
@@ -265,24 +261,72 @@ export default function ProductForm() {
 
         <section className="space-y-5">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imagen
+            Imágenes
           </h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
               URL de imagen
             </label>
-            <input
-              id="image_url"
-              type="url"
-              {...register('image_url')}
-              className={inputClass}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
+            <div className="flex gap-2 min-w-0">
+              <input
+                id="image_url"
+                type="url"
+                {...register('image_url')}
+                className={`${INPUT_CLASS} flex-1 min-w-0`}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addImage();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={addImage}
+                disabled={!watch('image_url')}
+                className="flex-shrink-0"
+              >
+                Agregar
+              </Button>
+            </div>
             <p className="mt-1.5 text-xs text-gray-500">
-              Opcional. Pega la URL de una imagen del artículo.
+              Agrega URLs de imágenes del artículo. Se mostrarán en orden.
             </p>
           </div>
+
+          {images.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">
+                Imágenes agregadas ({images.length})
+              </p>
+              <div className="space-y-2">
+                {images.map((url, index) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
+                  >
+                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                      {index + 1}
+                    </span>
+                    <span className="flex-1 text-sm text-gray-600 break-all overflow-wrap-anywhere">{url}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="flex-shrink-0 text-red-600 hover:text-red-700"
+                      title="Eliminar imagen"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <div className="flex items-center gap-3 border-t border-gray-200 pt-6">

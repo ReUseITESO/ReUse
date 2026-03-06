@@ -1,46 +1,51 @@
-// TODO: uncomment when auth module is implemented
-// import { getAccessToken } from '@/lib/auth';
+import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
-
-const MOCK_USER_STORAGE_KEY = 'mock_user_id';
-
-export function getMockUserId(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(MOCK_USER_STORAGE_KEY);
-}
-
-export function setMockUserId(userId: string | null): void {
-  if (typeof window === 'undefined') return;
-  if (userId) {
-    localStorage.setItem(MOCK_USER_STORAGE_KEY, userId);
-  } else {
-    localStorage.removeItem(MOCK_USER_STORAGE_KEY);
-  }
-}
 
 export async function apiClient<T>(
   endpoint: string,
   options?: RequestInit,
 ): Promise<T> {
-  const mockUserId = getMockUserId();
-  const authHeaders: Record<string, string> = {};
-  if (mockUserId) {
-    authHeaders['X-Mock-User-Id'] = mockUserId;
-  }
-  // TODO: uncomment when JWT auth is wired in
-  // const token = getAccessToken();
+  const tokens = getStoredTokens();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
+  };
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders,
-      // TODO: uncomment when JWT auth is wired in
-      // ...(token && { Authorization: `Bearer ${token}` }),
-      ...options?.headers,
-    },
-  });
+  if (tokens?.access) {
+    headers['Authorization'] = `Bearer ${tokens.access}`;
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      'No se pudo conectar con el servidor.',
+    );
+  }
+
+  if (response.status === 401 && tokens?.refresh) {
+    const refreshed = await refreshAndStore(tokens.refresh);
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${refreshed.access}`;
+      try {
+        response = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers,
+        });
+      } catch {
+        throw new Error('No se pudo conectar con el servidor.');
+      }
+    } else {
+      clearTokens();
+      throw new Error('La sesión ha expirado. Inicia sesión de nuevo.');
+    }
+  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
@@ -49,5 +54,15 @@ export async function apiClient<T>(
     throw new Error(message);
   }
 
+  if (response.status === 204) {
+    return null as T;
+  }
+
   return response.json();
+}
+
+// ===== Marketplace Products =====
+
+export async function getProductById(id: string | number) {
+  return apiClient(`/marketplace/products/${id}/`);
 }

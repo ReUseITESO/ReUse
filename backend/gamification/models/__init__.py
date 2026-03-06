@@ -5,5 +5,7 @@
 from .badges import Badges
 from .user_badges import UserBadges
 from .environment_impact import EnvironmentImpact
-#
-__all__ = ["Badges", "UserBadges", "EnvironmentImpact"]
+from .point_rule import PointRule, PointAction
+from .point_transaction import PointTransaction
+
+__all__ = ["Badges", "UserBadges", "EnvironmentImpact", "PointRule", "PointAction", "PointTransaction"]

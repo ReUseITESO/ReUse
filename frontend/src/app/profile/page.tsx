@@ -1,22 +1,70 @@
 // Scaffolding: profile page stub. Add user profile component when core module is ready.
 // See reglas_de_escritura_front.md section 3 (Pages) for page conventions.
+'use client';
+
 import type { Metadata } from 'next';
 import BadgesList from '@/components/gamification/BadgesList';
-
-export const metadata: Metadata = {
-  title: 'Mi perfil | ReUseITESO',
-  description: 'Tu perfil de estudiante en ReUseITESO',
-};
+import { useMockAuth } from '@/context/MockAuthContext';
+import PointsBalance from '@/components/gamification/PointsBalance';
 
 export default function ProfilePage() {
-  return (
-    <main className="p-8 max-w-7xl mx-auto">
-      <h1 className="mb-6 text-2xl font-bold">Mi perfil</h1>
+  const { currentUser, isAuthenticated } = useMockAuth();
 
-      <section className="mt-8">
-        <h2 className="mb-4 text-xl font-semibold border-b pb-2">Logros y Medallas</h2>
-        <BadgesList />
-      </section>
-    </main>
-  );
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-slate-50 p-6">
+        <div className="mx-auto max-w-4xl">
+          <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-6 text-center">
+            <p className="text-yellow-900 font-medium">
+              Por favor selecciona un usuario del menú superior para ver el perfil
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+ return (
+        <main className="min-h-screen bg-slate-50 p-6">
+            <div className="mx-auto max-w-4xl">
+                <h1 className="mb-8 text-3xl font-bold text-slate-900">Mi Perfil</h1>
+
+                {/* User Info Card */}
+                <section className="mb-6 rounded-lg bg-white border border-slate-200 p-6 shadow-sm">
+                    <div className="flex items-start gap-6">
+                        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-100 text-blue-600 text-2xl font-bold">
+                            {currentUser?.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-xl font-semibold text-slate-900">{currentUser?.name}</h2>
+                            <p className="text-sm text-slate-600 mt-1">{currentUser?.email}</p>
+                            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
+                                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                Usuario activo
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Gamification Section */}
+                <section className="space-y-6">
+                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                        <h2 className="mb-4 text-lg font-semibold text-slate-800">Mis Puntos</h2>
+                        <PointsBalance />
+                    </div>
+                    
+                    {/* Logros y Medallas (Su trabajo) */}
+                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mt-6">
+                        <h2 className="mb-4 text-xl font-semibold border-b pb-2 text-slate-800">Logros y Medallas</h2>
+                        <BadgesList />
+                    </div>
+                </section>
+
+                {/* TODO: Add more profile sections */}
+                {/* - Published items */}
+                {/* - Transaction history */}
+                {/* - Account settings */}
+            </div>
+        </main>
+    );
 }

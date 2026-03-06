@@ -5,7 +5,16 @@
 from django.urls import path
 from gamification.views.badges import UserBadgesStatusView
 
+
+from gamification.views.points import CurrentUserPointsView, UserPointsView
+from gamification.views.award_points import AwardPointsView
+from gamification.views.deduct_points import DeductPointsView
+
 urlpatterns = [
-    # Ajustamos la ruta para que coincida con el fetch del frontend
-    path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
+  path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
+  
+	path('points/', CurrentUserPointsView.as_view(), name='current-user-points'),
+	path('points/<int:user_id>/', UserPointsView.as_view(), name='user-points'),
+  path("award-points/", AwardPointsView.as_view(), name="award-points"),
+  path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
 ]

@@ -1,4 +1,11 @@
-import type { TransactionType } from '@/types/product';
+import type { ProductCondition, TransactionType } from '@/types/product';
+
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
+}
 
 const TRANSACTION_LABELS: Record<TransactionType, string> = {
     donation: 'Donacion',
@@ -10,7 +17,19 @@ export function formatTransactionLabel(type: TransactionType): string {
     return TRANSACTION_LABELS[type];
 }
 
-export function formatPrice(price: string): string {
+const CONDITION_LABELS: Record<ProductCondition, string> = {
+    nuevo: 'Nuevo',
+    como_nuevo: 'Como nuevo',
+    buen_estado: 'Buen estado',
+    usado: 'Usado',
+};
+
+export function formatConditionLabel(condition: ProductCondition): string {
+    return CONDITION_LABELS[condition];
+}
+
+export function formatPrice(price: string | null): string {
+    if (!price) return '';
     const numeric = parseFloat(price);
     if (isNaN(numeric) || numeric === 0) return '';
     return `$${numeric.toLocaleString('es-MX')}`;
