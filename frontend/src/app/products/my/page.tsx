@@ -14,10 +14,10 @@ export default function MyProductsPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <Link
-            href="/profile"
+            href="/products"
             className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
           >
-            &larr; Volver a perfil
+            &larr; Volver a productos
           </Link>
           <h1 className="mt-2 text-2xl font-bold text-gray-900">Mis artículos</h1>
         </div>

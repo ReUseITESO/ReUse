@@ -2,7 +2,6 @@
 // See reglas_de_escritura_front.md section 3 (Pages) for page conventions.
 'use client';
 
-import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
@@ -53,25 +52,6 @@ export default function ProfilePage() {
                 Usuario activo
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* My Articles Section */}
-        <section className="mb-6 rounded-lg bg-white border p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800">Mis Artículos</h2>
-              <p className="mt-1 text-sm text-slate-500">Administra los productos que has publicado</p>
-            </div>
-            <Link
-              href="/products/my"
-              className="
-                inline-flex items-center gap-2 rounded-lg
-              bg-blue-600 px-4 py-2 text-sm font-medium
-              text-white transition-colors hover:bg-blue-700"
-            >
-              Ver mis artículos
-            </Link>
           </div>
         </section>
 
