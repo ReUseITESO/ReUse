@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMockAuth } from '@/context/MockAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -9,14 +9,14 @@ interface TestPointsButtonsProps {
   onPointsChanged?: () => void;
 }
 
-export default function TestPointsButtons({ onPointsChanged }: TestPointsButtonsProps) {
-  const { currentUser, isAuthenticated } = useMockAuth();
+export default function TestPointsButtons({ onPointsChanged }: Readonly<TestPointsButtonsProps>) {
+  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleAwardPoints = async (action: string) => {
-    if (!isAuthenticated || !currentUser) {
-      setMessage({ type: 'error', text: 'Selecciona un usuario primero' });
+    if (!isAuthenticated || !user) {
+      setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
       return;
     }
 
@@ -27,7 +27,7 @@ export default function TestPointsButtons({ onPointsChanged }: TestPointsButtons
       await apiClient('/gamification/award-points/', {
         method: 'POST',
         body: JSON.stringify({
-          user_id: currentUser.id,
+          user_id: user.id,
           action: action,
         }),
       });
@@ -43,8 +43,8 @@ export default function TestPointsButtons({ onPointsChanged }: TestPointsButtons
   };
 
   const handleDeductPoints = async (points: number) => {
-    if (!isAuthenticated || !currentUser) {
-      setMessage({ type: 'error', text: 'Selecciona un usuario primero' });
+    if (!isAuthenticated || !user) {
+      setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
       return;
     }
 
@@ -55,7 +55,7 @@ export default function TestPointsButtons({ onPointsChanged }: TestPointsButtons
       await apiClient('/gamification/deduct-points/', {
         method: 'POST',
         body: JSON.stringify({
-          user_id: currentUser.id,
+          user_id: user.id,
           points,
         }),
       });

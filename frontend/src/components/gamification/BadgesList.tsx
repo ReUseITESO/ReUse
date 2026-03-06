@@ -45,13 +45,13 @@ export default function BadgesList() {
             <h3 className="font-semibold text-sm mb-1">{badge.name}</h3>
             <p className="text-xs text-gray-500 mb-2">{badge.description}</p>
             
-            {!isLocked ? (
-              <span className="text-xs font-medium text-green-600">
-                Obtenido: {new Date(badge.earned_at as string).toLocaleDateString()}
-              </span>
-            ) : (
+            {isLocked ? (
               <span className="text-xs font-medium text-gray-400">
                 Bloqueado
+              </span>
+            ) : (
+              <span className="text-xs font-medium text-green-600">
+                Obtenido: {new Date(badge.earned_at as string).toLocaleDateString()}
               </span>
             )}
           </Card>

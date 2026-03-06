@@ -33,6 +33,22 @@ export interface GamificationSummary {
 export interface UserPoints {
   points: number;
 }
+
+export interface LevelDefinition {
+  name: string;
+  min_points: number;
+  icon: string;
+}
+
+export interface LevelProgression {
+  points: number;
+  current_level: LevelDefinition;
+  next_level: LevelDefinition | null;
+  progress_percent: number;
+  points_to_next_level: number;
+  is_max_level: boolean;
+}
+
 export interface BadgeWithStatus {
   id: number;
   name: string;
