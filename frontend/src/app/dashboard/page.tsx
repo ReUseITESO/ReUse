@@ -1,6 +1,13 @@
+'use client';
+
+import { useState } from 'react';
+
 import PointsBalance from '@/components/gamification/PointsBalance';
+import TestPointsButtons from '@/components/gamification/TestPointsButtons';
 
 export default function DashboardPage() {
+  const [pointsVersion, setPointsVersion] = useState(0);
+
   return (
     <main className="min-h-screen bg-slate-50 p-6">
       <div className="mx-auto max-w-4xl">
@@ -9,8 +16,9 @@ export default function DashboardPage() {
         <section className="space-y-6">
           <div>
             <h2 className="mb-4 text-lg font-semibold text-slate-800">Mi Gamificación</h2>
-            <PointsBalance />
+            <PointsBalance refreshTrigger={pointsVersion} />
           </div>
+          <TestPointsButtons onPointsUpdated={() => setPointsVersion((v) => v + 1)} />
         </section>
       </div>
     </main>
