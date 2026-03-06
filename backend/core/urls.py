@@ -15,4 +15,7 @@ urlpatterns = [
      # HU-CORE-09: Email verification module
     path("email-verification/send/", views.EmailVerificationSendView.as_view(), name="email_verification_send"),
     path("email-verification/confirm/", views.EmailVerificationConfirmView.as_view(), name="email_verification_confirm"),
+
+    # HU-CORE-04: Dashboard
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
 ]
