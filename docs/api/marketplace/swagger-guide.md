@@ -97,23 +97,36 @@ GET /api/marketplace/products/?category=1&condition=usado&ordering=-price&page=1
 #### Example Response — Detail `200 OK`
 
 ```json
+{
+  "id": 4,
+  "title": "Química Orgánica - McMurry",
+  "description": "Libro de Química Orgánica de John McMurry, 9na edición. Con subrayados pero legible.",
+  "condition": "usado",
+  "transaction_type": "donation",
+  "status": "disponible",
+  "price": null,
+  "image_url": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500",
+  "category": {
+    "id": 1,
+    "name": "Libros",
+    "icon": "book"
+  },
+  "seller_name": "María García Pérez",
+  "seller_email": "maria.garcia@iteso.mx",
+  "images": [
     {
-      "id": 4,
-      "title": "Química Orgánica - McMurry",
-      "description": "Libro de Química Orgánica de John McMurry, 9na edición. Con subrayados pero legible.",
-      "condition": "usado",
-      "transaction_type": "donation",
-      "status": "disponible",
-      "price": null,
+      "id": 1,
       "image_url": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500",
-      "category": {
-        "id": 1,
-        "name": "Libros",
-        "icon": "book"
-      },
-      "seller_name": "María García Pérez",
-      "created_at": "2026-02-06T03:15:00-06:00"
+      "order_number": 0
+    },
+    {
+      "id": 2,
+      "image_url": "https://images.unsplash.com/photo-1507842217343-583f20270319?w=500",
+      "order_number": 1
     }
+  ],
+  "created_at": "2026-02-06T03:15:00-06:00"
+}
 ```
 
 ---
@@ -174,19 +187,21 @@ GET /api/marketplace/categories/
 
 ### Product
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `integer` | Unique identifier |
-| `title` | `string` | Product title (max 255 chars) |
-| `description` | `string` | Full text description |
-| `condition` | `string` | One of: `nuevo`, `como_nuevo`, `buen_estado`, `usado` |
-| `transaction_type` | `string` | One of: `donation`, `sale`, `swap` |
-| `status` | `string` | One of: `disponible`, `en_proceso`, `completado`, `cancelado` |
-| `price` | `string` | Price with 2 decimals (e.g. `"350.00"`). `null` for donations |
-| `image_url` | `string` | URL to product image. `null` if not provided |
-| `category` | `object` | Nested category (`id` + basic fields) |
-| `seller_name` | `string` | Seller display name |
-| `created_at` | `string` | ISO 8601 datetime in UTC (e.g. `"2026-02-18T20:30:00Z"`) |
+| Field | Type | Description | Notes |
+|-------|------|-------------|-------|
+| `id` | `integer` | Unique identifier | |
+| `title` | `string` | Product title (max 255 chars) | |
+| `description` | `string` | Full text description | |
+| `condition` | `string` | One of: `nuevo`, `como_nuevo`, `buen_estado`, `usado` | |
+| `transaction_type` | `string` | One of: `donation`, `sale`, `swap` | |
+| `status` | `string` | One of: `disponible`, `en_proceso`, `completado`, `cancelado` | |
+| `price` | `string` | Price with 2 decimals (e.g. `"350.00"`). `null` for donations | |
+| `image_url` | `string` | URL to product image. `null` if not provided | List endpoint only |
+| `category` | `object` | Nested category (`id` + basic fields) | |
+| `seller_name` | `string` | Seller display name | |
+| `seller_email` | `string` | Seller email address | Detail endpoint only |
+| `images` | `array` | Array of product images with order | Detail endpoint only |
+| `created_at` | `string` | ISO 8601 datetime in UTC (e.g. `"2026-02-18T20:30:00Z"`) | |
 
 ### Category
 
@@ -195,6 +210,14 @@ GET /api/marketplace/categories/
 | `id` | `integer` | Unique identifier |
 | `name` | `string` | Category name (max 100 chars) |
 | `icon` | `string` | Icon or emoji. `null` if not provided |
+
+### ProductImage
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `integer` | Unique identifier |
+| `image_url` | `string` | URL to the image |
+| `order_number` | `integer` | Display order (0-indexed). Used to sort images in galleries |
 
 ---
 

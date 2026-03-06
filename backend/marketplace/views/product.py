@@ -8,6 +8,7 @@ from marketplace.models import Products
 from marketplace.serializers import (
     ProductCreateSerializer,
     ProductListSerializer,
+    ProductDetailSerializer,
     ProductStatusSerializer,
     ProductUpdateSerializer,
 )
@@ -129,6 +130,8 @@ class ProductViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return ProductCreateSerializer
+        if self.action == "retrieve":
+            return ProductDetailSerializer
         if self.action == "partial_update":
             return ProductUpdateSerializer
         if self.action == "change_status":
@@ -136,7 +139,7 @@ class ProductViewSet(
         return ProductListSerializer
 
     def get_queryset(self):
-        queryset = Products.objects.select_related("category", "seller")
+        queryset = Products.objects.select_related("category", "seller").prefetch_related("images")
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
@@ -173,6 +176,7 @@ class ProductViewSet(
             serializer.instance,
             context=self.get_serializer_context(),
         )
+
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
