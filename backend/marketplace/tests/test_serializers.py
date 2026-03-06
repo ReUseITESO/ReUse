@@ -9,7 +9,8 @@ class ProductCreateSerializerTests(TestCase):
     def setUp(self):
         self.seller = User.objects.create(
             email="seller@iteso.mx",
-            name="Seller",
+            first_name="Seller",
+            last_name="Test",
             phone="3300000001",
         )
         self.category = Category.objects.create(name="Libros")

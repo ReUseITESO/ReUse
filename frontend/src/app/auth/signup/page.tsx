@@ -138,7 +138,8 @@ export default function SignUpPage() {
         password: form.password,
         password_confirm: form.password_confirm,
       });
-      router.push('/products');
+      // Account created but needs email verification before login
+      router.push('/auth/verify-notice');
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Error al crear la cuenta.');
     } finally {

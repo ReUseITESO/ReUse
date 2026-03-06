@@ -11,14 +11,15 @@ class ProductViewSetTests(APITestCase):
     def setUp(self):
         self.seller = User.objects.create(
             email="seller@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
         )
         self.category = Category.objects.create(name="Libros")
 
     def _auth(self):
-        """Set the mock auth header for subsequent requests."""
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(self.seller.pk))
+        """Authenticate as the seller for subsequent requests."""
+        self.client.force_authenticate(user=self.seller)
 
     def _payload(self, **overrides):
         base = {
@@ -39,7 +40,7 @@ class ProductViewSetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_with_invalid_user_id_returns_401(self):
-        self.client.credentials(HTTP_X_MOCK_USER_ID="99999")
+        # Without authentication, should return 401
         response = self.client.post(self.PRODUCTS_URL, self._payload(), format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -109,7 +110,7 @@ class ProductViewSetTests(APITestCase):
         Products.objects.filter(title="Disponible").update(status="en_proceso")
         self.client.post(self.PRODUCTS_URL, self._payload(title="Visible"), format="json")
 
-        self.client.credentials()  # remove auth header for listing
+        self.client.force_authenticate(user=None)  # remove auth for listing
         response = self.client.get(self.PRODUCTS_URL)
         titles = [p["title"] for p in response.data["results"]]
         self.assertNotIn("Disponible", titles)
