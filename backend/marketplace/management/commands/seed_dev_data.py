@@ -14,13 +14,14 @@ from marketplace.models import Category, Products, Images, Transaction
 from gamification.models.badges import Badges
 from gamification.models.user_badges import UserBadges
 from gamification.models.environment_impact import EnvironmentImpact
+from gamification.models.point_rule import PointRule
 
 
 class Command(BaseCommand):
     help = "Pobla la BD con datos de prueba para desarrollo"
 
     def handle(self, *args, **options):
-        self.stdout.write("🌱 Iniciando seed de datos de desarrollo...\n")
+        self.stdout.write("Iniciando seed de datos de desarrollo...\n")
 
         users = self._create_users()
         categories = self._create_categories()
@@ -29,19 +30,19 @@ class Command(BaseCommand):
         badges = self._create_badges()
         self._assign_badges(users, badges)
         self._create_environment_impact(users)
+        self._create_point_rules()
         self._create_transactions(users, products)
 
-        self.stdout.write(self.style.SUCCESS("\n✅ Seed completado exitosamente!"))
-        self.stdout.write(f"   📊 {User.objects.count()} usuarios")
-        self.stdout.write(f"   📂 {Category.objects.count()} categorías")
-        self.stdout.write(f"   📦 {Products.objects.count()} productos")
-        self.stdout.write(f"   🖼️  {Images.objects.count()} imágenes")
-        self.stdout.write(f"   🏅 {Badges.objects.count()} badges")
-        self.stdout.write(f"   🤝 {Transaction.objects.count()} transacciones")
+        self.stdout.write(self.style.SUCCESS("\nSeed completado exitosamente!"))
+        self.stdout.write(f"   {User.objects.count()} usuarios")
+        self.stdout.write(f"   {Category.objects.count()} categorias")
+        self.stdout.write(f"   {Products.objects.count()} productos")
+        self.stdout.write(f"   {Images.objects.count()} imagenes")
+        self.stdout.write(f"   {Badges.objects.count()} badges")
+        self.stdout.write(f"   {Transaction.objects.count()} transacciones")
 
-    # ── Usuarios ─────────────────────────────────────────────────────────
     def _create_users(self):
-        self.stdout.write("  👥 Creando usuarios...")
+        self.stdout.write("  Creando usuarios...")
         users_data = [
             {
                 "email": "jose.chavez@iteso.mx",
@@ -117,7 +118,7 @@ class Command(BaseCommand):
                 defaults=data,
             )
             if was_created:
-                user.set_password("Deuteronomio1")
+                user.set_password("ReUse2026!")
                 user.is_active = True
                 user.is_email_verified = True
                 user.save()
@@ -130,12 +131,11 @@ class Command(BaseCommand):
                 user.save()
             created.append(user)
 
-        self.stdout.write(f"    ✅ {len(created)} usuarios listos")
+        self.stdout.write(f"    {len(created)} usuarios listos")
         return created
 
-    # ── Categorías ───────────────────────────────────────────────────────
     def _create_categories(self):
-        self.stdout.write("  📂 Creando categorías...")
+        self.stdout.write("  Creando categorias...")
         categories_data = [
             {"name": "Libros y Apuntes", "icon": "book"},
             {"name": "Electrónica", "icon": "laptop"},
@@ -157,18 +157,17 @@ class Command(BaseCommand):
             )
             created.append(cat)
 
-        self.stdout.write(f"    ✅ {len(created)} categorías listas")
+        self.stdout.write(f"    {len(created)} categorias listas")
         return created
 
-    # ── Productos ────────────────────────────────────────────────────────
     def _create_products(self, users, categories):
-        self.stdout.write("  📦 Creando productos...")
+        self.stdout.write("  Creando productos...")
 
         # Mapear categorías por nombre para fácil acceso
         cat = {c.name: c for c in categories}
 
         products_data = [
-            # ─── Libros ──────────────────────────────────
+            # Libros
             {
                 "seller": users[1],  # María
                 "category": cat["Libros y Apuntes"],
@@ -210,7 +209,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1589998059171-988d887df646?w=400",
             },
 
-            # ─── Electrónica ────────────────────────────
+            # Electronica
             {
                 "seller": users[0],  # Jose
                 "category": cat["Electrónica"],
@@ -262,7 +261,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1564466809058-bf4114d55352?w=400",
             },
 
-            # ─── Ropa y Accesorios ──────────────────────
+            # Ropa y Accesorios
             {
                 "seller": users[5],  # Sofía
                 "category": cat["Ropa y Accesorios"],
@@ -294,7 +293,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
             },
 
-            # ─── Muebles ────────────────────────────────
+            # Muebles
             {
                 "seller": users[0],  # Jose
                 "category": cat["Muebles"],
@@ -326,7 +325,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400",
             },
 
-            # ─── Deportes ───────────────────────────────
+            # Deportes
             {
                 "seller": users[4],  # Diego
                 "category": cat["Deportes"],
@@ -358,7 +357,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400",
             },
 
-            # ─── Transporte ─────────────────────────────
+            # Transporte
             {
                 "seller": users[2],  # Carlos
                 "category": cat["Transporte"],
@@ -380,7 +379,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400",
             },
 
-            # ─── Instrumentos Musicales ──────────────────
+            # Instrumentos Musicales
             {
                 "seller": users[6],  # Pedro
                 "category": cat["Instrumentos Musicales"],
@@ -402,7 +401,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400",
             },
 
-            # ─── Arte y Papelería ────────────────────────
+            # Arte y Papeleria
             {
                 "seller": users[3],  # Ana
                 "category": cat["Arte y Papelería"],
@@ -424,7 +423,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400",
             },
 
-            # ─── Cocina y Hogar ──────────────────────────
+            # Cocina y Hogar
             {
                 "seller": users[5],  # Sofía
                 "category": cat["Cocina y Hogar"],
@@ -446,7 +445,7 @@ class Command(BaseCommand):
                 "image_url": "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400",
             },
 
-            # ─── Videojuegos ────────────────────────────
+            # Videojuegos
             {
                 "seller": users[4],  # Diego
                 "category": cat["Videojuegos"],
@@ -495,12 +494,11 @@ class Command(BaseCommand):
             )
             created.append(product)
 
-        self.stdout.write(f"    ✅ {len(created)} productos listos")
+        self.stdout.write(f"    {len(created)} productos listos")
         return created
 
-    # ── Imágenes extra ───────────────────────────────────────────────────
     def _create_images(self, products):
-        self.stdout.write("  🖼️  Creando imágenes de productos...")
+        self.stdout.write("  Creando imagenes de productos...")
         count = 0
 
         extra_images = {
@@ -547,65 +545,64 @@ class Command(BaseCommand):
                 if created:
                     count += 1
 
-        self.stdout.write(f"    ✅ {count} imágenes creadas")
+        self.stdout.write(f"    {count} imagenes creadas")
 
-    # ── Badges ───────────────────────────────────────────────────────────
     def _create_badges(self):
-        self.stdout.write("  🏅 Creando badges...")
+        self.stdout.write("  Creando badges...")
         badges_data = [
             {
                 "name": "Primera Venta",
                 "description": "Completaste tu primera venta en ReUse",
-                "icon": "🏷️",
+                "icon": "tag",
                 "points": 50,
                 "rarity": "comun",
             },
             {
                 "name": "Comprador Estrella",
                 "description": "Realizaste 5 compras exitosas",
-                "icon": "⭐",
+                "icon": "star",
                 "points": 100,
                 "rarity": "raro",
             },
             {
                 "name": "Eco Warrior",
-                "description": "Donaste 3 o más productos a la comunidad ITESO",
-                "icon": "🌱",
+                "description": "Donaste 3 o mas productos a la comunidad ITESO",
+                "icon": "leaf",
                 "points": 150,
                 "rarity": "epico",
             },
             {
                 "name": "Trueque Master",
                 "description": "Completaste 3 intercambios exitosos",
-                "icon": "🔄",
+                "icon": "refresh",
                 "points": 120,
                 "rarity": "raro",
             },
             {
                 "name": "Bienvenido a ReUse",
-                "description": "Te registraste en la plataforma. ¡Bienvenido!",
-                "icon": "👋",
+                "description": "Te registraste en la plataforma.",
+                "icon": "wave",
                 "points": 10,
                 "rarity": "comun",
             },
             {
                 "name": "Vendedor Top",
-                "description": "Vendiste más de 10 productos",
-                "icon": "🏆",
+                "description": "Vendiste mas de 10 productos",
+                "icon": "trophy",
                 "points": 200,
                 "rarity": "legendario",
             },
             {
-                "name": "Librófilo",
+                "name": "Librofilo",
                 "description": "Publicaste 5 libros en la plataforma",
-                "icon": "📚",
+                "icon": "books",
                 "points": 80,
                 "rarity": "raro",
             },
             {
                 "name": "Perfil Completo",
                 "description": "Llenaste todos los campos de tu perfil",
-                "icon": "✅",
+                "icon": "check",
                 "points": 30,
                 "rarity": "comun",
             },
@@ -619,12 +616,11 @@ class Command(BaseCommand):
             )
             created.append(badge)
 
-        self.stdout.write(f"    ✅ {len(created)} badges listos")
+        self.stdout.write(f"    {len(created)} badges listos")
         return created
 
-    # ── Asignar badges a usuarios ────────────────────────────────────────
     def _assign_badges(self, users, badges):
-        self.stdout.write("  🎖️  Asignando badges a usuarios...")
+        self.stdout.write("  Asignando badges a usuarios...")
         badge_map = {b.name: b for b in badges}
         count = 0
 
@@ -642,7 +638,7 @@ class Command(BaseCommand):
             (users[3], badge_map["Perfil Completo"]),
             (users[4], badge_map["Trueque Master"]),
             (users[5], badge_map["Primera Venta"]),
-            (users[5], badge_map["Librófilo"]),
+            (users[5], badge_map["Librofilo"]),
             (users[6], badge_map["Primera Venta"]),
             (users[7], badge_map["Comprador Estrella"]),
         ]
@@ -652,11 +648,10 @@ class Command(BaseCommand):
             if created:
                 count += 1
 
-        self.stdout.write(f"    ✅ {count} badges asignados")
+        self.stdout.write(f"    {count} badges asignados")
 
-    # ── Impacto ambiental ────────────────────────────────────────────────
     def _create_environment_impact(self, users):
-        self.stdout.write("  🌍 Creando impacto ambiental...")
+        self.stdout.write("  Creando impacto ambiental...")
         count = 0
         for user in users:
             _, created = EnvironmentImpact.objects.get_or_create(
@@ -669,11 +664,30 @@ class Command(BaseCommand):
             if created:
                 count += 1
 
-        self.stdout.write(f"    ✅ {count} registros de impacto")
+        self.stdout.write(f"    {count} registros de impacto")
 
-    # ── Transacciones ────────────────────────────────────────────────────
+    def _create_point_rules(self):
+        self.stdout.write("  Creando reglas de puntos...")
+        rules_data = [
+            {"action": "publish_item", "points": 10},
+            {"action": "complete_donation", "points": 25},
+            {"action": "complete_sale", "points": 15},
+            {"action": "complete_exchange", "points": 20},
+            {"action": "receive_positive_review", "points": 10},
+        ]
+        count = 0
+        for data in rules_data:
+            _, created = PointRule.objects.get_or_create(
+                action=data["action"],
+                defaults={"points": data["points"], "is_active": True},
+            )
+            if created:
+                count += 1
+
+        self.stdout.write(f"    {count} reglas de puntos creadas")
+
     def _create_transactions(self, users, products):
-        self.stdout.write("  🤝 Creando transacciones...")
+        self.stdout.write("  Creando transacciones...")
         now = timezone.now()
         count = 0
 
@@ -756,4 +770,4 @@ class Command(BaseCommand):
                 product.save(update_fields=["status"])
                 count += 1
 
-        self.stdout.write(f"    ✅ {count} transacciones creadas")
+        self.stdout.write(f"    {count} transacciones creadas")

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "⏳ Waiting for database..."
+echo "Waiting for database..."
 while ! python -c "
 import psycopg2, os
 psycopg2.connect(
@@ -13,13 +13,13 @@ psycopg2.connect(
 )" 2>/dev/null; do
     sleep 1
 done
-echo "✅ Database ready"
+echo "Database ready"
 
-echo "📦 Running migrations..."
+echo "Running migrations..."
 python manage.py migrate --noinput
 
-echo "🌱 Seeding development data..."
+echo "Seeding development data..."
 python manage.py seed_dev_data
 
-echo "🚀 Starting server..."
+echo "Starting server..."
 exec python manage.py runserver 0.0.0.0:8000
