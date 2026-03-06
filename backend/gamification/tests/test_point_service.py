@@ -9,7 +9,12 @@ from gamification.services.point_service import award_points
 class AwardPointsServiceTest(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create(username="testuser", points=0)
+        self.user = User.objects.create(
+            email="test.user@iteso.mx",
+            first_name="Test",
+            last_name="User",
+            points=0,
+        )
 
         self.rule = PointRule.objects.create(
             action=PointAction.PUBLISH_ITEM,
