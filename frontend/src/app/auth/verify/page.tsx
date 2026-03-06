@@ -45,6 +45,8 @@ export default function VerifyPage() {
           const code = data?.error?.code;
           const msg = data?.error?.message || 'No se pudo verificar el correo.';
 
+          // ✅ Fix: si el token ya fue usado, lo tratamos como "ya verificado"
+          // y mandamos al home (si ya estás logueado, te deja; si no, tu app decidirá qué mostrar).
           if (code === 'TOKEN_USED') {
             setStatus('success');
             setTimeout(() => window.location.replace('/'), 900);
@@ -56,6 +58,7 @@ export default function VerifyPage() {
           return;
         }
 
+        // OK: token válido, backend devuelve tokens para auto-login
         const payload = data as ConfirmResponse;
 
         if (!payload?.tokens?.access || !payload?.tokens?.refresh) {
@@ -69,6 +72,7 @@ export default function VerifyPage() {
 
         setStatus('success');
 
+        // ✅ Fuerza reload para que AuthProvider lea tokens y cargue perfil
         setTimeout(() => window.location.replace('/'), 1200);
       } catch {
         setStatus('error');
