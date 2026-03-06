@@ -39,6 +39,15 @@ export default function Navbar() {
             </Link>
           )}
 
+          {isAuthenticated && (
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+            >
+              Dashboard
+            </Link>
+          )}
+
           {isLoading ? (
             <div className="h-8 w-20 animate-pulse rounded-lg bg-gray-200" />
           ) : isAuthenticated ? (
@@ -115,6 +124,13 @@ export default function Navbar() {
           </Link>
           {isAuthenticated ? (
             <>
+              <Link
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Dashboard
+              </Link>
               <div className="my-2 border-t border-gray-100 pt-2">
                 <p className="px-3 text-sm font-medium text-gray-900">{user?.full_name}</p>
                 <p className="px-3 text-xs text-gray-500">{user?.email}</p>

@@ -212,23 +212,6 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
     "x-mock-user-id",  # For mock authentication in development
 ]
-    "authorization",
-    "content-type",
-    "origin",
-    "x-csrftoken",
-    "x-requested-with",
-    "x-mock-user-id",
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    'x-mock-user-id',
-]
 
 # LOGGING CONFIGURATION
 LOGGING = {
