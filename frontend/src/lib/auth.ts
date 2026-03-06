@@ -112,30 +112,25 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<AuthResponse> {
+export async function signUp(payload: SignUpRequest): Promise<any> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
+  const body = await response.json().catch(() => ({}));
 
+  if (!response.ok) {
     if (body?.error?.details) {
       const details = body.error.details;
       const messages = Object.values(details).flat();
       throw new Error((messages as string[]).join(' '));
     }
-
-    throw new Error(
-      body?.error?.message ?? 'Error al crear la cuenta.',
-    );
+    throw new Error(body?.error?.message ?? 'Error al crear la cuenta.');
   }
 
-  const data: AuthResponse = await response.json();
-  storeTokens(data.tokens);
-  return data;
+  return body;
 }
 
 export async function signOut(): Promise<void> {
