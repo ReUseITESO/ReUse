@@ -48,8 +48,7 @@ class CurrentUserPointsViewTests(APITestCase):
         self.assertIn("detail", response.data["error"]["details"])
 
     def test_get_points_with_invalid_user_id_returns_401(self):
-        """Request with mock header but no auth should still return 401"""
-        self.client.credentials(HTTP_X_MOCK_USER_ID="99999")
+        """Request without proper JWT auth should return 401"""
         response = self.client.get(self.POINTS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 

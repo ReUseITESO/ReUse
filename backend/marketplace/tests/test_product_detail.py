@@ -13,10 +13,11 @@ from marketplace.models.product import Products
 from marketplace.models.images import Images
 
 
-def make_user(email: str = "test@iteso.mx", name: str = "Test User") -> User:
+def make_user(email: str = "test@iteso.mx", first_name: str = "Test", last_name: str = "User") -> User:
     return User.objects.create(
         email=email,
-        name=name,
+        first_name=first_name,
+        last_name=last_name,
         phone="3300000000",
     )
 
@@ -50,7 +51,7 @@ class TestProductDetailEndpoint(APITestCase):
     """Tests for GET /api/marketplace/products/{id}/ endpoint."""
 
     def setUp(self):
-        self.user = make_user(email="seller@iteso.mx", name="María García")
+        self.user = make_user(email="seller@iteso.mx", first_name="María", last_name="García")
         self.category = make_category(name="Libros", icon="book")
         self.product = make_product(
             seller=self.user,
@@ -151,9 +152,9 @@ class TestProductCreationWithImages(APITestCase):
     """Tests for POST /api/marketplace/products/ with images array."""
 
     def setUp(self):
-        self.user = make_user(email="creator@iteso.mx", name="Test Creator")
+        self.user = make_user(email="creator@iteso.mx", first_name="Test", last_name="Creator")
         self.category = make_category(name="Electrónica", icon="laptop")
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(self.user.id))
+        self.client.force_authenticate(user=self.user)
 
     def test_create_product_without_images_returns_201(self):
         data = {

@@ -10,15 +10,15 @@ class MyProductsTests(APITestCase):
 
     def setUp(self):
         self.seller = User.objects.create(
-            username="seller_my",
             email="seller@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
         )
         self.other_user = User.objects.create(
-            username="other_my",
             email="other@iteso.mx",
-            name="Carlos López",
+            first_name="Carlos",
+            last_name="López",
             phone="3312345679",
         )
         self.category = Category.objects.create(name="Libros")
@@ -72,7 +72,7 @@ class MyProductsTests(APITestCase):
 
     def _auth(self, user=None):
         user = user or self.seller
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(user.pk))
+        self.client.force_authenticate(user=user)
 
     def test_list_my_products_returns_all_statuses(self):
         self._auth()

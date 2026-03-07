@@ -12,8 +12,7 @@ class UserBadgesStatusView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        # Soporte para MockAuthMiddleware o Auth normal
-        user = getattr(request, 'mock_user', None) or request.user
+        user = request.user
 
         if not user or not user.is_authenticated:
             return Response({"detail": "Las credenciales de autenticación no se proveyeron."}, status=401)

@@ -5,24 +5,75 @@ services:
     image: postgres:15-alpine
     container_name: reuse_iteso_db
     environment:
-      POSTGRES_DB: ${DB_NAME:-reuse_iteso_dev}
-      POSTGRES_USER: ${DB_USER:-reuse_dev}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-local_dev_password}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=es_MX.UTF-8"
+      POSTGRES_DB: reuse_iteso_dev
+      POSTGRES_USER: reuse_dev
+      POSTGRES_PASSWORD: local_dev_password
       TZ: America/Mexico_City
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/seeds:/docker-entrypoint-initdb.d:ro
     networks:
       - reuse_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-reuse_dev} -d ${DB_NAME:-reuse_iteso_dev}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test: ["CMD-SHELL", "pg_isready -U reuse_dev -d reuse_iteso_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: reuse_iteso_backend
+    environment:
+      SECRET_KEY: django-insecure-dev-key-change-in-production
+      DEBUG: "True"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0,backend"
+      DB_NAME: reuse_iteso_dev
+      DB_USER: reuse_dev
+      DB_PASSWORD: local_dev_password
+      DB_HOST: db
+      DB_PORT: "5432"
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      FRONTEND_BASE_URL: "http://localhost:3000"
+      EMAIL_HOST: smtp.sendgrid.net
+      EMAIL_PORT: "587"
+      EMAIL_USE_TLS: "True"
+      EMAIL_HOST_USER: apikey
+      EMAIL_HOST_PASSWORD: "${SENDGRID_API_KEY:-}"
+      DEFAULT_FROM_EMAIL: reuseiteso@outlook.com
+      EMAIL_VERIFICATION_EXPIRES_MINUTES: "30"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - reuse_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: reuse_iteso_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8000/api"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - reuse_network
     restart: unless-stopped
 
   adminer:
