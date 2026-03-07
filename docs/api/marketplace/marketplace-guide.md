@@ -355,6 +355,41 @@ GET /api/marketplace/products/?category=2&ordering=-created_at&page=2
 }
 ```
 
+##### Detalle de producto
+
+```json
+{
+  "id": 1,
+  "title": "Cálculo Diferencial - Stewart 8va Edición",
+  "description": "Libro de Cálculo en excelente estado, con notas y ejercicios resueltos. Ideal para matemáticas I.",
+  "condition": "buen_estado",
+  "transaction_type": "sale",
+  "status": "disponible",
+  "price": "350.00",
+  "image_url": "https://images.unsplash.com/...",
+  "category": {
+    "id": 1,
+    "name": "Libros",
+    "icon": "book"
+  },
+  "seller_name": "María García Pérez",
+  "seller_email": "maria.garcia@iteso.mx",
+  "images": [
+    {
+      "id": 1,
+      "image_url": "https://images.unsplash.com/photo-1507842217343-583f20270319?w=500",
+      "order_number": 0
+    },
+    {
+      "id": 2,
+      "image_url": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500",
+      "order_number": 1
+    }
+  ],
+  "created_at": "2026-02-01T04:00:00-06:00"
+}
+```
+
 ##### Lista de categorías
 
 ```json
@@ -467,7 +502,7 @@ Si todo está configurado correctamente, deberás visualizar productos en la rut
 |------|-------------|------------|
 | `/` | Página principal — landing con enlace a productos | `app/page.tsx` |
 | `/products` | Lista de productos con barra de búsqueda y filtros | `app/products/page.tsx` |
-| `/products/{id}` | Detalle de un producto específico (en desarrollo) | `app/products/[id]/page.tsx` |
+| `/products/{id}` | Detalle de un producto específico con galería de imágenes | `app/products/[id]/page.tsx` |
 
 #### Funcionalidades de `/products`
 
@@ -475,6 +510,14 @@ Si todo está configurado correctamente, deberás visualizar productos en la rut
 - **Botón "Mostrar todos"** para resetear filtros
 - **Grid de tarjetas** con título, categoría, precio y estado
 - **Estados de UI:** loading (spinner), éxito (grid), vacío ("No se encontraron productos"), error (con botón "Reintentar")
+
+#### Funcionalidades de `/products/{id}`
+
+- **Galería de imágenes** con thumbnails y vista principal
+- **Detalles del producto:** título, descripción, categoría, condición, precio
+- **Información del vendedor:** nombre y email de contacto
+- **Fecha de publicación**
+- **Botón de contacto** para comunicarse con el vendedor
 
 ---
 
