@@ -249,6 +249,137 @@ export default function ProductsPage() {
   )}>
   ```
 
+### Variables Globales de Color y Tipografía
+
+Los colores, tipografía y variantes de botones están centralizados en dos archivos. **No existe otra fuente de verdad.**
+
+- `src/app/globals.css` — define las variables CSS en `:root` (light) y `.dark`
+- `tailwind.config.js` — mapea cada variable a una clase utilitaria de Tailwind
+
+**Regla obligatoria:** Nunca hardcodear colores en componentes.
+
+```tsx
+// MAL – color hardcodeado
+<button className="bg-[#004976] text-white">Publicar</button>
+<div style={{ color: '#155DFC' }}>Texto</div>
+<div className="text-blue-700">Texto</div>   {/* color nativo Tailwind */}
+
+// BIEN – usando variables globales
+<button className="bg-btn-primary text-btn-primary-fg">Publicar</button>
+<div className="text-secondary">Texto</div>
+```
+
+#### Tipografía
+
+| Nivel | Clase Tailwind | Variable CSS | Tamaño |
+|-------|----------------|--------------|--------|
+| Título principal | `text-h1` | `--text-h1` | 24px |
+| Título de sección | `text-h2` | `--text-h2` | 20px |
+| Subtítulo | `text-h3` | `--text-h3` | 18px |
+| Cuerpo | `text-body` | `--text-body` | 16px |
+| Pequeño / metadata | `text-sm` | `--text-sm` | 14px |
+| Labels / timestamps | `text-xs` | `--text-xs` | 12px |
+
+| Peso | Clase Tailwind | Variable CSS |
+|------|----------------|---------------|
+| Regular | `font-normal` | `--font-normal` |
+| Medio (botones) | `font-medium` | `--font-medium` |
+| Semibold (precios) | `font-semibold` | `--font-semibold` |
+| Negrita (títulos) | `font-bold` | `--font-bold` |
+
+Las etiquetas semánticas HTML tienen estilos aplicados automáticamente vía `@layer base` en `globals.css`. **No es necesario agregar clases de tamaño manualmente** a `h1`, `h2`, `h3`, `h4`, `p`, `small` ni `label`.
+
+| Etiqueta | Tamaño automático | Peso automático |
+|----------|-------------------|-----------------|
+| `<h1>` | `text-h1` (24px) | `font-bold` |
+| `<h2>` | `text-h2` (20px) | `font-semibold` |
+| `<h3>` | `text-h3` (18px) | `font-semibold` |
+| `<h4>` | `text-body` (16px) | `font-semibold` |
+| `<p>` | `text-body` (16px) | `font-normal` |
+| `<small>` | `text-xs` (12px) | `font-normal` |
+| `<label>` | `text-sm` (14px) | `font-medium` |
+
+```tsx
+// BIEN – las etiquetas semánticas ya tienen el tamaño correcto
+<h1 className="text-fg">Productos disponibles</h1>
+<h2 className="text-fg">Categorías</h2>
+<p className="text-fg">Descripción del item</p>
+<span className="text-xs font-medium text-muted-fg">Hace 2h</span>
+
+// También BIEN – sobreescribir cuando el diseño lo requiera
+<h2 className="text-h3 font-bold text-primary">Caso especial</h2>
+
+// MAL – tamaño hardcodeado
+<h1 className="text-[24px]">Productos</h1>
+<p  className="text-base">Texto</p>   {/* clase nativa Tailwind */}
+```
+
+#### Clases de color disponibles
+
+| Categoría | Clases Tailwind | Variable CSS |
+|-----------|-----------------|---------------|
+| **Principales** | `bg-primary` / `text-primary` | `--primary` |
+| | `bg-secondary` / `text-secondary` | `--secondary` |
+| | `bg-accent` / `text-accent` | `--accent` |
+| **Superficie** | `bg-bg` / `text-fg` | `--bg`, `--fg` |
+| | `bg-card` / `text-card-fg` | `--card` |
+| | `bg-muted` / `text-muted-fg` | `--muted-fg` |
+| **Feedback** | `bg-success` / `text-success-fg` | `--success` |
+| | `bg-warning` / `text-warning-fg` | `--warning` |
+| | `bg-error` / `text-error-fg` | `--error` |
+| | `bg-info` / `text-info-fg` | `--info` |
+| **Categorías** | `bg-cat-books` | `--cat-books` |
+| | `bg-cat-electronics` | `--cat-electronics` |
+| | `bg-cat-clothing` | `--cat-clothing` |
+| | `bg-cat-supplies` | `--cat-supplies` |
+
+#### Variantes de botones
+
+| Variante | Uso | Clases base |
+|----------|-----|-------------|
+| `primary` | Acción principal | `bg-btn-primary text-btn-primary-fg hover:bg-primary-hover` |
+| `secondary` | Acción secundaria | `bg-btn-secondary text-btn-secondary-fg hover:bg-secondary-hover` |
+| `template` | Ghost / outline | `bg-btn-tmpl text-btn-tmpl-fg border border-btn-tmpl-border hover:bg-btn-tmpl-hover` |
+| `disabled` | Deshabilitado | `bg-btn-disabled text-btn-disabled-fg cursor-not-allowed` |
+
+```tsx
+// Ejemplos de variantes de botón
+<button className="bg-btn-primary text-btn-primary-fg rounded px-4 py-2 hover:bg-primary-hover">
+  Publicar item
+</button>
+
+<button className="bg-btn-secondary text-btn-secondary-fg rounded px-4 py-2 hover:bg-secondary-hover">
+  Ver más
+</button>
+
+<button className="bg-btn-tmpl text-btn-tmpl-fg border border-btn-tmpl-border rounded px-4 py-2 hover:bg-btn-tmpl-hover">
+  Cancelar
+</button>
+
+<button
+  className="bg-btn-disabled text-btn-disabled-fg rounded px-4 py-2 cursor-not-allowed"
+  disabled
+>
+  No disponible
+</button>
+```
+
+#### Agregar nuevos colores
+
+Si necesitas un color que no existe:
+
+1. Agrégalo en `src/app/globals.css` dentro de `:root` con su equivalente en `.dark`.
+2. Mapéalo en `tailwind.config.js` dentro de `theme.extend.colors`.
+3. Usa la nueva clase Tailwind en el componente.
+
+**Prohibido:**
+
+```tsx
+<div className="bg-[#004976]">...</div>       // Valor hex hardcodeado
+<div style={{ color: '#155DFC' }}>...</div>   // Style inline con hex
+<div className="text-blue-700">...</div>       // Color nativo de Tailwind
+```
+
 ---
 
 ## 5. Manejo de Estados de UI

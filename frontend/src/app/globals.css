@@ -1,3 +1,164 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================================================================
+    VARIABLES GLOBALES – ReUseITESO
+    Fuente de verdad de estilos. Basadas en el diseño Figma.
+    No hardcodear colores en componentes. Usar siempre estas variables
+    o las clases Tailwind mapeadas en tailwind.config.js
+    ================================================================ */
+
+:root {
+    /* ── Tipografía ─────────────────────────────────────────────── */
+    --font-sans:  system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    --font-serif: Source Serif 4, serif;
+    --font-mono:  JetBrains Mono, monospace;
+
+    /* Tamaños */
+    --text-h1:    1.5rem;    /* 24px – Título principal */
+    --text-h2:    1.25rem;   /* 20px – Título de sección */
+    --text-h3:    1.125rem;  /* 18px – Subtítulo */
+    --text-body:  1rem;      /* 16px – Texto estándar */
+    --text-sm:    0.875rem;  /* 14px – Texto pequeño / metadata */
+    --text-xs:    0.75rem;   /* 12px – Labels / timestamps */
+
+    /* Pesos */
+    --font-normal:   400;
+    --font-medium:   500;  /* Botones y labels */
+    --font-semibold: 600;  /* Títulos de items y precios */
+    --font-bold:     700;  /* Títulos de página */
+
+    /* ── Colores Principales ITESO ──────────────────────────────── */
+    --primary: #004976;    /* Azul principal */
+    --primary-fg: #ffffff;
+    --primary-hover: #003d5c;
+    --secondary: #155DFC;    /* Azul claro */
+    --secondary-fg: #ffffff;
+    --secondary-hover: #004976;
+    --accent: #16a34a;    /* Verde sostenibilidad */
+    --accent-fg: #ffffff;
+
+    /* ── Fondo y Superficie ─────────────────────────────────────── */
+    --bg: #ffffff;
+    --fg: #111827;
+    --card: #ffffff;
+    --card-fg: #111827;
+    --muted: #f9fafb;
+    --muted-fg: #6b7280;
+    --popover: #ffffff;
+    --popover-fg: #111827;
+
+    /* ── Status / Feedback ──────────────────────────────────────── */
+    --success: #16a34a;
+    --success-fg: #ffffff;
+    --warning: #f59e0b;
+    --warning-fg: #111827;
+    --error: #dc2626;
+    --error-fg: #ffffff;
+    --info: #0066a1;
+    --info-fg: #ffffff;
+
+    /* ── Bordes e Inputs ────────────────────────────────────────── */
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #155DFC;
+    --radius: 0.5rem;
+
+    /* ── Categorías ─────────────────────────────────────────────── */
+    --cat-books: #2B7FFF;
+    --cat-electronics: #AD46FF;
+    --cat-clothing: #F6339A;
+    --cat-supplies: #FF6900;
+
+    /* ── Botones / Acciones ─────────────────────────────────────── */
+    /* primary – acción principal de la página */
+    --btn-primary-bg: #004976;
+    --btn-primary-fg: #ffffff;
+    --btn-primary-hover: #003d5c;
+
+    /* secondary – acciones secundarias */
+    --btn-secondary-bg: #155DFC;
+    --btn-secondary-fg: #ffffff;
+    --btn-secondary-hover: #004976;
+
+    /* disabled – estado deshabilitado */
+    --btn-disabled-bg: #e5e7eb;
+    --btn-disabled-fg: #9ca3af;
+
+    /* template / ghost – sin fondo, con borde y color */
+    --btn-tmpl-bg: transparent;
+    --btn-tmpl-fg: #004976;
+    --btn-tmpl-border: #004976;
+    --btn-tmpl-hover-bg: #f3f4f6;
+}
+
+/* ================================================================
+    BASE LAYER – Estilos automáticos para etiquetas semánticas
+    Aplica la escala tipográfica del Figma sin necesidad de className.
+    Si el componente necesita un tamaño diferente, puede sobreescribir
+    con la clase Tailwind correspondiente (text-h1, text-sm, etc.).
+    ================================================================ */
+@layer base {
+    h1 { @apply text-h1 font-bold; }
+    h2 { @apply text-h2 font-semibold; }
+    h3 { @apply text-h3 font-semibold; }
+    h4 { @apply text-body font-semibold; }
+    p  { @apply text-body font-normal; }
+    small { @apply text-xs font-normal; }
+    label { @apply text-sm font-medium; }
+}
+
+.dark {
+    /* ── Colores Principales ITESO (modo oscuro)(si es que existe)───── */
+    --primary: #2B7FFF;
+    --primary-fg: #ffffff;
+    --primary-hover: #155DFC;
+    --secondary: #155DFC;
+    --secondary-fg: #ffffff;
+    --secondary-hover: #2B7FFF;
+    --accent: #16a34a;
+    --accent-fg: #ffffff;
+
+    /* ── Fondo y Superficie ─────────────────────────────────────── */
+    --bg: #111827;
+    --fg: #f9fafb;
+    --card: #1f2937;
+    --card-fg: #f9fafb;
+    --muted: #1f2937;
+    --muted-fg: #9ca3af;
+    --popover: #1f2937;
+    --popover-fg: #f9fafb;
+
+    /* ── Status / Feedback ──────────────────────────────────────── */
+    --success: #22c55e;
+    --success-fg: #ffffff;
+    --warning: #fbbf24;
+    --warning-fg: #111827;
+    --error: #f87171;
+    --error-fg: #ffffff;
+    --info: #38bdf8;
+    --info-fg: #111827;
+
+    /* ── Bordes e Inputs ────────────────────────────────────────── */
+    --border: #374151;
+    --input: #374151;
+    --ring: #2B7FFF;
+
+    /* ── Botones / Acciones (modo oscuro) ───────────────────────── */
+    --btn-primary-bg: #2B7FFF;
+    --btn-primary-fg: #ffffff;
+    --btn-primary-hover: #155DFC;
+
+    --btn-secondary-bg: #155DFC;
+    --btn-secondary-fg: #ffffff;
+    --btn-secondary-hover: #2B7FFF;
+
+    --btn-disabled-bg: #374151;
+    --btn-disabled-fg: #6b7280;
+
+    --btn-tmpl-bg: transparent;
+    --btn-tmpl-fg: #2B7FFF;
+    --btn-tmpl-border: #2B7FFF;
+    --btn-tmpl-hover-bg: #1f2937;
+}
