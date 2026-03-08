@@ -10,15 +10,15 @@ class ProductUpdateTests(APITestCase):
 
     def setUp(self):
         self.seller = User.objects.create(
-            username="seller_update",
             email="seller@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
         )
         self.other_user = User.objects.create(
-            username="other_update",
             email="other@iteso.mx",
-            name="Carlos López",
+            first_name="Carlos",
+            last_name="López",
             phone="3312345679",
         )
         self.category = Category.objects.create(name="Libros")
@@ -35,7 +35,7 @@ class ProductUpdateTests(APITestCase):
 
     def _auth(self, user=None):
         user = user or self.seller
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(user.pk))
+        self.client.force_authenticate(user=user)
 
     def _url(self, product_id=None):
         product_id = product_id or self.product.pk
