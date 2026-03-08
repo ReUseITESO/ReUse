@@ -7,11 +7,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       <div className="mb-8">
         <Link
           href="/products/my"
-          className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+          className="text-sm font-medium text-muted-fg transition-colors hover:text-fg"
         >
           &larr; Volver a mis artículos
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Editar artículo</h1>
+        <h1 className="mt-2 text-h2 font-bold text-fg">Editar artículo</h1>
       </div>
       <ProductEditForm productId={Number(params.id)} />
     </main>
