@@ -269,6 +269,40 @@ Los colores, tipografía y variantes de botones están centralizados en dos arch
 <div className="text-secondary">Texto</div>
 ```
 
+#### Por qué los colores están en formato HSL (y no hex)
+
+Los colores en `globals.css` están definidos como **valores HSL sin wrapper** (p. ej. `203 100% 23%`), no como hex (`#004976`). Esto es obligatorio para que Tailwind pueda aplicar modificadores de opacidad con la sintaxis barra (`/`).
+
+**Cómo funciona internamente:**
+
+Cuando Tailwind ve `bg-primary/10`, necesita inyectar el canal alpha en la declaración CSS. Para lograrlo, en `tailwind.config.js` cada color se mapea con el placeholder `<alpha-value>`:
+
+```js
+// tailwind.config.js
+primary: 'hsl(var(--primary) / <alpha-value>)'
+```
+
+Tailwind reemplaza `<alpha-value>` por el número de la barra dividido entre 100:
+- `bg-primary` → `hsl(var(--primary) / 1)` (100% opaco)
+- `bg-primary/10` → `hsl(var(--primary) / 0.1)` (10% opaco)
+- `bg-primary/30` → `hsl(var(--primary) / 0.3)` (30% opaco)
+
+**Por qué hex no funciona:**
+
+Con hex, el CSS generado sería `rgb(#004976 / 0.1)`, que es inválido. Con HSL (valores sueltos `H S% L%`), el CSS generado es `hsl(203 100% 23% / 0.1)`, que es perfectamente válido en CSS moderno.
+
+**Escala de opacidad `/N`:**
+
+```
+/10  →  10% opaco  → fondo muy suave (ideal para badges)
+/20  →  20% opaco
+/30  →  30% opaco  → borde sutil (ideal para bordes de badges)
+/50  →  50% opaco  → semitransparente
+/100 → 100% opaco  → color sólido (equivale a no poner barra)
+```
+
+Cuanto más bajo el número, más transparente. Los badges de este proyecto usan el patrón `bg-{color}/10 text-{color} border border-{color}/30` precisamente por esto.
+
 #### Tipografía
 
 | Nivel | Clase Tailwind | Variable CSS | Tamaño |
@@ -368,16 +402,46 @@ Las etiquetas semánticas HTML tienen estilos aplicados automáticamente vía `@
 
 Si necesitas un color que no existe:
 
-1. Agrégalo en `src/app/globals.css` dentro de `:root` con su equivalente en `.dark`.
-2. Mapéalo en `tailwind.config.js` dentro de `theme.extend.colors`.
-3. Usa la nueva clase Tailwind en el componente.
+1. Convierte el color a HSL (usa una herramienta como [hslpicker.com](https://hslpicker.com) o el devtools del navegador). El valor debe ser **solo los tres números** sin la función `hsl()`:
+   ```css
+   /* ✅ Correcto — solo valores H S% L% */
+   --mi-color: 260 80% 55%;
+
+   /* ❌ Incorrecto — no incluir hex ni wrapper hsl() */
+   --mi-color: #7c3aed;
+   --mi-color: hsl(260, 80%, 55%);
+   ```
+2. Agrégalo en `src/app/globals.css` dentro de `:root` Y su equivalente en `.dark`:
+   ```css
+   :root {
+     --mi-color: 260 80% 55%;
+   }
+   .dark {
+     --mi-color: 270 85% 65%;
+   }
+   ```
+3. Mapéalo en `tailwind.config.js` con el formato `<alpha-value>` para habilitar modificadores de opacidad:
+   ```js
+   'mi-color': 'hsl(var(--mi-color) / <alpha-value>)',
+   ```
+4. Usa la nueva clase Tailwind en el componente. Ya puedes usar modificadores de opacidad:
+   ```tsx
+   <div className="bg-mi-color/10 text-mi-color border border-mi-color/30">...</div>
+   ```
 
 **Prohibido:**
 
 ```tsx
-<div className="bg-[#004976]">...</div>       // Valor hex hardcodeado
-<div style={{ color: '#155DFC' }}>...</div>   // Style inline con hex
-<div className="text-blue-700">...</div>       // Color nativo de Tailwind
+<div className="bg-[#7c3aed]">...</div>       // Valor hex hardcodeado
+<div style={{ color: '#7c3aed' }}>...</div>   // Style inline con hex
+<div className="text-purple-600">...</div>     // Color nativo de Tailwind
+```
+
+**Prohibido también en globals.css:**
+
+```css
+/* ❌ No registrar colores en hex — rompe los modificadores de opacidad de Tailwind */
+--mi-color: #7c3aed;
 ```
 
 ---
