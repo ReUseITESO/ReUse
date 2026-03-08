@@ -12,11 +12,11 @@ export default function NewProductPage() {
         <div className="mb-8">
           <Link
             href="/products"
-            className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+            className="text-sm font-medium text-muted-fg transition-colors hover:text-fg"
           >
             &larr; Volver a productos
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">Publicar artículo</h1>
+          <h1 className="mt-2 text-h2 font-bold text-fg">Publicar artículo</h1>
         </div>
         <ProductForm />
       </main>

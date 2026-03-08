@@ -15,15 +15,15 @@ export default function MyProductsPage() {
         <div>
           <Link
             href="/profile"
-            className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+            className="text-sm font-medium text-muted-fg transition-colors hover:text-fg"
           >
             &larr; Volver a perfil
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">Mis artículos</h1>
+          <h1 className="mt-2 text-h2 font-bold text-fg">Mis artículos</h1>
         </div>
         <Link
           href="/products/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring/20 focus:ring-offset-2"
         >
           <span aria-hidden="true">+</span>
           Publicar artículo
