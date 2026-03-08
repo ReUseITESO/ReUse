@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useEffect } from 'react';
 
 interface FormErrors {
   email?: string;
@@ -30,10 +31,11 @@ export default function SignUpPage() {
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (isAuthenticated) {
-    router.replace('/products');
-    return null;
-  }
+useEffect(() => {
+  if (isAuthenticated) router.replace('/');
+}, [isAuthenticated, router]);
+
+if (isAuthenticated) return null;
 
   const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -138,8 +140,7 @@ export default function SignUpPage() {
         password: form.password,
         password_confirm: form.password_confirm,
       });
-      // Account created but needs email verification before login
-      router.push('/auth/verify-notice');
+      router.push(`/auth/check-email?email=${encodeURIComponent(form.email.trim().toLowerCase())}`);
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Error al crear la cuenta.');
     } finally {
