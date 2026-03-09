@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
-from marketplace.serializers.product import ImageSerializer
+from marketplace.serializers.images import ImageSerializer
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -25,10 +25,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
             "seller_name",
             "seller_email",
             "created_at",
-            "images",
         ]

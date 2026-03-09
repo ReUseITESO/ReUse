@@ -141,7 +141,7 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
         expected_fields = {
             "id", "title", "description", "condition",
             "transaction_type", "status", "price",
-            "image_url", "category", "seller_name", "created_at",
+            "images", "category", "seller_name", "created_at",
         }
         self.assertTrue(expected_fields.issubset(product.keys()))
 
