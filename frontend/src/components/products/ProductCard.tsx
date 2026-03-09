@@ -34,12 +34,16 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`}>
       <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md cursor-pointer">
         <div className="flex h-44 items-center justify-center bg-gray-100">
-        {product.image_url ? (
-          <img src={product.image_url} alt={product.title} className="h-full w-full object-cover" />
-        ) : (
-          <span className="text-sm text-gray-400">{product.category.name} - Imagen</span>
-        )}
-      </div>
+          {product.images?.[0]?.image_url ? (
+            <img
+              src={product.images[0].image_url}
+              alt={product.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="text-sm text-gray-400">{product.category.name} - Imagen</span>
+          )}
+        </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <Badge className={categoryClass}>{product.category.name}</Badge>

@@ -5,7 +5,7 @@ with open('seeds/seed_v1.json', encoding='utf-8') as f:
 
 for obj in data:
     fields = obj['fields']
-    
+
     # 1. Arreglar los campos de core.user
     if obj['model'] == 'core.user':
         if 'created_at' in fields:
@@ -15,7 +15,7 @@ for obj in data:
         fields['is_active'] = True
         fields['is_staff'] = False
         fields['is_superuser'] = False
-        
+
     # 2. Arreglar todos los Foreign Keys (quitando el sufijo '_id')
     keys_to_change = [k for k in fields.keys() if k.endswith('_id')]
     for k in keys_to_change:

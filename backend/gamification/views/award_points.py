@@ -1,14 +1,15 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from drf_spectacular.utils import extend_schema
 
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from core.models import User
-from gamification.services.point_service import award_points
 from gamification.serializers.award_points import AwardPointsSerializer
+from gamification.services.point_service import award_points
 
 
 class AwardPointsView(APIView):

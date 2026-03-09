@@ -79,12 +79,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const timeAgo = formatTimeAgo(product.created_at);
   const conditionLabel = CONDITION_LABELS[product.condition] || product.condition;
 
-  // Prepare images array for gallery
-  const galleryImages = product.images.length > 0
-    ? product.images.map(img => img.image_url)
-    : product.image_url
-    ? [product.image_url]
-    : [];
+  const galleryImages = product.images.map((img) => img.image_url);
 
   return (
     <div className="mx-auto max-w-6xl">

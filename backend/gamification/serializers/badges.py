@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from gamification.models.badges import Badges
+
 
 class BadgeWithStatusSerializer(serializers.ModelSerializer):
     icon_url = serializers.CharField(source='icon', read_only=True)

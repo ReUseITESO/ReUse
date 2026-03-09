@@ -5,7 +5,7 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
     """Manager personalizado para User con email como USERNAME_FIELD"""
-    
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('El email es requerido')
@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -45,7 +45,7 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
-    
+
     objects = CustomUserManager()
 
     class Meta:

@@ -4,10 +4,10 @@
 #
 from django.contrib import admin
 
-from gamification.models import Badges, UserBadges, EnvironmentImpact
-
+from gamification.models import Badges, EnvironmentImpact, UserBadges
 from gamification.models.point_rule import PointRule
 from gamification.models.point_transaction import PointTransaction
+
 
 @admin.register(Badges)
 class BadgesAdmin(admin.ModelAdmin):
@@ -22,7 +22,7 @@ class UserBadgesAdmin(admin.ModelAdmin):
 @admin.register(EnvironmentImpact)
 class EnvironmentImpactAdmin(admin.ModelAdmin):
      list_display = ["id", "user", "kg_co2_saved", "reused_products"]
-     
+
 @admin.register(PointRule)
 class PointRuleAdmin(admin.ModelAdmin):
     list_display = ['action', 'points', 'is_active']

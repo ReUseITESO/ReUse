@@ -9,7 +9,7 @@ def award_points(user, action, reference_id=None):
     try:
         rule = PointRule.objects.get(action=action, is_active=True)
     except PointRule.DoesNotExist:
-        raise ValidationError('Point rule not configured')
+        raise ValidationError('Point rule not configured') from None
 
     with transaction.atomic():
         point_transaction = PointTransaction.objects.create(

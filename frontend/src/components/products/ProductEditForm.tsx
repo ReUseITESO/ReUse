@@ -63,7 +63,6 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           condition: data.condition,
           transaction_type: data.transaction_type,
           price: data.price ?? '',
-          image_url: data.image_url ?? '',
         });
       } catch (err) {
         const message =
@@ -85,7 +84,6 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
       condition: data.condition,
       transaction_type: data.transaction_type,
       price: showPrice ? Number(data.price) : null,
-      image_url: data.image_url || undefined,
     });
 
     if (result) {
@@ -293,27 +291,33 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           )}
         </section>
 
-        <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imagen
-          </h2>
-
-          <div>
-            <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
-              URL de imagen
-            </label>
-            <input
-              id="image_url"
-              type="url"
-              {...register('image_url')}
-              className={INPUT_CLASS}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-            <p className="mt-1.5 text-xs text-gray-500">
-              Opcional. Pega la URL de una imagen del artículo.
+        {/* Current images (read-only) */}
+        {product.images.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Imágenes actuales
+            </h2>
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+              {product.images.map((img, index) => (
+                <div key={img.id} className="relative aspect-square">
+                  <img
+                    src={img.image_url}
+                    alt={`Imagen ${index + 1}`}
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+                  {index === 0 && (
+                    <span className="absolute bottom-1.5 left-1.5 rounded bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      Principal
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400">
+              La edición de imágenes se realizará en una próxima versión.
             </p>
-          </div>
-        </section>
+          </section>
+        )}
 
         <div className="flex items-center gap-3 border-t border-gray-200 pt-6">
           <Button type="submit" disabled={submitting}>

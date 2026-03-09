@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
@@ -18,11 +19,19 @@ import {
 
 import type { FormValues } from '@/types/product';
 
+const MAX_IMAGES = 5;
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 export default function ProductForm() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
+
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -38,40 +47,56 @@ export default function ProductForm() {
       condition: 'buen_estado',
       transaction_type: 'sale',
       price: '',
-      image_url: '',
-      images: [],
     },
   });
 
   const transactionType = watch('transaction_type');
-  const images = watch('images');
   const showPrice = transactionType === 'sale';
 
-  function addImage() {
-    const imageUrl = watch('image_url');
-    if (imageUrl && !images.includes(imageUrl)) {
-      setValue('images', [...images, imageUrl]);
-      setValue('image_url', '');
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileError(null);
+    const incoming = Array.from(e.target.files ?? []);
+
+    const invalid = incoming.find((f) => !ACCEPTED_TYPES.includes(f.type));
+    if (invalid) {
+      setFileError('Solo se permiten imágenes JPEG, PNG o WebP.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
     }
+
+    const remaining = MAX_IMAGES - selectedFiles.length;
+    if (remaining <= 0) return;
+
+    const toAdd = incoming.slice(0, remaining);
+    const newUrls = toAdd.map((f) => URL.createObjectURL(f));
+
+    setSelectedFiles((prev) => [...prev, ...toAdd]);
+    setPreviewUrls((prev) => [...prev, ...newUrls]);
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  function removeImage(index: number) {
-    setValue('images', images.filter((_, i) => i !== index));
+  function removeFile(index: number) {
+    URL.revokeObjectURL(previewUrls[index]);
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function onSubmit(data: FormValues) {
-    const result = await createProduct({
-      title: data.title,
-      description: data.description,
-      category: Number(data.category),
-      condition: data.condition,
-      transaction_type: data.transaction_type,
-      price: showPrice ? Number(data.price) : null,
-      image_url: data.images.length > 0 ? data.images[0] : (data.image_url || undefined),
-      images: data.images.length > 0 ? data.images : undefined,
-    });
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('category', data.category);
+    formData.append('condition', data.condition);
+    formData.append('transaction_type', data.transaction_type);
+    if (showPrice && data.price) {
+      formData.append('price', data.price);
+    }
+    selectedFiles.forEach((file) => formData.append('images', file));
 
+    const result = await createProduct(formData);
     if (result) {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
       router.push('/products');
     }
   }
@@ -96,6 +121,7 @@ export default function ProductForm() {
       )}
 
       <fieldset disabled={submitting} className="space-y-8">
+        {/* ── Información del artículo ── */}
         <section className="space-y-5">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
             Información del artículo
@@ -152,9 +178,7 @@ export default function ProductForm() {
               ) : (
                 <select
                   id="category"
-                  {...register('category', {
-                    required: 'Selecciona una categoría',
-                  })}
+                  {...register('category', { required: 'Selecciona una categoría' })}
                   className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
@@ -176,9 +200,7 @@ export default function ProductForm() {
               </label>
               <select
                 id="condition"
-                {...register('condition', {
-                  required: 'Selecciona la condición',
-                })}
+                {...register('condition', { required: 'Selecciona la condición' })}
                 className={SELECT_CLASS}
               >
                 {Object.entries(CONDITION_LABELS).map(([value, label]) => (
@@ -194,13 +216,17 @@ export default function ProductForm() {
           </div>
         </section>
 
+        {/* ── Tipo de publicación ── */}
         <section className="space-y-5">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
             Tipo de publicación
           </h2>
 
           <div>
-            <input type="hidden" {...register('transaction_type', { required: 'Selecciona el tipo' })} />
+            <input
+              type="hidden"
+              {...register('transaction_type', { required: 'Selecciona el tipo' })}
+            />
             <div className="grid gap-3 sm:grid-cols-3">
               {TRANSACTION_OPTIONS.map((option) => {
                 const isSelected = transactionType === option.value;
@@ -215,10 +241,14 @@ export default function ProductForm() {
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <span className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <span
+                      className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}
+                    >
                       {option.label}
                     </span>
-                    <span className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                    <span
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
+                    >
                       {option.description}
                     </span>
                   </button>
@@ -259,72 +289,107 @@ export default function ProductForm() {
           )}
         </section>
 
-        <section className="space-y-5">
+        {/* ── Imágenes ── */}
+        <section className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
             Imágenes
           </h2>
 
+          {/* Drop zone / upload button */}
           <div>
-            <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
-              URL de imagen
-            </label>
-            <div className="flex gap-2 min-w-0">
-              <input
-                id="image_url"
-                type="url"
-                {...register('image_url')}
-                className={`${INPUT_CLASS} flex-1 min-w-0`}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addImage();
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={addImage}
-                disabled={!watch('image_url')}
-                className="flex-shrink-0"
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={selectedFiles.length >= MAX_IMAGES}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={selectedFiles.length >= MAX_IMAGES}
+              className={`flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 transition-colors ${
+                selectedFiles.length >= MAX_IMAGES
+                  ? 'cursor-not-allowed border-gray-200 bg-gray-50'
+                  : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
+              }`}
+            >
+              {/* Upload icon */}
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                  selectedFiles.length >= MAX_IMAGES ? 'bg-gray-100' : 'bg-blue-100'
+                }`}
               >
-                Agregar
-              </Button>
-            </div>
-            <p className="mt-1.5 text-xs text-gray-500">
-              Agrega URLs de imágenes del artículo. Se mostrarán en orden.
-            </p>
+                <svg
+                  className={`h-6 w-6 ${selectedFiles.length >= MAX_IMAGES ? 'text-gray-400' : 'text-blue-600'}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                  />
+                </svg>
+              </div>
+
+              <div className="text-center">
+                <p
+                  className={`text-sm font-medium ${
+                    selectedFiles.length >= MAX_IMAGES ? 'text-gray-400' : 'text-gray-700'
+                  }`}
+                >
+                  {selectedFiles.length >= MAX_IMAGES
+                    ? 'Límite de imágenes alcanzado'
+                    : 'Haz clic para subir imágenes'}
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
+                  JPEG, PNG o WebP · Máx. {MAX_IMAGES} imágenes
+                  {selectedFiles.length > 0 && ` · ${selectedFiles.length}/${MAX_IMAGES} seleccionadas`}
+                </p>
+              </div>
+            </button>
+
+            {fileError && (
+              <p className="mt-2 text-sm text-red-600">{fileError}</p>
+            )}
           </div>
 
-          {images.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">
-                Imágenes agregadas ({images.length})
-              </p>
-              <div className="space-y-2">
-                {images.map((url, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3"
-                  >
-                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                      {index + 1}
+          {/* Preview grid */}
+          {previewUrls.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="group relative aspect-square">
+                  <img
+                    src={url}
+                    alt={`Vista previa ${index + 1}`}
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+
+                  {/* Principal badge */}
+                  {index === 0 && (
+                    <span className="absolute bottom-1.5 left-1.5 rounded bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      Principal
                     </span>
-                    <span className="flex-1 text-sm text-gray-600 break-all overflow-wrap-anywhere">{url}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="flex-shrink-0 text-red-600 hover:text-red-700"
-                      title="Eliminar imagen"
-                    >
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
+                  )}
+
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    title="Eliminar imagen"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </section>

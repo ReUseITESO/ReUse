@@ -2,7 +2,6 @@
 Tests for marketplace filters: category, condition, transaction_type.
 Covers individual filters, combined filters, text search, and edge cases.
 """
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -18,7 +17,7 @@ CATEGORIES_URL = "/api/marketplace/categories/"
 def make_user(n: int) -> User:
     return User.objects.create(
         email=f"testuser{n}@iteso.mx",
-        first_name=f"Test",
+        first_name="Test",
         last_name=f"User{n}",
         phone="3300000000",
     )
@@ -141,7 +140,7 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
         expected_fields = {
             "id", "title", "description", "condition",
             "transaction_type", "status", "price",
-            "image_url", "category", "seller_name", "created_at",
+            "images", "category", "seller_name", "created_at",
         }
         self.assertTrue(expected_fields.issubset(product.keys()))
 

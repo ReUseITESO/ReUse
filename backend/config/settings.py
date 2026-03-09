@@ -1,7 +1,8 @@
+import logging
+import os
 from datetime import timedelta
 from pathlib import Path
 
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -232,15 +233,19 @@ LOGGING = {
             'formatter': 'timestamp_format',
         },
     },
-    'root': { 
+    'root': {
         'handlers': ['file'],
         'level': 'INFO',
     },
 }
 
-import logging
 logger = logging.getLogger(__name__)
 logger.info("Application started")
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
 
 FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
 EMAIL_VERIFICATION_EXPIRES_MINUTES = int(os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30"))

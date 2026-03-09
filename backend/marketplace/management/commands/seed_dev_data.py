@@ -4,10 +4,11 @@ Crea usuarios, categorías, productos con imágenes, badges y transacciones.
 
 Uso: python manage.py seed_dev_data
 """
+import random
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from datetime import timedelta
-import random
 
 from core.models import User
 from marketplace.models import Category, Products, Images, Transaction
@@ -489,7 +490,6 @@ class Command(BaseCommand):
                     "condition": data["condition"],
                     "transaction_type": data["transaction_type"],
                     "price": data["price"],
-                    "image_url": data.get("image_url", ""),
                 },
             )
             created.append(product)
@@ -535,7 +535,7 @@ class Command(BaseCommand):
         }
 
         for product in products:
-            urls = extra_images.get(product.title, [product.image_url] if product.image_url else [])
+            urls = extra_images.get(product.title, [])
             for i, url in enumerate(urls):
                 _, created = Images.objects.get_or_create(
                     product=product,
