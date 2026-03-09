@@ -7,5 +7,17 @@ from .user_badges import UserBadges
 from .environment_impact import EnvironmentImpact
 from .point_rule import PointRule, PointAction
 from .point_transaction import PointTransaction
+from .challenge import Challenge, ChallengeType
+from .user_challenge import UserChallenge
 
-__all__ = ["Badges", "UserBadges", "EnvironmentImpact", "PointRule", "PointAction", "PointTransaction"]
+__all__ = [
+    "Badges",
+    "UserBadges",
+    "EnvironmentImpact",
+    "PointRule",
+    "PointAction",
+    "PointTransaction",
+    "Challenge",
+    "ChallengeType",
+    "UserChallenge",
+]
