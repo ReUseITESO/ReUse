@@ -1,6 +1,6 @@
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from marketplace.models import Images, Products
+from marketplace.models import Images
 from marketplace.services.s3_service import upload_product_images
 
 

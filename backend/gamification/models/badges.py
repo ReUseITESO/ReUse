@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Badges(models.Model):
     """
     Model representing the badges available in the system.

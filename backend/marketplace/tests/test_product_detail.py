@@ -3,7 +3,6 @@ Tests for product detail endpoint and product creation with images.
 Covers GET /products/{id}/ returning seller_email and images array,
 and POST /products/ creating products with multiple images.
 """
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -106,7 +105,7 @@ class TestProductDetailEndpoint(APITestCase):
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         assert len(response.data["images"]) == 2
 
     def test_product_detail_images_have_correct_fields(self):
@@ -118,7 +117,7 @@ class TestProductDetailEndpoint(APITestCase):
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         image = response.data["images"][0]
         assert "id" in image
         assert "image_url" in image
@@ -138,7 +137,7 @@ class TestProductDetailEndpoint(APITestCase):
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         assert response.data["images"][0]["order_number"] == 0
         assert response.data["images"][1]["order_number"] == 1
 

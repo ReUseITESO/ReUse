@@ -4,10 +4,11 @@ Crea usuarios, categorías, productos con imágenes, badges y transacciones.
 
 Uso: python manage.py seed_dev_data
 """
+import random
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from datetime import timedelta
-import random
 
 from core.models import User
 from marketplace.models import Category, Products, Images, Transaction

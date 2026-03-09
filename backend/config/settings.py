@@ -1,7 +1,8 @@
+import logging
+import os
 from datetime import timedelta
 from pathlib import Path
 
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -232,13 +233,12 @@ LOGGING = {
             'formatter': 'timestamp_format',
         },
     },
-    'root': { 
+    'root': {
         'handlers': ['file'],
         'level': 'INFO',
     },
 }
 
-import logging
 logger = logging.getLogger(__name__)
 logger.info("Application started")
 

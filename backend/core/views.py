@@ -4,6 +4,7 @@ import secrets
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.mail import send_mail
 from django.utils import timezone
 
 from rest_framework import generics, status
@@ -15,8 +16,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignUpSerializer, SignInSerializer, UserProfileSerializer
-from django.core.mail import send_mail
+from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
 User = get_user_model()
 
