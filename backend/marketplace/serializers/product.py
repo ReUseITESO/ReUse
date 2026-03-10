@@ -3,6 +3,9 @@ from rest_framework import serializers
 from marketplace.models import Products, Images
 from marketplace.serializers.category import CategorySerializer
 
+# GAMIFICATION imports
+from gamification.services.point_service import award_points
+
 
 class ImageSerializer(serializers.ModelSerializer):
     """Serializer for product images."""
@@ -85,6 +88,15 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         images_data = validated_data.pop('images', [])
         product = Products.objects.create(**validated_data)
+        
+        # === GAMIFICATION: Award points to the seller for publishing an item ===
+        award_points(
+            user=product.seller,
+            action="publish_item",
+            reference_id=product.id
+        )
+        
+        # ==========================================================================
         
         # Create Images objects for each URL
         for index, image_url in enumerate(images_data):

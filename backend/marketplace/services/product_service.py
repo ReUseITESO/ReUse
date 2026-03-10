@@ -2,6 +2,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from marketplace.models import Products
 
+# GAMIFICATION imports
+from gamification.services.point_service import award_points
+
 
 VALID_STATUS_TRANSITIONS = {
     "disponible": ["en_proceso", "cancelado"],
@@ -82,6 +85,25 @@ def change_product_status(product, new_status, user):
 
     product.status = new_status
     product.save(update_fields=["status", "updated_at"])
+    
+    # === GAMIFICATION: Award points for completing a sale/donation/swap ===
+    
+    if new_status == "completado":
+        action_map = {
+            "donation": "complete_donation",
+            "sale": "complete_sale",
+            "swap": "complete_exchange",
+        }
+        action = action_map.get(product.transaction_type)
+        if action:
+            award_points(
+                user=product.seller,
+                action=action,
+                reference_id=product.id
+            )
+    
+    # ==========================================================================
+            
     return product
 
 
