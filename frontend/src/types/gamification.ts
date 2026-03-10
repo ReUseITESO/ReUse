@@ -42,3 +42,34 @@ export interface BadgeWithStatus {
 export interface UserPoints {
   points: number;
 }
+
+export type ChallengeType = 'donation' | 'exchange' | 'sale' | 'publish' | 'review';
+
+export interface Challenge {
+  id: number;
+  title: string;
+  description: string;
+  challenge_type: ChallengeType;
+  goal: number;
+  bonus_points: number;
+  start_date: string;
+  end_date: string;
+  joined: boolean;
+}
+
+export interface UserChallenge {
+  id: number;
+  challenge_id: number;
+  title: string;
+  description: string;
+  challenge_type: ChallengeType;
+  goal: number;
+  progress: number;
+  bonus_points: number;
+  is_completed: boolean;
+  joined_at: string;
+  completed_at: string | null;
+  start_date: string;
+  end_date: string;
+  is_expired: boolean;
+}

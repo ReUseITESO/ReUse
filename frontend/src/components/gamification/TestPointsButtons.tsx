@@ -86,6 +86,22 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         </button>
         <button
           type="button"
+          onClick={() => runAction('complete_exchange')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-indigo-100 px-3 py-2 text-sm font-medium text-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Intercambio (+)
+        </button>
+        <button
+          type="button"
+          onClick={() => runAction('complete_sale')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-cyan-100 px-3 py-2 text-sm font-medium text-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Venta (+)
+        </button>
+        <button
+          type="button"
           onClick={() => deduct(5)}
           disabled={!isAuthenticated || isLoading}
           className="rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-800 disabled:cursor-not-allowed disabled:opacity-60"

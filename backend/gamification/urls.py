@@ -9,12 +9,19 @@ from gamification.views.badges import UserBadgesStatusView
 from gamification.views.points import CurrentUserPointsView, UserPointsView
 from gamification.views.award_points import AwardPointsView
 from gamification.views.deduct_points import DeductPointsView
+from gamification.views.challenges import (
+    ChallengeListView,
+    JoinChallengeView,
+    MyChallengesView,
+)
 
 urlpatterns = [
-  path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
-  
-	path('points/', CurrentUserPointsView.as_view(), name='current-user-points'),
-	path('points/<int:user_id>/', UserPointsView.as_view(), name='user-points'),
-  path("award-points/", AwardPointsView.as_view(), name="award-points"),
-  path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
+    path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
+    path('points/', CurrentUserPointsView.as_view(), name='current-user-points'),
+    path('points/<int:user_id>/', UserPointsView.as_view(), name='user-points'),
+    path("award-points/", AwardPointsView.as_view(), name="award-points"),
+    path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
+    path('challenges/', ChallengeListView.as_view(), name='challenge-list'),
+    path('challenges/me/', MyChallengesView.as_view(), name='my-challenges'),
+    path('challenges/<int:challenge_id>/join/', JoinChallengeView.as_view(), name='join-challenge'),
 ]
