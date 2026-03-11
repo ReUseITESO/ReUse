@@ -147,6 +147,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "phone",
             "points",
             "profile_picture",
+            "interests",
             "date_joined",
             "last_login",
         ]
@@ -163,3 +164,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_phone(self, value: str) -> str:
         return sanitize_phone(value) if value else value
+
+    def validate_interests(self, value) -> list:
+        if not isinstance(value, list):
+            raise serializers.ValidationError("Interests must be a list.")
+        if len(value) > 10:
+            raise serializers.ValidationError("Maximum 10 interests allowed.")
+        cleaned = []
+        for item in value:
+            if not isinstance(item, str):
+                raise serializers.ValidationError("Each interest must be a string.")
+            item = sanitize_string(item)
+            if len(item) > 50:
+                raise serializers.ValidationError(
+                    f"Interest '{item[:20]}...' exceeds 50 characters."
+                )
+            if item:
+                cleaned.append(item)
+        return cleaned
+
+    def validate_profile_picture(self, value: str) -> str:
+        if value:
+            value = sanitize_string(value)
+            if len(value) > 500:
+                raise serializers.ValidationError("URL too long (max 500 characters).")
+        return value

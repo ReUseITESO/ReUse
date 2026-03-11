@@ -339,3 +339,58 @@ class EmailVerificationConfirmView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+# ── Profile Picture Upload ───────────────────────────────
+
+from rest_framework.parsers import MultiPartParser
+import os
+import uuid
+
+
+class ProfilePictureUploadView(APIView):
+    """POST /api/auth/profile/upload-picture/ — upload profile image file."""
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser]
+
+    ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    MAX_SIZE = 5 * 1024 * 1024  # 5 MB
+
+    def post(self, request):
+        file = request.FILES.get("file")
+
+        if not file:
+            return Response(
+                {"error": {"code": "NO_FILE", "message": "No se envio ningun archivo."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if file.content_type not in self.ALLOWED_TYPES:
+            return Response(
+                {"error": {"code": "INVALID_TYPE", "message": "Solo se permiten imagenes (JPEG, PNG, WebP, GIF)."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if file.size > self.MAX_SIZE:
+            return Response(
+                {"error": {"code": "FILE_TOO_LARGE", "message": "La imagen no puede superar 5 MB."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        ext = os.path.splitext(file.name)[1].lower()
+        filename = f"profile_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join("profile_pictures", filename)
+
+        from django.core.files.storage import default_storage
+        saved_path = default_storage.save(filepath, file)
+        file_url = request.build_absolute_uri(f"/media/{saved_path}")
+
+        user = request.user
+        user.profile_picture = file_url
+        user.save(update_fields=["profile_picture"])
+
+        return Response(
+            {"profile_picture": file_url},
+            status=status.HTTP_200_OK,
+        )
