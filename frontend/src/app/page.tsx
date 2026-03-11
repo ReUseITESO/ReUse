@@ -2,43 +2,44 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import Dashboard from '@/components/dashboard/Dashboard';
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
 
+  if (isLoading) {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <div className="h-10 w-40 animate-pulse rounded-lg bg-slate-200" />
+      </main>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Dashboard />;
+  }
+
   return (
     <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-6 p-8">
-      <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">ReUseITESO</h1>
-      <p className="max-w-lg text-center text-lg text-gray-600">
+      <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">ReUseITESO</h1>
+      <p className="max-w-lg text-center text-lg text-slate-600">
         Plataforma de compraventa de segunda mano para la comunidad ITESO.
-        Publica, intercambia y dona artículos de forma segura.
+        Publica, intercambia y dona articulos de forma segura.
       </p>
-
-      {isLoading ? (
-        <div className="h-10 w-40 animate-pulse rounded-lg bg-gray-200" />
-      ) : isAuthenticated ? (
+      <div className="flex flex-col items-center gap-3 sm:flex-row">
         <Link
-          href="/products"
-          className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+          href="/auth/signin"
+          className="rounded-xl bg-iteso-800 px-6 py-3 font-medium text-white transition-colors hover:bg-iteso-700"
         >
-          Ver productos
+          Iniciar sesion
         </Link>
-      ) : (
-        <div className="flex flex-col items-center gap-3 sm:flex-row">
-          <Link
-            href="/auth/signin"
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
-          >
-            Iniciar sesión
-          </Link>
-          <Link
-            href="/auth/signup"
-            className="rounded-lg border border-blue-600 px-6 py-3 font-medium text-blue-600 transition-colors hover:bg-blue-50"
-          >
-            Crear cuenta
-          </Link>
-        </div>
-      )}
+        <Link
+          href="/auth/signup"
+          className="rounded-xl border border-iteso-800 px-6 py-3 font-medium text-iteso-800 transition-colors hover:bg-iteso-50"
+        >
+          Crear cuenta
+        </Link>
+      </div>
     </main>
   );
 }
