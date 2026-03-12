@@ -4,16 +4,18 @@
     "pk": 1,
     "fields": {
       "email": "admin@iteso.mx",
-      "name": "Administrador ITESO",
+      "first_name": "Administrador",
+      "last_name": "ITESO",
       "phone": "3312345678",
       "points": 500,
       "profile_picture": "https://i.pravatar.cc/150?img=1",
       "date_joined": "2026-01-15T10:00:00Z",
-      "username": "admin",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-01-15T10:00:00Z"
     }
   },
   {
@@ -21,16 +23,18 @@
     "pk": 2,
     "fields": {
       "email": "maria.garcia@iteso.mx",
-      "name": "Mar\u00c3\u00ada Garc\u00c3\u00ada P\u00c3\u00a9rez",
+      "first_name": "María",
+      "last_name": "García Pérez",
       "phone": "3398765432",
       "points": 250,
       "profile_picture": "https://i.pravatar.cc/150?img=5",
       "date_joined": "2026-01-20T09:00:00Z",
-      "username": "maria.garcia",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-01-20T09:05:00Z"
     }
   },
   {
@@ -38,16 +42,18 @@
     "pk": 3,
     "fields": {
       "email": "juan.lopez@iteso.mx",
-      "name": "Juan L\u00c3\u00b3pez S\u00c3\u00a1nchez",
+      "first_name": "Juan",
+      "last_name": "López Sánchez",
       "phone": "3387654321",
       "points": 180,
       "profile_picture": "https://i.pravatar.cc/150?img=12",
       "date_joined": "2026-01-22T11:30:00Z",
-      "username": "juan.lopez",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-01-22T11:35:00Z"
     }
   },
   {
@@ -55,16 +61,18 @@
     "pk": 4,
     "fields": {
       "email": "ana.martinez@iteso.mx",
-      "name": "Ana Mart\u00c3\u00adnez Ruiz",
+      "first_name": "Ana",
+      "last_name": "Martínez Ruiz",
       "phone": "3376543210",
       "points": 320,
       "profile_picture": "https://i.pravatar.cc/150?img=9",
       "date_joined": "2026-01-25T13:00:00Z",
-      "username": "ana.martinez",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-01-25T13:05:00Z"
     }
   },
   {
@@ -72,16 +80,18 @@
     "pk": 5,
     "fields": {
       "email": "carlos.rodriguez@iteso.mx",
-      "name": "Carlos Rodr\u00c3\u00adguez Torres",
+      "first_name": "Carlos",
+      "last_name": "Rodríguez Torres",
       "phone": "3365432109",
       "points": 150,
       "profile_picture": "https://i.pravatar.cc/150?img=15",
       "date_joined": "2026-01-28T16:00:00Z",
-      "username": "carlos.rodriguez",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-01-28T16:05:00Z"
     }
   },
   {
@@ -89,16 +99,18 @@
     "pk": 6,
     "fields": {
       "email": "lucia.fernandez@iteso.mx",
-      "name": "Luc\u00c3\u00ada Fern\u00c3\u00a1ndez G\u00c3\u00b3mez",
+      "first_name": "Lucía",
+      "last_name": "Fernández Gómez",
       "phone": "3354321098",
       "points": 210,
       "profile_picture": "https://i.pravatar.cc/150?img=20",
       "date_joined": "2026-02-01T10:30:00Z",
-      "username": "lucia.fernandez",
-      "password": "pbkdf2_sha256\\\\=",
+      "password": "pbkdf2_sha256$600000$test$test=",
       "is_active": true,
       "is_staff": false,
-      "is_superuser": false
+      "is_superuser": false,
+      "is_email_verified": true,
+      "email_verified_at": "2026-02-01T10:35:00Z"
     }
   },
   {
@@ -114,7 +126,7 @@
     "model": "marketplace.category",
     "pk": 2,
     "fields": {
-      "name": "Electr\u00c3\u00b3nica",
+      "name": "Electrónica",
       "icon": "laptop",
       "created_at": "2026-01-15T10:00:00Z"
     }
@@ -150,25 +162,24 @@
     "model": "marketplace.products",
     "pk": 1,
     "fields": {
-      "seller_id": 2,
-      "category_id": 1,
-      "title": "C\u00c3\u00a1lculo Diferencial - Stewart 8va Edici\u00c3\u00b3n",
-      "description": "Libro de C\u00c3\u00a1lculo en excelente estado. Solo tiene algunas anotaciones a l\u00c3\u00a1piz. Incluye ejercicios resueltos.",
+      "seller": 2,
+      "category": 1,
+      "title": "Cálculo Diferencial - Stewart 8va Edición",
+      "description": "Libro de Cálculo en excelente estado. Solo tiene algunas anotaciones a lápiz. Incluye ejercicios resueltos.",
       "condition": "buen_estado",
       "transaction_type": "sale",
       "status": "disponible",
       "price": "350.00",
       "image_url": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500",
-      "created_at": "2026-02-01T10:00:00Z",
-      "updated_at": "2026-02-01T10:00:00Z"
+      "created_at": "2026-02-01T10:00:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 2,
     "fields": {
-      "seller_id": 3,
-      "category_id": 4,
+      "seller": 3,
+      "category": 4,
       "title": "Calculadora TI-84 Plus",
       "description": "Calculadora graficadora en perfectas condiciones. Usada 1 semestre. Incluye funda protectora.",
       "condition": "como_nuevo",
@@ -176,16 +187,15 @@
       "status": "disponible",
       "price": "800.00",
       "image_url": "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=500",
-      "created_at": "2026-02-03T14:30:00Z",
-      "updated_at": "2026-02-03T14:30:00Z"
+      "created_at": "2026-02-03T14:30:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 3,
     "fields": {
-      "seller_id": 4,
-      "category_id": 3,
+      "seller": 4,
+      "category": 3,
       "title": "Sudadera ITESO Gris - Talla M",
       "description": "Sudadera oficial ITESO color gris, talla M. Casi sin uso. Como nueva.",
       "condition": "como_nuevo",
@@ -193,134 +203,126 @@
       "status": "en_proceso",
       "price": "250.00",
       "image_url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500",
-      "created_at": "2026-02-05T11:20:00Z",
-      "updated_at": "2026-02-05T11:20:00Z"
+      "created_at": "2026-02-05T11:20:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 4,
     "fields": {
-      "seller_id": 2,
-      "category_id": 1,
-      "title": "Qu\u00c3\u00admica Org\u00c3\u00a1nica - McMurry",
-      "description": "Libro de Qu\u00c3\u00admica Org\u00c3\u00a1nica de John McMurry, 9na edici\u00c3\u00b3n. Con subrayados pero legible.",
+      "seller": 2,
+      "category": 1,
+      "title": "Química Orgánica - McMurry",
+      "description": "Libro de Química Orgánica de John McMurry, 9na edición. Con subrayados pero legible.",
       "condition": "usado",
       "transaction_type": "donation",
       "status": "disponible",
       "price": null,
       "image_url": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500",
-      "created_at": "2026-02-06T09:15:00Z",
-      "updated_at": "2026-02-06T09:15:00Z"
+      "created_at": "2026-02-06T09:15:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 5,
     "fields": {
-      "seller_id": 5,
-      "category_id": 2,
+      "seller": 5,
+      "category": 2,
       "title": "Mouse Logitech MX Master 3",
-      "description": "Mouse inal\u00c3\u00a1mbrico en excelente estado. Bater\u00c3\u00ada dura mucho. Incluye cable USB-C.",
+      "description": "Mouse inalámbrico en excelente estado. Batería dura mucho. Incluye cable USB-C.",
       "condition": "buen_estado",
       "transaction_type": "sale",
       "status": "disponible",
       "price": "600.00",
       "image_url": "https://images.unsplash.com/photo-1527814050087-3793815479db?w=500",
-      "created_at": "2026-02-08T16:45:00Z",
-      "updated_at": "2026-02-08T16:45:00Z"
+      "created_at": "2026-02-08T16:45:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 6,
     "fields": {
-      "seller_id": 6,
-      "category_id": 5,
-      "title": "Apuntes Completos - Estad\u00c3\u00adstica Aplicada",
-      "description": "Apuntes digitales de Estad\u00c3\u00adstica Aplicada. Todos los temas. Formato PDF.",
+      "seller": 6,
+      "category": 5,
+      "title": "Apuntes Completos - Estadística Aplicada",
+      "description": "Apuntes digitales de Estadística Aplicada. Todos los temas. Formato PDF.",
       "condition": "nuevo",
       "transaction_type": "donation",
       "status": "disponible",
       "price": null,
       "image_url": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500",
-      "created_at": "2026-02-09T13:00:00Z",
-      "updated_at": "2026-02-09T13:00:00Z"
+      "created_at": "2026-02-09T13:00:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 7,
     "fields": {
-      "seller_id": 3,
-      "category_id": 1,
+      "seller": 3,
+      "category": 1,
       "title": "Fundamentos de Marketing - Kotler",
-      "description": "Busco intercambiar este libro por uno de Contabilidad o Finanzas. Buen estado, 13va edici\u00c3\u00b3n.",
+      "description": "Busco intercambiar este libro por uno de Contabilidad o Finanzas. Buen estado, 13va edición.",
       "condition": "buen_estado",
       "transaction_type": "swap",
       "status": "disponible",
       "price": null,
       "image_url": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500",
-      "created_at": "2026-02-10T10:30:00Z",
-      "updated_at": "2026-02-10T10:30:00Z"
+      "created_at": "2026-02-10T10:30:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 8,
     "fields": {
-      "seller_id": 4,
-      "category_id": 3,
+      "seller": 4,
+      "category": 3,
       "title": "Chamarra ITESO Azul - Talla L",
-      "description": "Chamarra oficial ITESO azul marino, talla L. A\u00c3\u00b1os de uso pero en buenas condiciones.",
+      "description": "Chamarra oficial ITESO azul marino, talla L. Años de uso pero en buenas condiciones.",
       "condition": "usado",
       "transaction_type": "sale",
       "status": "completado",
       "price": "180.00",
       "image_url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500",
-      "created_at": "2026-02-04T15:00:00Z",
-      "updated_at": "2026-02-04T15:00:00Z"
+      "created_at": "2026-02-04T15:00:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 9,
     "fields": {
-      "seller_id": 5,
-      "category_id": 2,
-      "title": "Teclado Mec\u00c3\u00a1nico Redragon K552",
-      "description": "Teclado mec\u00c3\u00a1nico gaming, switches azules. LED RGB funcional.",
+      "seller": 5,
+      "category": 2,
+      "title": "Teclado Mecánico Redragon K552",
+      "description": "Teclado mecánico gaming, switches azules. LED RGB funcional.",
       "condition": "buen_estado",
       "transaction_type": "sale",
       "status": "disponible",
       "price": "450.00",
       "image_url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500",
-      "created_at": "2026-02-11T12:00:00Z",
-      "updated_at": "2026-02-11T12:00:00Z"
+      "created_at": "2026-02-11T12:00:00Z"
     }
   },
   {
     "model": "marketplace.products",
     "pk": 10,
     "fields": {
-      "seller_id": 6,
-      "category_id": 1,
-      "title": "Colecci\u00c3\u00b3n 5 Libros Arquitectura",
-      "description": "Colecci\u00c3\u00b3n de 5 libros de teor\u00c3\u00ada arquitect\u00c3\u00b3nica. Le Corbusier, Rem Koolhaas y otros.",
+      "seller": 6,
+      "category": 1,
+      "title": "Colección 5 Libros Arquitectura",
+      "description": "Colección de 5 libros de teoría arquitectónica. Le Corbusier, Rem Koolhaas y otros.",
       "condition": "buen_estado",
       "transaction_type": "sale",
       "status": "disponible",
       "price": "600.00",
       "image_url": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500",
-      "created_at": "2026-02-12T14:30:00Z",
-      "updated_at": "2026-02-12T14:30:00Z"
+      "created_at": "2026-02-12T14:30:00Z"
     }
   },
   {
     "model": "marketplace.images",
     "pk": 1,
     "fields": {
-      "products_id": 1,
+      "product": 1,
       "image_url": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500",
       "order_number": 1,
       "created_at": "2026-02-01T10:00:00Z"
@@ -330,7 +332,7 @@
     "model": "marketplace.images",
     "pk": 2,
     "fields": {
-      "products_id": 2,
+      "product": 2,
       "image_url": "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=500",
       "order_number": 1,
       "created_at": "2026-02-03T14:30:00Z"
@@ -340,7 +342,7 @@
     "model": "marketplace.images",
     "pk": 3,
     "fields": {
-      "products_id": 3,
+      "product": 3,
       "image_url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500",
       "order_number": 1,
       "created_at": "2026-02-05T11:20:00Z"
@@ -350,9 +352,9 @@
     "model": "marketplace.transaction",
     "pk": 1,
     "fields": {
-      "products_id": 3,
-      "seller_id": 4,
-      "buyer_id": 5,
+      "product": 3,
+      "seller": 4,
+      "buyer": 5,
       "transaction_type": "sale",
       "seller_confirmation": true,
       "seller_confirmed_at": "2026-02-14T09:00:00Z",
@@ -368,16 +370,16 @@
     "model": "marketplace.transaction",
     "pk": 2,
     "fields": {
-      "products_id": 8,
-      "seller_id": 4,
-      "buyer_id": 6,
+      "product": 8,
+      "seller": 4,
+      "buyer": 6,
       "transaction_type": "sale",
       "seller_confirmation": true,
       "seller_confirmed_at": "2026-02-13T17:00:00Z",
       "buyer_confirmation": true,
       "buyer_confirmed_at": "2026-02-13T17:30:00Z",
       "delivery_date": "2026-02-13T16:00:00Z",
-      "delivery_location": "Cafeter\u00c3\u00ada Los Pinos",
+      "delivery_location": "Cafetería Los Pinos",
       "status": "completada",
       "created_at": "2026-02-12T15:00:00Z"
     }
@@ -386,16 +388,16 @@
     "model": "marketplace.transaction",
     "pk": 3,
     "fields": {
-      "products_id": 1,
-      "seller_id": 2,
-      "buyer_id": 3,
+      "product": 1,
+      "seller": 2,
+      "buyer": 3,
       "transaction_type": "sale",
       "seller_confirmation": false,
       "seller_confirmed_at": null,
       "buyer_confirmation": false,
       "buyer_confirmed_at": null,
       "delivery_date": "2026-02-18T15:00:00Z",
-      "delivery_location": "Explanada, cerca del m\u00c3\u00a1stil",
+      "delivery_location": "Explanada, cerca del mástil",
       "status": "pendiente",
       "created_at": "2026-02-15T08:30:00Z"
     }
@@ -404,10 +406,10 @@
     "model": "marketplace.forumquestion",
     "pk": 1,
     "fields": {
-      "user_id": 3,
-      "products_id": 1,
-      "message": "Hola! \u00c2\u00bfEl libro incluye las soluciones de los ejercicios?",
-      "parent_id": null,
+      "user": 3,
+      "product": 1,
+      "message": "Hola! ¿El libro incluye las soluciones de los ejercicios?",
+      "parent": null,
       "created_at": "2026-02-02T11:30:00Z"
     }
   },
@@ -415,10 +417,10 @@
     "model": "marketplace.forumquestion",
     "pk": 2,
     "fields": {
-      "user_id": 2,
-      "products_id": 1,
-      "message": "S\u00c3\u00ad! Tiene las respuestas de los ejercicios impares al final.",
-      "parent_id": 1,
+      "user": 2,
+      "product": 1,
+      "message": "Sí! Tiene las respuestas de los ejercicios impares al final.",
+      "parent": 1,
       "created_at": "2026-02-02T14:00:00Z"
     }
   },
@@ -426,10 +428,10 @@
     "model": "marketplace.forumquestion",
     "pk": 3,
     "fields": {
-      "user_id": 4,
-      "products_id": 2,
-      "message": "\u00c2\u00bfLa calculadora viene con cable USB o pilas?",
-      "parent_id": null,
+      "user": 4,
+      "product": 2,
+      "message": "¿La calculadora viene con cable USB o pilas?",
+      "parent": null,
       "created_at": "2026-02-04T10:00:00Z"
     }
   },
@@ -437,10 +439,10 @@
     "model": "marketplace.forumquestion",
     "pk": 4,
     "fields": {
-      "user_id": 3,
-      "products_id": 2,
+      "user": 3,
+      "product": 2,
       "message": "Usa 4 pilas AAA, no incluye cable USB.",
-      "parent_id": 3,
+      "parent": 3,
       "created_at": "2026-02-04T11:15:00Z"
     }
   },
@@ -448,11 +450,134 @@
     "model": "marketplace.forumquestion",
     "pk": 5,
     "fields": {
-      "user_id": 6,
-      "products_id": 5,
-      "message": "Hola! \u00c2\u00bfEl mouse funciona con Mac?",
-      "parent_id": null,
+      "user": 6,
+      "product": 5,
+      "message": "Hola! ¿El mouse funciona con Mac?",
+      "parent": null,
       "created_at": "2026-02-09T09:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.badges",
+    "pk": 1,
+    "fields": {
+      "name": "Primera Venta",
+      "description": "Completaste tu primera venta",
+      "icon": "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
+      "rarity": "comun",
+      "points": 50,
+      "created_at": "2026-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.badges",
+    "pk": 2,
+    "fields": {
+      "name": "Eco Warrior",
+      "description": "Donaste 5 artículos",
+      "icon": "https://cdn-icons-png.flaticon.com/512/3082/3082031.png",
+      "rarity": "raro",
+      "points": 100,
+      "created_at": "2026-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.badges",
+    "pk": 3,
+    "fields": {
+      "name": "Intercambiador",
+      "description": "Completaste 3 intercambios",
+      "icon": "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
+      "rarity": "raro",
+      "points": 75,
+      "created_at": "2026-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.userbadges",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "badges": 1,
+      "earned_at": "2026-02-13T17:30:00Z"
+    }
+  },
+  {
+    "model": "gamification.userbadges",
+    "pk": 2,
+    "fields": {
+      "user": 4,
+      "badges": 1,
+      "earned_at": "2026-02-13T17:30:00Z"
+    }
+  },
+  {
+    "model": "gamification.userbadges",
+    "pk": 3,
+    "fields": {
+      "user": 2,
+      "badges": 2,
+      "earned_at": "2026-02-10T16:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "kg_co2_saved": "0.00",
+      "reused_products": 0,
+      "created_at": "2026-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "kg_co2_saved": "7.50",
+      "reused_products": 3,
+      "created_at": "2026-01-20T09:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "kg_co2_saved": "2.50",
+      "reused_products": 1,
+      "created_at": "2026-01-22T11:30:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "kg_co2_saved": "5.00",
+      "reused_products": 2,
+      "created_at": "2026-01-25T13:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 5,
+    "fields": {
+      "user": 5,
+      "kg_co2_saved": "2.50",
+      "reused_products": 1,
+      "created_at": "2026-01-28T16:00:00Z"
+    }
+  },
+  {
+    "model": "gamification.environmentimpact",
+    "pk": 6,
+    "fields": {
+      "user": 6,
+      "kg_co2_saved": "2.50",
+      "reused_products": 1,
+      "created_at": "2026-02-01T10:30:00Z"
     }
   }
 ]

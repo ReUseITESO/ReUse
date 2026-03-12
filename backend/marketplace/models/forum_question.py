@@ -36,4 +36,4 @@ class ForumQuestion(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"Question on {self.product.title} by {self.user.name}"
+        return f"Question on {self.product.title} by {self.user.get_full_name()}"
