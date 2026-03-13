@@ -10,8 +10,8 @@ export default function HomePage() {
     <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-6 p-8">
       <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">ReUseITESO</h1>
       <p className="max-w-lg text-center text-lg text-gray-600">
-        Plataforma de compraventa de segunda mano para la comunidad ITESO.
-        Publica, intercambia y dona artículos de forma segura.
+        Plataforma de compraventa de segunda mano para la comunidad ITESO. Publica, intercambia y
+        dona artículos de forma segura.
       </p>
 
       {isLoading ? (

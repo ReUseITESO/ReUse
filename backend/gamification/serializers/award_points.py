@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from gamification.models.point_rule import PointAction
 
 

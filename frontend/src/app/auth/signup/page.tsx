@@ -38,8 +38,8 @@ useEffect(() => {
 if (isAuthenticated) return null;
 
   const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setForm(prev => ({ ...prev, [field]: e.target.value }));
+    setErrors(prev => ({ ...prev, [field]: undefined }));
   };
 
   const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
@@ -200,7 +200,9 @@ if (isAuthenticated) return null;
                 disabled={isSubmitting}
                 className={inputClass(errors.first_name)}
               />
-              {errors.first_name && <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>}
+              {errors.first_name && (
+                <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>
+              )}
             </div>
             <div>
               <label htmlFor="last_name" className="mb-1 block text-sm font-medium text-gray-700">
@@ -268,7 +270,10 @@ if (isAuthenticated) return null;
           </div>
 
           <div>
-            <label htmlFor="password_confirm" className="mb-1 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password_confirm"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Confirmar contraseña <span className="text-red-500">*</span>
             </label>
             <input

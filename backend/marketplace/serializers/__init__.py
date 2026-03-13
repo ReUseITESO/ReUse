@@ -1,10 +1,10 @@
 from .category import CategorySerializer
 from .product import (
+    ImageSerializer,
     ProductCreateSerializer,
     ProductListSerializer,
     ProductStatusSerializer,
     ProductUpdateSerializer,
-    ImageSerializer,
 )
 from .product_detail import ProductDetailSerializer
 

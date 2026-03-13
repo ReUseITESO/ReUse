@@ -1,5 +1,5 @@
-from core.models.user import User
 from core.models.email_verification import EmailVerificationToken
+from core.models.user import User
 
 email = "omar.ponce@iteso.mx"  # <-- CAMBIA ESTE CORREO
 

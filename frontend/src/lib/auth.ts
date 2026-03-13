@@ -23,10 +23,7 @@ export function clearTokens(): void {
   localStorage.removeItem(REFRESH_KEY);
 }
 
-async function authFetch<T>(
-  endpoint: string,
-  options?: RequestInit,
-): Promise<T> {
+async function authFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const tokens = getStoredTokens();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -58,19 +55,14 @@ async function authFetch<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message =
-      body?.error?.message ??
-      body?.message ??
-      `Error ${response.status}`;
+    const message = body?.error?.message ?? body?.message ?? `Error ${response.status}`;
     throw new Error(message);
   }
 
   return response.json();
 }
 
-export async function refreshAndStore(
-  refreshToken: string,
-): Promise<AuthTokens | null> {
+export async function refreshAndStore(refreshToken: string): Promise<AuthTokens | null> {
   try {
     const response = await fetch(`${API_BASE}/auth/refresh/`, {
       method: 'POST',
@@ -101,9 +93,7 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message =
-      body?.error?.message ??
-      'Correo o contraseña incorrectos.';
+    const message = body?.error?.message ?? 'Correo o contraseña incorrectos.';
     throw new Error(message);
   }
 
@@ -141,8 +131,7 @@ export async function signOut(): Promise<void> {
         method: 'POST',
         body: JSON.stringify({ refresh: tokens.refresh }),
       });
-    } catch {
-    }
+    } catch {}
   }
   clearTokens();
 }
