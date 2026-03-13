@@ -341,3 +341,55 @@ class EmailVerificationConfirmView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+# ── Dashboard ────────────────────────────────────────────
+
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
+
+
+class DashboardView(APIView):
+    """Aggregated dashboard endpoint for the home page."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        recent_products = (
+            Products.objects
+            .select_related("category", "seller")
+            .filter(status="disponible")
+            .order_by("-created_at")[:6]
+        )
+
+        user_products = []
+        user_products_count = 0
+        user_points = 0
+
+        if request.user and request.user.is_authenticated:
+            user_qs = (
+                Products.objects
+                .select_related("category", "seller")
+                .filter(seller=request.user)
+                .order_by("-created_at")
+            )
+            user_products_count = user_qs.count()
+            user_products = user_qs[:3]
+            user_points = getattr(request.user, "points", 0)
+
+        data = {
+            "recent_products": ProductListSerializer(
+                recent_products, many=True
+            ).data,
+            "user_products": ProductListSerializer(
+                user_products, many=True
+            ).data,
+            "user_products_count": user_products_count,
+            "active_transactions_count": 0,
+            "gamification": {
+                "points": user_points,
+                "badges_count": 0,
+            },
+        }
+
+        return Response(data, status=status.HTTP_200_OK)

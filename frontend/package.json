@@ -10,7 +10,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\""
   },
   "dependencies": {
-     "clsx": "^2.1.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.577.0",
     "next": "^14.2.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
