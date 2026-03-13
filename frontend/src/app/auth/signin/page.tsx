@@ -65,7 +65,7 @@ export default function SignInPage() {
               autoComplete="email"
               placeholder="tu.nombre@iteso.mx"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               disabled={isSubmitting}
               className="w-full rounded-lg border border-input px-4 py-2.5 text-fg placeholder-muted-fg
                          focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring
@@ -83,7 +83,7 @@ export default function SignInPage() {
               autoComplete="current-password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               disabled={isSubmitting}
               className="w-full rounded-lg border border-input px-4 py-2.5 text-fg placeholder-muted-fg
                          focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring

@@ -14,91 +14,99 @@ import { useProducts } from '@/hooks/useProducts';
 import type { ProductFilters } from '@/hooks/useProducts';
 
 export default function ProductList() {
-    const {
-        products, totalCount, currentPage, hasNextPage, hasPrevPage,
-        isLoading, error, hasFilters, fetchProducts, goToPage,
-    } = useProducts();
+  const {
+    products,
+    totalCount,
+    currentPage,
+    hasNextPage,
+    hasPrevPage,
+    isLoading,
+    error,
+    hasFilters,
+    fetchProducts,
+    goToPage,
+  } = useProducts();
 
-    // Search text and filter selects are tracked separately so each can reset
-    // independently, but they are always merged into one API call.
-    const [currentSearch, setCurrentSearch] = useState('');
-    const [currentFilters, setCurrentFilters] = useState<Omit<ProductFilters, 'search'>>({});
+  // Search text and filter selects are tracked separately so each can reset
+  // independently, but they are always merged into one API call.
+  const [currentSearch, setCurrentSearch] = useState('');
+  const [currentFilters, setCurrentFilters] = useState<Omit<ProductFilters, 'search'>>({});
 
-    function handleSearch(query: string) {
-        setCurrentSearch(query);
-        fetchProducts({ ...currentFilters, search: query }); // resets to page 1
-    }
+  function handleSearch(query: string) {
+    setCurrentSearch(query);
+    fetchProducts({ ...currentFilters, search: query }); // resets to page 1
+  }
 
-    function handleFilterChange(filters: Omit<ProductFilters, 'search'>) {
-        setCurrentFilters(filters);
-        fetchProducts({ ...filters, search: currentSearch }); // resets to page 1
-    }
+  function handleFilterChange(filters: Omit<ProductFilters, 'search'>) {
+    setCurrentFilters(filters);
+    fetchProducts({ ...filters, search: currentSearch }); // resets to page 1
+  }
 
-    function handleShowAll() {
-        setCurrentSearch('');
-        setCurrentFilters({});
-        fetchProducts();
-    }
+  function handleShowAll() {
+    setCurrentSearch('');
+    setCurrentFilters({});
+    fetchProducts();
+  }
 
-    return (
-        <>
-            <SearchBar onSearch={handleSearch} onShowAll={handleShowAll} />
-            <FilterBar filters={currentFilters} onChange={handleFilterChange} />
+  return (
+    <>
+      <SearchBar onSearch={handleSearch} onShowAll={handleShowAll} />
+      <FilterBar filters={currentFilters} onChange={handleFilterChange} />
 
-            {hasFilters && (
-                <SearchResultsBadge totalCount={totalCount} isLoading={isLoading} />
-            )}
+      {hasFilters && <SearchResultsBadge totalCount={totalCount} isLoading={isLoading} />}
 
-            <section className="mt-6">
-                {isLoading && <Spinner />}
+      <section className="mt-6">
+        {isLoading && <Spinner />}
 
-                {error && (
-                    <ErrorMessage message={error} onRetry={() => fetchProducts()} />
-                )}
+        {error && <ErrorMessage message={error} onRetry={() => fetchProducts()} />}
 
-                {!isLoading && !error && products.length === 0 && (
-                    <EmptyState
-                        message={hasFilters ? 'No se encontraron productos con esos filtros' : 'No se ha registrado ningun articulo o producto'}
-                        actionLabel={hasFilters ? 'Mostrar todos' : undefined}
-                        onAction={hasFilters ? handleShowAll : undefined}
-                    />
-                )}
+        {!isLoading && !error && products.length === 0 && (
+          <EmptyState
+            message={
+              hasFilters
+                ? 'No se encontraron productos con esos filtros'
+                : 'No se ha registrado ningun articulo o producto'
+            }
+            actionLabel={hasFilters ? 'Mostrar todos' : undefined}
+            onAction={hasFilters ? handleShowAll : undefined}
+          />
+        )}
 
-                {!isLoading && !error && products.length > 0 && (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {products.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                )}
+        {!isLoading && !error && products.length > 0 && (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
-                {/* ── Pagination ─────────────────────────────────────────── */}
-                {!isLoading && !error && (hasNextPage || hasPrevPage) && (
-                    <div className="mt-8 flex items-center justify-center gap-4">
-                        <button
-                            type="button"
-                            disabled={!hasPrevPage}
-                            onClick={() => goToPage(currentPage - 1)}
-                            className="rounded-lg border border-input px-4 py-2 text-sm text-fg hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                            ← Anterior
-                        </button>
+        {/* ── Pagination ─────────────────────────────────────────── */}
+        {!isLoading && !error && (hasNextPage || hasPrevPage) && (
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              disabled={!hasPrevPage}
+              onClick={() => goToPage(currentPage - 1)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Anterior
+            </button>
 
-                        <span className="text-sm text-muted-fg">
-                            Página {currentPage} &nbsp;·&nbsp; {totalCount} productos
-                        </span>
+            <span className="text-sm text-gray-500">
+              Página {currentPage} &nbsp;·&nbsp; {totalCount} productos
+            </span>
 
-                        <button
-                            type="button"
-                            disabled={!hasNextPage}
-                            onClick={() => goToPage(currentPage + 1)}
-                            className="rounded-lg border border-input px-4 py-2 text-sm text-fg hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                            Siguiente →
-                        </button>
-                    </div>
-                )}
-            </section>
-        </>
-    );
+            <button
+              type="button"
+              disabled={!hasNextPage}
+              onClick={() => goToPage(currentPage + 1)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Siguiente →
+            </button>
+          </div>
+        )}
+      </section>
+    </>
+  );
 }

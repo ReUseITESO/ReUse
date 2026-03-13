@@ -29,8 +29,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <Badge className={categoryClass}>{product.category.name}</Badge>
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <Badge className={categoryClass}>{product.category.name}</Badge>
 
         <h3 className="line-clamp-2 text-body font-semibold text-card-fg">{product.title}</h3>
 
@@ -43,8 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-2 flex items-center gap-2 border-t border-border pt-3">
           <span className="text-sm text-fg">{product.seller_name}</span>
         </div>
-      </div>
-    </article>
+      </article>
     </Link>
   );
 }

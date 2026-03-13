@@ -14,9 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-bg text-fg">
         <AuthProvider>
           <Navbar />
-          <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            {children}
-          </main>
+          <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
         </AuthProvider>
       </body>
     </html>

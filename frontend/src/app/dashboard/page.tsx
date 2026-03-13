@@ -19,8 +19,8 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-h3 font-semibold text-fg">Mi Gamificación</h2>
             <PointsBalance refreshTrigger={pointsVersion} />
           </div>
-          <TestPointsButtons onPointsUpdated={() => setPointsVersion((v) => v + 1)} />
-          
+          <TestPointsButtons onPointsUpdated={() => setPointsVersion(v => v + 1)} />
+
           <div>
             <h2 className="mb-4 text-h3 font-semibold text-fg">Insignias</h2>
             <BadgesList />

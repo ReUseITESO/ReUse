@@ -20,11 +20,7 @@ import {
 
 import { apiClient } from '@/lib/api';
 
-import type {
-  Product,
-  EditFormValues,
-  ProductEditFormProps,
-} from '@/types/product';
+import type { Product, EditFormValues, ProductEditFormProps } from '@/types/product';
 
 export default function ProductEditForm({ productId }: ProductEditFormProps) {
   const router = useRouter();
@@ -66,8 +62,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           image_url: data.image_url ?? '',
         });
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Error al cargar el producto';
+        const message = err instanceof Error ? err.message : 'Error al cargar el producto';
         setLoadError(message);
       } finally {
         setIsLoadingProduct(false);
@@ -185,7 +180,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                   className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
-                  {categories.map((cat) => (
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -232,7 +227,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               {...register('transaction_type', { required: 'Selecciona el tipo' })}
             />
             <div className="grid gap-3 sm:grid-cols-3">
-              {TRANSACTION_OPTIONS.map((option) => {
+              {TRANSACTION_OPTIONS.map(option => {
                 const isSelected = transactionType === option.value;
                 return (
                   <button

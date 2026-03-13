@@ -47,9 +47,10 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
   const priceColorClass = getPriceColor(product.transaction_type);
 
   const isSale = product.transaction_type === 'sale';
-  const priceDisplay = isSale && product.price
-    ? formatPrice(product.price)
-    : formatTransactionLabel(product.transaction_type);
+  const priceDisplay =
+    isSale && product.price
+      ? formatPrice(product.price)
+      : formatTransactionLabel(product.transaction_type);
 
   async function handleDelete() {
     const success = await deleteProduct(product.id);
@@ -103,7 +104,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
             {transitions.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {transitions.map((t) => (
+                {transitions.map(t => (
                   <button
                     key={t.value}
                     type="button"

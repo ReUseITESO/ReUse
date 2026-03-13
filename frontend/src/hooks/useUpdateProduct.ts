@@ -14,17 +14,13 @@ export function useUpdateProduct() {
       setError(null);
 
       try {
-        const product = await apiClient<Product>(
-          `/marketplace/products/${productId}/`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify(payload),
-          },
-        );
+        const product = await apiClient<Product>(`/marketplace/products/${productId}/`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
         return product;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Error al actualizar el producto';
+        const message = err instanceof Error ? err.message : 'Error al actualizar el producto';
         setError(message);
         return null;
       } finally {

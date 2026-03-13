@@ -56,7 +56,10 @@ export default function ProductForm() {
   }
 
   function removeImage(index: number) {
-    setValue('images', images.filter((_, i) => i !== index));
+    setValue(
+      'images',
+      images.filter((_, i) => i !== index),
+    );
   }
 
   async function onSubmit(data: FormValues) {
@@ -67,7 +70,7 @@ export default function ProductForm() {
       condition: data.condition,
       transaction_type: data.transaction_type,
       price: showPrice ? Number(data.price) : null,
-      image_url: data.images.length > 0 ? data.images[0] : (data.image_url || undefined),
+      image_url: data.images.length > 0 ? data.images[0] : data.image_url || undefined,
       images: data.images.length > 0 ? data.images : undefined,
     });
 
@@ -158,7 +161,7 @@ export default function ProductForm() {
                   className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
-                  {categories.map((cat) => (
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -200,9 +203,12 @@ export default function ProductForm() {
           </h2>
 
           <div>
-            <input type="hidden" {...register('transaction_type', { required: 'Selecciona el tipo' })} />
+            <input
+              type="hidden"
+              {...register('transaction_type', { required: 'Selecciona el tipo' })}
+            />
             <div className="grid gap-3 sm:grid-cols-3">
-              {TRANSACTION_OPTIONS.map((option) => {
+              {TRANSACTION_OPTIONS.map(option => {
                 const isSelected = transactionType === option.value;
                 return (
                   <button
@@ -275,7 +281,7 @@ export default function ProductForm() {
                 {...register('image_url')}
                 className={`${INPUT_CLASS} flex-1 min-w-0`}
                 placeholder="https://ejemplo.com/imagen.jpg"
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     addImage();
@@ -318,8 +324,18 @@ export default function ProductForm() {
                       className="flex-shrink-0 text-error hover:opacity-80"
                       title="Eliminar imagen"
                     >
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>

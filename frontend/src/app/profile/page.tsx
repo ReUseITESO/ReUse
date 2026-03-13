@@ -96,11 +96,11 @@ export default function ProfilePage() {
                     </div>
                 </section>
 
-                {/* TODO: Add more profile sections */}
-                {/* - Published items */}
-                {/* - Transaction history */}
-                {/* - Account settings */}
-            </div>
-        </main>
-    );
+        {/* TODO: Add more profile sections */}
+        {/* - Published items */}
+        {/* - Transaction history */}
+        {/* - Account settings */}
+      </div>
+    </main>
+  );
 }

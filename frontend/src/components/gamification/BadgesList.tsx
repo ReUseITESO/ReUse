@@ -18,8 +18,12 @@ export default function BadgesList() {
         // apiClient automatically handles the base URL and auth headers
         const data = await apiClient<BadgeWithStatus[]>('/gamification/badges/status/');
         setBadges(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch achievements. Please try again later.');
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : 'Failed to fetch achievements. Please try again later.';
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -33,13 +37,16 @@ export default function BadgesList() {
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-      {badges.map((badge) => {
+      {badges.map(badge => {
         const isLocked = !badge.earned_at;
         return (
-          <Card key={badge.id} className={`p-4 flex flex-col items-center text-center transition-all ${isLocked ? 'opacity-50 grayscale' : 'hover:scale-105 shadow-md'}`}>
-            <img 
-              src={badge.icon_url || 'https://via.placeholder.com/64'} 
-              alt={badge.name} 
+          <Card
+            key={badge.id}
+            className={`p-4 flex flex-col items-center text-center transition-all ${isLocked ? 'opacity-50 grayscale' : 'hover:scale-105 shadow-md'}`}
+          >
+            <img
+              src={badge.icon_url || 'https://via.placeholder.com/64'}
+              alt={badge.name}
               className="w-16 h-16 mb-3 rounded-full"
             />
             <h3 className="font-semibold text-sm mb-1">{badge.name}</h3>
