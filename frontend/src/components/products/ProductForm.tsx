@@ -56,7 +56,10 @@ export default function ProductForm() {
   }
 
   function removeImage(index: number) {
-    setValue('images', images.filter((_, i) => i !== index));
+    setValue(
+      'images',
+      images.filter((_, i) => i !== index),
+    );
   }
 
   async function onSubmit(data: FormValues) {
@@ -67,7 +70,7 @@ export default function ProductForm() {
       condition: data.condition,
       transaction_type: data.transaction_type,
       price: showPrice ? Number(data.price) : null,
-      image_url: data.images.length > 0 ? data.images[0] : (data.image_url || undefined),
+      image_url: data.images.length > 0 ? data.images[0] : data.image_url || undefined,
       images: data.images.length > 0 ? data.images : undefined,
     });
 
@@ -115,9 +118,7 @@ export default function ProductForm() {
               className={INPUT_CLASS}
               placeholder="Ej: Libro de Cálculo Diferencial"
             />
-            {errors.title && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>}
           </div>
 
           <div>
@@ -158,7 +159,7 @@ export default function ProductForm() {
                   className={SELECT_CLASS}
                 >
                   <option value="">Seleccionar categoría</option>
-                  {categories.map((cat) => (
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -200,9 +201,12 @@ export default function ProductForm() {
           </h2>
 
           <div>
-            <input type="hidden" {...register('transaction_type', { required: 'Selecciona el tipo' })} />
+            <input
+              type="hidden"
+              {...register('transaction_type', { required: 'Selecciona el tipo' })}
+            />
             <div className="grid gap-3 sm:grid-cols-3">
-              {TRANSACTION_OPTIONS.map((option) => {
+              {TRANSACTION_OPTIONS.map(option => {
                 const isSelected = transactionType === option.value;
                 return (
                   <button
@@ -215,10 +219,14 @@ export default function ProductForm() {
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    <span className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <span
+                      className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}
+                    >
                       {option.label}
                     </span>
-                    <span className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                    <span
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
+                    >
                       {option.description}
                     </span>
                   </button>
@@ -260,9 +268,7 @@ export default function ProductForm() {
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Imágenes
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Imágenes</h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -275,7 +281,7 @@ export default function ProductForm() {
                 {...register('image_url')}
                 className={`${INPUT_CLASS} flex-1 min-w-0`}
                 placeholder="https://ejemplo.com/imagen.jpg"
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     addImage();
@@ -311,15 +317,27 @@ export default function ProductForm() {
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
                       {index + 1}
                     </span>
-                    <span className="flex-1 text-sm text-gray-600 break-all overflow-wrap-anywhere">{url}</span>
+                    <span className="flex-1 text-sm text-gray-600 break-all overflow-wrap-anywhere">
+                      {url}
+                    </span>
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
                       className="flex-shrink-0 text-red-600 hover:text-red-700"
                       title="Eliminar imagen"
                     >
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>

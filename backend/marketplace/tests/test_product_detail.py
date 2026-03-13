@@ -3,17 +3,19 @@ Tests for product detail endpoint and product creation with images.
 Covers GET /products/{id}/ returning seller_email and images array,
 and POST /products/ creating products with multiple images.
 """
-from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core.models.user import User
 from marketplace.models.category import Category
-from marketplace.models.product import Products
 from marketplace.models.images import Images
+from marketplace.models.product import Products
 
 
-def make_user(email: str = "test@iteso.mx", first_name: str = "Test", last_name: str = "User") -> User:
+def make_user(
+    email: str = "test@iteso.mx", first_name: str = "Test", last_name: str = "User"
+) -> User:
     return User.objects.create(
         email=email,
         first_name=first_name,
@@ -51,7 +53,9 @@ class TestProductDetailEndpoint(APITestCase):
     """Tests for GET /api/marketplace/products/{id}/ endpoint."""
 
     def setUp(self):
-        self.user = make_user(email="seller@iteso.mx", first_name="María", last_name="García")
+        self.user = make_user(
+            email="seller@iteso.mx", first_name="María", last_name="García"
+        )
         self.category = make_category(name="Libros", icon="book")
         self.product = make_product(
             seller=self.user,
@@ -96,29 +100,29 @@ class TestProductDetailEndpoint(APITestCase):
         Images.objects.create(
             product=self.product,
             image_url="https://example.com/image1.jpg",
-            order_number=0
+            order_number=0,
         )
         Images.objects.create(
             product=self.product,
             image_url="https://example.com/image2.jpg",
-            order_number=1
+            order_number=1,
         )
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         assert len(response.data["images"]) == 2
 
     def test_product_detail_images_have_correct_fields(self):
         Images.objects.create(
             product=self.product,
             image_url="https://example.com/image1.jpg",
-            order_number=0
+            order_number=0,
         )
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         image = response.data["images"][0]
         assert "id" in image
         assert "image_url" in image
@@ -128,17 +132,17 @@ class TestProductDetailEndpoint(APITestCase):
         Images.objects.create(
             product=self.product,
             image_url="https://example.com/image2.jpg",
-            order_number=1
+            order_number=1,
         )
         Images.objects.create(
             product=self.product,
             image_url="https://example.com/image1.jpg",
-            order_number=0
+            order_number=0,
         )
 
         url = f"/api/marketplace/products/{self.product.id}/"
         response = self.client.get(url)
-        
+
         assert response.data["images"][0]["order_number"] == 0
         assert response.data["images"][1]["order_number"] == 1
 
@@ -152,7 +156,9 @@ class TestProductCreationWithImages(APITestCase):
     """Tests for POST /api/marketplace/products/ with images array."""
 
     def setUp(self):
-        self.user = make_user(email="creator@iteso.mx", first_name="Test", last_name="Creator")
+        self.user = make_user(
+            email="creator@iteso.mx", first_name="Test", last_name="Creator"
+        )
         self.category = make_category(name="Electrónica", icon="laptop")
         self.client.force_authenticate(user=self.user)
 
@@ -224,7 +230,7 @@ class TestProductCreationWithImages(APITestCase):
             ],
         }
         response = self.client.post("/api/marketplace/products/", data, format="json")
-        
+
         product = Products.objects.get(id=response.data["id"])
         assert product.images.count() == 2
 
@@ -243,10 +249,10 @@ class TestProductCreationWithImages(APITestCase):
             ],
         }
         response = self.client.post("/api/marketplace/products/", data, format="json")
-        
+
         product = Products.objects.get(id=response.data["id"])
         images = product.images.all().order_by("order_number")
-        
+
         assert images[0].order_number == 0
         assert images[1].order_number == 1
         assert images[2].order_number == 2
@@ -266,10 +272,12 @@ class TestProductCreationWithImages(APITestCase):
             "images": image_urls,
         }
         response = self.client.post("/api/marketplace/products/", data, format="json")
-        
+
         product = Products.objects.get(id=response.data["id"])
-        saved_urls = list(product.images.values_list("image_url", flat=True).order_by("order_number"))
-        
+        saved_urls = list(
+            product.images.values_list("image_url", flat=True).order_by("order_number")
+        )
+
         assert saved_urls == image_urls
 
     def test_create_product_with_invalid_image_url_returns_400(self):
@@ -295,7 +303,7 @@ class TestProductCreationWithImages(APITestCase):
             "price": 500.00,
         }
         response = self.client.post("/api/marketplace/products/", data, format="json")
-        
+
         product = Products.objects.get(id=response.data["id"])
         assert response.status_code == status.HTTP_201_CREATED
         assert product.images.count() == 0

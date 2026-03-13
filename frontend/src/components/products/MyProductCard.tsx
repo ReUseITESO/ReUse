@@ -54,9 +54,10 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
   const categoryClass = CATEGORY_COLORS[product.category.name] ?? 'bg-gray-100 text-gray-700';
 
   const isSale = product.transaction_type === 'sale';
-  const priceDisplay = isSale && product.price
-    ? formatPrice(product.price)
-    : formatTransactionLabel(product.transaction_type);
+  const priceDisplay =
+    isSale && product.price
+      ? formatPrice(product.price)
+      : formatTransactionLabel(product.transaction_type);
 
   async function handleDelete() {
     const success = await deleteProduct(product.id);
@@ -84,9 +85,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-sm text-gray-400">
-              {product.category.name} - Imagen
-            </span>
+            <span className="text-sm text-gray-400">{product.category.name} - Imagen</span>
           )}
         </div>
 
@@ -96,9 +95,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
             <StatusBadge status={product.status} />
           </div>
 
-          <h3 className="line-clamp-2 text-base font-semibold text-gray-900">
-            {product.title}
-          </h3>
+          <h3 className="line-clamp-2 text-base font-semibold text-gray-900">{product.title}</h3>
 
           <p className="text-lg font-bold text-blue-600">{priceDisplay}</p>
 
@@ -110,7 +107,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           <div className="mt-auto flex flex-col gap-2 border-t border-gray-100 pt-3">
             {transitions.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {transitions.map((t) => (
+                {transitions.map(t => (
                   <button
                     key={t.value}
                     type="button"

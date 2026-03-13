@@ -1,24 +1,23 @@
-from datetime import timedelta
 import hashlib
 import secrets
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.mail import send_mail
 from django.utils import timezone
-
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignUpSerializer, SignInSerializer, UserProfileSerializer
-from django.core.mail import send_mail
+from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
 User = get_user_model()
+
 
 def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -82,7 +81,6 @@ def verify_email_token(raw_token: str):
     return user, None
 
 
-
 def send_verification_email(to_email: str, verify_url: str):
     subject = "Verifica tu correo - ReUseITESO"
     message = (
@@ -99,8 +97,6 @@ def send_verification_email(to_email: str, verify_url: str):
         recipient_list=[to_email],
         fail_silently=False,
     )
-
-
 
 
 class SignUpView(generics.CreateAPIView):
@@ -138,6 +134,7 @@ class SignUpView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
 
 class SignInView(APIView):
     """
@@ -257,18 +254,22 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
 class EmailVerificationSendView(APIView):
     """
     POST /api/auth/email-verification/send/
     Dispara (re)envío de correo de verificación.
     Respuesta genérica para no filtrar si el email existe.
     """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
 
-        generic_msg = {"message": "Si el correo existe, se enviará un email de verificación."}
+        generic_msg = {
+            "message": "Si el correo existe, se enviará un email de verificación."
+        }
 
         if not email:
             return Response(generic_msg, status=status.HTTP_200_OK)
@@ -297,6 +298,7 @@ class EmailVerificationConfirmView(APIView):
     - marca usuario verificado y activo
     - devuelve JWT tokens (login automático)
     """
+
     permission_classes = [AllowAny]
 
     def get(self, request):

@@ -9,12 +9,10 @@ export default function VerifyNoticePage() {
         <div className="mb-6">
           <span className="inline-block text-5xl">📧</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          ¡Revisa tu correo!
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">¡Revisa tu correo!</h1>
         <p className="text-gray-600 mb-6">
-          Te enviamos un enlace de verificación a tu correo ITESO.
-          Haz clic en el enlace para activar tu cuenta.
+          Te enviamos un enlace de verificación a tu correo ITESO. Haz clic en el enlace para
+          activar tu cuenta.
         </p>
         <p className="text-sm text-gray-500 mb-8">
           Si no ves el correo, revisa tu carpeta de spam.

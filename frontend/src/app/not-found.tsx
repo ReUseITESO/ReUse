@@ -5,9 +5,7 @@ export default function NotFound() {
     <main className="flex min-h-[70vh] flex-col items-center justify-center p-4">
       <div className="flex max-w-md flex-col items-center text-center">
         <h1 className="text-6xl font-bold text-gray-900">404</h1>
-        <h2 className="mt-4 text-2xl font-semibold text-gray-800">
-          Página no encontrada
-        </h2>
+        <h2 className="mt-4 text-2xl font-semibold text-gray-800">Página no encontrada</h2>
         <p className="mt-2 text-base text-gray-600">
           Esta página ya fue reciclada o la dirección es incorrecta.
         </p>
