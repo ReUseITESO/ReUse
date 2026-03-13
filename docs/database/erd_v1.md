@@ -1,19 +1,20 @@
 
 # ERD - ReUseITESO
 
-**Date:** 5 March 2026
+**Date:** 12 March 2026
 **DBA:** Daniel
-**Version:** 1.2
+**Version:** 1.3
 
 ---
 
 ## Changelog
 
-| Version | Date        | Change                                                                                                                                                                                                        |
-| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 15 Feb 2026 | Initial ERD                                                                                                                                                                                                   |
-| 1.1     | 5 Mar 2026  | User: name → first_name/last_name, email verification fields. Products: updated_at. Badges: icon_url → icon. Added PointRule, PointTransaction, EmailVerificationToken. All gamification tables now active. |
-| 1.2     | 11 Mar 2026 | Added Social module: UserConnection, FrequentContact, Community, CommunityMember. Fixed FK column names: Images/Transaction/ForumQuestion use products_id (verified against source code).                     |
+| Version | Date        | Change                                                                                                                                                                                                                         |
+| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 15 Feb 2026 | Initial ERD                                                                                                                                                                                                                    |
+| 1.1     | 5 Mar 2026  | User: name replaced by first_name/last_name, email verification fields. Products: updated_at. Badges: icon_url renamed to icon. Added PointRule, PointTransaction, EmailVerificationToken. All gamification tables now active. |
+| 1.2     | 11 Mar 2026 | Added Social module: UserConnection, FrequentContact, Community, CommunityMember. Fixed FK column names: Images/Transaction/ForumQuestion use products_id (verified against source code).                                      |
+| 1.3     | 12 Mar 2026 | Added CommunityPost. ForumQuestion: products_id made nullable, post_id added (FK to social_communitypost). A ForumQuestion must belong to exactly one target: product or post.                                                 |
 
 ---
 
@@ -39,6 +40,7 @@ Django generates table names automatically as `{app}_{model}`. The actual table 
 | social.FrequentContact         | `social_frequentcontact`         | Active |
 | social.Community               | `social_community`               | Active |
 | social.CommunityMember         | `social_communitymember`         | Active |
+| social.CommunityPost           | `social_communitypost`           | Active |
 
 ---
 
@@ -187,18 +189,26 @@ CREATE INDEX idx_marketplace_transaction_buyer ON marketplace_transaction(buyer_
 
 ### ForumQuestion
 
+> **v1.3 change:** `products_id` is now nullable. `post_id` added as FK to `social_communitypost`. A ForumQuestion must belong to exactly one target (product or post) — enforced via `clean()` in Django. The `CHECK (id != parent_id)` constraint is preserved.
+
 ```sql
 CREATE TABLE marketplace_forumquestion (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
-    products_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    products_id BIGINT REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    post_id BIGINT REFERENCES social_communitypost(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
     parent_id BIGINT REFERENCES marketplace_forumquestion(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (id != parent_id)
+    CHECK (id != parent_id),
+    CHECK (
+        (products_id IS NOT NULL AND post_id IS NULL) OR
+        (products_id IS NULL AND post_id IS NOT NULL)
+    )
 );
 
 CREATE INDEX idx_marketplace_forumquestion_product ON marketplace_forumquestion(products_id);
+CREATE INDEX idx_marketplace_forumquestion_post ON marketplace_forumquestion(post_id);
 CREATE INDEX idx_marketplace_forumquestion_user ON marketplace_forumquestion(user_id);
 CREATE INDEX idx_marketplace_forumquestion_parent ON marketplace_forumquestion(parent_id);
 ```
@@ -275,7 +285,7 @@ CREATE TABLE gamification_pointrule (
 | action                | points | description              |
 | --------------------- | ------ | ------------------------ |
 | `complete_sale`     | 50     | Completar una venta      |
-| `complete_donation` | 100    | Completar una donación  |
+| `complete_donation` | 100    | Completar una donacion   |
 | `complete_swap`     | 75     | Completar un intercambio |
 
 ---
@@ -302,6 +312,7 @@ CREATE INDEX idx_gamification_pointtransaction_user ON gamification_pointtransac
 ## Social Module
 
 > **v1.2:** New module added. Four tables to support user connections, frequent contacts, and communities.
+> **v1.3:** CommunityPost added.
 
 ### UserConnection
 
@@ -402,6 +413,32 @@ CREATE INDEX idx_social_communitymember_role ON social_communitymember(community
 
 ---
 
+### CommunityPost
+
+> **v1.3:** New table. Posts published inside a community by its members. Supports pinned posts for announcements. ForumQuestion can reference a CommunityPost via `post_id` to enable threaded discussion on posts.
+
+```sql
+CREATE TABLE social_communitypost (
+    id BIGSERIAL PRIMARY KEY,
+    community_id BIGINT NOT NULL REFERENCES social_community(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image_url VARCHAR(500),
+    is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_social_communitypost_community_created ON social_communitypost(community_id, created_at);
+CREATE INDEX idx_social_communitypost_user ON social_communitypost(user_id);
+CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(community_id, is_pinned);
+```
+
+**Design note:** Only community members can create posts — enforced at the serializer layer. The default ordering is pinned posts first, then newest. `ON DELETE CASCADE` on both FKs: if the community or the user is deleted, their posts are removed.
+
+---
+
 ## Relations
 
 **Core**
@@ -416,7 +453,8 @@ CREATE INDEX idx_social_communitymember_role ON social_communitymember(community
 * Products 1 → 1 Transaction
 * User 1 → N Transactions (as seller)
 * User 1 → N Transactions (as buyer)
-* Products 1 → N ForumQuestions
+* Products 1 → N ForumQuestions (via products_id, nullable)
+* CommunityPost 1 → N ForumQuestions (via post_id, nullable)
 * User 1 → N ForumQuestions
 * ForumQuestion 1 → N ForumQuestion (self-referential, replies)
 
@@ -434,6 +472,8 @@ CREATE INDEX idx_social_communitymember_role ON social_communitymember(community
 * User 1 → N FrequentContact (as contact)
 * User 1 → N Community (as creator)
 * Community N → M User (through CommunityMember)
+* Community 1 → N CommunityPost
+* User 1 → N CommunityPost
 
 ---
 
@@ -455,7 +495,11 @@ The original ERD specified `icon_url`. The implementation uses `icon` (PR #64). 
 
 `UserConnection` uses a single row per pair (requester/addressee) to represent a bidirectional friendship once accepted. Querying friends requires checking both FK columns. `FrequentContact` is a unilateral personal mark — no notification or acceptance required from the contact. `Community` uses soft delete (`is_active`) to preserve history. `CommunityMember` governs all access via `role`; the `creator_id` on `Community` is audit-only.
 
+**ForumQuestion dual-target design**
+
+`ForumQuestion` can now belong to either a `Products` record or a `CommunityPost`. Exactly one of `products_id` / `post_id` must be non-null — enforced by a CHECK constraint at the DB level and by `clean()` in Django. Reply threads are validated to stay within the same target: a reply to a product thread cannot reference a post, and vice versa. This reuses the existing comment infrastructure rather than introducing a separate comments table for community posts.
+
 ---
 
-**Last updated:** 11 March 2026
+**Last updated:** 12 March 2026
 **Responsible:** Daniel (DBA)

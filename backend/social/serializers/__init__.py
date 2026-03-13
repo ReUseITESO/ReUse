@@ -5,6 +5,11 @@ from social.serializers.community import (
     CommunityMemberSerializer,
     CommunityUpdateSerializer,
 )
+from social.serializers.community_post import (
+    CommunityPostDetailSerializer,
+    CommunityPostListSerializer,
+    CommunityPostWriteSerializer,
+)
 from social.serializers.frequent_contact import FrequentContactCreateSerializer, FrequentContactSerializer
 from social.serializers.user_connection import (
     UserConnectionCreateSerializer,
@@ -23,4 +28,7 @@ __all__ = [
     "CommunityCreateSerializer",
     "CommunityUpdateSerializer",
     "CommunityMemberSerializer",
+    "CommunityPostListSerializer",
+    "CommunityPostDetailSerializer",
+    "CommunityPostWriteSerializer",
 ]

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from social.models import Community, CommunityMember, FrequentContact, UserConnection
+from social.models import Community, CommunityMember, FrequentContact, UserConnection, CommunityPost
 
 
 @admin.register(UserConnection)
@@ -35,3 +35,9 @@ class CommunityMemberAdmin(admin.ModelAdmin):
     list_display = ["id", "community", "user", "role", "joined_at"]
     list_filter = ["role"]
     search_fields = ["community__name", "user__email"]
+
+@admin.register(CommunityPost)
+class CommunityPostAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "community", "user", "is_pinned", "created_at")
+    list_filter = ("community", "is_pinned", "created_at")
+    search_fields = ("title", "content", "user__email", "community__name")

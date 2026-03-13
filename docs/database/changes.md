@@ -2,7 +2,7 @@
 # Database Changes Log - ReUseITESO
 
 **DBA:** Daniel
-**Last updated:** 11 March 2026
+**Last updated:** 12 March 2026
 
 ---
 
@@ -26,12 +26,12 @@
 | Field added   | —                             | `is_email_verified BOOLEAN NOT NULL DEFAULT FALSE`         |
 | Field added   | —                             | `email_verified_at TIMESTAMP NULL`                         |
 
-**Table: `core_emailverificationtoken`** ← New table
+**Table: `core_emailverificationtoken`** — New table
 
 | Column     | Type      | Constraints                           |
 | ---------- | --------- | ------------------------------------- |
 | id         | BIGSERIAL | PK                                    |
-| user_id    | BIGINT    | FK → core_user(id) ON DELETE CASCADE |
+| user_id    | BIGINT    | FK to core_user(id) ON DELETE CASCADE |
 | token      | VARCHAR   | UNIQUE NOT NULL                       |
 | created_at | TIMESTAMP | NOT NULL DEFAULT NOW()                |
 | expires_at | TIMESTAMP | NOT NULL                              |
@@ -43,9 +43,9 @@
 
 ### Side effects (bugs introduced)
 
-* `marketplace/models/forum_question.py` — `__str__` used `self.user.name` → **fixed to `get_full_name()`**
-* `gamification/models/environment_impact.py` — `__str__` used `self.user.name` → **fixed to `get_full_name()`**
-* `seeds/seed_partial.json` and `seeds/seed_v1_fixed.json` — outdated user fields → **replaced by `seed_dev_fixed.json`**
+* `marketplace/models/forum_question.py` — `__str__` used `self.user.name` — fixed to `get_full_name()`
+* `gamification/models/environment_impact.py` — `__str__` used `self.user.name` — fixed to `get_full_name()`
+* `seeds/seed_partial.json` and `seeds/seed_v1_fixed.json` — outdated user fields — replaced by `seed_dev_fixed.json`
 
 ---
 
@@ -61,7 +61,7 @@
 
 ### Schema changes
 
-**Table: `gamification_pointrule`** ← New table
+**Table: `gamification_pointrule`** — New table
 
 | Column      | Type        | Constraints                  |
 | ----------- | ----------- | ---------------------------- |
@@ -72,12 +72,12 @@
 | is_active   | BOOLEAN     | NOT NULL DEFAULT TRUE        |
 | created_at  | TIMESTAMP   | NOT NULL DEFAULT NOW()       |
 
-**Table: `gamification_pointtransaction`** ← New table
+**Table: `gamification_pointtransaction`** — New table
 
 | Column       | Type        | Constraints                           |
 | ------------ | ----------- | ------------------------------------- |
 | id           | BIGSERIAL   | PK                                    |
-| user_id      | BIGINT      | FK → core_user(id) ON DELETE CASCADE |
+| user_id      | BIGINT      | FK to core_user(id) ON DELETE CASCADE |
 | action       | VARCHAR(50) | NOT NULL                              |
 | points       | INTEGER     | NOT NULL                              |
 | reference_id | INTEGER     | NULLABLE                              |
@@ -89,7 +89,7 @@
 
 ### Pending
 
-* [X] Update `erd_v1.md` with these two tables — **done in v1.1**
+* [X] Update `erd_v1.md` with these two tables — done in v1.1
 * [ ] Create `docs/database/rfc/rfc_001_point_ledger.md` as post-facto RFC
 * [ ] Configure `PointRule` rows via admin panel before demo (no seed data)
 
@@ -105,7 +105,7 @@
 
 ### Schema changes
 
-**Table: `gamification_badges`** ← New table
+**Table: `gamification_badges`** — New table
 
 | Column      | Type         | Constraints                                                      | Note                                             |
 | ----------- | ------------ | ---------------------------------------------------------------- | ------------------------------------------------ |
@@ -117,13 +117,13 @@
 | points      | INTEGER      | NOT NULL CHECK (points >= 0)                                     |                                                  |
 | created_at  | TIMESTAMP    | NOT NULL DEFAULT NOW()                                           |                                                  |
 
-**Table: `gamification_userbadges`** ← New table
+**Table: `gamification_userbadges`** — New table
 
 | Column    | Type      | Constraints                                     |
 | --------- | --------- | ----------------------------------------------- |
 | id        | BIGSERIAL | PK                                              |
-| user_id   | BIGINT    | FK → core_user(id) ON DELETE CASCADE           |
-| badge_id  | BIGINT    | FK → gamification_badges(id) ON DELETE CASCADE |
+| user_id   | BIGINT    | FK to core_user(id) ON DELETE CASCADE           |
+| badge_id  | BIGINT    | FK to gamification_badges(id) ON DELETE CASCADE |
 | earned_at | TIMESTAMP | NOT NULL DEFAULT NOW()                          |
 | UNIQUE    |           | (user_id, badge_id)                             |
 
@@ -133,7 +133,7 @@
 
 ### Pending
 
-* [X] Update `erd_v1.md`: change `icon_url` → `icon` in Badges — **done in v1.1**
+* [X] Update `erd_v1.md`: change `icon_url` to `icon` in Badges — done in v1.1
 
 ---
 
@@ -147,10 +147,10 @@
 
 **Table: `marketplace_products`** — field added
 
-| Change      | Detail                                                                                          |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| Field added | `updated_at TIMESTAMP NOT NULL DEFAULT NOW()`                                                 |
-| Fix applied | `auto_now=True`→`default=timezone.now`+`save()`override (incompatible with `loaddata`) |
+| Change      | Detail                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| Field added | `updated_at TIMESTAMP NOT NULL DEFAULT NOW()`                                                           |
+| Fix applied | `auto_now=True`replaced by `default=timezone.now`+`save()`override (incompatible with `loaddata`) |
 
 **Tables added:** `marketplace_forumquestion`, `marketplace_images`, `marketplace_transaction`
 (defined in ERD v1 — expected changes, no governance violations)
@@ -201,10 +201,10 @@ def save(self, *args, **kwargs):
 
 ### Changes
 
-* `seed_partial.json` and `seed_v1_fixed.json` → replaced by `seed_dev_fixed.json`
-* Users: `name` → `first_name` + `last_name`, removed `username`, added `is_email_verified` + `email_verified_at`
+* `seed_partial.json` and `seed_v1_fixed.json` replaced by `seed_dev_fixed.json`
+* Users: `name` replaced by `first_name` + `last_name`, removed `username`, added `is_email_verified` + `email_verified_at`
 * FKs corrected to Django attribute names (no `_id` suffix in fixture keys)
-* Badges: `icon_url` → `icon` (aligned to actual model)
+* Badges: `icon_url` replaced by `icon` (aligned to actual model)
 * `updated_at` added explicitly in all Products entries
 
 ---
@@ -242,36 +242,36 @@ New `social` app to support social connections between users: friend requests, f
 
 ### Schema changes
 
-**Table: `social_userconnection`** ← New table
+**Table: `social_userconnection`** — New table
 
 | Column       | Type        | Constraints                                                                     |
 | ------------ | ----------- | ------------------------------------------------------------------------------- |
 | id           | BIGSERIAL   | PK                                                                              |
-| requester_id | BIGINT      | FK → core_user(id) ON DELETE CASCADE, NOT NULL                                 |
-| addressee_id | BIGINT      | FK → core_user(id) ON DELETE CASCADE, NOT NULL                                 |
+| requester_id | BIGINT      | FK to core_user(id) ON DELETE CASCADE, NOT NULL                                 |
+| addressee_id | BIGINT      | FK to core_user(id) ON DELETE CASCADE, NOT NULL                                 |
 | status       | VARCHAR(20) | NOT NULL DEFAULT 'pending' CHECK IN ('pending','accepted','rejected','blocked') |
 | created_at   | TIMESTAMP   | NOT NULL DEFAULT NOW()                                                          |
 | updated_at   | TIMESTAMP   | NOT NULL DEFAULT NOW()                                                          |
 | UNIQUE       |             | (requester_id, addressee_id)                                                    |
 | CHECK        |             | requester_id != addressee_id                                                    |
 
-**Table: `social_frequentcontact`** ← New table
+**Table: `social_frequentcontact`** — New table
 
 | Column     | Type      | Constraints                                     |
 | ---------- | --------- | ----------------------------------------------- |
 | id         | BIGSERIAL | PK                                              |
-| user_id    | BIGINT    | FK → core_user(id) ON DELETE CASCADE, NOT NULL |
-| contact_id | BIGINT    | FK → core_user(id) ON DELETE CASCADE, NOT NULL |
+| user_id    | BIGINT    | FK to core_user(id) ON DELETE CASCADE, NOT NULL |
+| contact_id | BIGINT    | FK to core_user(id) ON DELETE CASCADE, NOT NULL |
 | created_at | TIMESTAMP | NOT NULL DEFAULT NOW()                          |
 | UNIQUE     |           | (user_id, contact_id)                           |
 | CHECK      |           | user_id != contact_id                           |
 
-**Table: `social_community`** ← New table
+**Table: `social_community`** — New table
 
 | Column      | Type         | Constraints                                      |
 | ----------- | ------------ | ------------------------------------------------ |
 | id          | BIGSERIAL    | PK                                               |
-| creator_id  | BIGINT       | FK → core_user(id) ON DELETE RESTRICT, NOT NULL |
+| creator_id  | BIGINT       | FK to core_user(id) ON DELETE RESTRICT, NOT NULL |
 | name        | VARCHAR(100) | NOT NULL                                         |
 | description | TEXT         | NOT NULL                                         |
 | icon        | VARCHAR(500) | NULLABLE                                         |
@@ -280,27 +280,73 @@ New `social` app to support social connections between users: friend requests, f
 | created_at  | TIMESTAMP    | NOT NULL DEFAULT NOW()                           |
 | updated_at  | TIMESTAMP    | NOT NULL DEFAULT NOW()                           |
 
-**Table: `social_communitymember`** ← New table
+**Table: `social_communitymember`** — New table
 
 | Column       | Type        | Constraints                                                       |
 | ------------ | ----------- | ----------------------------------------------------------------- |
 | id           | BIGSERIAL   | PK                                                                |
-| community_id | BIGINT      | FK → social_community(id) ON DELETE CASCADE, NOT NULL            |
-| user_id      | BIGINT      | FK → core_user(id) ON DELETE CASCADE, NOT NULL                   |
+| community_id | BIGINT      | FK to social_community(id) ON DELETE CASCADE, NOT NULL            |
+| user_id      | BIGINT      | FK to core_user(id) ON DELETE CASCADE, NOT NULL                   |
 | role         | VARCHAR(20) | NOT NULL DEFAULT 'member' CHECK IN ('admin','moderator','member') |
 | joined_at    | TIMESTAMP   | NOT NULL DEFAULT NOW()                                            |
 | UNIQUE       |             | (community_id, user_id)                                           |
 
 ### Migration
 
-`social/migrations/0001_initial.py` ← pending creation
+`social/migrations/0001_initial.py`
 
-### Pending
+---
 
-* [ ] Create `social` app: `python manage.py startapp social`
-* [ ] Implement the 4 Django models
-* [ ] Generate migration: `python manage.py makemigrations social --name initial`
-* [ ] Add basic seed data for social module
+## [2026-03-12] Social — CommunityPost + ForumQuestion post_id
+
+**Author:** Daniel (DBA)
+**Type:** Moderate (new table + FK added to existing table)
+**DBA approved:** Yes — self-approved (DBA)
+
+### Context
+
+New `CommunityPost` table added to the `social` app. Posts are published inside communities by their members. Supports pinned posts for announcements.
+
+`ForumQuestion` extended to support threaded discussion on community posts. `products_id` made nullable. New `post_id` FK added. Exactly one of the two must be non-null — enforced by CHECK constraint at the DB level and by `clean()` in Django.
+
+### Schema changes
+
+**Table: `social_communitypost`** — New table
+
+| Column       | Type         | Constraints                                            |
+| ------------ | ------------ | ------------------------------------------------------ |
+| id           | BIGSERIAL    | PK                                                     |
+| community_id | BIGINT       | FK to social_community(id) ON DELETE CASCADE, NOT NULL |
+| user_id      | BIGINT       | FK to core_user(id) ON DELETE CASCADE, NOT NULL        |
+| title        | VARCHAR(255) | NOT NULL                                               |
+| content      | TEXT         | NOT NULL                                               |
+| image_url    | VARCHAR(500) | NULLABLE                                               |
+| is_pinned    | BOOLEAN      | NOT NULL DEFAULT FALSE                                 |
+| created_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
+| updated_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
+
+**Table: `marketplace_forumquestion`** — Fields modified
+
+| Change        | Before                          | After                                                                                              |
+| ------------- | ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Field changed | `products_id BIGINT NOT NULL` | `products_id BIGINT NULL`                                                                        |
+| Field added   | —                              | `post_id BIGINT NULL REFERENCES social_communitypost(id) ON DELETE CASCADE`                      |
+| CHECK added   | —                              | `(products_id IS NOT NULL AND post_id IS NULL) OR (products_id IS NULL AND post_id IS NOT NULL)` |
+| Index added   | —                              | `idx_marketplace_forumquestion_post ON (post_id)`                                                |
+
+### Migrations
+
+* `social/migrations/0002_add_community_post_and_forum_post_link.py`
+* `marketplace/migrations/0004_add_community_post_and_forum_post_link.py`
+
+### Seed data updated
+
+`seeds/seed_dev_fixed.json` updated. Added:
+
+* 3 `social.communitypost` records (pks 1-3)
+* 3 `marketplace.forumquestion` records linked to posts (pks 6-8)
+
+Total objects: 62 (previously 44, then 56 after social module seed).
 
 ---
 
@@ -311,5 +357,4 @@ New `social` app to support social connections between users: friend requests, f
 | Update `erd_v1.md`with PointRule, PointTransaction,`icon`field in Badges | Done — v1.1                                    |
 | Post-facto RFC for PointTransaction                                          | Documented in erd_v1.md v1.1 Known Design Notes |
 | Notify team: schema changes must tag DBA in PRs                              | Pending                                         |
-| Create `social`app and implement 4 models                                  | Pending                                         |
-| Add social seed data to `seed_dev_fixed.json`                              | Pending                                         |
+| Update `erd_v1.md`with CommunityPost and ForumQuestion dual-target         | Done — v1.3                                    |
