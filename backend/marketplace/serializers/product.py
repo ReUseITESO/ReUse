@@ -15,12 +15,13 @@ class ImageSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     """Serializer for the product list (Object -> JSON)."""
     category = CategorySerializer(read_only=True)
-    seller_name = serializers.CharField(
-        source='seller.name', read_only=True
-    )
+    seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(
         source='seller.id', read_only=True
     )
+
+    def get_seller_name(self, obj):
+        return obj.seller.get_full_name()
 
     class Meta:
         model = Products

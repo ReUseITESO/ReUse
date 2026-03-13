@@ -8,7 +8,7 @@ export interface Badge {
   name: string;
   description: string;
   icon_url: string;
-  criteria: string;
+  criteria?: string;
 }
 
 export interface UserBadge {

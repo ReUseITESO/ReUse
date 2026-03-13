@@ -80,4 +80,5 @@ export interface FormValues {
   transaction_type: TransactionType;
   price: string;
   image_url: string;
+  images: string[];
 }

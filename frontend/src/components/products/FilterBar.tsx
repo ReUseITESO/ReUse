@@ -12,27 +12,27 @@ interface FilterBarProps {
 }
 
 const CONDITIONS: { value: ProductCondition | ''; label: string }[] = [
-  { value: '',          label: 'Cualquier condición' },
-  { value: 'nuevo',     label: 'Nuevo' },
+  { value: '', label: 'Cualquier condición' },
+  { value: 'nuevo', label: 'Nuevo' },
   { value: 'como_nuevo', label: 'Como nuevo' },
   { value: 'buen_estado', label: 'Buen estado' },
-  { value: 'usado',     label: 'Usado' },
+  { value: 'usado', label: 'Usado' },
 ];
 
 const TRANSACTION_TYPES: { value: TransactionType | ''; label: string }[] = [
-  { value: '',         label: 'Cualquier tipo' },
-  { value: 'sale',     label: 'Venta' },
+  { value: '', label: 'Cualquier tipo' },
+  { value: 'sale', label: 'Venta' },
   { value: 'donation', label: 'Donación' },
-  { value: 'swap',     label: 'Intercambio' },
+  { value: 'swap', label: 'Intercambio' },
 ];
 
 const ORDERING_OPTIONS: { value: string; label: string }[] = [
-  { value: '',           label: 'Más recientes primero' },
+  { value: '', label: 'Más recientes primero' },
   { value: 'created_at', label: 'Más antiguos primero' },
-  { value: 'price',      label: 'Precio: menor a mayor' },
-  { value: '-price',     label: 'Precio: mayor a menor' },
-  { value: 'title',      label: 'Nombre: A → Z' },
-  { value: '-title',     label: 'Nombre: Z → A' },
+  { value: 'price', label: 'Precio: menor a mayor' },
+  { value: '-price', label: 'Precio: mayor a menor' },
+  { value: 'title', label: 'Nombre: A → Z' },
+  { value: '-title', label: 'Nombre: Z → A' },
 ];
 
 const selectClass =
@@ -63,7 +63,12 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
   }
 
   function handleClear() {
-    onChange({ category: undefined, condition: undefined, transaction_type: undefined, ordering: undefined });
+    onChange({
+      category: undefined,
+      condition: undefined,
+      transaction_type: undefined,
+      ordering: undefined,
+    });
   }
 
   return (
@@ -72,12 +77,12 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
       <select
         className={selectClass}
         value={filters.category ?? ''}
-        onChange={(e) => handleCategory(e.target.value)}
+        onChange={e => handleCategory(e.target.value)}
         disabled={loadingCats}
         aria-label="Filtrar por categoría"
       >
         <option value="">Todas las categorías</option>
-        {categories.map((cat) => (
+        {categories.map(cat => (
           <option key={cat.id} value={cat.id}>
             {cat.name}
           </option>
@@ -88,7 +93,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
       <select
         className={selectClass}
         value={filters.condition ?? ''}
-        onChange={(e) => handleCondition(e.target.value)}
+        onChange={e => handleCondition(e.target.value)}
         aria-label="Filtrar por condición"
       >
         {CONDITIONS.map(({ value, label }) => (
@@ -102,7 +107,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
       <select
         className={selectClass}
         value={filters.transaction_type ?? ''}
-        onChange={(e) => handleTransactionType(e.target.value)}
+        onChange={e => handleTransactionType(e.target.value)}
         aria-label="Filtrar por tipo de transacción"
       >
         {TRANSACTION_TYPES.map(({ value, label }) => (
@@ -116,7 +121,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
       <select
         className={selectClass}
         value={filters.ordering ?? ''}
-        onChange={(e) => handleOrdering(e.target.value)}
+        onChange={e => handleOrdering(e.target.value)}
         aria-label="Ordenar resultados"
       >
         {ORDERING_OPTIONS.map(({ value, label }) => (

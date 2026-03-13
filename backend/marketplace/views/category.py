@@ -1,5 +1,5 @@
-from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import viewsets
 
 from marketplace.models import Category
 from marketplace.serializers import CategorySerializer

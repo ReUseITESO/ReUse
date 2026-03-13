@@ -8,9 +8,13 @@ class DeductPointsAPITest(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create(
-            username="testuser",
+            email="test.user@iteso.mx",
+            first_name="Test",
+            last_name="User",
             points=10
         )
+
+        self.client.force_authenticate(user=self.user)
 
     def test_deduct_points(self):
 

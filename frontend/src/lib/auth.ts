@@ -133,9 +133,15 @@ export async function signUp(payload: SignUpRequest): Promise<AuthResponse> {
     );
   }
 
-  const data: AuthResponse = await response.json();
-  storeTokens(data.tokens);
-  return data;
+  const data = await response.json();
+
+  // If backend returns tokens (auto-login), store them.
+  // If not (email verification required), skip token storage.
+  if (data.tokens) {
+    storeTokens(data.tokens);
+  }
+
+  return data as AuthResponse;
 }
 
 export async function signOut(): Promise<void> {

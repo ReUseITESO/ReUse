@@ -56,7 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = useCallback(async (payload: SignUpRequest) => {
     const data = await apiSignUp(payload);
-    setUser(data.user);
+    // Only set user if tokens were returned (auto-login).
+    // If email verification is required, user stays unauthenticated.
+    if (data.tokens) {
+      setUser(data.user);
+    }
   }, []);
 
   const signOut = useCallback(async () => {
