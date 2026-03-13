@@ -90,9 +90,9 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-md rounded-lg border border-amber-200 bg-amber-50 p-8 text-center">
-        <p className="text-lg font-medium text-amber-900">Selecciona un usuario</p>
-        <p className="mt-2 text-sm text-amber-700">
+      <div className="mx-auto max-w-md rounded-lg border border-warning/20 bg-warning/5 p-8 text-center">
+        <p className="text-body font-medium text-fg">Selecciona un usuario</p>
+        <p className="mt-2 text-sm text-warning">
           Usa el selector en la parte superior para elegir un usuario antes de editar.
         </p>
       </div>
@@ -114,20 +114,20 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mx-auto max-w-2xl">
       {submitError && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm font-medium text-red-800">{submitError}</p>
+        <div className="mb-6 rounded-lg border border-error/20 bg-error/5 px-4 py-3">
+          <p className="text-sm font-medium text-error">{submitError}</p>
         </div>
       )}
 
       <fieldset disabled={submitting} className="space-y-8">
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">
             Información del artículo
           </h2>
 
           <div>
-            <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Título <span className="text-red-500">*</span>
+            <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-fg">
+              Título <span className="text-error">*</span>
             </label>
             <input
               id="title"
@@ -138,12 +138,14 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               })}
               className={INPUT_CLASS}
             />
-            {errors.title && <p className="mt-1.5 text-sm text-red-600">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="mt-1.5 text-sm text-error">{errors.title.message}</p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Descripción <span className="text-red-500">*</span>
+            <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-fg">
+              Descripción <span className="text-error">*</span>
             </label>
             <textarea
               id="description"
@@ -154,19 +156,19 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               className={INPUT_CLASS}
             />
             {errors.description && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.description.message}</p>
+              <p className="mt-1.5 text-sm text-error">{errors.description.message}</p>
             )}
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-gray-700">
-                Categoría <span className="text-red-500">*</span>
+              <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-fg">
+                Categoría <span className="text-error">*</span>
               </label>
               {categoriesLoading ? (
                 <Spinner />
               ) : categoriesError ? (
-                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                <p className="rounded-lg border border-error/20 bg-error/5 px-4 py-2.5 text-sm text-error">
                   No se pudieron cargar las categorias.
                 </p>
               ) : (
@@ -186,13 +188,13 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                 </select>
               )}
               {errors.category && (
-                <p className="mt-1.5 text-sm text-red-600">{errors.category.message}</p>
-              )}
+              <p className="mt-1.5 text-sm text-error">{errors.category.message}</p>
+            )}
             </div>
 
             <div>
-              <label htmlFor="condition" className="mb-1.5 block text-sm font-medium text-gray-700">
-                Condición <span className="text-red-500">*</span>
+              <label htmlFor="condition" className="mb-1.5 block text-sm font-medium text-fg">
+                Condición <span className="text-error">*</span>
               </label>
               <select
                 id="condition"
@@ -208,14 +210,14 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                 ))}
               </select>
               {errors.condition && (
-                <p className="mt-1.5 text-sm text-red-600">{errors.condition.message}</p>
+                <p className="mt-1.5 text-sm text-error">{errors.condition.message}</p>
               )}
             </div>
           </div>
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">
             Tipo de publicación
           </h2>
 
@@ -234,17 +236,17 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                     onClick={() => setValue('transaction_type', option.value)}
                     className={`rounded-lg border-2 px-4 py-3 text-left transition-colors ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-ring bg-primary/5'
+                        : 'border-border bg-card hover:border-muted-fg hover:bg-muted'
                     }`}
                   >
                     <span
-                      className={`block text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-900'}`}
+                      className={`block text-sm font-semibold ${isSelected ? 'text-primary' : 'text-fg'}`}
                     >
                       {option.label}
                     </span>
                     <span
-                      className={`mt-0.5 block text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-secondary' : 'text-muted-fg'}`}
                     >
                       {option.description}
                     </span>
@@ -253,17 +255,17 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               })}
             </div>
             {errors.transaction_type && (
-              <p className="mt-1.5 text-sm text-red-600">{errors.transaction_type.message}</p>
+              <p className="mt-1.5 text-sm text-error">{errors.transaction_type.message}</p>
             )}
           </div>
 
           {showPrice && (
             <div>
-              <label htmlFor="price" className="mb-1.5 block text-sm font-medium text-gray-700">
-                Precio (MXN) <span className="text-red-500">*</span>
+              <label htmlFor="price" className="mb-1.5 block text-sm font-medium text-fg">
+                Precio (MXN) <span className="text-error">*</span>
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg">
                   $
                 </span>
                 <input
@@ -280,17 +282,19 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                 />
               </div>
               {errors.price && (
-                <p className="mt-1.5 text-sm text-red-600">{errors.price.message}</p>
+                <p className="mt-1.5 text-sm text-error">{errors.price.message}</p>
               )}
             </div>
           )}
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Imagen</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">
+            Imagen
+          </h2>
 
           <div>
-            <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-gray-700">
+            <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-fg">
               URL de imagen
             </label>
             <input
@@ -300,17 +304,17 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               className={INPUT_CLASS}
               placeholder="https://ejemplo.com/imagen.jpg"
             />
-            <p className="mt-1.5 text-xs text-gray-500">
+            <p className="mt-1.5 text-xs text-muted-fg">
               Opcional. Pega la URL de una imagen del artículo.
             </p>
           </div>
         </section>
 
-        <div className="flex items-center gap-3 border-t border-gray-200 pt-6">
+        <div className="flex items-center gap-3 border-t border-border pt-6">
           <Button type="submit" disabled={submitting}>
             {submitting ? 'Guardando...' : 'Guardar cambios'}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => router.back()}>
+          <Button type="button" variant="danger-outline" onClick={() => router.back()}>
             Cancelar
           </Button>
         </div>

@@ -36,8 +36,8 @@ const ORDERING_OPTIONS: { value: string; label: string }[] = [
 ];
 
 const selectClass =
-  'rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 ' +
-  'focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 cursor-pointer';
+  'rounded-lg border border-input bg-card px-3 py-2 text-sm text-fg ' +
+  'focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 cursor-pointer';
 
 export default function FilterBar({ filters, onChange }: FilterBarProps) {
   const { categories, isLoading: loadingCats } = useCategories();
@@ -136,7 +136,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
         <button
           type="button"
           onClick={handleClear}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 transition-colors"
+          className="rounded-lg border border-input px-3 py-2 text-sm text-muted-fg hover:bg-muted transition-colors"
           aria-label="Limpiar filtros"
         >
           ✕ Limpiar filtros
