@@ -7,6 +7,7 @@ export interface User {
   phone: string;
   points: number;
   profile_picture: string | null;
+  interests: string[];
   date_joined: string;
   last_login: string | null;
 }
