@@ -24,7 +24,9 @@ class Command(BaseCommand):
             if created:
                 user.set_password("mockpass123")
                 user.save()
-                self.stdout.write(self.style.SUCCESS(f"Usuario mock creado: {user.email}"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"Usuario mock creado: {user.email}")
+                )
             else:
                 self.stdout.write(f"Usuario mock ya existe: {user.email}")
         self.stdout.write(self.style.SUCCESS("Carga de usuarios mock finalizada."))
