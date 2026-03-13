@@ -26,4 +26,4 @@ class EnvironmentImpact(models.Model):
         ordering = ["-kg_co2_saved"]
 
     def __str__(self):
-        return f"{self.user.name}: {self.kg_co2_saved}kg CO2"
+        return f"{self.user.get_full_name()}: {self.kg_co2_saved}kg CO2"

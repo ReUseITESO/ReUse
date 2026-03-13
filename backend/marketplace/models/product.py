@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from .category import Category
+from django.utils import timezone
 
 
 class Products(models.Model):
@@ -48,8 +49,8 @@ class Products(models.Model):
     )
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     image_url = models.CharField(max_length=500, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "Products"
@@ -64,8 +65,15 @@ class Products(models.Model):
     def clean(self):
         if self.transaction_type == "donation" and self.price is not None:
             raise ValidationError("Donations must not have a price")
-        if self.transaction_type == "sale" and (self.price is None or self.price <= 0):
+        if self.transaction_type == "sale" and (
+            self.price is None or self.price <= 0
+        ):
             raise ValidationError("Sales must have a price greater than 0")
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
