@@ -6,7 +6,7 @@ from core.models import User
 
 class CurrentUserPointsViewTests(APITestCase):
     """Tests for GET /api/gamification/points/ endpoint"""
-    
+
     POINTS_URL = "/api/gamification/points/"
 
     def setUp(self):
@@ -58,7 +58,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Authenticated user should get their points balance"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("points", response.data)
         self.assertEqual(response.data["points"], 150)
@@ -69,7 +69,7 @@ class CurrentUserPointsViewTests(APITestCase):
         self._auth(self.user_ana)
         response1 = self.client.get(self.POINTS_URL)
         self.assertEqual(response1.data["points"], 150)
-        
+
         # Second user
         self._auth(self.user_carlos)
         response2 = self.client.get(self.POINTS_URL)
@@ -79,7 +79,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """User with 0 points should get valid response"""
         self._auth(self.user_zero_points)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["points"], 0)
 
@@ -89,7 +89,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Response should have correct JSON structure"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsInstance(response.data, dict)
         self.assertIn("points", response.data)
@@ -99,7 +99,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Points field should be a number, not string"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         points = response.data["points"]
         self.assertIsInstance(points, int)
         self.assertGreaterEqual(points, 0)
@@ -107,7 +107,7 @@ class CurrentUserPointsViewTests(APITestCase):
 
 class UserPointsViewTests(APITestCase):
     """Tests for GET /api/gamification/points/<user_id>/ endpoint"""
-    
+
     POINTS_BASE_URL = "/api/gamification/points/"
 
     def setUp(self):
@@ -124,7 +124,7 @@ class UserPointsViewTests(APITestCase):
         """Can retrieve points for specific user by ID"""
         url = f"{self.POINTS_BASE_URL}{self.user.pk}/"
         response = self.client.get(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["points"], 200)
 
@@ -132,7 +132,7 @@ class UserPointsViewTests(APITestCase):
         """Request for non-existent user should return 404"""
         url = f"{self.POINTS_BASE_URL}99999/"
         response = self.client.get(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("detail", response.data)
         self.assertIn("not found", response.data["detail"].lower())

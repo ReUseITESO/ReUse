@@ -1,5 +1,7 @@
 from django.db import models
+
 from core.models.user import User
+
 
 class UserBadges(models.Model):
     """Many-to-many relationship between users and earned badges."""
@@ -12,7 +14,7 @@ class UserBadges(models.Model):
     )
     # Referencia por string para evitar Circular Import
     badges = models.ForeignKey(
-        'gamification.Badges',
+        "gamification.Badges",
         on_delete=models.CASCADE,
         related_name="user_badges",
         db_column="badges_id",
