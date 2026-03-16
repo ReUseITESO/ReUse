@@ -92,9 +92,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     def validate_phone(self, value: str) -> str:
         value = sanitize_phone(value)
         if not value:
-            raise serializers.ValidationError(
-                "El teléfono es obligatorio."
-            )
+            raise serializers.ValidationError("El teléfono es obligatorio.")
         if not re.match(r"^\+?\d{10,15}$", value):
             raise serializers.ValidationError(
                 "Ingresa un número válido (10-15 dígitos, puede iniciar con +)."
@@ -124,9 +122,7 @@ class SignInSerializer(serializers.Serializer):
     """Serializer para inicio de sesión."""
 
     email = serializers.EmailField()
-    password = serializers.CharField(
-        write_only=True, style={"input_type": "password"}
-    )
+    password = serializers.CharField(write_only=True, style={"input_type": "password"})
 
     def validate_email(self, value: str) -> str:
         return sanitize_string(value).lower().strip()

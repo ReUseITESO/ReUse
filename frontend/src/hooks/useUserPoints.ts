@@ -26,7 +26,7 @@ export function useUserPoints(enabled: boolean = true, refreshTrigger: number = 
       setPoints(data.points);
     } catch (err) {
       let message = 'No se pudieron cargar los puntos';
-      
+
       if (err instanceof Error) {
         if (err.message.includes('401')) {
           message = 'Usuario no autenticado. Inicia sesión para ver tus puntos.';
@@ -36,7 +36,7 @@ export function useUserPoints(enabled: boolean = true, refreshTrigger: number = 
           message = err.message;
         }
       }
-      
+
       setError(message);
       setPoints(null);
     } finally {

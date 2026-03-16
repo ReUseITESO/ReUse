@@ -88,8 +88,11 @@ export function useFriends() {
   async function searchUsers(query: string): Promise<FriendUser[]> {
     if (query.length < 2) return [];
     try {
-      const data = await apiClient<FriendUser[]>(`/auth/users/search/?q=${encodeURIComponent(query)}`);
-      return data;
+      const data = await apiClient<{ results: FriendUser[] } | FriendUser[]>(
+        `/auth/users/search/?q=${encodeURIComponent(query)}`,
+      );
+      if (Array.isArray(data)) return data;
+      return data.results ?? [];
     } catch {
       return [];
     }
