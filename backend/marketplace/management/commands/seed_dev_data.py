@@ -13,9 +13,9 @@ from django.utils import timezone
 
 from core.models import User
 from gamification.models.badges import Badges
+from gamification.models.challenge import Challenge, ChallengeType
 from gamification.models.environment_impact import EnvironmentImpact
 from gamification.models.point_rule import PointRule
-from gamification.models.challenge import Challenge, ChallengeType
 from gamification.models.user_badges import UserBadges
 from marketplace.models import Category, Images, Products, Transaction
 

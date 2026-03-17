@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from gamification.models import Challenge, ChallengeType, PointAction, PointRule
 
-
 DEFAULT_POINT_RULES = {
     PointAction.PUBLISH_ITEM: 5,
     PointAction.COMPLETE_DONATION: 12,

@@ -4,11 +4,15 @@
 # When ready, uncomment the path in config/urls.py to wire this in.
 from django.urls import path
 
-from gamification.views.points import CurrentUserPointsView, UserPointsView
 from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
+from gamification.views.challenges import (
+    ChallengeListView,
+    JoinChallengeView,
+    MyChallengesView,
+)
 from gamification.views.deduct_points import DeductPointsView
-from gamification.views.challenges import ChallengeListView, JoinChallengeView, MyChallengesView
+from gamification.views.points import CurrentUserPointsView, UserPointsView
 
 urlpatterns = [
     path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
