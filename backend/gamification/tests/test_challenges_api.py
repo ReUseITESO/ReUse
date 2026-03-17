@@ -110,7 +110,9 @@ class ChallengeAPITest(APITestCase):
 
     def test_join_challenge_twice_returns_400(self):
         self._auth()
-        self.client.post(f"/api/gamification/challenges/{self.active_challenge.id}/join/")
+        self.client.post(
+            f"/api/gamification/challenges/{self.active_challenge.id}/join/"
+        )
 
         response = self.client.post(
             f"/api/gamification/challenges/{self.active_challenge.id}/join/"
@@ -120,7 +122,9 @@ class ChallengeAPITest(APITestCase):
 
     def test_my_challenges_refreshes_progress_and_awards_bonus_once(self):
         self._auth()
-        self.client.post(f"/api/gamification/challenges/{self.active_challenge.id}/join/")
+        self.client.post(
+            f"/api/gamification/challenges/{self.active_challenge.id}/join/"
+        )
 
         self._create_transaction(transaction_type="donation")
         self._create_transaction(transaction_type="donation")
@@ -159,7 +163,9 @@ class ChallengeAPITest(APITestCase):
 
     def test_my_challenges_uses_point_transactions_for_progress(self):
         self._auth()
-        self.client.post(f"/api/gamification/challenges/{self.active_challenge.id}/join/")
+        self.client.post(
+            f"/api/gamification/challenges/{self.active_challenge.id}/join/"
+        )
 
         PointTransaction.objects.create(
             user=self.user,
@@ -172,4 +178,3 @@ class ChallengeAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["progress"], 1)
         self.assertFalse(response.data[0]["is_completed"])
-

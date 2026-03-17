@@ -34,8 +34,12 @@ class UserChallengeSerializer(serializers.ModelSerializer):
         source="challenge.challenge_type", read_only=True
     )
     goal = serializers.IntegerField(source="challenge.goal", read_only=True)
-    bonus_points = serializers.IntegerField(source="challenge.bonus_points", read_only=True)
-    start_date = serializers.DateTimeField(source="challenge.start_date", read_only=True)
+    bonus_points = serializers.IntegerField(
+        source="challenge.bonus_points", read_only=True
+    )
+    start_date = serializers.DateTimeField(
+        source="challenge.start_date", read_only=True
+    )
     end_date = serializers.DateTimeField(source="challenge.end_date", read_only=True)
     is_expired = serializers.SerializerMethodField()
 

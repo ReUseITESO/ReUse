@@ -102,10 +102,14 @@ def join_challenge(*, user, challenge):
 
 def refresh_user_challenge_progress(user_challenge):
     with transaction.atomic():
-        locked = UserChallenge.objects.select_for_update().select_related(
-            "challenge",
-            "user",
-        ).get(id=user_challenge.id)
+        locked = (
+            UserChallenge.objects.select_for_update()
+            .select_related(
+                "challenge",
+                "user",
+            )
+            .get(id=user_challenge.id)
+        )
 
         progress = calculate_user_challenge_progress(locked)
         has_new_completion = (
@@ -116,7 +120,9 @@ def refresh_user_challenge_progress(user_challenge):
         if has_new_completion:
             locked.is_completed = True
             locked.completed_at = timezone.now()
-        locked.save(update_fields=["progress", "is_completed", "completed_at", "updated_at"])
+        locked.save(
+            update_fields=["progress", "is_completed", "completed_at", "updated_at"]
+        )
 
         if has_new_completion and locked.challenge.bonus_points > 0:
             PointTransaction.objects.create(
