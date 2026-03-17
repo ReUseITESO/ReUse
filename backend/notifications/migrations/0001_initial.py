@@ -15,25 +15,66 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notification_type', models.CharField(choices=[('new_message', 'New Message'), ('item_request', 'Item Request'), ('transaction_update', 'Transaction Update'), ('gamification_achievement', 'Gamification Achievement'), ('item_sold', 'Item Sold'), ('offer_received', 'Offer Received'), ('system', 'System')], db_index=True, max_length=40)),
-                ('title', models.CharField(max_length=255)),
-                ('message', models.TextField()),
-                ('is_read', models.BooleanField(db_index=True, default=False)),
-                ('related_object_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('related_object_type', models.CharField(blank=True, max_length=50, null=True)),
-                ('action_url', models.CharField(blank=True, max_length=500, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('read_at', models.DateTimeField(blank=True, null=True)),
-                ('recipient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "notification_type",
+                    models.CharField(
+                        choices=[
+                            ("new_message", "New Message"),
+                            ("item_request", "Item Request"),
+                            ("transaction_update", "Transaction Update"),
+                            ("gamification_achievement", "Gamification Achievement"),
+                            ("item_sold", "Item Sold"),
+                            ("offer_received", "Offer Received"),
+                            ("system", "System"),
+                        ],
+                        db_index=True,
+                        max_length=40,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("message", models.TextField()),
+                ("is_read", models.BooleanField(db_index=True, default=False)),
+                (
+                    "related_object_id",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
+                (
+                    "related_object_type",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                ("action_url", models.CharField(blank=True, max_length=500, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("read_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "recipient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notifications",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Notification',
-                'verbose_name_plural': 'Notifications',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['recipient', 'is_read', '-created_at'], name='notificatio_recipie_684eac_idx')],
+                "verbose_name": "Notification",
+                "verbose_name_plural": "Notifications",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["recipient", "is_read", "-created_at"],
+                        name="notificatio_recipie_684eac_idx",
+                    )
+                ],
             },
         ),
     ]

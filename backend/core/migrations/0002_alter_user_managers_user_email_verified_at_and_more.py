@@ -8,33 +8,61 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_initial'),
+        ("core", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='email_verified_at',
+            model_name="user",
+            name="email_verified_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='is_email_verified',
+            model_name="user",
+            name="is_email_verified",
             field=models.BooleanField(default=False),
         ),
         migrations.CreateModel(
-            name='EmailVerificationToken',
+            name="EmailVerificationToken",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token_hash', models.CharField(max_length=64, unique=True)),
-                ('expires_at', models.DateTimeField()),
-                ('used_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='email_verification_tokens', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("token_hash", models.CharField(max_length=64, unique=True)),
+                ("expires_at", models.DateTimeField()),
+                ("used_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="email_verification_tokens",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'db_table': 'email_verification_tokens',
-                'indexes': [models.Index(fields=['user'], name='email_verif_user_id_bef55e_idx'), models.Index(fields=['token_hash'], name='email_verif_token_h_af9b84_idx'), models.Index(fields=['expires_at'], name='email_verif_expires_770728_idx'), models.Index(fields=['used_at'], name='email_verif_used_at_3ec81f_idx')],
+                "db_table": "email_verification_tokens",
+                "indexes": [
+                    models.Index(
+                        fields=["user"], name="email_verif_user_id_bef55e_idx"
+                    ),
+                    models.Index(
+                        fields=["token_hash"], name="email_verif_token_h_af9b84_idx"
+                    ),
+                    models.Index(
+                        fields=["expires_at"], name="email_verif_expires_770728_idx"
+                    ),
+                    models.Index(
+                        fields=["used_at"], name="email_verif_used_at_3ec81f_idx"
+                    ),
+                ],
             },
         ),
     ]

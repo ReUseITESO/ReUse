@@ -5,8 +5,15 @@ from .models import Notification
 User = get_user_model()
 
 
-def _create(recipient, notification_type, title, message,
-            related_object_id=None, related_object_type=None, action_url=None):
+def _create(
+    recipient,
+    notification_type,
+    title,
+    message,
+    related_object_id=None,
+    related_object_type=None,
+    action_url=None,
+):
     return Notification.objects.create(
         recipient=recipient,
         notification_type=notification_type,

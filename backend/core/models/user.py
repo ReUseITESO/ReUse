@@ -30,10 +30,10 @@ class User(AbstractUser):
         validators=[
             EmailValidator(),
             RegexValidator(
-                regex=r'^[^@]+@iteso\.mx$',
-                message='Email debe ser del dominio @iteso.mx'
-            )
-        ]
+                regex=r"^[^@]+@iteso\.mx$",
+                message="Email debe ser del dominio @iteso.mx",
+            ),
+        ],
     )
     phone = models.CharField(max_length=20, blank=True, default="")
     points = models.IntegerField(default=0)
@@ -43,8 +43,8 @@ class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(blank=True, null=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     objects = CustomUserManager()
 

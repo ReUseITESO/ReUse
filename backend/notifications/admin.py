@@ -23,5 +23,8 @@ class NotificationAdmin(admin.ModelAdmin):
     @admin.action(description="Mark selected notifications as read")
     def mark_as_read(self, request, queryset):
         from django.utils import timezone
-        updated = queryset.filter(is_read=False).update(is_read=True, read_at=timezone.now())
+
+        updated = queryset.filter(is_read=False).update(
+            is_read=True, read_at=timezone.now()
+        )
         self.message_user(request, f"{updated} notification(s) marked as read.")

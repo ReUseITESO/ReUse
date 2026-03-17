@@ -8,7 +8,10 @@ class Notification(models.Model):
         NEW_MESSAGE = "new_message", "New Message"
         ITEM_REQUEST = "item_request", "Item Request"
         TRANSACTION_UPDATE = "transaction_update", "Transaction Update"
-        GAMIFICATION_ACHIEVEMENT = "gamification_achievement", "Gamification Achievement"
+        GAMIFICATION_ACHIEVEMENT = (
+            "gamification_achievement",
+            "Gamification Achievement",
+        )
         ITEM_SOLD = "item_sold", "Item Sold"
         OFFER_RECEIVED = "offer_received", "Offer Received"
         SYSTEM = "system", "System"
@@ -47,6 +50,7 @@ class Notification(models.Model):
     def mark_as_read(self):
         if not self.is_read:
             from django.utils import timezone
+
             self.is_read = True
             self.read_at = timezone.now()
             self.save(update_fields=["is_read", "read_at"])

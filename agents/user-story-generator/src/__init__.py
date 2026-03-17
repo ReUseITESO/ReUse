@@ -9,7 +9,7 @@ from .validators import (
     DuplicationChecker,
     DependencyAnalyzer,
     StoryValidator,
-    TechnologyValidator
+    TechnologyValidator,
 )
 
 __version__ = "1.0.0"

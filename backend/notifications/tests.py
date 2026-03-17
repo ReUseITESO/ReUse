@@ -9,10 +9,14 @@ User = get_user_model()
 
 
 def make_user(username="testuser", password="testpass123"):
-    return User.objects.create_user(username=username, password=password, email=f"{username}@iteso.mx")
+    return User.objects.create_user(
+        username=username, password=password, email=f"{username}@iteso.mx"
+    )
 
 
-def make_notification(recipient, notification_type=Notification.NotificationType.SYSTEM, is_read=False):
+def make_notification(
+    recipient, notification_type=Notification.NotificationType.SYSTEM, is_read=False
+):
     return Notification.objects.create(
         recipient=recipient,
         notification_type=notification_type,
@@ -64,5 +68,7 @@ class NotificationMarkAllReadTest(APITestCase):
             make_notification(self.user, is_read=False)
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        remaining = Notification.objects.filter(recipient=self.user, is_read=False).count()
+        remaining = Notification.objects.filter(
+            recipient=self.user, is_read=False
+        ).count()
         self.assertEqual(remaining, 0)
