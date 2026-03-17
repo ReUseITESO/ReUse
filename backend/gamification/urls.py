@@ -3,17 +3,12 @@
 # See docs/architecture/modules.md for the expected endpoint list.
 # When ready, uncomment the path in config/urls.py to wire this in.
 from django.urls import path
-from gamification.views.badges import UserBadgesStatusView
-
 
 from gamification.views.points import CurrentUserPointsView, UserPointsView
 from gamification.views.award_points import AwardPointsView
+from gamification.views.badges import UserBadgesStatusView
 from gamification.views.deduct_points import DeductPointsView
-from gamification.views.challenges import (
-    ChallengeListView,
-    JoinChallengeView,
-    MyChallengesView,
-)
+from gamification.views.challenges import ChallengeListView, JoinChallengeView, MyChallengesView
 
 urlpatterns = [
     path('badges/status/', UserBadgesStatusView.as_view(), name='user-badges-status'),
@@ -23,5 +18,5 @@ urlpatterns = [
     path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
     path('challenges/', ChallengeListView.as_view(), name='challenge-list'),
     path('challenges/me/', MyChallengesView.as_view(), name='my-challenges'),
-    path('challenges/<int:challenge_id>/join/', JoinChallengeView.as_view(), name='join-challenge'),
+    path('challenges/<int:challenge_id>/join/', JoinChallengeView.as_view(), name='join-challenge')
 ]

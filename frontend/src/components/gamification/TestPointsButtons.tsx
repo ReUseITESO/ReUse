@@ -110,12 +110,7 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         </button>
       </div>
       {message ? (
-        <p
-          className={cn(
-            'mt-3 text-xs',
-            isError ? 'text-red-600' : 'text-emerald-700',
-          )}
-        >
+        <p className={cn('mt-3 text-xs', isError ? 'text-red-600' : 'text-emerald-700')}>
           {message}
         </p>
       ) : null}

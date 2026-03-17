@@ -4,18 +4,20 @@ Crea usuarios, categorías, productos con imágenes, badges y transacciones.
 
 Uso: python manage.py seed_dev_data
 """
+
+import random
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from datetime import timedelta
-import random
 
 from core.models import User
-from marketplace.models import Category, Products, Images, Transaction
 from gamification.models.badges import Badges
-from gamification.models.user_badges import UserBadges
 from gamification.models.environment_impact import EnvironmentImpact
 from gamification.models.point_rule import PointRule
 from gamification.models.challenge import Challenge, ChallengeType
+from gamification.models.user_badges import UserBadges
+from marketplace.models import Category, Images, Products, Transaction
 
 
 class Command(BaseCommand):
@@ -210,7 +212,6 @@ class Command(BaseCommand):
                 "price": "450.00",
                 "image_url": "https://images.unsplash.com/photo-1589998059171-988d887df646?w=400",
             },
-
             # Electronica
             {
                 "seller": users[0],  # Jose
@@ -262,7 +263,6 @@ class Command(BaseCommand):
                 "price": "1200.00",
                 "image_url": "https://images.unsplash.com/photo-1564466809058-bf4114d55352?w=400",
             },
-
             # Ropa y Accesorios
             {
                 "seller": users[5],  # Sofía
@@ -294,7 +294,6 @@ class Command(BaseCommand):
                 "price": "600.00",
                 "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
             },
-
             # Muebles
             {
                 "seller": users[0],  # Jose
@@ -326,7 +325,6 @@ class Command(BaseCommand):
                 "price": None,
                 "image_url": "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400",
             },
-
             # Deportes
             {
                 "seller": users[4],  # Diego
@@ -358,7 +356,6 @@ class Command(BaseCommand):
                 "price": "280.00",
                 "image_url": "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400",
             },
-
             # Transporte
             {
                 "seller": users[2],  # Carlos
@@ -380,7 +377,6 @@ class Command(BaseCommand):
                 "price": "5500.00",
                 "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400",
             },
-
             # Instrumentos Musicales
             {
                 "seller": users[6],  # Pedro
@@ -402,7 +398,6 @@ class Command(BaseCommand):
                 "price": None,
                 "image_url": "https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400",
             },
-
             # Arte y Papeleria
             {
                 "seller": users[3],  # Ana
@@ -424,7 +419,6 @@ class Command(BaseCommand):
                 "price": "1200.00",
                 "image_url": "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400",
             },
-
             # Cocina y Hogar
             {
                 "seller": users[5],  # Sofía
@@ -446,7 +440,6 @@ class Command(BaseCommand):
                 "price": "380.00",
                 "image_url": "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400",
             },
-
             # Videojuegos
             {
                 "seller": users[4],  # Diego
@@ -537,7 +530,9 @@ class Command(BaseCommand):
         }
 
         for product in products:
-            urls = extra_images.get(product.title, [product.image_url] if product.image_url else [])
+            urls = extra_images.get(
+                product.title, [product.image_url] if product.image_url else []
+            )
             for i, url in enumerate(urls):
                 _, created = Images.objects.get_or_create(
                     product=product,
@@ -826,8 +821,16 @@ class Command(BaseCommand):
                     "delivery_location": t_data["delivery_location"],
                     "seller_confirmation": t_data["seller_confirmation"],
                     "buyer_confirmation": t_data["buyer_confirmation"],
-                    "seller_confirmed_at": now - timedelta(days=t_data["days_ago"]) if t_data["seller_confirmation"] else None,
-                    "buyer_confirmed_at": now - timedelta(days=t_data["days_ago"]) if t_data["buyer_confirmation"] else None,
+                    "seller_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["seller_confirmation"]
+                        else None
+                    ),
+                    "buyer_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["buyer_confirmation"]
+                        else None
+                    ),
                 },
             )
             if created:

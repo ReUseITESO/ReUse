@@ -144,9 +144,7 @@ class ProductUpdateTests(APITestCase):
             },
             format="json",
         )
-        self.assertEqual(
-            response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED
-        )
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_update_nonexistent_product_returns_404(self):
         self._auth()

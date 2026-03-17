@@ -12,17 +12,13 @@ export function useChangeProductStatus() {
       setError(null);
 
       try {
-        const product = await apiClient<Product>(
-          `/marketplace/products/${productId}/status/`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify({ status }),
-          },
-        );
+        const product = await apiClient<Product>(`/marketplace/products/${productId}/status/`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        });
         return product;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Error al cambiar el estado';
+        const message = err instanceof Error ? err.message : 'Error al cambiar el estado';
         setError(message);
         return null;
       } finally {
