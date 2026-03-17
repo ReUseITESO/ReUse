@@ -16,8 +16,7 @@ export function useDeleteProduct() {
       });
       return true;
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Error al eliminar el producto';
+      const message = err instanceof Error ? err.message : 'Error al eliminar el producto';
       setError(message);
       return false;
     } finally {

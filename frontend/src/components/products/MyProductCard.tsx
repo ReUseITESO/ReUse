@@ -7,13 +7,14 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useDeleteProduct } from '@/hooks/useDeleteProduct';
 import { useChangeProductStatus } from '@/hooks/useChangeProductStatus';
-
 import {
-  formatConditionLabel,
-  formatPrice,
-  formatTimeAgo,
-  formatTransactionLabel,
-} from '@/lib/utils';
+  getCategoryStyle,
+  getConditionLabel,
+  getConditionStyle,
+  getPriceColor,
+} from '@/lib/productStyles';
+
+import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
 import type { Product, ProductStatus } from '@/types/product';
 
@@ -21,14 +22,6 @@ interface MyProductCardProps {
   product: Product;
   onProductChanged: () => void;
 }
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Libros: 'bg-[#2B7FFF]/10 text-[#2B7FFF]',
-  Electronica: 'bg-[#AD46FF]/10 text-[#AD46FF]',
-  'Ropa ITESO': 'bg-[#F6339A]/10 text-[#F6339A]',
-  Calculadoras: 'bg-[#FF6900]/10 text-[#FF6900]',
-  Apuntes: 'bg-[#10B981]/10 text-[#10B981]',
-};
 
 const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
   disponible: [
@@ -51,12 +44,14 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
 
   const isDisponible = product.status === 'disponible';
   const transitions = STATUS_TRANSITIONS[product.status];
-  const categoryClass = CATEGORY_COLORS[product.category.name] ?? 'bg-gray-100 text-gray-700';
+  const categoryClass = getCategoryStyle(product.category.name);
+  const priceColorClass = getPriceColor(product.transaction_type);
 
   const isSale = product.transaction_type === 'sale';
-  const priceDisplay = isSale && product.price
-    ? formatPrice(product.price)
-    : formatTransactionLabel(product.transaction_type);
+  const priceDisplay =
+    isSale && product.price
+      ? formatPrice(product.price)
+      : formatTransactionLabel(product.transaction_type);
 
   async function handleDelete() {
     const success = await deleteProduct(product.id);
@@ -75,8 +70,8 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
 
   return (
     <>
-      <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-        <div className="flex h-36 items-center justify-center bg-gray-100">
+      <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+        <div className="flex h-36 items-center justify-center bg-muted">
           {product.image_url ? (
             <img
               src={product.image_url}
@@ -84,9 +79,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-sm text-gray-400">
-              {product.category.name} - Imagen
-            </span>
+            <span className="text-sm text-muted-fg">{product.category.name} - Imagen</span>
           )}
         </div>
 
@@ -96,27 +89,27 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
             <StatusBadge status={product.status} />
           </div>
 
-          <h3 className="line-clamp-2 text-base font-semibold text-gray-900">
-            {product.title}
-          </h3>
+          <h3 className="line-clamp-2 text-body font-semibold text-card-fg">{product.title}</h3>
 
-          <p className="text-lg font-bold text-blue-600">{priceDisplay}</p>
+          <p className={`text-h3 font-bold ${priceColorClass}`}>{priceDisplay}</p>
 
-          <div className="flex items-center gap-3 text-xs text-gray-500">
-            <span>{formatConditionLabel(product.condition)}</span>
+          <div className="flex items-center gap-3 text-xs text-muted-fg">
+            <Badge className={getConditionStyle(product.condition)}>
+              {getConditionLabel(product.condition)}
+            </Badge>
             <span>{formatTimeAgo(product.created_at)}</span>
           </div>
 
-          <div className="mt-auto flex flex-col gap-2 border-t border-gray-100 pt-3">
+          <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
             {transitions.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {transitions.map((t) => (
+                {transitions.map(t => (
                   <button
                     key={t.value}
                     type="button"
                     disabled={isChangingStatus}
                     onClick={() => handleStatusChange(t.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50"
+                    className="rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
                   >
                     {t.label}
                   </button>
@@ -128,7 +121,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               {isDisponible && (
                 <Link
                   href={`/products/${product.id}/edit`}
-                  className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-lg bg-btn-primary px-3 py-1.5 text-xs font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
                 >
                   Editar
                 </Link>
@@ -138,7 +131,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
                 <button
                   type="button"
                   onClick={() => setIsDeleteOpen(true)}
-                  className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+                  className="rounded-lg bg-error px-3 py-1.5 text-xs font-medium text-error-fg transition-colors hover:opacity-90"
                 >
                   Eliminar
                 </button>

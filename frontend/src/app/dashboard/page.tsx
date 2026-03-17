@@ -10,19 +10,19 @@ export default function DashboardPage() {
   const [pointsVersion, setPointsVersion] = useState(0);
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6">
+    <main className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-4xl">
-        <h1 className="mb-8 text-3xl font-bold text-slate-900">Dashboard</h1>
+        <h1 className="mb-8 text-h1 font-bold text-fg">Dashboard</h1>
 
         <section className="space-y-6">
           <div>
-            <h2 className="mb-4 text-lg font-semibold text-slate-800">Mi Gamificación</h2>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Mi Gamificación</h2>
             <PointsBalance refreshTrigger={pointsVersion} />
           </div>
-          <TestPointsButtons onPointsUpdated={() => setPointsVersion((v) => v + 1)} />
-          
+          <TestPointsButtons onPointsUpdated={() => setPointsVersion(v => v + 1)} />
+
           <div>
-            <h2 className="mb-4 text-lg font-semibold text-slate-800">Insignias</h2>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Insignias</h2>
             <BadgesList />
           </div>
         </section>

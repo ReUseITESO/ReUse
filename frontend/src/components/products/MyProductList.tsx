@@ -25,9 +25,9 @@ export default function MyProductList() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-md rounded-lg border border-amber-200 bg-amber-50 p-8 text-center">
-        <p className="text-lg font-medium text-amber-900">Selecciona un usuario</p>
-        <p className="mt-2 text-sm text-amber-700">
+      <div className="mx-auto max-w-md rounded-lg border border-warning/20 bg-warning/5 p-8 text-center">
+        <p className="text-body font-medium text-fg">Selecciona un usuario</p>
+        <p className="mt-2 text-sm text-warning">
           Usa el selector en la parte superior para elegir un usuario y ver tus articulos.
         </p>
       </div>
@@ -57,7 +57,7 @@ export default function MyProductList() {
   return (
     <section>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
+        {products.map(product => (
           <MyProductCard
             key={product.id}
             product={product}
@@ -72,12 +72,12 @@ export default function MyProductList() {
             type="button"
             disabled={!hasPrevPage}
             onClick={() => goToPage(currentPage - 1)}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg border border-input px-4 py-2 text-sm text-fg transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
           >
             Anterior
           </button>
 
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-fg">
             Pagina {currentPage} · {totalCount} productos
           </span>
 
@@ -85,7 +85,7 @@ export default function MyProductList() {
             type="button"
             disabled={!hasNextPage}
             onClick={() => goToPage(currentPage + 1)}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg border border-input px-4 py-2 text-sm text-fg transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
           >
             Siguiente
           </button>
