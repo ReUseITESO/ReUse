@@ -33,8 +33,7 @@ INSTALLED_APPS = [
     "core",
     "marketplace",
     "notifications",
-    # TODO: uncomment when gamification app has models and migrations ready
-    # "gamification",
+    "gamification",
 ]
 
 MIDDLEWARE = [
