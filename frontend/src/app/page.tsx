@@ -20,8 +20,8 @@ export default function HomePage() {
             ReUse<span className="text-primary">ITESO</span>
           </h1>
           <p className="max-w-xl text-body text-muted-fg">
-            La plataforma de compraventa, intercambio y donación de segunda mano
-            para la comunidad ITESO. Sostenible, segura y hecha por estudiantes.
+            La plataforma de compraventa, intercambio y donación de segunda mano para la comunidad
+            ITESO. Sostenible, segura y hecha por estudiantes.
           </p>
         </div>
 
@@ -54,8 +54,6 @@ export default function HomePage() {
           </div>
         )}
       </section>
-
-
     </main>
   );
 }

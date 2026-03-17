@@ -6,7 +6,12 @@ import { useRouter } from 'next/navigation';
 import Badge from '@/components/ui/Badge';
 import ImageGallery from '@/components/products/ImageGallery';
 import { getProductById } from '@/lib/api';
-import { getCategoryStyle, getConditionLabel, getConditionStyle, getPriceColor } from '@/lib/productStyles';
+import {
+  getCategoryStyle,
+  getConditionLabel,
+  getConditionStyle,
+  getPriceColor,
+} from '@/lib/productStyles';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
 import type { ProductDetail } from '@/types/product';

@@ -94,14 +94,7 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         </button>
       </div>
       {message ? (
-        <p
-          className={cn(
-            'mt-3 text-xs',
-            isError ? 'text-error' : 'text-success',
-          )}
-        >
-          {message}
-        </p>
+        <p className={cn('mt-3 text-xs', isError ? 'text-error' : 'text-success')}>{message}</p>
       ) : null}
     </section>
   );

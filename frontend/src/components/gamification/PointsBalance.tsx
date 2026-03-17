@@ -63,9 +63,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     <article className="rounded-lg bg-gradient-to-br from-primary/5 to-primary/15 border border-primary/20 p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">
-            Puntos Acumulados
-          </h3>
+          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">Puntos Acumulados</h3>
           <p className="mt-1 text-4xl font-bold text-primary">{points || 0}</p>
         </div>
         <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">

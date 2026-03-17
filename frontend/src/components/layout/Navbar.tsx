@@ -19,7 +19,11 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 text-h3 font-bold text-primary">
-          <img src="/ReUseITESOLogo.png" alt="ReUseITESO logo" className="h-12 w-12 object-contain" />
+          <img
+            src="/ReUseITESOLogo.png"
+            alt="ReUseITESO logo"
+            className="h-12 w-12 object-contain"
+          />
           <span>ReUseITESO</span>
         </Link>
 
@@ -78,7 +82,10 @@ export default function Navbar() {
                       Mi perfil
                     </Link>
                     <button
-                      onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleSignOut();
+                      }}
                       className="w-full px-4 py-2 text-left text-sm text-error transition-colors hover:bg-error/5"
                     >
                       Cerrar sesión
@@ -167,7 +174,10 @@ export default function Navbar() {
                 <p className="px-3 text-xs text-muted-fg">{user?.email}</p>
               </div>
               <button
-                onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleSignOut();
+                }}
                 className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-error hover:bg-error/5"
               >
                 Cerrar sesión

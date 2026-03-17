@@ -23,7 +23,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md cursor-pointer">
         <div className="flex h-44 items-center justify-center bg-muted">
           {product.image_url ? (
-            <img src={product.image_url} alt={product.title} className="h-full w-full object-cover" />
+            <img
+              src={product.image_url}
+              alt={product.title}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <span className="text-sm text-muted-fg">{product.category.name} - Imagen</span>
           )}

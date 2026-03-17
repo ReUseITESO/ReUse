@@ -7,13 +7,14 @@ import StatusBadge from '@/components/ui/StatusBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useDeleteProduct } from '@/hooks/useDeleteProduct';
 import { useChangeProductStatus } from '@/hooks/useChangeProductStatus';
-import { getCategoryStyle, getConditionLabel, getConditionStyle, getPriceColor } from '@/lib/productStyles';
-
 import {
-  formatPrice,
-  formatTimeAgo,
-  formatTransactionLabel,
-} from '@/lib/utils';
+  getCategoryStyle,
+  getConditionLabel,
+  getConditionStyle,
+  getPriceColor,
+} from '@/lib/productStyles';
+
+import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
 import type { Product, ProductStatus } from '@/types/product';
 
@@ -78,9 +79,7 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-sm text-muted-fg">
-              {product.category.name} - Imagen
-            </span>
+            <span className="text-sm text-muted-fg">{product.category.name} - Imagen</span>
           )}
         </div>
 
@@ -90,14 +89,14 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
             <StatusBadge status={product.status} />
           </div>
 
-          <h3 className="line-clamp-2 text-body font-semibold text-card-fg">
-            {product.title}
-          </h3>
+          <h3 className="line-clamp-2 text-body font-semibold text-card-fg">{product.title}</h3>
 
           <p className={`text-h3 font-bold ${priceColorClass}`}>{priceDisplay}</p>
 
           <div className="flex items-center gap-3 text-xs text-muted-fg">
-            <Badge className={getConditionStyle(product.condition)}>{getConditionLabel(product.condition)}</Badge>
+            <Badge className={getConditionStyle(product.condition)}>
+              {getConditionLabel(product.condition)}
+            </Badge>
             <span>{formatTimeAgo(product.created_at)}</span>
           </div>
 

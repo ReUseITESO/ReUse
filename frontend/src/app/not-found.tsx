@@ -4,18 +4,24 @@ export default function NotFound() {
   return (
     <main className="relative flex h-[calc(100vh-4rem)] flex-col items-center justify-center px-6 py-12">
       <div className="relative z-10 flex items-center justify-center gap-2 select-none">
-        <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">4</span>
+        <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">
+          4
+        </span>
         <img
           src="/ReUseITESOLogo.png"
           alt="0"
           className="h-32 w-32 object-contain sm:h-44 sm:w-44"
         />
-        <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">4</span>
+        <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">
+          4
+        </span>
       </div>
 
       <div className="relative z-10 mt-6 flex items-center gap-4 w-full max-w-xs">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs font-semibold uppercase tracking-widest text-muted-fg">página no encontrada</span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-fg">
+          página no encontrada
+        </span>
         <div className="h-px flex-1 bg-border" />
       </div>
 

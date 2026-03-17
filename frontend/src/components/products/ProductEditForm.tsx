@@ -138,9 +138,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
               })}
               className={INPUT_CLASS}
             />
-            {errors.title && (
-              <p className="mt-1.5 text-sm text-error">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="mt-1.5 text-sm text-error">{errors.title.message}</p>}
           </div>
 
           <div>
@@ -188,8 +186,8 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                 </select>
               )}
               {errors.category && (
-              <p className="mt-1.5 text-sm text-error">{errors.category.message}</p>
-            )}
+                <p className="mt-1.5 text-sm text-error">{errors.category.message}</p>
+              )}
             </div>
 
             <div>
@@ -281,17 +279,13 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
                   placeholder="0.00"
                 />
               </div>
-              {errors.price && (
-                <p className="mt-1.5 text-sm text-error">{errors.price.message}</p>
-              )}
+              {errors.price && <p className="mt-1.5 text-sm text-error">{errors.price.message}</p>}
             </div>
           )}
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">
-            Imagen
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">Imagen</h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-fg">

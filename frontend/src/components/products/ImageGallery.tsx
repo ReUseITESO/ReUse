@@ -41,9 +41,7 @@ export default function ImageGallery({ images, productTitle }: ImageGalleryProps
               className={`
                 relative aspect-square overflow-hidden rounded-lg border-2 transition-all
                 ${
-                  index === selectedIndex
-                    ? 'border-primary'
-                    : 'border-border hover:border-muted-fg'
+                  index === selectedIndex ? 'border-primary' : 'border-border hover:border-muted-fg'
                 }
               `}
             >

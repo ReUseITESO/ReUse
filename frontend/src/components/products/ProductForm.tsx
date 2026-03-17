@@ -118,9 +118,7 @@ export default function ProductForm() {
               className={INPUT_CLASS}
               placeholder="Ej: Libro de Cálculo Diferencial"
             />
-            {errors.title && (
-              <p className="mt-1.5 text-sm text-error">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="mt-1.5 text-sm text-error">{errors.title.message}</p>}
           </div>
 
           <div>
@@ -169,8 +167,8 @@ export default function ProductForm() {
                 </select>
               )}
               {errors.category && (
-              <p className="mt-1.5 text-sm text-error">{errors.category.message}</p>
-            )}
+                <p className="mt-1.5 text-sm text-error">{errors.category.message}</p>
+              )}
             </div>
 
             <div>
@@ -221,10 +219,14 @@ export default function ProductForm() {
                         : 'border-border bg-card hover:border-muted-fg hover:bg-muted'
                     }`}
                   >
-                    <span className={`block text-sm font-semibold ${isSelected ? 'text-primary' : 'text-fg'}`}>
+                    <span
+                      className={`block text-sm font-semibold ${isSelected ? 'text-primary' : 'text-fg'}`}
+                    >
                       {option.label}
                     </span>
-                    <span className={`mt-0.5 block text-xs ${isSelected ? 'text-secondary' : 'text-muted-fg'}`}>
+                    <span
+                      className={`mt-0.5 block text-xs ${isSelected ? 'text-secondary' : 'text-muted-fg'}`}
+                    >
                       {option.description}
                     </span>
                   </button>
@@ -258,17 +260,13 @@ export default function ProductForm() {
                   placeholder="0.00"
                 />
               </div>
-              {errors.price && (
-                <p className="mt-1.5 text-sm text-error">{errors.price.message}</p>
-              )}
+              {errors.price && <p className="mt-1.5 text-sm text-error">{errors.price.message}</p>}
             </div>
           )}
         </section>
 
         <section className="space-y-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">
-            Imágenes
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-fg">Imágenes</h2>
 
           <div>
             <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-fg">
@@ -305,9 +303,7 @@ export default function ProductForm() {
 
           {images.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-fg">
-                Imágenes agregadas ({images.length})
-              </p>
+              <p className="text-sm font-medium text-fg">Imágenes agregadas ({images.length})</p>
               <div className="space-y-2">
                 {images.map((url, index) => (
                   <div
@@ -317,7 +313,9 @@ export default function ProductForm() {
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                       {index + 1}
                     </span>
-                    <span className="flex-1 text-sm text-muted-fg break-all overflow-wrap-anywhere">{url}</span>
+                    <span className="flex-1 text-sm text-muted-fg break-all overflow-wrap-anywhere">
+                      {url}
+                    </span>
                     <button
                       type="button"
                       onClick={() => removeImage(index)}

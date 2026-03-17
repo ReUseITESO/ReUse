@@ -156,7 +156,11 @@ export default function SignUpPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <img src="/ReUseITESOLogo.png" alt="ReUseITESO logo" className="mx-auto mb-3 h-12 w-12 object-contain" />
+          <img
+            src="/ReUseITESOLogo.png"
+            alt="ReUseITESO logo"
+            className="mx-auto mb-3 h-12 w-12 object-contain"
+          />
           <h1 className="text-h1 font-bold text-fg">ReUseITESO</h1>
           <p className="mt-2 text-muted-fg">Crea tu cuenta con tu correo ITESO</p>
         </div>
