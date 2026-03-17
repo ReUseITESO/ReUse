@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from generator import UserStoryGenerator
-from models import StoryInput, ExistingStory, DetailLevel, Domain
+from models import StoryInput, ExistingStory, DetailLevel
 
 
 def example_1_basic_generation():

@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 
 from .models import Notification
 from .serializers import (
-    NotificationSerializer,
     NotificationMarkReadSerializer,
+    NotificationSerializer,
     UnreadCountSerializer,
 )
 

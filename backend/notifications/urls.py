@@ -1,9 +1,10 @@
 from django.urls import path
+
 from .views import (
-    NotificationListView,
     NotificationDetailView,
-    NotificationMarkReadView,
+    NotificationListView,
     NotificationMarkAllReadView,
+    NotificationMarkReadView,
     NotificationUnreadCountView,
 )
 
