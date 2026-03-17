@@ -56,13 +56,17 @@ export default function ProductList() {
                     <ErrorMessage message={error} onRetry={() => fetchProducts()} />
                 )}
 
-                {!isLoading && !error && products.length === 0 && (
-                    <EmptyState
-                        message={hasFilters ? 'No se encontraron productos con esos filtros' : 'No se ha registrado ningun articulo o producto'}
-                        actionLabel={hasFilters ? 'Mostrar todos' : undefined}
-                        onAction={hasFilters ? handleShowAll : undefined}
-                    />
-                )}
+        {!isLoading && !error && products.length === 0 && (
+          <EmptyState
+            message={
+              hasFilters
+                ? 'No se encontraron productos con esos filtros'
+                : 'No se ha registrado ningun articulo o producto'
+            }
+            actionLabel={hasFilters ? 'Mostrar todos' : undefined}
+            onAction={hasFilters ? handleShowAll : undefined}
+          />
+        )}
 
                 {!isLoading && !error && products.length > 0 && (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

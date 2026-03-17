@@ -7,8 +7,8 @@ from drf_spectacular.types import OpenApiTypes
 from marketplace.models import Products
 from marketplace.serializers import (
     ProductCreateSerializer,
-    ProductListSerializer,
     ProductDetailSerializer,
+    ProductListSerializer,
     ProductStatusSerializer,
     ProductUpdateSerializer,
 )
@@ -139,7 +139,9 @@ class ProductViewSet(
         return ProductListSerializer
 
     def get_queryset(self):
-        queryset = Products.objects.select_related("category", "seller").prefetch_related("images")
+        queryset = Products.objects.select_related(
+            "category", "seller"
+        ).prefetch_related("images")
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
@@ -181,9 +183,7 @@ class ProductViewSet(
 
     def partial_update(self, request, *args, **kwargs):
         product = self.get_object()
-        serializer = self.get_serializer(
-            product, data=request.data, partial=True
-        )
+        serializer = self.get_serializer(product, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         updated_product = update_product(

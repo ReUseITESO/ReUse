@@ -18,21 +18,21 @@ export function formatTransactionLabel(type: TransactionType): string {
 }
 
 const CONDITION_LABELS: Record<ProductCondition, string> = {
-    nuevo: 'Nuevo',
-    como_nuevo: 'Como nuevo',
-    buen_estado: 'Buen estado',
-    usado: 'Usado',
+  nuevo: 'Nuevo',
+  como_nuevo: 'Como nuevo',
+  buen_estado: 'Buen estado',
+  usado: 'Usado',
 };
 
 export function formatConditionLabel(condition: ProductCondition): string {
-    return CONDITION_LABELS[condition];
+  return CONDITION_LABELS[condition];
 }
 
 export function formatPrice(price: string | null): string {
-    if (!price) return '';
-    const numeric = parseFloat(price);
-    if (isNaN(numeric) || numeric === 0) return '';
-    return `$${numeric.toLocaleString('es-MX')}`;
+  if (!price) return '';
+  const numeric = parseFloat(price);
+  if (isNaN(numeric) || numeric === 0) return '';
+  return `$${numeric.toLocaleString('es-MX')}`;
 }
 
 const SECONDS_IN_MINUTE = 60;

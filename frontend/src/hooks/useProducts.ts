@@ -55,8 +55,7 @@ export function useProducts() {
       setHasNextPage(Boolean(data.next));
       setHasPrevPage(Boolean(data.previous));
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'No se pudieron cargar los productos';
+      const message = err instanceof Error ? err.message : 'No se pudieron cargar los productos';
       setError(message);
     } finally {
       setIsLoading(false);

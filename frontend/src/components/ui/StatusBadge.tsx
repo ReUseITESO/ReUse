@@ -6,7 +6,10 @@ interface StatusBadgeProps {
   status: ProductStatus;
 }
 
-const STATUS_CONFIG: Record<ProductStatus, { label: string; variant: 'green' | 'blue' | 'gray' | 'red' | 'yellow' }> = {
+const STATUS_CONFIG: Record<
+  ProductStatus,
+  { label: string; variant: 'green' | 'blue' | 'gray' | 'red' | 'yellow' }
+> = {
   disponible: { label: 'Disponible', variant: 'green' },
   en_proceso: { label: 'En proceso', variant: 'yellow' },
   completado: { label: 'Completado', variant: 'blue' },

@@ -31,12 +31,20 @@ export default function Navbar() {
           </Link>
 
           {isAuthenticated && (
-            <Link
-              href="/products/my"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-            >
-              Mis artículos
-            </Link>
+            <>
+              <Link
+                href="/products/my"
+                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              >
+                Mis artículos
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
+            </>
           )}
 
           {isLoading ? (
@@ -61,9 +69,19 @@ export default function Navbar() {
                       <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      Mi perfil
+                    </Link>
                     <button
-                      onClick={handleSignOut}
-                      className="mt-1 w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleSignOut();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                     >
                       Cerrar sesión
                     </button>
@@ -94,11 +112,21 @@ export default function Navbar() {
           className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 sm:hidden"
           aria-label="Menú"
         >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
             {menuOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
             )}
           </svg>
         </button>
@@ -115,12 +143,36 @@ export default function Navbar() {
           </Link>
           {isAuthenticated ? (
             <>
+              <Link
+                href="/products/my"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Mis artículos
+              </Link>
+              <Link
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Mi perfil
+              </Link>
               <div className="my-2 border-t border-gray-100 pt-2">
                 <p className="px-3 text-sm font-medium text-gray-900">{user?.full_name}</p>
                 <p className="px-3 text-xs text-gray-500">{user?.email}</p>
               </div>
               <button
-                onClick={() => { setMenuOpen(false); handleSignOut(); }}
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleSignOut();
+                }}
                 className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
               >
                 Cerrar sesión

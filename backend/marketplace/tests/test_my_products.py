@@ -10,15 +10,15 @@ class MyProductsTests(APITestCase):
 
     def setUp(self):
         self.seller = User.objects.create(
-            username="seller_my",
             email="seller@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
         )
         self.other_user = User.objects.create(
-            username="other_my",
             email="other@iteso.mx",
-            name="Carlos López",
+            first_name="Carlos",
+            last_name="López",
             phone="3312345679",
         )
         self.category = Category.objects.create(name="Libros")
@@ -72,13 +72,11 @@ class MyProductsTests(APITestCase):
 
     def _auth(self, user=None):
         user = user or self.seller
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(user.pk))
+        self.client.force_authenticate(user=user)
 
     def test_list_my_products_returns_all_statuses(self):
         self._auth()
-        response = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         titles = [p["title"] for p in response.data["results"]]
         self.assertIn("Disponible", titles)
@@ -88,31 +86,23 @@ class MyProductsTests(APITestCase):
 
     def test_list_my_products_does_not_include_other_users_products(self):
         self._auth()
-        response = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         titles = [p["title"] for p in response.data["results"]]
         self.assertNotIn("Producto de Otro", titles)
 
     def test_list_my_products_count(self):
         self._auth()
-        response = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self.assertEqual(response.data["count"], 4)
 
     def test_list_my_products_is_paginated(self):
         self._auth()
-        response = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self.assertIn("count", response.data)
         self.assertIn("results", response.data)
 
     def test_list_my_products_without_auth_returns_empty(self):
-        response = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
 
@@ -137,16 +127,10 @@ class MyProductsTests(APITestCase):
 
     def test_list_my_products_switching_user_returns_own_only(self):
         self._auth(self.seller)
-        response_seller = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response_seller = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self._auth(self.other_user)
-        response_other = self.client.get(
-            self.PRODUCTS_URL, {"seller": "me"}
-        )
+        response_other = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self.assertEqual(response_seller.data["count"], 4)
         self.assertEqual(response_other.data["count"], 1)
-        other_titles = [
-            p["title"] for p in response_other.data["results"]
-        ]
+        other_titles = [p["title"] for p in response_other.data["results"]]
         self.assertEqual(other_titles, ["Producto de Otro"])

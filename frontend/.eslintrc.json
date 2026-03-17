@@ -1,7 +1,6 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
-    "no-unused-vars": "error",
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "react-hooks/exhaustive-deps": "warn"
   }
