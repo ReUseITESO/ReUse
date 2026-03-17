@@ -7,7 +7,7 @@ import { useChallenges } from '@/hooks/useChallenges';
 import type { UserChallenge } from '@/types/gamification';
 
 function getProgressForChallenge(challengeId: number, myChallenges: UserChallenge[]) {
-  return myChallenges.find((item) => item.challenge_id === challengeId);
+  return myChallenges.find(item => item.challenge_id === challengeId);
 }
 
 function getChallengeLabel(type: 'donation' | 'exchange' | 'sale' | 'publish' | 'review') {
@@ -32,14 +32,16 @@ interface ChallengesBoardProps {
 
 export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardProps) {
   const { isAuthenticated } = useAuth();
-  const { challenges, myChallenges, isLoading, error, joinChallenge, refetch } =
-    useChallenges(isAuthenticated, refreshTrigger);
+  const { challenges, myChallenges, isLoading, error, joinChallenge, refetch } = useChallenges(
+    isAuthenticated,
+    refreshTrigger,
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [joiningId, setJoiningId] = useState<number | null>(null);
 
   const completedChallenges = useMemo(
-    () => myChallenges.filter((challenge) => challenge.is_completed).length,
+    () => myChallenges.filter(challenge => challenge.is_completed).length,
     [myChallenges],
   );
 
@@ -116,7 +118,7 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
         <p className="mt-4 text-sm text-slate-600">No hay retos activos por el momento.</p>
       ) : (
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {challenges.map((challenge) => {
+          {challenges.map(challenge => {
             const progress = getProgressForChallenge(challenge.id, myChallenges);
             const currentValue = progress ? progress.progress : 0;
             const normalizedProgress = Math.min(
@@ -141,7 +143,8 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                 <div className="mt-3 text-xs text-slate-600">
                   <p>Tipo: {getChallengeLabel(challenge.challenge_type)}</p>
                   <p>
-                    Meta: {challenge.goal} {getChallengeLabel(challenge.challenge_type).toLowerCase()}
+                    Meta: {challenge.goal}{' '}
+                    {getChallengeLabel(challenge.challenge_type).toLowerCase()}
                   </p>
                 </div>
 

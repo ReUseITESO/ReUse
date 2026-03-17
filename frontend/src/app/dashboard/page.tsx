@@ -23,7 +23,7 @@ export default function DashboardPage() {
             <p className="mb-3 text-sm text-amber-800">
               Usa estos botones para simular acciones y actualizar el progreso de tus retos.
             </p>
-            <TestPointsButtons onPointsUpdated={() => setPointsVersion((v) => v + 1)} />
+            <TestPointsButtons onPointsUpdated={() => setPointsVersion(v => v + 1)} />
           </div>
 
           <div>
