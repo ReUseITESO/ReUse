@@ -36,19 +36,17 @@ export function useProducts() {
     setHasFilters(isFiltered);
 
     const params = new URLSearchParams();
-    if (search)            params.set('search', search);
-    if (category)          params.set('category', category);
-    if (condition)         params.set('condition', condition);
-    if (transaction_type)  params.set('transaction_type', transaction_type);
-    if (ordering)          params.set('ordering', ordering);
-    if (page > 1)          params.set('page', String(page));
+    if (search) params.set('search', search);
+    if (category) params.set('category', category);
+    if (condition) params.set('condition', condition);
+    if (transaction_type) params.set('transaction_type', transaction_type);
+    if (ordering) params.set('ordering', ordering);
+    if (page > 1) params.set('page', String(page));
 
     const query = params.toString() ? `?${params.toString()}` : '';
 
     try {
-      const data = await apiClient<PaginatedResponse<Product>>(
-        `/marketplace/products/${query}`,
-      );
+      const data = await apiClient<PaginatedResponse<Product>>(`/marketplace/products/${query}`);
       setProducts(data.results);
       setTotalCount(data.count);
       setCurrentPage(page);
@@ -62,9 +60,12 @@ export function useProducts() {
     }
   }, []);
 
-  const goToPage = useCallback((page: number) => {
-    fetchProducts(activeFiltersRef.current, page);
-  }, [fetchProducts]);
+  const goToPage = useCallback(
+    (page: number) => {
+      fetchProducts(activeFiltersRef.current, page);
+    },
+    [fetchProducts],
+  );
 
   useEffect(() => {
     fetchProducts();
