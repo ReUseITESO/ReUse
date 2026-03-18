@@ -15,39 +15,118 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('icon', models.CharField(blank=True, max_length=500, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("icon", models.CharField(blank=True, max_length=500, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'verbose_name_plural': 'Categories',
-                'db_table': 'categories',
-                'ordering': ['name'],
+                "verbose_name_plural": "Categories",
+                "db_table": "categories",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Products',
+            name="Products",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('condition', models.CharField(choices=[('nuevo', 'Nuevo'), ('como_nuevo', 'Como Nuevo'), ('buen_estado', 'Buen Estado'), ('usado', 'Usado')], max_length=20)),
-                ('transaction_type', models.CharField(choices=[('donation', 'Donación'), ('sale', 'Venta'), ('swap', 'Intercambio')], max_length=20)),
-                ('status', models.CharField(choices=[('disponible', 'Disponible'), ('en_proceso', 'En Proceso'), ('completado', 'Completado'), ('cancelado', 'Cancelado')], default='disponible', max_length=20)),
-                ('price', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('image_url', models.CharField(blank=True, max_length=500, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('category', models.ForeignKey(db_column='category_id', on_delete=django.db.models.deletion.RESTRICT, related_name='products', to='marketplace.category')),
-                ('seller', models.ForeignKey(db_column='seller_id', on_delete=django.db.models.deletion.RESTRICT, related_name='products_selling', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                (
+                    "condition",
+                    models.CharField(
+                        choices=[
+                            ("nuevo", "Nuevo"),
+                            ("como_nuevo", "Como Nuevo"),
+                            ("buen_estado", "Buen Estado"),
+                            ("usado", "Usado"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "transaction_type",
+                    models.CharField(
+                        choices=[
+                            ("donation", "Donación"),
+                            ("sale", "Venta"),
+                            ("swap", "Intercambio"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("disponible", "Disponible"),
+                            ("en_proceso", "En Proceso"),
+                            ("completado", "Completado"),
+                            ("cancelado", "Cancelado"),
+                        ],
+                        default="disponible",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True
+                    ),
+                ),
+                ("image_url", models.CharField(blank=True, max_length=500, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "category",
+                    models.ForeignKey(
+                        db_column="category_id",
+                        on_delete=django.db.models.deletion.RESTRICT,
+                        related_name="products",
+                        to="marketplace.category",
+                    ),
+                ),
+                (
+                    "seller",
+                    models.ForeignKey(
+                        db_column="seller_id",
+                        on_delete=django.db.models.deletion.RESTRICT,
+                        related_name="products_selling",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Products',
-                'db_table': 'products',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['seller'], name='products_seller__c70854_idx'), models.Index(fields=['category'], name='products_categor_4083ff_idx'), models.Index(fields=['status'], name='products_status_a30e64_idx'), models.Index(fields=['status', 'category'], name='idx_products_available')],
+                "verbose_name_plural": "Products",
+                "db_table": "products",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(fields=["seller"], name="products_seller__c70854_idx"),
+                    models.Index(
+                        fields=["category"], name="products_categor_4083ff_idx"
+                    ),
+                    models.Index(fields=["status"], name="products_status_a30e64_idx"),
+                    models.Index(
+                        fields=["status", "category"], name="idx_products_available"
+                    ),
+                ],
             },
         ),
     ]
