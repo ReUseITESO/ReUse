@@ -23,6 +23,7 @@ class Products(models.Model):
 
     STATUS_CHOICES = [
         ("disponible", "Available"),
+        ("pausado", "Paused"),
         ("en_proceso", "In Progress"),
         ("completado", "Completed"),
         ("cancelado", "Cancelled"),
