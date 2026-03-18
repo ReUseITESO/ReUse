@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from marketplace.models import Images, Products, Transaction
+from marketplace.models import Images, Products
 from marketplace.serializers.category import CategorySerializer
 from marketplace.services.transaction_service import has_active_transaction
 

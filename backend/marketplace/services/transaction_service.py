@@ -1,5 +1,6 @@
 from marketplace.models import Transaction
 
+
 def has_active_transaction(product):
     try:
         transaction = product.transaction
