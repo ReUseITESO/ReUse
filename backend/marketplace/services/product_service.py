@@ -1,6 +1,5 @@
 from rest_framework import status
-from rest_framework.exceptions import APIException
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
 from marketplace.models import Transaction
 

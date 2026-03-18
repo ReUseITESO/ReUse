@@ -1,7 +1,12 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from social.views import CommunityViewSet, FrequentContactViewSet, UserConnectionViewSet,CommunityPostViewSet
+from social.views import (
+    CommunityPostViewSet,
+    CommunityViewSet,
+    FrequentContactViewSet,
+    UserConnectionViewSet,
+)
 
 router = DefaultRouter()
 router.register("connections", UserConnectionViewSet, basename="social-connections")

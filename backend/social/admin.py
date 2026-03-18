@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from social.models import Community, CommunityMember, FrequentContact, UserConnection, CommunityPost
+from social.models import (
+    Community,
+    CommunityMember,
+    CommunityPost,
+    FrequentContact,
+    UserConnection,
+)
 
 
 @admin.register(UserConnection)

@@ -4,7 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from social.models import FrequentContact
-from social.serializers import FrequentContactCreateSerializer, FrequentContactSerializer
+from social.serializers import (
+    FrequentContactCreateSerializer,
+    FrequentContactSerializer,
+)
 from social.services import create_frequent_contact, delete_frequent_contact
 
 

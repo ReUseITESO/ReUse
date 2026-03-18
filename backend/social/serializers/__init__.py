@@ -10,7 +10,10 @@ from social.serializers.community_post import (
     CommunityPostListSerializer,
     CommunityPostWriteSerializer,
 )
-from social.serializers.frequent_contact import FrequentContactCreateSerializer, FrequentContactSerializer
+from social.serializers.frequent_contact import (
+    FrequentContactCreateSerializer,
+    FrequentContactSerializer,
+)
 from social.serializers.user_connection import (
     UserConnectionCreateSerializer,
     UserConnectionResponseSerializer,
