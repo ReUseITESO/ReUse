@@ -6,6 +6,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import models
 from rest_framework import serializers
 
+from core.models.friendship import FriendRequest, Friendship
+
 User = get_user_model()
 
 
@@ -164,8 +166,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 # ── Friend System Serializers ────────────────────────────
 
-from core.models.friendship import FriendRequest, Friendship
-
 
 class UserSearchSerializer(serializers.ModelSerializer):
     """Minimal user info for search results and friend lists."""
@@ -174,7 +174,14 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "full_name",
+            "profile_picture",
+        ]
         read_only_fields = fields
 
     def get_full_name(self, obj):
@@ -202,7 +209,9 @@ class FriendRequestCreateSerializer(serializers.Serializer):
         request_user = self.context["request"].user
 
         if value == request_user.id:
-            raise serializers.ValidationError("No puedes enviarte una solicitud a ti mismo.")
+            raise serializers.ValidationError(
+                "No puedes enviarte una solicitud a ti mismo."
+            )
 
         if not User.objects.filter(id=value, is_active=True).exists():
             raise serializers.ValidationError("Usuario no encontrado.")
@@ -216,6 +225,8 @@ class FriendRequestCreateSerializer(serializers.Serializer):
         if FriendRequest.objects.filter(
             from_user=request_user, to_user_id=value, status="pending"
         ).exists():
-            raise serializers.ValidationError("Ya enviaste una solicitud a este usuario.")
+            raise serializers.ValidationError(
+                "Ya enviaste una solicitud a este usuario."
+            )
 
         return value

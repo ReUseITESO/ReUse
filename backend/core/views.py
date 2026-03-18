@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,6 +13,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from core.models.friendship import FriendRequest, Friendship
+from core.serializers import (
+    FriendRequestCreateSerializer,
+    FriendRequestSerializer,
+    UserSearchSerializer,
+)
 
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
@@ -345,14 +353,6 @@ class EmailVerificationConfirmView(APIView):
 
 # ── Friend System ────────────────────────────────────────
 
-from django.db.models import Q
-from core.models.friendship import FriendRequest, Friendship
-from core.serializers import (
-    UserSearchSerializer,
-    FriendRequestSerializer,
-    FriendRequestCreateSerializer,
-)
-
 
 class UserSearchView(generics.ListAPIView):
     """GET /api/auth/users/search/?q=query — search users by name or email."""
@@ -431,9 +431,7 @@ class AcceptFriendRequestView(APIView):
         friend_request.save(update_fields=["status", "updated_at"])
 
         user_ids = sorted([friend_request.from_user_id, friend_request.to_user_id])
-        Friendship.objects.get_or_create(
-            user1_id=user_ids[0], user2_id=user_ids[1]
-        )
+        Friendship.objects.get_or_create(user1_id=user_ids[0], user2_id=user_ids[1])
 
         return Response(
             {"message": "Solicitud aceptada."},

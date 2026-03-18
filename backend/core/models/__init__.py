@@ -1,9 +1,14 @@
 from .email_verification import EmailVerificationToken
-from .user import User
 from .friendship import FriendRequest, Friendship
+from .user import User
 
 __all__ = ["User", "EmailVerificationToken", "FriendRequest", "Friendship"]
-from .community import Community, CommunityMembership, CommunityPost, CommunityInvitation
+from .community import (
+    Community,
+    CommunityInvitation,
+    CommunityMembership,
+    CommunityPost,
+)
 
 __all__ = [
     "User",
