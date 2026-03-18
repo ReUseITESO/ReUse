@@ -1,25 +1,46 @@
+
 # ERD - ReUseITESO
 
-**Date:** 24 February 2026
+**Date:** 12 March 2026
 **DBA:** Daniel
+**Version:** 1.3
+
+---
+
+## Changelog
+
+| Version | Date        | Change                                                                                                                                                                                                                         |
+| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 15 Feb 2026 | Initial ERD                                                                                                                                                                                                                    |
+| 1.1     | 5 Mar 2026  | User: name replaced by first_name/last_name, email verification fields. Products: updated_at. Badges: icon_url renamed to icon. Added PointRule, PointTransaction, EmailVerificationToken. All gamification tables now active. |
+| 1.2     | 11 Mar 2026 | Added Social module: UserConnection, FrequentContact, Community, CommunityMember. Fixed FK column names: Images/Transaction/ForumQuestion use products_id (verified against source code).                                      |
+| 1.3     | 12 Mar 2026 | Added CommunityPost. ForumQuestion: products_id made nullable, post_id added (FK to social_communitypost). A ForumQuestion must belong to exactly one target: product or post.                                                 |
 
 ---
 
 ## Notes on Table Names
 
-Django generates table names automatically as `{app}_{model}`. Since `db_table` overrides were removed, the actual table names in PostgreSQL are:
+Django generates table names automatically as `{app}_{model}`. The actual table names in PostgreSQL are:
 
-| Model                          | Table                              |
-| ------------------------------ | ---------------------------------- |
-| core.User                      | `core_user`                      |
-| marketplace.Category           | `marketplace_category`           |
-| marketplace.Products           | `marketplace_products`           |
-| marketplace.Images             | `marketplace_images`             |
-| marketplace.Transaction        | `marketplace_transaction`        |
-| marketplace.ForumQuestion      | `marketplace_forumquestion`      |
-| gamification.Badges            | `gamification_badges`            |
-| gamification.UserBadges        | `gamification_userbadges`        |
-| gamification.EnvironmentImpact | `gamification_environmentimpact` |
+| Model                          | Table                              | Status |
+| ------------------------------ | ---------------------------------- | ------ |
+| core.User                      | `core_user`                      | Active |
+| core.EmailVerificationToken    | `core_emailverificationtoken`    | Active |
+| marketplace.Category           | `marketplace_category`           | Active |
+| marketplace.Products           | `marketplace_products`           | Active |
+| marketplace.Images             | `marketplace_images`             | Active |
+| marketplace.Transaction        | `marketplace_transaction`        | Active |
+| marketplace.ForumQuestion      | `marketplace_forumquestion`      | Active |
+| gamification.Badges            | `gamification_badges`            | Active |
+| gamification.UserBadges        | `gamification_userbadges`        | Active |
+| gamification.EnvironmentImpact | `gamification_environmentimpact` | Active |
+| gamification.PointRule         | `gamification_pointrule`         | Active |
+| gamification.PointTransaction  | `gamification_pointtransaction`  | Active |
+| social.UserConnection          | `social_userconnection`          | Active |
+| social.FrequentContact         | `social_frequentcontact`         | Active |
+| social.Community               | `social_community`               | Active |
+| social.CommunityMember         | `social_communitymember`         | Active |
+| social.CommunityPost           | `social_communitypost`           | Active |
 
 ---
 
@@ -29,15 +50,20 @@ Django generates table names automatically as `{app}_{model}`. Since `db_table` 
 
 Extends Django `AbstractUser`. Authentication fields (`password`, `last_login`, `is_active`, `is_staff`, `is_superuser`) are included automatically.
 
+> **v1.1 change:** `name` replaced by `first_name` + `last_name` (PR #70). Email verification fields added.
+
 ```sql
 CREATE TABLE core_user (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(254) UNIQUE NOT NULL CHECK (email ~* '@iteso\.mx$'),
     username VARCHAR(150) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(150) NOT NULL,
+    last_name VARCHAR(150) NOT NULL,
     phone VARCHAR(20) NOT NULL,
     points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
     profile_picture VARCHAR(500),
+    is_email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    email_verified_at TIMESTAMP,
     date_joined TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     password VARCHAR(128) NOT NULL,
     last_login TIMESTAMP,
@@ -47,6 +73,25 @@ CREATE TABLE core_user (
 );
 
 CREATE INDEX idx_core_user_email ON core_user(email);
+```
+
+---
+
+### EmailVerificationToken
+
+> **v1.1:** New table added by PR #70.
+
+```sql
+CREATE TABLE core_emailverificationtoken (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    token VARCHAR NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_core_emailverificationtoken_user ON core_emailverificationtoken(user_id);
 ```
 
 ---
@@ -66,6 +111,8 @@ CREATE TABLE marketplace_category (
 
 ### Products
 
+> **v1.1:** `updated_at` added. `auto_now=True` replaced by `default=timezone.now` + `save()` override for `loaddata` compatibility.
+
 ```sql
 CREATE TABLE marketplace_products (
     id BIGSERIAL PRIMARY KEY,
@@ -79,6 +126,7 @@ CREATE TABLE marketplace_products (
     description TEXT NOT NULL,
     image_url VARCHAR(500),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK (
         (transaction_type = 'donation' AND price IS NULL) OR
         (transaction_type = 'sale' AND price > 0) OR
@@ -100,14 +148,14 @@ CREATE INDEX idx_marketplace_products_search ON marketplace_products USING GIN(t
 ```sql
 CREATE TABLE marketplace_images (
     id BIGSERIAL PRIMARY KEY,
-    product_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    products_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
     image_url VARCHAR(500) NOT NULL,
     order_number INTEGER NOT NULL CHECK (order_number > 0),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(product_id, order_number)
+    UNIQUE(products_id, order_number)
 );
 
-CREATE INDEX idx_marketplace_images_product ON marketplace_images(product_id, order_number);
+CREATE INDEX idx_marketplace_images_product ON marketplace_images(products_id, order_number);
 ```
 
 ---
@@ -117,7 +165,7 @@ CREATE INDEX idx_marketplace_images_product ON marketplace_images(product_id, or
 ```sql
 CREATE TABLE marketplace_transaction (
     id BIGSERIAL PRIMARY KEY,
-    product_id BIGINT UNIQUE NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    products_id BIGINT UNIQUE NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
     seller_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE RESTRICT,
     buyer_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE RESTRICT,
     transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN ('donation', 'sale', 'swap')),
@@ -132,7 +180,7 @@ CREATE TABLE marketplace_transaction (
     CHECK (seller_id != buyer_id)
 );
 
-CREATE UNIQUE INDEX idx_marketplace_transaction_product ON marketplace_transaction(product_id);
+CREATE UNIQUE INDEX idx_marketplace_transaction_product ON marketplace_transaction(products_id);
 CREATE INDEX idx_marketplace_transaction_seller ON marketplace_transaction(seller_id);
 CREATE INDEX idx_marketplace_transaction_buyer ON marketplace_transaction(buyer_id);
 ```
@@ -141,32 +189,42 @@ CREATE INDEX idx_marketplace_transaction_buyer ON marketplace_transaction(buyer_
 
 ### ForumQuestion
 
+> **v1.3 change:** `products_id` is now nullable. `post_id` added as FK to `social_communitypost`. A ForumQuestion must belong to exactly one target (product or post) — enforced via `clean()` in Django. The `CHECK (id != parent_id)` constraint is preserved.
+
 ```sql
 CREATE TABLE marketplace_forumquestion (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
-    product_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    products_id BIGINT REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    post_id BIGINT REFERENCES social_communitypost(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
     parent_id BIGINT REFERENCES marketplace_forumquestion(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (id != parent_id)
+    CHECK (id != parent_id),
+    CHECK (
+        (products_id IS NOT NULL AND post_id IS NULL) OR
+        (products_id IS NULL AND post_id IS NOT NULL)
+    )
 );
 
-CREATE INDEX idx_marketplace_forumquestion_product ON marketplace_forumquestion(product_id);
+CREATE INDEX idx_marketplace_forumquestion_product ON marketplace_forumquestion(products_id);
+CREATE INDEX idx_marketplace_forumquestion_post ON marketplace_forumquestion(post_id);
 CREATE INDEX idx_marketplace_forumquestion_user ON marketplace_forumquestion(user_id);
 CREATE INDEX idx_marketplace_forumquestion_parent ON marketplace_forumquestion(parent_id);
 ```
 
 ---
 
-### Badges (pending — gamification module not yet active)
+### Badges
+
+> **v1.1:** `icon_url` renamed to `icon` (PR #64). Module now active.
 
 ```sql
 CREATE TABLE gamification_badges (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
-    icon_url VARCHAR(500) NOT NULL,
+    icon VARCHAR(500) NOT NULL,
     rarity VARCHAR(20) NOT NULL CHECK (rarity IN ('comun', 'raro', 'epico', 'legendario')),
     points INTEGER NOT NULL CHECK (points >= 0),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -175,7 +233,7 @@ CREATE TABLE gamification_badges (
 
 ---
 
-### UserBadges (pending — gamification module not yet active)
+### UserBadges
 
 ```sql
 CREATE TABLE gamification_userbadges (
@@ -191,7 +249,7 @@ CREATE INDEX idx_gamification_userbadges_user ON gamification_userbadges(user_id
 
 ---
 
-### EnvironmentImpact (pending — gamification module not yet active)
+### EnvironmentImpact
 
 ```sql
 CREATE TABLE gamification_environmentimpact (
@@ -207,36 +265,241 @@ CREATE UNIQUE INDEX idx_gamification_environmentimpact_user ON gamification_envi
 
 ---
 
+### PointRule
+
+> **v1.1:** New table added by PR #62. Defines how many points each action awards.
+
+```sql
+CREATE TABLE gamification_pointrule (
+    id BIGSERIAL PRIMARY KEY,
+    action VARCHAR(50) UNIQUE NOT NULL,
+    points INTEGER NOT NULL CHECK (points >= 0),
+    description TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Example rows (must be configured manually via admin panel):**
+
+| action                | points | description              |
+| --------------------- | ------ | ------------------------ |
+| `complete_sale`     | 50     | Completar una venta      |
+| `complete_donation` | 100    | Completar una donacion   |
+| `complete_swap`     | 75     | Completar un intercambio |
+
+---
+
+### PointTransaction
+
+> **v1.1:** New table added by PR #62. Records every point movement per user.
+
+```sql
+CREATE TABLE gamification_pointtransaction (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    action VARCHAR(50) NOT NULL,
+    points INTEGER NOT NULL,
+    reference_id INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_gamification_pointtransaction_user ON gamification_pointtransaction(user_id);
+```
+
+---
+
+## Social Module
+
+> **v1.2:** New module added. Four tables to support user connections, frequent contacts, and communities.
+> **v1.3:** CommunityPost added.
+
+### UserConnection
+
+Manages the full lifecycle of a friend request between two users. A single row represents the relationship — once `accepted`, both users are considered connected (bidirectional).
+
+```sql
+CREATE TABLE social_userconnection (
+    id BIGSERIAL PRIMARY KEY,
+    requester_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    addressee_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'blocked')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(requester_id, addressee_id),
+    CHECK (requester_id != addressee_id)
+);
+
+CREATE INDEX idx_social_userconnection_requester ON social_userconnection(requester_id);
+CREATE INDEX idx_social_userconnection_addressee ON social_userconnection(addressee_id);
+CREATE INDEX idx_social_userconnection_status ON social_userconnection(addressee_id, status);
+```
+
+**Status flow:**
+
+* `pending` — requester sent request, addressee has not responded
+* `accepted` — addressee accepted, connection is now bidirectional
+* `rejected` — addressee declined
+* `blocked` — either user blocked the other
+
+---
+
+### FrequentContact
+
+Personal and unilateral mark. A user can tag any of their accepted connections as "frequent". The contact is not notified and does not need to take any action.
+
+```sql
+CREATE TABLE social_frequentcontact (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    contact_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, contact_id),
+    CHECK (user_id != contact_id)
+);
+
+CREATE INDEX idx_social_frequentcontact_user ON social_frequentcontact(user_id);
+```
+
+**Design note:** No FK to `social_userconnection`. The prerequisite (must be accepted friends) is enforced at the business logic layer in Django, not at the DB level. Keeps schema simple.
+
+---
+
+### Community
+
+Communities created by users. Supports public and private communities. Uses soft delete via `is_active` — communities are never hard deleted.
+
+```sql
+CREATE TABLE social_community (
+    id BIGSERIAL PRIMARY KEY,
+    creator_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE RESTRICT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    icon VARCHAR(500),
+    is_private BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_social_community_creator ON social_community(creator_id);
+CREATE INDEX idx_social_community_active ON social_community(is_active) WHERE is_active = TRUE;
+```
+
+**Design note:** `ON DELETE RESTRICT` on `creator_id` — a user who created communities cannot be deleted without first transferring ownership or deactivating the community.
+
+---
+
+### CommunityMember
+
+N:M junction table between users and communities, with a role per membership.
+
+```sql
+CREATE TABLE social_communitymember (
+    id BIGSERIAL PRIMARY KEY,
+    community_id BIGINT NOT NULL REFERENCES social_community(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'moderator', 'member')),
+    joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(community_id, user_id)
+);
+
+CREATE INDEX idx_social_communitymember_community ON social_communitymember(community_id);
+CREATE INDEX idx_social_communitymember_user ON social_communitymember(user_id);
+CREATE INDEX idx_social_communitymember_role ON social_communitymember(community_id, role);
+```
+
+**Design note:** The `creator_id` in `social_community` is audit-only. Actual permissions are governed by `role` in this table. When a community is created, the creator must be inserted here with `role = 'admin'`.
+
+---
+
+### CommunityPost
+
+> **v1.3:** New table. Posts published inside a community by its members. Supports pinned posts for announcements. ForumQuestion can reference a CommunityPost via `post_id` to enable threaded discussion on posts.
+
+```sql
+CREATE TABLE social_communitypost (
+    id BIGSERIAL PRIMARY KEY,
+    community_id BIGINT NOT NULL REFERENCES social_community(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image_url VARCHAR(500),
+    is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_social_communitypost_community_created ON social_communitypost(community_id, created_at);
+CREATE INDEX idx_social_communitypost_user ON social_communitypost(user_id);
+CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(community_id, is_pinned);
+```
+
+**Design note:** Only community members can create posts — enforced at the serializer layer. The default ordering is pinned posts first, then newest. `ON DELETE CASCADE` on both FKs: if the community or the user is deleted, their posts are removed.
+
+---
+
 ## Relations
 
-* User 1 → N Products (seller)
+**Core**
+
+* User 1 → N EmailVerificationToken
+
+**Marketplace**
+
+* User 1 → N Products (as seller)
 * Category 1 → N Products
 * Products 1 → N Images
 * Products 1 → 1 Transaction
 * User 1 → N Transactions (as seller)
 * User 1 → N Transactions (as buyer)
-* Products 1 → N ForumQuestions
+* Products 1 → N ForumQuestions (via products_id, nullable)
+* CommunityPost 1 → N ForumQuestions (via post_id, nullable)
 * User 1 → N ForumQuestions
 * ForumQuestion 1 → N ForumQuestion (self-referential, replies)
+
+**Gamification**
+
 * User N → M Badges (through UserBadges)
 * User 1 → 1 EnvironmentImpact
+* User 1 → N PointTransaction
+
+**Social**
+
+* User 1 → N UserConnection (as requester)
+* User 1 → N UserConnection (as addressee)
+* User 1 → N FrequentContact (as user)
+* User 1 → N FrequentContact (as contact)
+* User 1 → N Community (as creator)
+* Community N → M User (through CommunityMember)
+* Community 1 → N CommunityPost
+* User 1 → N CommunityPost
 
 ---
 
-## Triggers (planned)
+## Known Design Notes
 
-```sql
--- Auto-update updated_at on tables that require it
-CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-   NEW.updated_at = CURRENT_TIMESTAMP;
-   RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-```
+**`updated_at` and `auto_now=True`**
+
+`auto_now=True` in Django 5 is incompatible with `loaddata` (marks field as `editable=False`, Django ignores it in raw mode and inserts NULL). All `updated_at` fields use `default=timezone.now` with a `save()` override instead.
+
+**`PointRule` and `PointTransaction`**
+
+These tables were not in the original ERD v1 design (which used `users.points` as a simple counter for MVP). They were added in PR #62 without prior DBA approval. They have been retained but require `PointRule` rows to be configured manually via the admin panel before the points system functions.
+
+**`Badges.icon` vs `icon_url`**
+
+The original ERD specified `icon_url`. The implementation uses `icon` (PR #64). The ERD has been updated to reflect the actual implementation.
+
+**Social Module**
+
+`UserConnection` uses a single row per pair (requester/addressee) to represent a bidirectional friendship once accepted. Querying friends requires checking both FK columns. `FrequentContact` is a unilateral personal mark — no notification or acceptance required from the contact. `Community` uses soft delete (`is_active`) to preserve history. `CommunityMember` governs all access via `role`; the `creator_id` on `Community` is audit-only.
+
+**ForumQuestion dual-target design**
+
+`ForumQuestion` can now belong to either a `Products` record or a `CommunityPost`. Exactly one of `products_id` / `post_id` must be non-null — enforced by a CHECK constraint at the DB level and by `clean()` in Django. Reply threads are validated to stay within the same target: a reply to a product thread cannot reference a post, and vice versa. This reuses the existing comment infrastructure rather than introducing a separate comments table for community posts.
 
 ---
 
-**Last updated:** 24 February 2026
+**Last updated:** 12 March 2026
 **Responsible:** Daniel (DBA)

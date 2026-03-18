@@ -34,7 +34,7 @@ export default function ConfirmDialog({
         <p className="mt-2 text-sm text-muted-fg">{message}</p>
 
         <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" onClick={onCancel} disabled={isLoading}>
+          <Button variant="template" onClick={onCancel} disabled={isLoading}>
             {cancelLabel}
           </Button>
           <Button variant={variant} onClick={onConfirm} disabled={isLoading}>

@@ -25,7 +25,12 @@ interface MyProductCardProps {
 
 const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
   disponible: [
+    { label: 'Pausar', value: 'pausado' },
     { label: 'Marcar en proceso', value: 'en_proceso' },
+    { label: 'Cancelar', value: 'cancelado' },
+  ],
+  pausado: [
+    { label: 'Reactivar', value: 'disponible' },
     { label: 'Cancelar', value: 'cancelado' },
   ],
   en_proceso: [
@@ -39,6 +44,9 @@ const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductS
 
 export default function MyProductCard({ product, onProductChanged }: MyProductCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isPauseOpen, setIsPauseOpen] = useState(false);
+  const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
+  const [statusFeedbackKind, setStatusFeedbackKind] = useState<'success' | 'error'>('success');
   const { deleteProduct, isLoading: isDeleting } = useDeleteProduct();
   const { changeStatus, isLoading: isChangingStatus } = useChangeProductStatus();
 
@@ -63,9 +71,28 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
 
   async function handleStatusChange(newStatus: ProductStatus) {
     const result = await changeStatus(product.id, newStatus);
-    if (result) {
+    if (result.product) {
+      const message =
+        newStatus === 'pausado'
+          ? 'Publicacion pausada exitosamente.'
+          : newStatus === 'disponible' && product.status === 'pausado'
+            ? 'Publicacion reactivada exitosamente.'
+            : 'Estado actualizado exitosamente.';
+      setStatusFeedbackKind('success');
+      setStatusFeedback(message);
       onProductChanged();
+      return;
     }
+
+    if (result.error) {
+      setStatusFeedbackKind('error');
+      setStatusFeedback(result.error);
+    }
+  }
+
+  async function confirmPause() {
+    setIsPauseOpen(false);
+    await handleStatusChange('pausado');
   }
 
   return (
@@ -107,14 +134,38 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
                   <button
                     key={t.value}
                     type="button"
-                    disabled={isChangingStatus}
-                    onClick={() => handleStatusChange(t.value)}
+                    disabled={
+                      isChangingStatus ||
+                      (t.value === 'pausado' && Boolean(product.has_active_transaction))
+                    }
+                    title={
+                      t.value === 'pausado' && product.has_active_transaction
+                        ? 'No puedes pausar este articulo porque tiene una transaccion activa.'
+                        : undefined
+                    }
+                    onClick={() => {
+                      if (t.value === 'pausado') {
+                        setIsPauseOpen(true);
+                        return;
+                      }
+                      handleStatusChange(t.value);
+                    }}
                     className="rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
                   >
                     {t.label}
                   </button>
                 ))}
               </div>
+            )}
+
+            {statusFeedback && (
+              <p
+                className={`text-xs ${
+                  statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
+                }`}
+              >
+                {statusFeedback}
+              </p>
             )}
 
             <div className="flex items-center gap-2">
@@ -150,6 +201,17 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
         isLoading={isDeleting}
         onConfirm={handleDelete}
         onCancel={() => setIsDeleteOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={isPauseOpen}
+        title="Pausar publicacion"
+        message="¿Estas seguro de que quieres pausar esta publicacion? No sera visible en el marketplace."
+        confirmLabel="Pausar"
+        variant="primary"
+        isLoading={isChangingStatus}
+        onConfirm={confirmPause}
+        onCancel={() => setIsPauseOpen(false)}
       />
     </>
   );

@@ -38,4 +38,4 @@ class ProductsAdmin(admin.ModelAdmin):
 #
 # @admin.register(ForumQuestion)
 # class ForumQuestionAdmin(admin.ModelAdmin):
-#     list_display = ["id", "products", "user", "created_at"]
+#     list_display = ["id", "products", "user", "created_at","post"]

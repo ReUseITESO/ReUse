@@ -59,6 +59,12 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+# Ignore Django migrations
+**/migrations/
+!**/migrations/__init__.py
+**/migrations/core/
+**/migrations/marketplace/
+**/migrations/gamification/
 
 # Flask stuff:
 instance/

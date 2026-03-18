@@ -114,6 +114,14 @@ class ProductFilterSetupMixin:
             transaction_type="sale",
             status_val="completado",
         )
+        cls.p_pausado = make_product(
+            cls.seller,
+            cls.cat_libros,
+            title="Libro Pausado",
+            condition="buen_estado",
+            transaction_type="sale",
+            status_val="pausado",
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -127,6 +135,7 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         titles = [p["title"] for p in response.data["results"]]
         self.assertNotIn("Libro Inactivo", titles)
+        self.assertNotIn("Libro Pausado", titles)
 
     def test_list_returns_five_products(self):
         """Exactly 5 available products created in setup are returned."""
