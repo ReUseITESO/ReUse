@@ -88,11 +88,18 @@ class CommunityDetailView(APIView):
         membership = self.get_membership(community, request.user)
         if not membership or membership.role != "admin":
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "Solo administradores pueden editar."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "Solo administradores pueden editar.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = CommunityCreateSerializer(community, data=request.data, partial=True)
+        serializer = CommunityCreateSerializer(
+            community, data=request.data, partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -111,7 +118,12 @@ class CommunityDetailView(APIView):
         membership = self.get_membership(community, request.user)
         if not membership or membership.role != "admin":
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "Solo administradores pueden eliminar."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "Solo administradores pueden eliminar.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -153,20 +165,37 @@ class CommunityInviteView(APIView):
         ).first()
         if not membership:
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "Solo administradores pueden invitar."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "Solo administradores pueden invitar.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         user_id = request.data.get("user_id")
         if not user_id:
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "user_id es requerido."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "user_id es requerido.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if CommunityMembership.objects.filter(community=community, user_id=user_id).exists():
+        if CommunityMembership.objects.filter(
+            community=community, user_id=user_id
+        ).exists():
             return Response(
-                {"error": {"code": "ALREADY_MEMBER", "message": "El usuario ya es miembro."}},
+                {
+                    "error": {
+                        "code": "ALREADY_MEMBER",
+                        "message": "El usuario ya es miembro.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -174,7 +203,12 @@ class CommunityInviteView(APIView):
             community=community, invited_user_id=user_id, status="pending"
         ).exists():
             return Response(
-                {"error": {"code": "ALREADY_INVITED", "message": "Ya existe una invitacion pendiente."}},
+                {
+                    "error": {
+                        "code": "ALREADY_INVITED",
+                        "message": "Ya existe una invitacion pendiente.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -202,7 +236,12 @@ class CommunityJoinView(APIView):
 
         if not invitation:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "No tienes invitacion pendiente."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "No tienes invitacion pendiente.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -213,7 +252,9 @@ class CommunityJoinView(APIView):
             community_id=pk, user=request.user, defaults={"role": "member"}
         )
 
-        return Response({"message": "Te uniste a la comunidad."}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Te uniste a la comunidad."}, status=status.HTTP_200_OK
+        )
 
 
 class CommunityLeaveView(APIView):
@@ -238,12 +279,19 @@ class CommunityLeaveView(APIView):
             ).count()
             if admin_count <= 1:
                 return Response(
-                    {"error": {"code": "LAST_ADMIN", "message": "No puedes salir siendo el unico admin. Transfiere el rol primero."}},
+                    {
+                        "error": {
+                            "code": "LAST_ADMIN",
+                            "message": "No puedes salir siendo el unico admin. Transfiere el rol primero.",
+                        }
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
         membership.delete()
-        return Response({"message": "Saliste de la comunidad."}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Saliste de la comunidad."}, status=status.HTTP_200_OK
+        )
 
 
 class CommunityExpelView(APIView):
@@ -258,13 +306,23 @@ class CommunityExpelView(APIView):
 
         if not admin_membership:
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "Solo administradores pueden expulsar."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "Solo administradores pueden expulsar.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if user_id == request.user.id:
             return Response(
-                {"error": {"code": "SELF_EXPEL", "message": "No puedes expulsarte a ti mismo."}},
+                {
+                    "error": {
+                        "code": "SELF_EXPEL",
+                        "message": "No puedes expulsarte a ti mismo.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -291,9 +349,11 @@ class CommunityPostsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        posts = CommunityPost.objects.filter(
-            community_id=pk
-        ).select_related("author").order_by("-created_at")
+        posts = (
+            CommunityPost.objects.filter(community_id=pk)
+            .select_related("author")
+            .order_by("-created_at")
+        )
 
         serializer = CommunityPostSerializer(posts, many=True)
         return Response({"count": len(serializer.data), "results": serializer.data})
@@ -305,7 +365,12 @@ class CommunityPostsView(APIView):
 
         if not membership:
             return Response(
-                {"error": {"code": "NOT_MEMBER", "message": "Debes ser miembro para publicar."}},
+                {
+                    "error": {
+                        "code": "NOT_MEMBER",
+                        "message": "Debes ser miembro para publicar.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -340,7 +405,12 @@ class CommunityPostDetailView(APIView):
 
         if post.author_id != request.user.id:
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "Solo puedes editar tus propios posts."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "Solo puedes editar tus propios posts.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -367,7 +437,12 @@ class CommunityPostDetailView(APIView):
 
         if not is_author and not is_admin:
             return Response(
-                {"error": {"code": "FORBIDDEN", "message": "No tienes permiso para eliminar este post."}},
+                {
+                    "error": {
+                        "code": "FORBIDDEN",
+                        "message": "No tienes permiso para eliminar este post.",
+                    }
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 

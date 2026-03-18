@@ -66,9 +66,7 @@ class Products(models.Model):
     def clean(self):
         if self.transaction_type == "donation" and self.price is not None:
             raise ValidationError("Donations must not have a price")
-        if self.transaction_type == "sale" and (
-            self.price is None or self.price <= 0
-        ):
+        if self.transaction_type == "sale" and (self.price is None or self.price <= 0):
             raise ValidationError("Sales must have a price greater than 0")
 
     def save(self, *args, **kwargs):

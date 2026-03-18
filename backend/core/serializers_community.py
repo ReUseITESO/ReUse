@@ -20,7 +20,14 @@ class CommunityMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "full_name",
+            "profile_picture",
+        ]
         read_only_fields = fields
 
     def get_full_name(self, obj):
@@ -39,14 +46,21 @@ class MembershipSerializer(serializers.ModelSerializer):
 class CommunityListSerializer(serializers.ModelSerializer):
     """Serializer for community list view."""
 
-    created_by_name = serializers.CharField(source="created_by.get_full_name", read_only=True)
+    created_by_name = serializers.CharField(
+        source="created_by.get_full_name", read_only=True
+    )
     member_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Community
         fields = [
-            "id", "name", "description", "image_url",
-            "created_by_name", "member_count", "created_at",
+            "id",
+            "name",
+            "description",
+            "image_url",
+            "created_by_name",
+            "member_count",
+            "created_at",
         ]
         read_only_fields = fields
 
@@ -57,7 +71,9 @@ class CommunityListSerializer(serializers.ModelSerializer):
 class CommunityDetailSerializer(serializers.ModelSerializer):
     """Serializer for community detail view."""
 
-    created_by_name = serializers.CharField(source="created_by.get_full_name", read_only=True)
+    created_by_name = serializers.CharField(
+        source="created_by.get_full_name", read_only=True
+    )
     member_count = serializers.SerializerMethodField()
     is_member = serializers.SerializerMethodField()
     user_role = serializers.SerializerMethodField()
@@ -65,9 +81,17 @@ class CommunityDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = [
-            "id", "name", "description", "image_url",
-            "created_by", "created_by_name", "member_count",
-            "is_member", "user_role", "created_at", "updated_at",
+            "id",
+            "name",
+            "description",
+            "image_url",
+            "created_by",
+            "created_by_name",
+            "member_count",
+            "is_member",
+            "user_role",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = fields
 
@@ -100,9 +124,13 @@ class CommunityCreateSerializer(serializers.ModelSerializer):
     def validate_name(self, value):
         value = value.strip()
         if len(value) < 3:
-            raise serializers.ValidationError("El nombre debe tener al menos 3 caracteres.")
+            raise serializers.ValidationError(
+                "El nombre debe tener al menos 3 caracteres."
+            )
         if len(value) > 100:
-            raise serializers.ValidationError("El nombre no puede exceder 100 caracteres.")
+            raise serializers.ValidationError(
+                "El nombre no puede exceder 100 caracteres."
+            )
         return value
 
 
@@ -127,7 +155,12 @@ class CommunityInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityInvitation
         fields = [
-            "id", "community", "community_name",
-            "invited_by", "invited_user", "status", "created_at",
+            "id",
+            "community",
+            "community_name",
+            "invited_by",
+            "invited_user",
+            "status",
+            "created_at",
         ]
         read_only_fields = fields

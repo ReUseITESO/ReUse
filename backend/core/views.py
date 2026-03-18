@@ -27,11 +27,6 @@ from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializ
 User = get_user_model()
 
 
-
-
-
-
-
 def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
@@ -436,9 +431,7 @@ class AcceptFriendRequestView(APIView):
         friend_request.save(update_fields=["status", "updated_at"])
 
         user_ids = sorted([friend_request.from_user_id, friend_request.to_user_id])
-        Friendship.objects.get_or_create(
-            user1_id=user_ids[0], user2_id=user_ids[1]
-        )
+        Friendship.objects.get_or_create(user1_id=user_ids[0], user2_id=user_ids[1])
 
         return Response(
             {"message": "Solicitud aceptada."},
