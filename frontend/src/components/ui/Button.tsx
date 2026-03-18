@@ -1,7 +1,7 @@
 interface ButtonProps {
   children: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'template' | 'danger' | 'danger-outline';
   disabled?: boolean;
   onClick?: () => void;
   className?: string;
@@ -18,9 +18,11 @@ export default function Button({
   const baseStyles = 'px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50';
 
   const variantStyles = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary: 'bg-btn-primary text-btn-primary-fg hover:bg-primary-hover',
+    secondary: 'bg-btn-secondary text-btn-secondary-fg hover:bg-secondary-hover',
+    template: 'border border-btn-tmpl-border bg-btn-tmpl text-primary hover:bg-btn-tmpl-hover',
+    danger: 'bg-error text-error-fg hover:opacity-90',
+    'danger-outline': 'border border-error bg-transparent text-error hover:bg-error/5',
   };
 
   return (

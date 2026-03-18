@@ -2,10 +2,7 @@ import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
-export async function apiClient<T>(
-  endpoint: string,
-  options?: RequestInit,
-): Promise<T> {
+export async function apiClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const tokens = getStoredTokens();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -24,9 +21,7 @@ export async function apiClient<T>(
       headers,
     });
   } catch {
-    throw new Error(
-      'No se pudo conectar con el servidor.',
-    );
+    throw new Error('No se pudo conectar con el servidor.');
   }
 
   if (response.status === 401 && tokens?.refresh) {
@@ -49,8 +44,7 @@ export async function apiClient<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message =
-      body?.error?.message ?? `Error ${response.status}`;
+    const message = body?.error?.message ?? `Error ${response.status}`;
     throw new Error(message);
   }
 

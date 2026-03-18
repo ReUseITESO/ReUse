@@ -29,9 +29,9 @@ export default function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-        <p className="mt-2 text-sm text-gray-600">{message}</p>
+      <div className="mx-4 w-full max-w-md rounded-xl bg-card p-6 shadow-lg">
+        <h2 className="font-semibold text-card-fg">{title}</h2>
+        <p className="mt-2 text-sm text-muted-fg">{message}</p>
 
         <div className="mt-6 flex items-center justify-end gap-3">
           <Button variant="secondary" onClick={onCancel} disabled={isLoading}>
