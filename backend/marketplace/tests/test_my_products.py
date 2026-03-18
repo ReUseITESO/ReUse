@@ -42,6 +42,16 @@ class MyProductsTests(APITestCase):
             price="80.00",
             status="en_proceso",
         )
+        self.product_pausado = Products.objects.create(
+            seller=self.seller,
+            category=self.category,
+            title="Pausado",
+            description="Producto pausado.",
+            condition="usado",
+            transaction_type="sale",
+            price="70.00",
+            status="pausado",
+        )
         self.product_completado = Products.objects.create(
             seller=self.seller,
             category=self.category,
@@ -81,6 +91,7 @@ class MyProductsTests(APITestCase):
         titles = [p["title"] for p in response.data["results"]]
         self.assertIn("Disponible", titles)
         self.assertIn("En Proceso", titles)
+        self.assertIn("Pausado", titles)
         self.assertIn("Completado", titles)
         self.assertIn("Cancelado", titles)
 
@@ -93,7 +104,7 @@ class MyProductsTests(APITestCase):
     def test_list_my_products_count(self):
         self._auth()
         response = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
-        self.assertEqual(response.data["count"], 4)
+        self.assertEqual(response.data["count"], 5)
 
     def test_list_my_products_is_paginated(self):
         self._auth()
@@ -130,7 +141,7 @@ class MyProductsTests(APITestCase):
         response_seller = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
         self._auth(self.other_user)
         response_other = self.client.get(self.PRODUCTS_URL, {"seller": "me"})
-        self.assertEqual(response_seller.data["count"], 4)
+        self.assertEqual(response_seller.data["count"], 5)
         self.assertEqual(response_other.data["count"], 1)
         other_titles = [p["title"] for p in response_other.data["results"]]
         self.assertEqual(other_titles, ["Producto de Otro"])
