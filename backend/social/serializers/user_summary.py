@@ -8,7 +8,14 @@ class SocialUserSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "full_name",
+            "profile_picture",
+        ]
 
     def get_full_name(self, obj: User) -> str:
         return obj.get_full_name()

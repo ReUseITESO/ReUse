@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     "core",
     "marketplace",
     "gamification",
-    "social"
+    "social",
 ]
 
 MIDDLEWARE = [

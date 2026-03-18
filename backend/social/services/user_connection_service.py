@@ -9,7 +9,9 @@ User = get_user_model()
 
 def create_connection_request(requester, addressee_id: int) -> UserConnection:
     if requester.id == addressee_id:
-        raise ValidationError({"addressee_id": "You cannot send a request to yourself."})
+        raise ValidationError(
+            {"addressee_id": "You cannot send a request to yourself."}
+        )
 
     addressee = User.objects.filter(id=addressee_id).first()
     if addressee is None:
@@ -31,7 +33,9 @@ def create_connection_request(requester, addressee_id: int) -> UserConnection:
     )
 
 
-def respond_to_connection(connection: UserConnection, user, new_status: str) -> UserConnection:
+def respond_to_connection(
+    connection: UserConnection, user, new_status: str
+) -> UserConnection:
     if connection.addressee_id != user.id:
         raise PermissionDenied("Only the addressee can respond to this request.")
 

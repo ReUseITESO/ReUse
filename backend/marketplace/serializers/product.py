@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from marketplace.models import Images, Products
+from marketplace.models import Images, Products, Transaction
 from marketplace.serializers.category import CategorySerializer
 
 
@@ -18,9 +18,18 @@ class ProductListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
+    has_active_transaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         return obj.seller.get_full_name()
+
+    def get_has_active_transaction(self, obj):
+        try:
+            transaction = obj.transaction
+        except Transaction.DoesNotExist:
+            return False
+
+        return transaction.status in ["pendiente", "confirmada"]
 
     class Meta:
         model = Products
@@ -36,6 +45,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "category",
             "seller_name",
             "seller_id",
+            "has_active_transaction",
             "created_at",
             "updated_at",
         ]

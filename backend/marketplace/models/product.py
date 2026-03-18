@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from .category import Category
 from django.utils import timezone
@@ -23,6 +24,7 @@ class Products(models.Model):
 
     STATUS_CHOICES = [
         ("disponible", "Available"),
+        ("pausado", "Paused"),
         ("en_proceso", "In Progress"),
         ("completado", "Completed"),
         ("cancelado", "Cancelled"),

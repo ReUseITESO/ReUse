@@ -51,6 +51,10 @@ const STATUS_STYLES: Record<ProductStatus, { label: string; className: string }>
     label: 'Disponible',
     className: 'bg-success/10 text-success border border-success/30',
   },
+  pausado: {
+    label: 'Pausado',
+    className: 'bg-warning/10 text-warning border border-warning/30',
+  },
   en_proceso: {
     label: 'En proceso',
     className: 'bg-warning/10 text-warning border border-warning/30',

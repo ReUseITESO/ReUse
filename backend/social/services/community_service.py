@@ -19,7 +19,9 @@ def update_community(community: Community, validated_data: dict, user) -> Commun
         role__in=[CommunityMember.Role.ADMIN, CommunityMember.Role.MODERATOR],
     ).first()
     if membership is None:
-        raise PermissionDenied("Only community admins or moderators can update the community.")
+        raise PermissionDenied(
+            "Only community admins or moderators can update the community."
+        )
 
     for field, value in validated_data.items():
         setattr(community, field, value)
@@ -57,7 +59,9 @@ def leave_community(community: Community, user) -> None:
     )
     if is_only_admin and community.memberships.count() > 1:
         raise ValidationError(
-            {"detail": "Assign another admin before the last admin leaves the community."}
+            {
+                "detail": "Assign another admin before the last admin leaves the community."
+            }
         )
 
     if community.creator_id == user.id and community.memberships.count() == 1:
