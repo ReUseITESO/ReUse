@@ -194,11 +194,12 @@ GET /api/marketplace/categories/
 | `description` | `string` | Full text description | |
 | `condition` | `string` | One of: `nuevo`, `como_nuevo`, `buen_estado`, `usado` | |
 | `transaction_type` | `string` | One of: `donation`, `sale`, `swap` | |
-| `status` | `string` | One of: `disponible`, `en_proceso`, `completado`, `cancelado` | |
+| `status` | `string` | One of: `disponible`, `pausado`, `en_proceso`, `completado`, `cancelado` | |
 | `price` | `string` | Price with 2 decimals (e.g. `"350.00"`). `null` for donations | |
 | `image_url` | `string` | URL to product image. `null` if not provided | List endpoint only |
 | `category` | `object` | Nested category (`id` + basic fields) | |
 | `seller_name` | `string` | Seller display name | |
+| `has_active_transaction` | `boolean` | `true` when the product has a related transaction in `pendiente` or `confirmada` | |
 | `seller_email` | `string` | Seller email address | Detail endpoint only |
 | `images` | `array` | Array of product images with order | Detail endpoint only |
 | `created_at` | `string` | ISO 8601 datetime in UTC (e.g. `"2026-02-18T20:30:00Z"`) | |
