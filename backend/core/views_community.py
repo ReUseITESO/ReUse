@@ -21,7 +21,6 @@ from core.serializers_community import (
     MembershipSerializer,
 )
 
-
 # ── Community CRUD ───────────────────────────────────────
 
 

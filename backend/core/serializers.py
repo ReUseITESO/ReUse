@@ -6,6 +6,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import models
 from rest_framework import serializers
 
+from core.models.friendship import FriendRequest, Friendship
+
 User = get_user_model()
 
 
@@ -163,8 +165,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 # ── Friend System Serializers ────────────────────────────
-
-from core.models.friendship import FriendRequest, Friendship
 
 
 class UserSearchSerializer(serializers.ModelSerializer):
