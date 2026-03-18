@@ -12,9 +12,15 @@ from social.services import create_frequent_contact, delete_frequent_contact
 
 
 @extend_schema_view(
-    list=extend_schema(summary="List my frequent contacts", tags=["Social > Frequent Contacts"]),
-    create=extend_schema(summary="Mark a frequent contact", tags=["Social > Frequent Contacts"]),
-    destroy=extend_schema(summary="Remove a frequent contact", tags=["Social > Frequent Contacts"]),
+    list=extend_schema(
+        summary="List my frequent contacts", tags=["Social > Frequent Contacts"]
+    ),
+    create=extend_schema(
+        summary="Mark a frequent contact", tags=["Social > Frequent Contacts"]
+    ),
+    destroy=extend_schema(
+        summary="Remove a frequent contact", tags=["Social > Frequent Contacts"]
+    ),
 )
 class FrequentContactViewSet(
     mixins.ListModelMixin,

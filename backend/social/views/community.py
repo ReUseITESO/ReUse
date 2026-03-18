@@ -22,10 +22,16 @@ from social.services import (
 
 
 @extend_schema_view(
-    list=extend_schema(summary="List active communities", tags=["Social > Communities"]),
-    retrieve=extend_schema(summary="Retrieve a community", tags=["Social > Communities"]),
+    list=extend_schema(
+        summary="List active communities", tags=["Social > Communities"]
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a community", tags=["Social > Communities"]
+    ),
     create=extend_schema(summary="Create a community", tags=["Social > Communities"]),
-    partial_update=extend_schema(summary="Update a community", tags=["Social > Communities"]),
+    partial_update=extend_schema(
+        summary="Update a community", tags=["Social > Communities"]
+    ),
 )
 class CommunityViewSet(
     mixins.ListModelMixin,
@@ -34,9 +40,11 @@ class CommunityViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Community.objects.select_related("creator").prefetch_related(
-        "memberships__user"
-    ).annotate(members_count=Count("memberships"))
+    queryset = (
+        Community.objects.select_related("creator")
+        .prefetch_related("memberships__user")
+        .annotate(members_count=Count("memberships"))
+    )
     permission_classes = [IsAuthenticated, IsCommunityAdminOrReadOnly]
 
     def get_queryset(self):
@@ -85,7 +93,10 @@ class CommunityViewSet(
         community = self.get_object()
         membership = join_community(community, request.user)
         return Response(
-            {"message": "Community joined successfully.", "membership_id": membership.id},
+            {
+                "message": "Community joined successfully.",
+                "membership_id": membership.id,
+            },
             status=status.HTTP_200_OK,
         )
 
@@ -94,4 +105,6 @@ class CommunityViewSet(
     def leave(self, request, pk=None):
         community = self.get_object()
         leave_community(community, request.user)
-        return Response({"message": "Community left successfully."}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Community left successfully."}, status=status.HTTP_200_OK
+        )

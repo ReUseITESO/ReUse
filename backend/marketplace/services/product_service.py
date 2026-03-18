@@ -17,6 +17,7 @@ class ConflictError(APIException):
     default_detail = "La operación no puede completarse por conflicto de estado."
     default_code = "conflict"
 
+
 EDITABLE_FIELDS = [
     "title",
     "description",

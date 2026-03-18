@@ -9,5 +9,5 @@ __all__ = [
     "FrequentContact",
     "Community",
     "CommunityMember",
-    "CommunityPost"
+    "CommunityPost",
 ]

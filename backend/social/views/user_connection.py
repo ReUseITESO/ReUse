@@ -15,8 +15,12 @@ from social.services import create_connection_request, respond_to_connection
 
 
 @extend_schema_view(
-    list=extend_schema(summary="List my social connections", tags=["Social > Connections"]),
-    create=extend_schema(summary="Send a connection request", tags=["Social > Connections"]),
+    list=extend_schema(
+        summary="List my social connections", tags=["Social > Connections"]
+    ),
+    create=extend_schema(
+        summary="Send a connection request", tags=["Social > Connections"]
+    ),
 )
 class UserConnectionViewSet(
     mixins.ListModelMixin,
@@ -48,7 +52,9 @@ class UserConnectionViewSet(
         response_serializer = UserConnectionSerializer(connection)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
-    @extend_schema(summary="Respond to a connection request", tags=["Social > Connections"])
+    @extend_schema(
+        summary="Respond to a connection request", tags=["Social > Connections"]
+    )
     @action(detail=True, methods=["patch"], url_path="respond")
     def respond(self, request, pk=None):
         connection = self.get_object()

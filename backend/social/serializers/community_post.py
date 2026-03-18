@@ -9,9 +9,16 @@ class CommunityPostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityPost
         fields = [
-            "id", "community", "user", "author_name",
-            "title", "content", "image_url", "is_pinned",
-            "created_at", "updated_at",
+            "id",
+            "community",
+            "user",
+            "author_name",
+            "title",
+            "content",
+            "image_url",
+            "is_pinned",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
@@ -22,9 +29,16 @@ class CommunityPostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityPost
         fields = [
-            "id", "community", "user", "author_name",
-            "title", "content", "image_url", "is_pinned",
-            "created_at", "updated_at",
+            "id",
+            "community",
+            "user",
+            "author_name",
+            "title",
+            "content",
+            "image_url",
+            "is_pinned",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
@@ -37,8 +51,12 @@ class CommunityPostWriteSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         request = self.context["request"]
-        community = attrs.get("community") or (self.instance.community if self.instance else None)
-        if not CommunityMember.objects.filter(community=community, user=request.user).exists():
+        community = attrs.get("community") or (
+            self.instance.community if self.instance else None
+        )
+        if not CommunityMember.objects.filter(
+            community=community, user=request.user
+        ).exists():
             raise serializers.ValidationError(
                 "Only community members can create or edit posts."
             )

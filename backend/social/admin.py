@@ -11,7 +11,14 @@ from social.models import (
 
 @admin.register(UserConnection)
 class UserConnectionAdmin(admin.ModelAdmin):
-    list_display = ["id", "requester", "addressee", "status", "created_at", "updated_at"]
+    list_display = [
+        "id",
+        "requester",
+        "addressee",
+        "status",
+        "created_at",
+        "updated_at",
+    ]
     list_filter = ["status"]
     search_fields = ["requester__email", "addressee__email"]
 
@@ -41,6 +48,7 @@ class CommunityMemberAdmin(admin.ModelAdmin):
     list_display = ["id", "community", "user", "role", "joined_at"]
     list_filter = ["role"]
     search_fields = ["community__name", "user__email"]
+
 
 @admin.register(CommunityPost)
 class CommunityPostAdmin(admin.ModelAdmin):
