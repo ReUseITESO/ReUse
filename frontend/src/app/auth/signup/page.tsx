@@ -32,10 +32,14 @@ export default function SignUpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 useEffect(() => {
-  if (isAuthenticated) router.replace('/');
+  if (isAuthenticated) {
+    router.replace('/');
+  }
 }, [isAuthenticated, router]);
 
-if (isAuthenticated) return null;
+if (isAuthenticated) {
+  return null;
+}
 
   const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [field]: e.target.value }));
