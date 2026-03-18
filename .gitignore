@@ -215,3 +215,7 @@ __marimo__/
 node_modules/
 .next/
 out/
+
+# Django migrations in backend (do not commit generated migration files)
+backend/**/migrations/*.py
+!backend/**/migrations/__init__.py
