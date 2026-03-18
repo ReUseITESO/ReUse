@@ -36,7 +36,7 @@ export default function SearchBar({ onSearch, onShowAll }: SearchBarProps) {
         placeholder="Buscar productos..."
       />
       <Button onClick={handleSearch}>Buscar</Button>
-      <Button variant="secondary" onClick={handleShowAll}>
+      <Button variant="template" onClick={handleShowAll}>
         Mostrar todos
       </Button>
     </div>
