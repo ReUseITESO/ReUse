@@ -15,13 +15,10 @@ export function useCategories() {
     setError(null);
 
     try {
-      const data = await apiClient<PaginatedResponse<Category>>(
-        '/marketplace/categories/',
-      );
+      const data = await apiClient<PaginatedResponse<Category>>('/marketplace/categories/');
       setCategories(data.results);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar categorías';
+      const message = err instanceof Error ? err.message : 'Error al cargar categorías';
       setError(message);
     } finally {
       setIsLoading(false);

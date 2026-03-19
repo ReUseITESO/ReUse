@@ -1,167 +1,117 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 interface TestPointsButtonsProps {
+  onPointsUpdated?: () => void;
   onPointsChanged?: () => void;
 }
 
-export default function TestPointsButtons({ onPointsChanged }: Readonly<TestPointsButtonsProps>) {
+export default function TestPointsButtons({
+  onPointsUpdated,
+  onPointsChanged,
+}: Readonly<TestPointsButtonsProps>) {
   const { user, isAuthenticated } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const handleAwardPoints = async (action: string) => {
-    if (!isAuthenticated || !user) {
+  const notifyPointsUpdate = () => {
+    onPointsUpdated?.();
+    onPointsChanged?.();
+  };
+
+  const runAction = async (action: string) => {
+    if (!isAuthenticated) {
       setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     setMessage(null);
 
     try {
       await apiClient('/gamification/award-points/', {
         method: 'POST',
-        body: JSON.stringify({
-          user_id: user.id,
-          action: action,
-        }),
+        body: JSON.stringify({ action, user_id: user?.id }),
       });
-
-      setMessage({ type: 'success', text: ` ¡Puntos otorgados por "${action}"!` });
-      onPointsChanged?.();
+      setMessage({ type: 'success', text: `Accion aplicada: ${action}` });
+      notifyPointsUpdate();
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al añadir puntos';
-      setMessage({ type: 'error', text: ` ${errorMsg}` });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'No se pudo otorgar puntos' });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleDeductPoints = async (points: number) => {
-    if (!isAuthenticated || !user) {
+  const deduct = async (points: number) => {
+    if (!isAuthenticated) {
       setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     setMessage(null);
 
     try {
       await apiClient('/gamification/deduct-points/', {
         method: 'POST',
-        body: JSON.stringify({
-          user_id: user.id,
-          points,
-        }),
+        body: JSON.stringify({ points, user_id: user?.id }),
       });
-
-      setMessage({ type: 'success', text: ` ¡${points} puntos restados!` });
-      onPointsChanged?.();
+      setMessage({ type: 'success', text: `Descuento aplicado: -${points} puntos` });
+      notifyPointsUpdate();
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al restar puntos';
-      setMessage({ type: 'error', text: ` ${errorMsg}` });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'No se pudo descontar puntos' });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">🧪 Botones de Prueba</h3>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <button
-            onClick={() => handleAwardPoints('publish_item')}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-blue-100 text-blue-700 hover:bg-blue-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            📝 Publicar
-          </button>
-
-          <button
-            onClick={() => handleAwardPoints('complete_donation')}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-green-100 text-green-700 hover:bg-green-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            🎁 Donación
-          </button>
-
-          <button
-            onClick={() => handleAwardPoints('complete_sale')}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-purple-100 text-purple-700 hover:bg-purple-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            💳 Venta
-          </button>
-
-          <button
-            onClick={() => handleAwardPoints('complete_exchange')}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-orange-100 text-orange-700 hover:bg-orange-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            🔄 Intercambio
-          </button>
-
-          <button
-            onClick={() => handleAwardPoints('receive_positive_review')}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            ⭐ Reseña
-          </button>
-
-          <button
-            onClick={() => handleDeductPoints(10)}
-            disabled={loading || !isAuthenticated}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'bg-red-100 text-red-700 hover:bg-red-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
-          >
-            ➖ -10 pts
-          </button>
-        </div>
-
-        {message && (
-          <div
-            className={cn(
-              'rounded-md p-3 text-sm font-medium',
-              message.type === 'success'
-                ? 'bg-green-50 text-green-700'
-                : 'bg-red-50 text-red-700',
-            )}
-          >
-            {message.text}
-          </div>
-        )}
+    <section className="rounded-lg border border-slate-200 bg-white p-4">
+      <h3 className="mb-3 text-sm font-semibold text-slate-900">Botones de prueba</h3>
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+        <button
+          type="button"
+          onClick={() => runAction('publish_item')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-blue-100 px-3 py-2 text-sm font-medium text-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Publicar (+)
+        </button>
+        <button
+          type="button"
+          onClick={() => runAction('complete_donation')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-green-100 px-3 py-2 text-sm font-medium text-green-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Donacion (+)
+        </button>
+        <button
+          type="button"
+          onClick={() => runAction('receive_positive_review')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-purple-100 px-3 py-2 text-sm font-medium text-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Review (+)
+        </button>
+        <button
+          type="button"
+          onClick={() => deduct(5)}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Restar 5
+        </button>
       </div>
-    </div>
+      {message ? (
+        <p className={cn('mt-3 text-xs', message.type === 'error' ? 'text-red-600' : 'text-emerald-700')}>
+          {message.text}
+        </p>
+      ) : null}
+    </section>
   );
 }

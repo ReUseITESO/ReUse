@@ -1,7 +1,8 @@
+import logging
+import os
 from datetime import timedelta
 from pathlib import Path
 
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -151,9 +152,18 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "TAGS": [
-        {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
-        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
-        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        {
+            "name": "Core > Auth",
+            "description": "Authentication endpoints (register, login, token refresh).",
+        },
+        {
+            "name": "Marketplace > Products",
+            "description": "Product listing and detail endpoints.",
+        },
+        {
+            "name": "Marketplace > Categories",
+            "description": "Product category endpoints.",
+        },
     ],
     "CONTACT": {
         "name": "ReUseITESO Team",
@@ -186,18 +196,19 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002",
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -214,29 +225,41 @@ CORS_ALLOW_HEADERS = [
 ]
 # LOGGING CONFIGURATION
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'timestamp_format': {
-            'format': '%(asctime)s - %(levelname)s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "timestamp_format": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app.log',
-            'mode': 'a',
-            'formatter': 'timestamp_format',
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app.log",
+            "mode": "a",
+            "formatter": "timestamp_format",
         },
     },
-    'root': { 
-        'handlers': ['file'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["file"],
+        "level": "INFO",
     },
 }
 
-import logging
 logger = logging.getLogger(__name__)
 logger.info("Application started")
+
+FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
+EMAIL_VERIFICATION_EXPIRES_MINUTES = int(
+    os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30")
+)
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "apikey")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@reuse.com")

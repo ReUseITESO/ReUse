@@ -6,36 +6,36 @@ from core.models import User
 
 class CurrentUserPointsViewTests(APITestCase):
     """Tests for GET /api/gamification/points/ endpoint"""
-    
+
     POINTS_URL = "/api/gamification/points/"
 
     def setUp(self):
         """Create test users with different point balances"""
         self.user_ana = User.objects.create(
             email="ana.garcia@iteso.mx",
-            username="ana.garcia@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
             points=150,
         )
         self.user_carlos = User.objects.create(
             email="carlos.lopez@iteso.mx",
-            username="carlos.lopez@iteso.mx",
-            name="Carlos López",
+            first_name="Carlos",
+            last_name="López",
             phone="3387654321",
             points=80,
         )
         self.user_zero_points = User.objects.create(
             email="maria.torres@iteso.mx",
-            username="maria.torres@iteso.mx",
-            name="María Torres",
+            first_name="María",
+            last_name="Torres",
             phone="3356781234",
             points=0,
         )
 
     def _auth(self, user):
-        """Set the mock auth header for subsequent requests"""
-        self.client.credentials(HTTP_X_MOCK_USER_ID=str(user.pk))
+        """Authenticate requests as a specific user"""
+        self.client.force_authenticate(user=user)
 
     # --- Authentication tests ---
 
@@ -43,12 +43,12 @@ class CurrentUserPointsViewTests(APITestCase):
         """Unauthenticated request should return 401"""
         response = self.client.get(self.POINTS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertIn("detail", response.data)
-        self.assertIn("Authentication required", response.data["detail"])
+        self.assertIn("error", response.data)
+        self.assertIn("details", response.data["error"])
+        self.assertIn("detail", response.data["error"]["details"])
 
     def test_get_points_with_invalid_user_id_returns_401(self):
-        """Request with non-existent user ID should return 401"""
-        self.client.credentials(HTTP_X_MOCK_USER_ID="99999")
+        """Request without proper JWT auth should return 401"""
         response = self.client.get(self.POINTS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -58,7 +58,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Authenticated user should get their points balance"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("points", response.data)
         self.assertEqual(response.data["points"], 150)
@@ -69,7 +69,7 @@ class CurrentUserPointsViewTests(APITestCase):
         self._auth(self.user_ana)
         response1 = self.client.get(self.POINTS_URL)
         self.assertEqual(response1.data["points"], 150)
-        
+
         # Second user
         self._auth(self.user_carlos)
         response2 = self.client.get(self.POINTS_URL)
@@ -79,7 +79,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """User with 0 points should get valid response"""
         self._auth(self.user_zero_points)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["points"], 0)
 
@@ -89,7 +89,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Response should have correct JSON structure"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsInstance(response.data, dict)
         self.assertIn("points", response.data)
@@ -99,7 +99,7 @@ class CurrentUserPointsViewTests(APITestCase):
         """Points field should be a number, not string"""
         self._auth(self.user_ana)
         response = self.client.get(self.POINTS_URL)
-        
+
         points = response.data["points"]
         self.assertIsInstance(points, int)
         self.assertGreaterEqual(points, 0)
@@ -107,15 +107,15 @@ class CurrentUserPointsViewTests(APITestCase):
 
 class UserPointsViewTests(APITestCase):
     """Tests for GET /api/gamification/points/<user_id>/ endpoint"""
-    
+
     POINTS_BASE_URL = "/api/gamification/points/"
 
     def setUp(self):
         """Create test user"""
         self.user = User.objects.create(
             email="ana.garcia@iteso.mx",
-            username="ana.garcia@iteso.mx",
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             phone="3312345678",
             points=200,
         )
@@ -124,7 +124,7 @@ class UserPointsViewTests(APITestCase):
         """Can retrieve points for specific user by ID"""
         url = f"{self.POINTS_BASE_URL}{self.user.pk}/"
         response = self.client.get(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["points"], 200)
 
@@ -132,7 +132,7 @@ class UserPointsViewTests(APITestCase):
         """Request for non-existent user should return 404"""
         url = f"{self.POINTS_BASE_URL}99999/"
         response = self.client.get(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("detail", response.data)
         self.assertIn("not found", response.data["detail"].lower())

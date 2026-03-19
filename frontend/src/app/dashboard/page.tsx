@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import PointsBalance from '@/components/gamification/PointsBalance';
+
 import BadgesList from '@/components/gamification/BadgesList';
+import PointsBalance from '@/components/gamification/PointsBalance';
 import TestPointsButtons from '@/components/gamification/TestPointsButtons';
 
 export default function DashboardPage() {
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [pointsVersion, setPointsVersion] = useState(0);
 
-  const handlePointsChanged = () => {
-    setRefreshKey((key) => key + 1);
+  const handlePointsUpdated = () => {
+    setPointsVersion(v => v + 1);
   };
 
   return (
@@ -18,20 +19,17 @@ export default function DashboardPage() {
         <h1 className="mb-8 text-3xl font-bold text-slate-900">Dashboard</h1>
 
         <section className="space-y-6">
-          {/* Puntos */}
           <div>
-            <h2 className="mb-4 text-lg font-semibold text-slate-800">Mi Gamificación</h2>
-            <PointsBalance key={refreshKey} />
+            <h2 className="mb-4 text-lg font-semibold text-slate-800">Mi Gamificacion</h2>
+            <PointsBalance refreshTrigger={pointsVersion} />
           </div>
 
-          {/* Logros/Badges */}
-          <div>
-            <h2 className="mb-4 text-lg font-semibold text-slate-800">🏆 Mis Logros</h2>
-            <BadgesList key={refreshKey} />
-          </div>
+          <TestPointsButtons onPointsUpdated={handlePointsUpdated} />
 
-          {/* Botones de Prueba */}
-          <TestPointsButtons onPointsChanged={handlePointsChanged} />
+          <div>
+            <h2 className="mb-4 text-lg font-semibold text-slate-800">Insignias</h2>
+            <BadgesList />
+          </div>
         </section>
       </div>
     </main>

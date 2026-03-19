@@ -1,17 +1,26 @@
 'use client';
 
-import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { useAuth } from '@/hooks/useAuth';
+import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { cn } from '@/lib/utils';
 
-export default function PointsBalance() {
-  const { isAuthenticated } = useAuth();
-  const { levelProgression, isLoading, error, refetch } = useLevelProgression();
+interface PointsBalanceProps {
+  refreshTrigger?: number;
+}
 
-  if (isLoading) {
+export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { levelProgression, isLoading, error, refetch } = useLevelProgression(
+    isAuthenticated,
+    refreshTrigger,
+  );
+
+  const isInitialLoading = authLoading || (isLoading && !levelProgression && !error);
+
+  if (isInitialLoading) {
     return (
-      <div className="h-24 w-full rounded-lg bg-gradient-to-r from-slate-100 to-slate-50 animate-pulse">
-        <div className="flex items-center justify-center h-full">
+      <div className="h-24 w-full animate-pulse rounded-lg bg-gradient-to-r from-slate-100 to-slate-50">
+        <div className="flex h-full items-center justify-center">
           <div className="text-sm text-slate-500">Cargando puntos...</div>
         </div>
       </div>
@@ -24,10 +33,8 @@ export default function PointsBalance() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-sm font-medium text-yellow-900">Sin sesion iniciada</p>
-            <p className="mt-1 text-xs text-yellow-700">
-              Inicia sesion para ver tus puntos, nivel y progreso.
-            </p>
+            <p className="text-sm font-medium text-yellow-900">Usuario no autenticado</p>
+            <p className="mt-1 text-xs text-yellow-700">Inicia sesion para ver tus puntos acumulados</p>
           </div>
         </div>
       </div>
@@ -36,14 +43,14 @@ export default function PointsBalance() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-        <p className="text-sm text-red-700 font-medium">{error}</p>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="text-sm font-medium text-red-700">{error}</p>
         <button
           onClick={refetch}
           className={cn(
-            'mt-3 px-4 py-2 text-sm font-medium',
-            'rounded-md bg-red-100 text-red-700',
-            'hover:bg-red-200 transition-colors',
+            'mt-3 rounded-md px-4 py-2 text-sm font-medium',
+            'bg-red-100 text-red-700',
+            'transition-colors hover:bg-red-200',
             'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
           )}
         >
@@ -58,12 +65,10 @@ export default function PointsBalance() {
   }
 
   return (
-    <article className="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 p-6 shadow-sm">
+    <article className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-medium text-blue-900 uppercase tracking-wide">
-            Puntos Acumulados
-          </h3>
+          <h3 className="text-sm font-medium uppercase tracking-wide text-blue-900">Puntos acumulados</h3>
           <div className="flex items-center gap-3">
             <p className="text-4xl font-bold text-blue-600">{levelProgression.points}</p>
             <span className="rounded-full bg-blue-200 px-3 py-1 text-xs font-semibold text-blue-900">
@@ -71,7 +76,7 @@ export default function PointsBalance() {
             </span>
           </div>
         </div>
-        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-500 bg-opacity-10">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 bg-opacity-10">
           <span className="text-2xl">⭐</span>
         </div>
       </div>
