@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "marketplace",
     "gamification",
     "notifications",
+    "social",
 ]
 
 MIDDLEWARE = [

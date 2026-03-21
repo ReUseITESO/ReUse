@@ -11,6 +11,7 @@ const STATUS_CONFIG: Record<
   { label: string; variant: 'green' | 'blue' | 'gray' | 'red' | 'yellow' }
 > = {
   disponible: { label: 'Disponible', variant: 'green' },
+  pausado: { label: 'Pausado', variant: 'yellow' },
   en_proceso: { label: 'En proceso', variant: 'yellow' },
   completado: { label: 'Completado', variant: 'blue' },
   cancelado: { label: 'Cancelado', variant: 'red' },

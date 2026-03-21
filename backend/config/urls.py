@@ -11,9 +11,11 @@ from drf_spectacular.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("core.urls")),
+    path("api/communities/", include("core.urls_community")),
     path("api/marketplace/", include("marketplace.urls")),
     path("api/core/notifications/", include("notifications.urls")),
     path("api/gamification/", include("gamification.urls")),
+    path("api/social", include("social.urls")),
     # API Documentation (Swagger / OpenAPI)
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
