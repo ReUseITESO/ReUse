@@ -32,4 +32,10 @@ urlpatterns = [
     path("friends/requests/<int:pk>/accept/", views.AcceptFriendRequestView.as_view(), name="accept-friend-request"),
     path("friends/requests/<int:pk>/reject/", views.RejectFriendRequestView.as_view(), name="reject-friend-request"),
     path("friends/<int:user_id>/", views.RemoveFriendView.as_view(), name="remove-friend"),
+
+    # HU-CORE-04: Dashboard
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+
+    # HU-CORE-10: Profile picture upload
+    path("profile/upload-picture/", views.ProfilePictureUploadView.as_view(), name="profile-upload-picture"),
 ]
