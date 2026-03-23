@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import Badge from '@/components/ui/Badge';
 import ImageGallery from '@/components/products/ImageGallery';
+import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import { getProductById } from '@/lib/api';
 import {
   getCategoryStyle,
@@ -14,23 +15,27 @@ import {
 } from '@/lib/productStyles';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
-import type { ProductDetail } from '@/types/product';
+import type { ProductDetail, ProductReactionSummary } from '@/types/product';
 
 interface ProductDetailProps {
   productId: string;
 }
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
+  const DESCRIPTION_LIMIT = 220;
+
   const router = useRouter();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        setIsDescriptionExpanded(false);
         const data = await getProductById(productId);
         setProduct(data as ProductDetail);
       } catch (err) {
@@ -43,6 +48,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
     fetchProduct();
   }, [productId]);
+
+  const handleReactionChange = (summary: ProductReactionSummary) => {
+    setProduct(current => {
+      if (!current) return current;
+      return {
+        ...current,
+        likes_count: summary.likes_count,
+        dislikes_count: summary.dislikes_count,
+        user_reaction: summary.user_reaction,
+      };
+    });
+  };
 
   if (isLoading) {
     return (
@@ -80,6 +97,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const priceColorClass = getPriceColor(product.transaction_type);
   const categoryClass = getCategoryStyle(product.category.name);
   const conditionClass = getConditionStyle(product.condition);
+  const hasLongDescription = product.description.length > DESCRIPTION_LIMIT;
+  const descriptionText =
+    hasLongDescription && !isDescriptionExpanded
+      ? `${product.description.slice(0, DESCRIPTION_LIMIT)}...`
+      : product.description;
 
   // Prepare images array for gallery
   const galleryImages =
@@ -107,8 +129,19 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         {/* Right column: Product info */}
         <div className="flex flex-col gap-6">
           {/* Category badge */}
-          <div>
+          <div className="flex items-start justify-between gap-3">
             <Badge className={categoryClass}>{product.category.name}</Badge>
+
+            <ProductReactionButtons
+              productId={product.id}
+              sellerId={product.seller_id}
+              initialSummary={{
+                likes_count: product.likes_count,
+                dislikes_count: product.dislikes_count,
+                user_reaction: product.user_reaction,
+              }}
+              onChange={handleReactionChange}
+            />
           </div>
 
           {/* Title */}
@@ -126,7 +159,16 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           {/* Description */}
           <div>
             <h2 className="mb-2 text-h3 font-semibold text-fg">Descripción</h2>
-            <p className="whitespace-pre-wrap text-fg">{product.description}</p>
+            <p className="whitespace-pre-wrap text-fg">{descriptionText}</p>
+            {hasLongDescription && (
+              <button
+                type="button"
+                onClick={() => setIsDescriptionExpanded(value => !value)}
+                className="mt-2 text-sm font-medium text-secondary hover:text-primary"
+              >
+                {isDescriptionExpanded ? 'Ver menos' : 'Ver más'}
+              </button>
+            )}
           </div>
 
           {/* Seller info */}

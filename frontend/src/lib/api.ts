@@ -1,4 +1,5 @@
 import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
+import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
@@ -59,4 +60,20 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
 
 export async function getProductById(id: string | number) {
   return apiClient(`/marketplace/products/${id}/`);
+}
+
+export async function postProductReaction(
+  id: string | number,
+  type: ProductReactionType,
+): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'POST',
+    body: JSON.stringify({ type }),
+  });
+}
+
+export async function deleteProductReaction(id: string | number): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'DELETE',
+  });
 }
