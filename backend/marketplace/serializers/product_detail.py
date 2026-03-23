@@ -6,7 +6,9 @@ from marketplace.serializers.product import ImageSerializer
 from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 
 
-class ProductDetailSerializer(ReactionSerializerFieldsMixin, serializers.ModelSerializer):
+class ProductDetailSerializer(
+    ReactionSerializerFieldsMixin, serializers.ModelSerializer
+):
     """Serializer for product detail view with full information including images."""
 
     category = CategorySerializer(read_only=True)
