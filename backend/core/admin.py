@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from core.models import User
+from core.models.notification import Notification
 
 
 @admin.register(User)
@@ -45,3 +46,11 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ["id", "user", "type", "title", "is_read", "created_at"]
+    list_filter = ["type", "is_read"]
+    search_fields = ["user__email", "title"]
+    ordering = ["-created_at"]

@@ -796,5 +796,202 @@
       "parent": null,
       "created_at": "2026-02-24T15:00:00Z"
     }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "user": 3,
+      "type": "like",
+      "created_at": "2026-02-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "user": 4,
+      "type": "like",
+      "created_at": "2026-02-02T11:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 3,
+    "fields": {
+      "product": 1,
+      "user": 5,
+      "type": "dislike",
+      "created_at": "2026-02-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 4,
+    "fields": {
+      "product": 2,
+      "user": 2,
+      "type": "like",
+      "created_at": "2026-02-04T09:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 5,
+    "fields": {
+      "product": 2,
+      "user": 4,
+      "type": "like",
+      "created_at": "2026-02-04T10:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 6,
+    "fields": {
+      "product": 5,
+      "user": 2,
+      "type": "like",
+      "created_at": "2026-02-09T08:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 7,
+    "fields": {
+      "product": 5,
+      "user": 3,
+      "type": "like",
+      "created_at": "2026-02-09T09:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.productreaction",
+    "pk": 8,
+    "fields": {
+      "product": 9,
+      "user": 2,
+      "type": "dislike",
+      "created_at": "2026-02-11T13:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.report",
+    "pk": 1,
+    "fields": {
+      "product": 7,
+      "reporter": 4,
+      "reason": "misleading_description",
+      "description": "La descripción dice que busca intercambio pero no especifica qué artículos acepta.",
+      "created_at": "2026-02-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.report",
+    "pk": 2,
+    "fields": {
+      "product": 9,
+      "reporter": 3,
+      "reason": "possible_scam",
+      "description": "El vendedor no responde mensajes y el precio cambió sin aviso.",
+      "created_at": "2026-02-12T09:00:00Z"
+    }
+  },
+  {
+    "model": "marketplace.report",
+    "pk": 3,
+    "fields": {
+      "product": 10,
+      "reporter": 5,
+      "reason": "misleading_description",
+      "description": null,
+      "created_at": "2026-02-13T11:00:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 1,
+    "fields": {
+      "user": 4,
+      "type": "badge_earned",
+      "title": "¡Obtuviste un badge!",
+      "body": "Ganaste el badge Primera Venta por completar tu primera transacción.",
+      "reference_id": 1,
+      "is_read": true,
+      "read_at": "2026-02-13T18:00:00Z",
+      "created_at": "2026-02-13T17:30:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "type": "badge_earned",
+      "title": "¡Obtuviste un badge!",
+      "body": "Ganaste el badge Primera Venta por completar tu primera transacción.",
+      "reference_id": 1,
+      "is_read": true,
+      "read_at": "2026-02-13T19:00:00Z",
+      "created_at": "2026-02-13T17:30:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 3,
+    "fields": {
+      "user": 2,
+      "type": "badge_earned",
+      "title": "¡Obtuviste un badge!",
+      "body": "Ganaste el badge Eco Warrior por donar artículos a la comunidad.",
+      "reference_id": 2,
+      "is_read": false,
+      "read_at": null,
+      "created_at": "2026-02-10T16:00:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "type": "transaction_confirmed",
+      "title": "Transacción confirmada",
+      "body": "El comprador confirmó la entrega de Sudadera ITESO Gris - Talla M.",
+      "reference_id": 1,
+      "is_read": false,
+      "read_at": null,
+      "created_at": "2026-02-14T09:00:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 5,
+    "fields": {
+      "user": 2,
+      "type": "new_reaction",
+      "title": "Alguien reaccionó a tu producto",
+      "body": "Tu publicación Cálculo Diferencial - Stewart 8va Edición recibió un nuevo like.",
+      "reference_id": 1,
+      "is_read": false,
+      "read_at": null,
+      "created_at": "2026-02-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "core.notification",
+    "pk": 6,
+    "fields": {
+      "user": 3,
+      "type": "product_reported",
+      "title": "Tu publicación fue reportada",
+      "body": "Un usuario reportó tu producto Fundamentos de Marketing - Kotler.",
+      "reference_id": 1,
+      "is_read": false,
+      "read_at": null,
+      "created_at": "2026-02-11T10:00:00Z"
+    }
   }
 ]
