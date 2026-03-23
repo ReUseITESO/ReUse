@@ -1,21 +1,26 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from django.db.models import CharField, Count, OuterRef, Q, Subquery, Value
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from marketplace.models import Products
+from marketplace.models import ProductReaction, Products
 from marketplace.serializers import (
     ProductCreateSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
+    ProductReactionRequestSerializer,
+    ProductReactionSummarySerializer,
     ProductStatusSerializer,
     ProductUpdateSerializer,
 )
 from marketplace.services import (
     change_product_status,
     delete_product,
+    get_product_reaction_summary,
+    remove_product_reaction,
     update_product,
+    upsert_product_reaction,
 )
 
 
@@ -23,60 +28,10 @@ from marketplace.services import (
     list=extend_schema(
         summary="List available products",
         description=(
-            "Returns a paginated list of products with status **disponible**. <br>"
-            "Supports filtering by category, condition, and transaction type via query params. <br>"
-            "Results can be searched by **title**, **description**, or **category** name,"
-            "and ordered by created_at, price, or title. <br><br>"
-            "Use `?seller=me` to list all products "
-            "owned by the authenticated user (any status). Requires JWT authentication."
+            "Returns a paginated list of products with status **disponible**. "
+            "Supports filtering by category, condition, transaction type, search, ordering, "
+            "and `seller=me` for authenticated users."
         ),
-        parameters=[
-            OpenApiParameter(
-                name="category",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
-                description="Filter by category ID.",
-                required=False,
-            ),
-            OpenApiParameter(
-                name="condition",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                description="Filter by product condition. Options: `nuevo`, `como_nuevo`, `buen_estado`, `usado`.",
-                required=False,
-                enum=["nuevo", "como_nuevo", "buen_estado", "usado"],
-            ),
-            OpenApiParameter(
-                name="transaction_type",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                description="Filter by transaction type. Options: `donation`, `sale`, `swap`.",
-                required=False,
-                enum=["donation", "sale", "swap"],
-            ),
-            OpenApiParameter(
-                name="search",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                description="Search products by title, description, or category name.",
-                required=False,
-            ),
-            OpenApiParameter(
-                name="ordering",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                description="Order results. Options: `created_at`, `-created_at`, `price`, `-price`, `title`, `-title`.",
-                required=False,
-            ),
-            OpenApiParameter(
-                name="seller",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                description="Use `me` to list the authenticated user's own products (all statuses).",
-                required=False,
-                enum=["me"],
-            ),
-        ],
         tags=["Marketplace > Products"],
     ),
     retrieve=extend_schema(
@@ -142,6 +97,22 @@ class ProductViewSet(
         queryset = Products.objects.select_related(
             "category", "seller", "transaction"
         ).prefetch_related("images")
+
+        queryset = queryset.annotate(
+            likes_count=Count("reactions", filter=Q(reactions__type="like")),
+            dislikes_count=Count("reactions", filter=Q(reactions__type="dislike")),
+        )
+
+        if self.request.user.is_authenticated:
+            user_reaction = ProductReaction.objects.filter(
+                product=OuterRef("pk"),
+                user=self.request.user,
+            ).values("type")[:1]
+            queryset = queryset.annotate(user_reaction=Subquery(user_reaction))
+        else:
+            queryset = queryset.annotate(
+                user_reaction=Value(None, output_field=CharField())
+            )
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
@@ -230,3 +201,48 @@ class ProductViewSet(
             context=self.get_serializer_context(),
         )
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="Create or toggle product reaction",
+        description=(
+            "Creates, switches or toggles the authenticated user's reaction. <br>"
+            "- If reaction does not exist, it is created. <br>"
+            "- If same type already exists, it is removed (toggle). <br>"
+            "- If opposite type exists, it is switched. <br>"
+            "Only products with status `disponible` or `en_proceso` accept reactions."
+        ),
+        request=ProductReactionRequestSerializer,
+        responses={200: ProductReactionSummarySerializer},
+        tags=["Marketplace > Products"],
+    )
+    @action(detail=True, methods=["post"], url_path="reactions")
+    def reactions(self, request, pk=None):
+        product = self.get_object()
+        serializer = ProductReactionRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        upsert_product_reaction(
+            product=product,
+            user=request.user,
+            reaction_type=serializer.validated_data["type"],
+        )
+
+        summary = get_product_reaction_summary(product=product, user=request.user)
+        return Response(summary, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="Remove product reaction",
+        description=(
+            "Removes the authenticated user's active reaction from a product. <br>"
+            "Only products with status `disponible` or `en_proceso` accept this operation."
+        ),
+        responses={200: ProductReactionSummarySerializer},
+        tags=["Marketplace > Products"],
+    )
+    @reactions.mapping.delete
+    def delete_reaction(self, request, pk=None):
+        product = self.get_object()
+        remove_product_reaction(product=product, user=request.user)
+
+        summary = get_product_reaction_summary(product=product, user=request.user)
+        return Response(summary, status=status.HTTP_200_OK)

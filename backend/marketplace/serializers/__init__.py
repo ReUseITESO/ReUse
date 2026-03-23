@@ -7,6 +7,10 @@ from .product import (
     ProductUpdateSerializer,
 )
 from .product_detail import ProductDetailSerializer
+from .product_reaction import (
+    ProductReactionRequestSerializer,
+    ProductReactionSummarySerializer,
+)
 
 __all__ = [
     "CategorySerializer",
@@ -16,4 +20,6 @@ __all__ = [
     "ProductStatusSerializer",
     "ProductUpdateSerializer",
     "ImageSerializer",
+    "ProductReactionRequestSerializer",
+    "ProductReactionSummarySerializer",
 ]
