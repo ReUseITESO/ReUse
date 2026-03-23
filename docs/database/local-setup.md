@@ -1,402 +1,250 @@
-# Local Setup - ReUseITESO
+
+# Local Database Setup - ReUseITESO
 
 **DBA:** Daniel
-**Date:** 24 February 2026
-**Version:** 1.2
+**Date:** 11 March 2026
+**Version:** 1.3
 
 ---
 
-## Prerequisites
+## Changelog
 
-* Docker Desktop
-* Python 3.10+
+| Version | Date        | Change                                                       |
+| ------- | ----------- | ------------------------------------------------------------ |
+| 1.0     | 15 Feb 2026 | Initial setup guide                                          |
+| 1.1     | 24 Feb 2026 | Added Docker Compose instructions and .env.example reference |
+| 1.2     | 5 Mar 2026  | Updated seed filename to seed_dev_fixed.json                 |
+| 1.3     | 11 Mar 2026 | Added social app setup instructions                          |
+
+---
+
+## Requirements
+
+* Docker Desktop installed and running
+* Python 3.11+
 * Git
 
+If you cannot use Docker, see [Fallback: Local PostgreSQL](https://claude.ai/chat/a2cb6fe3-f50e-424e-893b-d9d1996fdf4d#fallback-local-postgresql) at the bottom.
+
 ---
 
-## Quick Setup
-
-### 1. Clone Repo
+## 1. Clone and configure environment
 
 ```bash
 git clone https://github.com/ReUseITESO/ReUse.git
 cd ReUse
 ```
 
-### 2. Start PostgreSQL
-
-```bash
-docker-compose up -d db
-
-# Verify it is running
-docker-compose ps
-# Status must show: healthy
-```
-
-### 3. Configure Backend
-
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate
-source venv/bin/activate  # Mac/Linux
-venv\Scripts\activate     # Windows
-```
-
-### 4. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-Key dependencies:
-
-* Django 5.0.1
-* djangorestframework 3.14.0
-* psycopg2-binary 2.9.9
-* python-dotenv 1.0.0
-
-### 5. Configure Environment Variables
-
-Create the `.env` file inside `backend/`:
+Copy the environment template:
 
 ```bash
 cp .env.example .env
 ```
 
-The `.env` file must contain:
+Edit `.env` with your local values:
 
-```dotenv
-DEBUG=True
-SECRET_KEY=django-insecure-change-this-in-production
+```bash
+DB_HOST=localhost
+DB_PORT=5432
 DB_NAME=reuse_iteso_dev
 DB_USER=reuse_dev
 DB_PASSWORD=local_dev_password
-DB_HOST=localhost
-DB_PORT=5432
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-Credentials must match `docker-compose.yml`.
+> **Port conflict on Windows:** If you have PostgreSQL installed locally, port 5432 may already be in use.
+> Check with: `netstat -ano | findstr :5432`
+> If occupied, change `DB_PORT=5433` in your `.env` and update `docker-compose.yml` accordingly.
 
-### 6. Apply Migrations
+---
+
+## 2. Start the database container
+
+```bash
+docker compose up -d db
+```
+
+Verify it is running:
+
+```bash
+docker compose ps
+```
+
+Wait for the health check to pass (status: `healthy`). This takes ~30 seconds on first run.
+
+---
+
+## 3. Install backend dependencies
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+---
+
+## 4. Apply migrations
 
 ```bash
 python manage.py migrate
 ```
 
-Expected output:
+Expected output — all migrations should show `[X]`:
 
 ```
-Applying core.0001_initial... OK
-Applying marketplace.0001_initial... OK
-...
+core
+  [X] 0001_initial
+  [X] 0002_user_email_verified_at_user_is_email_verified_and_more
+marketplace
+  [X] 0001_initial
+  [X] 0002_forumquestion_images_transaction_and_more
+  [X] 0003_fix_updated_at_products
+gamification
+  [X] 0001_initial
+social
+  [X] 0001_initial
 ```
 
-### 7. Load Seed Data
+If you see `DuplicateTable` errors, a teammate pushed models without including the migration. See [Troubleshooting](https://claude.ai/chat/a2cb6fe3-f50e-424e-893b-d9d1996fdf4d#troubleshooting).
 
-Gamification is not yet active. Load the partial seed (excludes gamification):
+---
+
+## 5. Load seed data
 
 ```bash
-python -c "
-import json
-with open('seeds/seed_v1.json') as f:
-    data = json.load(f)
-
-filtered = []
-for obj in data:
-    if obj['model'].startswith('gamification'):
-        continue
-    if obj['model'] == 'core.user':
-        fields = obj['fields']
-        if 'created_at' in fields:
-            fields['date_joined'] = fields.pop('created_at')
-        fields['username'] = fields['email'].split('@')[0]
-        fields['password'] = 'pbkdf2_sha256\$600000\$test\$test='
-        fields['is_active'] = True
-        fields['is_staff'] = False
-        fields['is_superuser'] = False
-    filtered.append(obj)
-
-with open('seeds/seed_partial.json', 'w') as f:
-    json.dump(filtered, f, indent=2)
-print(f'Objects: {len(filtered)}')
-"
-
-python manage.py loaddata seeds/seed_partial.json
-# Expected: Installed 32 object(s) from 1 fixture(s)
+python manage.py loaddata seeds/seed_dev_fixed.json
 ```
 
-When gamification models are activated, use the full seed:
+This loads:
+
+* 6 users (1 admin + 5 students)
+* 5 categories
+* 10 products (mix of sale / donation / swap)
+* 3 transactions (pending / confirmed / completed)
+* 5 forum questions
+* 3 badges + 3 user_badges
+* 6 environment_impact records
+
+> **Note:** The social module (UserConnection, FrequentContact, Community, CommunityMember) does not have seed data yet. Populate manually via the admin panel or Django shell.
+
+---
+
+## 6. Create a superuser (optional)
 
 ```bash
-python manage.py loaddata seeds/seed_v1.json
-# Expected: Installed 44 object(s) from 1 fixture(s)
+python manage.py createsuperuser
 ```
 
-### 8. Create Superuser
+Use an `@iteso.mx` email or the email validation will fail.
 
-Promote the existing admin user from the seed:
+---
 
-```bash
-python manage.py shell -c "
-from core.models import User
-u = User.objects.get(email='admin@iteso.mx')
-u.is_superuser = True
-u.is_staff = True
-u.set_password('admin1234')
-u.save()
-print('Done')
-"
-```
+## 7. Verify in admin panel
 
-### 9. Start Server
+Start the backend:
 
 ```bash
 python manage.py runserver
 ```
 
-Access:
+Open: `http://localhost:8000/admin`
 
-* Admin panel: http://127.0.0.1:8000/admin/
-  * Email: `admin@iteso.mx`
-  * Password: `admin1234`
-* API docs: http://127.0.0.1:8000/api/schema/swagger-ui/
+All modules should be visible: Core, Marketplace, Gamification, Social.
 
 ---
 
-## Verify Installation
+## Checking migration status
 
 ```bash
-python manage.py shell -c "
-from core.models import User
-from marketplace.models import Products, Category, Transaction, Images, ForumQuestion
-
-print('Users:', User.objects.count())          # 6
-print('Categories:', Category.objects.count()) # 5
-print('Products:', Products.objects.count())   # 10
-print('Transactions:', Transaction.objects.count()) # 3
-print('Images:', Images.objects.count())       # 3
-print('ForumQuestions:', ForumQuestion.objects.count()) # 5
-"
-```
-
----
-
-## Useful Commands
-
-### Docker (run from project root)
-
-```bash
-# View status
-docker-compose ps
-
-# View logs
-docker-compose logs -f db
-
-# Stop services
-docker-compose down
-
-# Full reset (WARNING: deletes all data)
-docker-compose down -v
-docker-compose up -d db
-```
-
-### Django (run from backend/)
-
-```bash
-# Apply migrations
-python manage.py migrate
-
-# View migration status
+# View all migrations and their status
 python manage.py showmigrations
 
-# View SQL for a migration
-python manage.py sqlmigrate core 0001
-
-# Django shell
-python manage.py shell
-
-# PostgreSQL shell
-python manage.py dbshell
-
-# Generate new migration
-python manage.py makemigrations
+# Verify no pending migrations exist
+python manage.py migrate --check
 ```
 
 ---
 
-## Direct Database Access
-
-### Option 1: Adminer (Web GUI)
+## Stopping and resetting
 
 ```bash
-docker-compose up -d adminer
+# Stop container (data is preserved)
+docker compose down
+
+# Stop and delete all data (full reset)
+docker compose down -v
+
+# After full reset, repeat steps 4 and 5
 ```
 
-Access: http://localhost:8080
+---
 
-Credentials:
+## Fallback: Local PostgreSQL
 
-* System: PostgreSQL
-* Server: db
-* Username: reuse_dev
-* Password: local_dev_password
-* Database: reuse_iteso_dev
+If Docker is not available, install PostgreSQL 15 manually and create the database:
 
-### Option 2: psql (Terminal)
-
-```bash
-docker exec -it reuse_iteso_db psql -U reuse_dev -d reuse_iteso_dev
-
-# Useful psql commands:
-\dt                   # List tables
-\d users              # Describe users table
-SELECT * FROM users;  # Query
-\q                    # Exit
+```sql
+CREATE DATABASE reuse_iteso_dev;
+CREATE USER reuse_dev WITH PASSWORD 'local_dev_password';
+GRANT ALL PRIVILEGES ON DATABASE reuse_iteso_dev TO reuse_dev;
 ```
+
+Then update your `.env` to point to `localhost` and follow steps 4–7 above.
 
 ---
 
 ## Troubleshooting
 
+### `DuplicateTable` on migrate
+
+A teammate pushed a model change without committing the migration. Solution:
+
+```bash
+# Check which migration is conflicting
+python manage.py showmigrations
+
+# If the table already exists and migration shows as unapplied, fake it
+python manage.py migrate <app> <migration_number> --fake
+```
+
+### `django.db.utils.IntegrityError` on loaddata
+
+The seed file references a model field that no longer exists. Check that your branch is up to date:
+
+```bash
+git pull origin dev
+python manage.py migrate
+python manage.py loaddata seeds/seed_dev_fixed.json
+```
+
 ### Port 5432 already in use
 
-If another PostgreSQL instance is running locally (common on Windows), it may conflict with Docker on port 5432.
-
-Check which processes are using the port:
+Change the host port in `.env`:
 
 ```bash
-# Windows
-netstat -ano | findstr :5432
-tasklist | findstr <PID>
-```
-
-Stop the local PostgreSQL service:
-
-```bash
-# Windows
-net stop postgresql
-# Or find the exact service name:
-Get-Service | Where-Object {$_.Name -like "*postgres*"}
-```
-
-If you cannot stop the local service, change the Docker port in `docker-compose.yml`:
-
-```yaml
-ports:
-  - "0.0.0.0:5433:5432"
-```
-
-And update `.env`:
-
-```dotenv
 DB_PORT=5433
 ```
 
-### Connection refused
+And update `docker-compose.yml`:
 
-PostgreSQL is not running:
-
-```bash
-docker-compose up -d db
-docker-compose ps
-# Wait for status: healthy
-```
-
-### No module named 'dotenv'
-
-```bash
-pip install python-dotenv
-```
-
-### Password authentication failed
-
-Verify `.env` credentials match `docker-compose.yml`:
-
-```bash
-# Windows
-type .env
-type docker-compose.yml
-```
-
-Both must have the same values for `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
-
-### migrations/ folder does not exist
-
-```bash
-# Mac/Linux
-mkdir -p core/migrations marketplace/migrations gamification/migrations
-touch core/migrations/__init__.py
-touch marketplace/migrations/__init__.py
-touch gamification/migrations/__init__.py
-
-# Windows
-New-Item -ItemType Directory -Path core\migrations, marketplace\migrations, gamification\migrations
-New-Item -ItemType File -Path core\migrations\__init__.py, marketplace\migrations\__init__.py, gamification\migrations\__init__.py
-```
-
-### Full reset
-
-```bash
-# From project root
-docker-compose down -v
-docker-compose up -d db
-
-# From backend/
-python manage.py migrate
-python manage.py loaddata seeds/seed_partial.json
+```yaml
+ports:
+  - "5433:5432"
 ```
 
 ---
 
-## Database Architecture
+## Key files
 
-**Engine:** PostgreSQL 15
-**ORM:** Django ORM
-**Migrations:** Django Migrations
-**Containerization:** Docker Compose
-
-Active tables (6):
-
-1. `core_user` - ITESO users (AbstractUser)
-2. `marketplace_category` - Product categories
-3. `marketplace_products` - Listed items
-4. `marketplace_images` - Product image gallery
-5. `marketplace_transaction` - Delivery coordination
-6. `marketplace_forumquestion` - Public Q&A per product
-
-Pending activation (gamification module):
-
-7. `gamification_badges` - Available achievements
-8. `gamification_userbadges` - Badges earned by users
-9. `gamification_environmentimpact` - Sustainability metrics
+| File                                  | Purpose                             |
+| ------------------------------------- | ----------------------------------- |
+| `docker-compose.yml`                | Database and services configuration |
+| `.env.example`                      | Environment variables template      |
+| `backend/seeds/seed_dev_fixed.json` | Current canonical seed file         |
+| `docs/database/erd_v1.md`           | Full schema reference               |
+| `docs/database/migrations.md`       | Migration strategy and rules        |
+| `docs/database/governance.md`       | Who approves schema changes         |
 
 ---
 
-## User Model Notes
-
-The `User` model extends Django's `AbstractUser`. This means:
-
-* Authentication fields are included: `password`, `last_login`, `is_active`, `is_staff`, `is_superuser`
-* `AUTH_USER_MODEL = "core.User"` is set in `settings.py`
-* `date_joined` replaces `created_at` from the ERD
-* `USERNAME_FIELD = 'email'` — login uses email, not username
-
----
-
-## Next Steps
-
-1. Explore the admin panel: http://127.0.0.1:8000/admin/
-2. Review models in `backend/core/models/` and `backend/marketplace/models/`
-3. Read `docs/database/erd_v1.md` for relationship details
-4. Read `docs/database/governance.md` before making schema changes
-
----
-
-**Last updated:** 24 February 2026
+**Last updated:** 11 March 2026
 **Responsible:** Daniel (DBA)

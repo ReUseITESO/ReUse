@@ -1,4 +1,4 @@
-export type ProductStatus = 'disponible' | 'en_proceso' | 'completado' | 'cancelado';
+export type ProductStatus = 'disponible' | 'pausado' | 'en_proceso' | 'completado' | 'cancelado';
 
 export type ProductCondition = 'nuevo' | 'como_nuevo' | 'buen_estado' | 'usado';
 
@@ -28,6 +28,7 @@ export interface Product {
   category: Category;
   seller_id: number;
   seller_name: string;
+  has_active_transaction: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -81,4 +82,9 @@ export interface FormValues {
   price: string;
   image_url: string;
   images: string[];
+}
+
+export interface ChangeStatusResult {
+  product: Product | null;
+  error: string | null;
 }

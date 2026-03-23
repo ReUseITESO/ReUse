@@ -1,7 +1,8 @@
+
 # Database Standards - ReUseITESO
 
 **DBA:** Daniel
-**Date:** 24 February 2026
+**Date:** 11 March 2026
 
 ---
 
@@ -11,7 +12,7 @@
 
 * Format: `{app}_{model}` — generated automatically by Django
 * snake_case, plural
-* Examples: `core_user`, `marketplace_products`, `marketplace_forumquestion`
+* Examples: `core_user`, `marketplace_products`, `marketplace_forumquestion`, `social_community`, `social_userconnection`
 
 ### Columns
 
@@ -69,7 +70,8 @@ id BIGSERIAL PRIMARY KEY
 seller_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE RESTRICT
 
 -- CASCADE: Delete dependents automatically
-product_id BIGINT REFERENCES marketplace_products(id) ON DELETE CASCADE
+-- Note: use the model name as-is, e.g. products_id (not product_id) when the model is named Products
+products_id BIGINT REFERENCES marketplace_products(id) ON DELETE CASCADE
 ```
 
 ### Check Constraints
@@ -144,5 +146,5 @@ CREATE INDEX idx_marketplace_products_search ON marketplace_products
 
 ---
 
-**Last updated:** 24 February 2026
+**Last updated:** 11 March 2026
 **Responsible:** Daniel (DBA)

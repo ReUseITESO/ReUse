@@ -140,7 +140,7 @@ class ProductViewSet(
 
     def get_queryset(self):
         queryset = Products.objects.select_related(
-            "category", "seller"
+            "category", "seller", "transaction"
         ).prefetch_related("images")
 
         seller_param = self.request.query_params.get("seller")
@@ -205,8 +205,10 @@ class ProductViewSet(
         summary="Change product status",
         description=(
             "Changes the status of a product owned by the authenticated user. <br>"
-            "Valid transitions: `disponible` → `en_proceso` | `cancelado`, "
+            "Valid transitions: `disponible` → `en_proceso` | `pausado` | `cancelado`, "
+            "`pausado` → `disponible` | `cancelado`, "
             "`en_proceso` → `disponible` | `completado` | `cancelado`. <br>"
+            "A product cannot be paused when it has an active transaction (`pendiente` or `confirmada`). <br>"
             "Requires JWT authentication."
         ),
         request=ProductStatusSerializer,
