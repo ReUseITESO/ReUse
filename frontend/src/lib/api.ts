@@ -1,4 +1,5 @@
 import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
+import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
 
 import type { PaginatedResponse } from '@/types/api';
 import type {
@@ -142,4 +143,20 @@ export async function submitTransactionReview(
     method: 'POST',
     body: JSON.stringify(payload),
   }) as Promise<TransactionReview>;
+}
+
+export async function postProductReaction(
+  id: string | number,
+  type: ProductReactionType,
+): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'POST',
+    body: JSON.stringify({ type }),
+  });
+}
+
+export async function deleteProductReaction(id: string | number): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'DELETE',
+  });
 }

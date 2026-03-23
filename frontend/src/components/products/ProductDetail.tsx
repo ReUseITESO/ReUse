@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import ProductDetailContent from '@/components/products/ProductDetailContent';
+import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateTransaction } from '@/hooks/useCreateTransaction';
 import { useProductDetail } from '@/hooks/useProductDetail';
+
+import type { ProductReactionSummary } from '@/types/product';
 
 interface ProductDetailProps {
   productId: string;
@@ -24,6 +27,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const { product, setProduct, isLoading, error } = useProductDetail(productId);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
+
+  const handleReactionChange = (summary: ProductReactionSummary) => {
+    setProduct(current => {
+      if (!current) return current;
+      return {
+        ...current,
+        likes_count: summary.likes_count,
+        dislikes_count: summary.dislikes_count,
+        user_reaction: summary.user_reaction,
+      };
+    });
+  };
 
   if (isLoading) {
     return (
@@ -119,6 +134,19 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         onBack={() => router.back()}
         onMainAction={handleMainAction}
       />
+
+      <div className="mx-auto mt-4 flex max-w-6xl justify-end">
+        <ProductReactionButtons
+          productId={product.id}
+          sellerId={product.seller_id}
+          initialSummary={{
+            likes_count: product.likes_count,
+            dislikes_count: product.dislikes_count,
+            user_reaction: product.user_reaction,
+          }}
+          onChange={handleReactionChange}
+        />
+      </div>
 
       <CreateTransactionDialog
         isOpen={isTransactionDialogOpen}

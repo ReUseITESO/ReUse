@@ -423,9 +423,19 @@ class DashboardView(APIView):
             user_products = user_qs[:3]
             user_points = getattr(request.user, "points", 0)
 
+        serializer_context = {"request": request}
+
         data = {
-            "recent_products": ProductListSerializer(recent_products, many=True).data,
-            "user_products": ProductListSerializer(user_products, many=True).data,
+            "recent_products": ProductListSerializer(
+                recent_products,
+                many=True,
+                context=serializer_context,
+            ).data,
+            "user_products": ProductListSerializer(
+                user_products,
+                many=True,
+                context=serializer_context,
+            ).data,
             "user_products_count": user_products_count,
             "active_transactions_count": 0,
             "gamification": {
