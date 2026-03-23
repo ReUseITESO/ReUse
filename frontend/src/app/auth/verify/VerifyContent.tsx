@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 type ConfirmResponse = {
   message?: string;
-  user?: Record<string, unknown>;
+  user?: unknown;
   tokens?: { access: string; refresh: string };
   error?: { code?: string; message?: string };
 };
