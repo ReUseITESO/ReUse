@@ -4,7 +4,7 @@ import ProductReactionButtons from '@/components/products/ProductReactionButtons
 import { getCategoryStyle, getPriceColor } from '@/lib/productStyles';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
-import type {ProductCardProps } from '@/types/product';
+import type { ProductCardProps } from '@/types/product';
 
 export default function ProductCard({ product }: ProductCardProps) {
   const timeAgo = formatTimeAgo(product.created_at);
