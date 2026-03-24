@@ -22,7 +22,9 @@ export function useDashboard() {
     }
   }, []);
 
-  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   return { data, isLoading, error, refetch: fetchDashboard };
 }
