@@ -381,3 +381,99 @@ class UserSearchView(generics.ListAPIView):
             .exclude(id=self.request.user.id)
             .order_by("first_name")[:20]
         )
+
+
+# ── Dashboard (HU-CORE-04) ───────────────────────────────
+
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
+
+
+class DashboardView(APIView):
+    """GET /api/auth/dashboard/ — aggregated home dashboard data."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        recent_products = (
+            Products.objects.select_related("category", "seller")
+            .filter(status="disponible")
+            .order_by("-created_at")[:6]
+        )
+
+        user_products = []
+        user_products_count = 0
+        user_points = 0
+
+        if request.user and request.user.is_authenticated:
+            user_qs = (
+                Products.objects.select_related("category", "seller")
+                .filter(seller=request.user)
+                .order_by("-created_at")
+            )
+            user_products_count = user_qs.count()
+            user_products = user_qs[:3]
+            user_points = getattr(request.user, "points", 0)
+
+        data = {
+            "recent_products": ProductListSerializer(recent_products, many=True).data,
+            "user_products": ProductListSerializer(user_products, many=True).data,
+            "user_products_count": user_products_count,
+            "active_transactions_count": 0,
+            "gamification": {
+                "points": user_points,
+                "badges_count": 0,
+            },
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+# ── Profile Picture Upload (HU-CORE-10) ─────────────────
+
+from rest_framework.parsers import MultiPartParser
+import os
+import uuid
+
+
+class ProfilePictureUploadView(APIView):
+    """POST /api/auth/profile/upload-picture/ — upload profile image."""
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser]
+
+    ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    MAX_SIZE = 5 * 1024 * 1024
+
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response(
+                {"error": {"code": "NO_FILE", "message": "No se envio ningun archivo."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if file.content_type not in self.ALLOWED_TYPES:
+            return Response(
+                {"error": {"code": "INVALID_TYPE", "message": "Solo imagenes (JPEG, PNG, WebP, GIF)."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if file.size > self.MAX_SIZE:
+            return Response(
+                {"error": {"code": "FILE_TOO_LARGE", "message": "Max 5 MB."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        ext = os.path.splitext(file.name)[1].lower()
+        filename = f"profile_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join("profile_pictures", filename)
+
+        from django.core.files.storage import default_storage
+
+        saved_path = default_storage.save(filepath, file)
+        file_url = request.build_absolute_uri(f"/media/{saved_path}")
+
+        user = request.user
+        user.profile_picture = file_url
+        user.save(update_fields=["profile_picture"])
+
+        return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)

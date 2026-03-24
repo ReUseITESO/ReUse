@@ -25,4 +25,10 @@ urlpatterns = [
 
     # User search (used by friends and communities)
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+
+    # HU-CORE-04: Dashboard
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+
+    # HU-CORE-10: Profile picture upload
+    path("profile/upload-picture/", views.ProfilePictureUploadView.as_view(), name="profile-upload-picture"),
 ]
