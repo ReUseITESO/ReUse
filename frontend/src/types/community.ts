@@ -1,4 +1,4 @@
-export interface CommunityMember {
+export interface SocialUser {
   id: number;
   email: string;
   first_name: string;
@@ -7,10 +7,10 @@ export interface CommunityMember {
   profile_picture: string | null;
 }
 
-export interface Membership {
+export interface CommunityMember {
   id: number;
-  user: CommunityMember;
-  role: 'admin' | 'member';
+  user: SocialUser;
+  role: string;
   joined_at: string;
 }
 
@@ -18,33 +18,28 @@ export interface Community {
   id: number;
   name: string;
   description: string;
-  image_url: string | null;
-  created_by_name: string;
-  member_count: number;
+  icon: string | null;
+  is_private: boolean;
+  is_active: boolean;
+  creator: SocialUser;
+  members_count: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface CommunityDetail extends Community {
-  created_by: number;
-  is_member: boolean;
-  user_role: 'admin' | 'member' | null;
-  updated_at: string;
+  members: CommunityMember[];
 }
 
 export interface CommunityPost {
   id: number;
-  author: CommunityMember;
+  community: number;
+  user: number;
+  author_name: string;
+  title: string;
   content: string;
+  image_url: string | null;
+  is_pinned: boolean;
   created_at: string;
   updated_at: string;
-}
-
-export interface CommunityInvitation {
-  id: number;
-  community: number;
-  community_name: string;
-  invited_by: CommunityMember;
-  invited_user: CommunityMember;
-  status: 'pending' | 'accepted' | 'declined';
-  created_at: string;
 }

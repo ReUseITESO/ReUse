@@ -2,12 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
-import type { CommunityDetail, CommunityPost, Membership } from '@/types/community';
+import type { CommunityDetail, CommunityPost } from '@/types/community';
 
 export function useCommunityDetail(id: string) {
   const [community, setCommunity] = useState<CommunityDetail | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [members, setMembers] = useState<Membership[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,14 +14,13 @@ export function useCommunityDetail(id: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const [detail, postsData, membersData] = await Promise.all([
-        apiClient<CommunityDetail>(`/communities/${id}/`),
-        apiClient<{ results: CommunityPost[] }>(`/communities/${id}/posts/`),
-        apiClient<{ results: Membership[] }>(`/communities/${id}/members/`),
+      const [detail, postsData] = await Promise.all([
+        apiClient<CommunityDetail>(`/social/communities/${id}/`),
+        apiClient<{ results: CommunityPost[] } | CommunityPost[]>(`/social/posts/?community=${id}`),
       ]);
       setCommunity(detail);
-      setPosts(postsData.results);
-      setMembers(membersData.results);
+      const postResults = Array.isArray(postsData) ? postsData : postsData.results ?? [];
+      setPosts(postResults);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar comunidad');
     } finally {
@@ -32,11 +30,11 @@ export function useCommunityDetail(id: string) {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
-  async function createPost(content: string): Promise<string | null> {
+  async function createPost(title: string, content: string): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/posts/`, {
+      await apiClient('/social/posts/', {
         method: 'POST',
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ community: Number(id), title, content }),
       });
       await fetchAll();
       return null;
@@ -47,7 +45,7 @@ export function useCommunityDetail(id: string) {
 
   async function deletePost(postId: number): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/posts/${postId}/`, { method: 'DELETE' });
+      await apiClient(`/social/posts/${postId}/`, { method: 'DELETE' });
       await fetchAll();
       return null;
     } catch (err) {
@@ -55,49 +53,27 @@ export function useCommunityDetail(id: string) {
     }
   }
 
-  async function inviteUser(userId: number): Promise<string | null> {
+  async function joinCommunity(): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/invite/`, {
-        method: 'POST',
-        body: JSON.stringify({ user_id: userId }),
-      });
+      await apiClient(`/social/communities/${id}/join/`, { method: 'POST' });
+      await fetchAll();
       return null;
     } catch (err) {
-      return err instanceof Error ? err.message : 'Error al invitar';
+      return err instanceof Error ? err.message : 'Error al unirse';
     }
   }
 
   async function leaveCommunity(): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/leave/`, { method: 'POST' });
+      await apiClient(`/social/communities/${id}/leave/`, { method: 'POST' });
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al salir';
     }
   }
 
-  async function expelMember(userId: number): Promise<string | null> {
-    try {
-      await apiClient(`/communities/${id}/members/${userId}/`, { method: 'DELETE' });
-      await fetchAll();
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al expulsar';
-    }
-  }
-
-  async function deleteCommunity(): Promise<string | null> {
-    try {
-      await apiClient(`/communities/${id}/`, { method: 'DELETE' });
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al eliminar comunidad';
-    }
-  }
-
   return {
-    community, posts, members, isLoading, error,
-    refresh: fetchAll, createPost, deletePost,
-    inviteUser, leaveCommunity, expelMember, deleteCommunity,
+    community, posts, isLoading, error,
+    refresh: fetchAll, createPost, deletePost, joinCommunity, leaveCommunity,
   };
 }

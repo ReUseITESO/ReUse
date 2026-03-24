@@ -341,3 +341,43 @@ class EmailVerificationConfirmView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+# ── User Search ──────────────────────────────────────────
+
+from django.db.models import Q
+from rest_framework import serializers as drf_serializers
+
+
+class UserSearchView(generics.ListAPIView):
+    """GET /api/auth/users/search/?q=query — search users by name or email."""
+
+    permission_classes = [IsAuthenticated]
+
+    class UserSearchSerializer(drf_serializers.ModelSerializer):
+        full_name = drf_serializers.SerializerMethodField()
+
+        class Meta:
+            model = User
+            fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+            read_only_fields = fields
+
+        def get_full_name(self, obj):
+            return obj.get_full_name()
+
+    serializer_class = UserSearchSerializer
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "").strip()
+        if len(query) < 2:
+            return User.objects.none()
+        return (
+            User.objects.filter(
+                Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(email__icontains=query),
+                is_active=True,
+            )
+            .exclude(id=self.request.user.id)
+            .order_by("first_name")[:20]
+        )

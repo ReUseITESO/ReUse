@@ -22,4 +22,7 @@ urlpatterns = [
         views.EmailVerificationConfirmView.as_view(),
         name="email_verification_confirm",
     ),
+
+    # User search (used by friends and communities)
+    path("users/search/", views.UserSearchView.as_view(), name="user-search"),
 ]
