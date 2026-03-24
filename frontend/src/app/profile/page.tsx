@@ -1,18 +1,25 @@
-// Scaffolding: profile page stub. Add user profile component when core module is ready.
-// See reglas_de_escritura_front.md section 3 (Pages) for page conventions.
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [localUser, setLocalUser] = useState<User | null>(null);
+  const displayUser = localUser ?? user;
+
+  function handleSave(updated: User) { setLocalUser(updated); setIsEditing(false); }
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-background p-6">
+      <main className="min-h-screen p-6">
         <div className="mx-auto max-w-4xl">
           <div className="h-32 animate-pulse rounded-lg border border-border bg-muted" />
         </div>
@@ -20,12 +27,12 @@ export default function ProfilePage() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !displayUser) {
     return (
-      <main className="min-h-screen bg-background p-6">
+      <main className="min-h-screen p-6">
         <div className="mx-auto max-w-4xl">
-          <div className="rounded-lg bg-warning/5 border border-warning/20 p-6 text-center">
-            <p className="text-fg font-medium">Inicia sesión para ver tu perfil</p>
+          <div className="rounded-lg border border-warning/20 bg-warning/5 p-6 text-center">
+            <p className="font-medium text-fg">Inicia sesion para ver tu perfil</p>
           </div>
         </div>
       </main>
@@ -33,75 +40,64 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-6">
+    <main className="min-h-screen p-6">
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-8 text-h1 font-bold text-fg">Mi Perfil</h1>
 
-        {/* User Info Card */}
-        <section className="mb-6 rounded-lg bg-card border border-border p-6 shadow-sm">
-          <div className="flex items-start gap-6">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary text-2xl font-bold">
-              {user?.first_name?.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-h3 font-semibold text-fg">
-                {user?.full_name || `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
-              </h2>
-              <p className="text-sm text-muted-fg mt-1">{user?.email}</p>
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
-                <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                Usuario activo
+        <section className="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+          {isEditing ? (
+            <ProfileEditForm user={displayUser} onSave={handleSave} onCancel={() => setIsEditing(false)} />
+          ) : (
+            <div className="flex items-start gap-6">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                {displayUser.profile_picture ? (
+                  <img src={displayUser.profile_picture} alt={displayUser.first_name} className="h-20 w-20 rounded-full object-cover" />
+                ) : displayUser.first_name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-h3 font-semibold text-fg">{displayUser.full_name || `${displayUser.first_name} ${displayUser.last_name}`.trim()}</h2>
+                    <p className="mt-1 text-sm text-muted-fg">{displayUser.email}</p>
+                    {displayUser.phone && <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>}
+                  </div>
+                  <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
+                    <Pencil className="h-4 w-4" /> Editar perfil
+                  </button>
+                </div>
+                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </section>
 
-        {/* My Articles Section */}
-        <section className="mb-6 rounded-lg bg-card border p-6 shadow-sm">
+        <section className="mb-6 rounded-lg border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-h3 font-semibold text-fg">Mis Artículos</h2>
-              <p className="mt-1 text-sm text-muted-fg">
-                Administra los productos que has publicado
-              </p>
+              <h2 className="text-h3 font-semibold text-fg">Mis Articulos</h2>
+              <p className="mt-1 text-sm text-muted-fg">Administra los productos que has publicado</p>
             </div>
-            <Link
-              href="/products/my"
-              className="
-                inline-flex items-center gap-2 rounded-lg
-              bg-btn-primary px-4 py-2 text-sm font-medium
-              text-btn-primary-fg transition-colors hover:bg-primary-hover"
-            >
-              Ver mis artículos
+            <Link href="/products/my" className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover">
+              Ver mis articulos
             </Link>
           </div>
         </section>
 
-        {/* Gamification Section */}
         <section className="space-y-6">
           <div>
-            <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificación</h2>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
             <PointsBalance />
           </div>
         </section>
 
-        {/* TODO: Add more profile sections */}
-        {/* - Published items */}
-        {/* - Transaction history */}
-        {/* - Badges earned */}
-        {/* - Account settings */}
         <section>
-          {/* Logros y Medallas (Su trabajo) */}
-          <div className="bg-card p-6 rounded-lg border border-border shadow-sm mt-6">
-            <h2 className="mb-4 text-h3 font-semibold border-b pb-2 text-fg">Logros y Medallas</h2>
+          <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">Logros y Medallas</h2>
             <BadgesList />
           </div>
         </section>
-
-        {/* TODO: Add more profile sections */}
-        {/* - Published items */}
-        {/* - Transaction history */}
-        {/* - Account settings */}
       </div>
     </main>
   );
