@@ -25,4 +25,7 @@ urlpatterns = [
 
     # User search (used by friends and communities)
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+
+    # HU-CORE-12: Share item with friends
+    path("shares/", views.ShareItemView.as_view(), name="share-item"),
 ]

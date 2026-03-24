@@ -10,6 +10,7 @@ class Notification(models.Model):
         ("transaction_confirmed", "Transaction Confirmed"),
         ("product_reported", "Product Reported"),
         ("new_reaction", "New Reaction"),
+        ("shared_item", "Shared Item"),
     ]
 
     user = models.ForeignKey(

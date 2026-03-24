@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import Badge from '@/components/ui/Badge';
 import ImageGallery from '@/components/products/ImageGallery';
+import ShareButton from '@/components/products/ShareButton';
 import { getProductById } from '@/lib/api';
 import {
   getCategoryStyle,
@@ -137,12 +138,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           </div>
 
           {/* Action button */}
-          <button
-            className="w-full rounded-lg bg-btn-primary px-6 py-3 font-semibold text-btn-primary-fg hover:bg-primary-hover transition-colors"
-            onClick={() => alert('Funcionalidad de contacto pendiente de implementación')}
-          >
-            Contactar vendedor
-          </button>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 rounded-lg bg-btn-primary px-6 py-3 font-semibold text-btn-primary-fg hover:bg-primary-hover transition-colors"
+              onClick={() => alert('Funcionalidad de contacto pendiente de implementación')}
+            >
+              Contactar vendedor
+            </button>
+            <ShareButton productId={product.id} productTitle={product.title} />
+          </div>
 
           {/* Publication date */}
           <div className="border-t border-border pt-4 text-sm text-muted-fg">
