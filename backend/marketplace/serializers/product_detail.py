@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
-from marketplace.models import Products, Transaction
+from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
 from marketplace.serializers.product import ImageSerializer
 from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
+from marketplace.services.transaction_service import has_active_transaction
 
 
 class ProductDetailSerializer(
@@ -25,12 +26,7 @@ class ProductDetailSerializer(
         return obj.seller.get_full_name()
 
     def get_has_active_transaction(self, obj):
-        try:
-            transaction = obj.transaction
-        except Transaction.DoesNotExist:
-            return False
-
-        return transaction.status in ["pendiente", "confirmada"]
+        return has_active_transaction(obj)
 
     class Meta:
         model = Products
