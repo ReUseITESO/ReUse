@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
+RUN npm install lucide-react --legacy-peer-deps
 
 COPY . .
 
