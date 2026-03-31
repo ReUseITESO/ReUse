@@ -92,6 +92,7 @@ class TransactionViewSet(
             product_id=serializer.validated_data["product_id"],
             buyer=request.user,
             delivery_location=serializer.validated_data["delivery_location"],
+            delivery_date=serializer.validated_data["delivery_date"],
         )
 
         response_serializer = TransactionSerializer(

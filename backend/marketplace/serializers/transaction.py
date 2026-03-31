@@ -1,3 +1,6 @@
+import re
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from core.models import User
@@ -70,10 +73,33 @@ class TransactionSerializer(serializers.ModelSerializer):
 class TransactionCreateSerializer(serializers.Serializer):
     product_id = serializers.IntegerField(min_value=1)
     delivery_location = serializers.CharField(max_length=255, trim_whitespace=True)
+    delivery_date = serializers.DateTimeField()
 
     def validate_product_id(self, value):
         if not Products.objects.filter(pk=value).exists():
             raise serializers.ValidationError("El producto seleccionado no existe.")
+        return value
+
+    def validate_delivery_location(self, value):
+        # Keep only place data in DB (building/room or gate), strip any
+        # legacy meeting text that might be sent by older frontend versions.
+        location_without_meeting = re.sub(
+            r"\s*·\s*Reuni[oó]n\s+.+$",
+            "",
+            value,
+            flags=re.IGNORECASE,
+        ).strip()
+
+        if not location_without_meeting:
+            raise serializers.ValidationError("La ubicación de entrega es obligatoria.")
+
+        return location_without_meeting
+
+    def validate_delivery_date(self, value):
+        if value <= timezone.now():
+            raise serializers.ValidationError(
+                "La fecha de entrega debe ser futura."
+            )
         return value
 
 

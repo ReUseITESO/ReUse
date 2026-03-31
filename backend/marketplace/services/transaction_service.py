@@ -40,7 +40,13 @@ def _set_product_in_progress(product):
         product.save(update_fields=["status", "updated_at"])
 
 
-def _reuse_cancelled_transaction(transaction, product, buyer, delivery_location):
+def _reuse_cancelled_transaction(
+    transaction,
+    product,
+    buyer,
+    delivery_location,
+    delivery_date,
+):
     transaction.seller = product.seller
     transaction.buyer = buyer
     transaction.transaction_type = product.transaction_type
@@ -50,7 +56,7 @@ def _reuse_cancelled_transaction(transaction, product, buyer, delivery_location)
     transaction.seller_confirmed_at = None
     transaction.buyer_confirmation = False
     transaction.buyer_confirmed_at = None
-    transaction.delivery_date = None
+    transaction.delivery_date = delivery_date
     transaction.created_at = timezone.now()
     transaction.save(
         update_fields=[
@@ -70,7 +76,7 @@ def _reuse_cancelled_transaction(transaction, product, buyer, delivery_location)
     return transaction
 
 
-def create_transaction_request(product_id, buyer, delivery_location):
+def create_transaction_request(product_id, buyer, delivery_location, delivery_date):
     with db_transaction.atomic():
         try:
             product = Products.objects.select_for_update().select_related("seller").get(
@@ -105,6 +111,7 @@ def create_transaction_request(product_id, buyer, delivery_location):
                 product=product,
                 buyer=buyer,
                 delivery_location=delivery_location,
+                delivery_date=delivery_date,
             )
             _set_product_in_progress(product)
 
@@ -116,6 +123,7 @@ def create_transaction_request(product_id, buyer, delivery_location):
             seller=product.seller,
             buyer=buyer,
             transaction_type=product.transaction_type,
+            delivery_date=delivery_date,
             delivery_location=delivery_location,
             status="pendiente",
         )
@@ -180,8 +188,12 @@ def update_transaction_status(transaction_id, new_status, actor):
 
         if transaction.seller_confirmation and transaction.buyer_confirmation:
             transaction.status = "completada"
-            transaction.delivery_date = confirmation_time
-            update_fields.extend(["status", "delivery_date"])
+            update_fields.append("status")
+
+            # Preserve the originally scheduled handoff date.
+            if transaction.delivery_date is None:
+                transaction.delivery_date = confirmation_time
+                update_fields.append("delivery_date")
 
             product = transaction.product
             if product.status != "completado":
