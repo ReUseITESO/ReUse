@@ -165,6 +165,10 @@ SPECTACULAR_SETTINGS = {
             "name": "Marketplace > Categories",
             "description": "Product category endpoints.",
         },
+        {
+            "name": "Marketplace > Transactions",
+            "description": "Transaction flow endpoints for buyer and seller actions.",
+        },
     ],
     "CONTACT": {
         "name": "ReUseITESO Team",

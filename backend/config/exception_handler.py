@@ -21,6 +21,8 @@ def custom_exception_handler(exc, context):
             error_code = "PERMISSION_DENIED"
         elif isinstance(exc, NotFound):
             error_code = "NOT_FOUND"
+        elif response.status_code == 409:
+            error_code = "STATE_CONFLICT"
 
         custom_response_data = {
             "error": {
