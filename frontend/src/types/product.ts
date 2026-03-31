@@ -33,6 +33,17 @@ export interface Product {
   updated_at: string;
 }
 
+export interface ProductBasicDetailsProps {
+  title: string;
+  description: string;
+  categoryName: string;
+  condition?: ProductCondition | null;
+  fallbackConditionLabel?: string;
+  transactionType?: TransactionType;
+  price?: string | null;
+  showTransactionBadge?: boolean;
+}
+
 export interface ProductDetail extends Product {
   seller_email: string;
   images: ProductImage[];
@@ -58,6 +69,7 @@ export interface ProductUpdatePayload {
   image_url?: string;
   category?: number;
 }
+
 
 export interface EditFormValues {
   title: string;
