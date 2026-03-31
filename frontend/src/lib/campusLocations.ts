@@ -15,13 +15,11 @@ const DEFAULT_ROOM_RANGES: RoomRange[] = [{ start: 100, end: 110 }];
 const GATE_ROOM_RANGES: RoomRange[] = [{ start: 1, end: 6 }];
 
 const CAMPUS_BUILDING_CODES = [
-  'A',  'A2',  'A3',
+  'A', 'A1', 'A2', 'A3',
   'B',
   'C',
   'D',
-  'E',
   'F',
-  'G',
   'H',
   'I',
   'J',
@@ -29,32 +27,177 @@ const CAMPUS_BUILDING_CODES = [
   'L',
   'M',
   'N',
-  'P',
-  'Q',  'Q1',  'Q2',  'Q3',
+  'O',
+  'P', 'P50','PT',
+  'Q', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5',
   'R',
-  'S',
+  'S', 'S1', 'S7',
   'T',
-  'U',
+  'U', 'U2',
   'V',
   'W',
   'X',
   'Y',
-  'Z',  'Z1',  'Z2',  'Z4',
+  'Z', 'Z1', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7',
   'PUERTA',
 ];
 
 const CUSTOM_LAYOUTS: Record<string, RoomRange[]> = {
-  A: [{ start: 100, end: 110 }],
-  A2: [{ start: 200, end: 210 }],
-  A3: [{ start: 300, end: 310 }],
+  A: [
+    { start: 100, end: 120 },
+    { start: 200, end: 220 },
+    { start: 300, end: 320 },
+  ],
+  A2: [{ start: 1, end: 1 }],
+  A3: [{ start: 1, end: 1 }],
   B: [
+    { start: 100, end: 120 },
+    { start: 200, end: 220 },
+  ],
+  C: [
+    { start: 100, end: 120 },
+    { start: 200, end: 220 },
+  ],
+  D: [
+    { start: 100, end: 120 },
+    { start: 200, end: 220 },
+    { start: 300, end: 320 },
+  ],
+  F: [
+    { start: 100, end: 105 },
+    { start: 200, end: 205 },
+    { start: 300, end: 305 },
+  ],
+  H: [
+    { start: 100, end: 130 },
+    { start: 200, end: 230 },
+  ],
+  I: [
+    { start: 100, end: 120 },
+    { start: 200, end: 220 },
+  ],
+  J: [
+    { start: 100, end: 107 },
+    { start: 200, end: 207 },
+  ],
+  K: [
+    { start: 1, end: 1 },
+  ],
+  L: [
+    { start: 1, end: 1 },
+  ],
+  M: [
+    { start: 100, end: 108 },
+    { start: 200, end: 208 },
+  ],
+  N: [
+    { start: 100, end: 106 },
+  ],
+  O: [
+    { start: 100, end: 110 },
+    { start: 200, end: 210 },
+    { start: 300, end: 310 },
+  ],
+  P: [
+    { start: 100, end: 108 },
+    { start: 200, end: 208 },
+    { start: 300, end: 308 },
+    { start: 400, end: 408 },
+  ],
+  P50: [
+    { start: 1, end: 1 },
+  ],
+  PT: [
+    { start: 1, end: 1 }
+  ],
+  Q: [
+    { start: 100, end: 109 },
+    { start: 209, end: 209 },
+    { start: 300, end: 309 },
+  ],
+  Q1: [
+    { start: 100, end: 106 },
+  ],
+  Q2: [
+    { start: 100, end: 106 },
+  ],
+  Q3: [
+    { start: 100, end: 106 },
+  ],
+  Q4: [
+    { start: 100, end: 106 },
+  ],
+  Q5: [
+    { start: 100, end: 106 },
+    { start: 200, end: 206 },
+    { start: 300, end: 306 },
+  ],
+  R: [
     { start: 100, end: 110 },
     { start: 200, end: 210 },
   ],
-  F: [
+  S: [
+    { start: 100, end: 110 },
+    { start: 200, end: 210 },
+  ],
+  S1: [
+    { start: 100, end: 105 },
+  ],
+  S7: [
+    { start: 100, end: 105 },
+  ],
+  T: [
     { start: 100, end: 115 },
     { start: 200, end: 215 },
     { start: 300, end: 315 },
+  ],
+  U: [
+    { start: 1, end: 1 },
+  ],
+  U2: [
+    { start: 1, end: 1 },
+  ],
+  V: [
+    { start: 100, end: 110 },
+    { start: 200, end: 210 },
+    { start: 300, end: 310 },
+    { start: 400, end: 410 },
+    { start: 500, end: 510 },
+  ],
+  W: [
+    { start: 100, end: 110 },
+    { start: 200, end: 210 },
+    { start: 300, end: 310 },
+  ],
+  X: [
+    { start: 1, end: 1 },
+  ],
+  Y: [
+    { start: 1, end: 1 },
+  ],
+  Z: [
+    { start: 1, end: 1 },
+  ],
+  Z1: [
+    { start: 1, end: 1 },
+  ],
+  Z2: [
+    { start: 1, end: 1 },
+  ],
+  Z3: [
+    { start: 1, end: 1 },
+  ],
+  Z4: [
+    { start: 1, end: 1 },
+  ],
+  Z5: [
+    { start: 1, end: 1 },
+  ],
+  Z6: [
+    { start: 1, end: 1 },
+  ],
+  Z7: [
+    { start: 1, end: 1 },
   ],
   PUERTA: GATE_ROOM_RANGES,
 };
