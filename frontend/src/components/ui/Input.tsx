@@ -5,6 +5,7 @@ interface InputProps {
   placeholder?: string;
   type?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 export default function Input({
@@ -14,6 +15,7 @@ export default function Input({
   placeholder = '',
   type = 'text',
   disabled = false,
+  className = '',
 }: InputProps) {
   return (
     <input
@@ -23,7 +25,7 @@ export default function Input({
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       disabled={disabled}
-      className="rounded-lg border border-input px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+      className={`w-full rounded-lg border border-input px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 ${className}`}
     />
   );
 }
