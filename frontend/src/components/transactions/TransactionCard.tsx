@@ -74,7 +74,11 @@ export default function TransactionCard({
         </p>
         <p className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-info" />
-          <TransactionLocationHighlight location={transaction.delivery_location} showPrefix />
+          <TransactionLocationHighlight
+            location={transaction.delivery_location}
+            deliveryDate={transaction.delivery_date}
+            showPrefix
+          />
         </p>
         <p className="flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-warning" />
@@ -99,6 +103,15 @@ export default function TransactionCard({
             Aceptar solicitud
           </Button>
         )}
+        {canConfirmDelivery && (
+          <Button
+            variant="success"
+            disabled={isUpdatingStatus}
+            onClick={() => onStatusChange(transaction.id, 'completada')}
+          >
+            {confirmDeliveryLabel}
+          </Button>
+        )}
         {canCancel && (
           <Button
             variant="danger-outline"
@@ -106,15 +119,6 @@ export default function TransactionCard({
             onClick={() => onStatusChange(transaction.id, 'cancelada')}
           >
             Cancelar
-          </Button>
-        )}
-        {canConfirmDelivery && (
-          <Button
-            variant="secondary"
-            disabled={isUpdatingStatus}
-            onClick={() => onStatusChange(transaction.id, 'completada')}
-          >
-            {confirmDeliveryLabel}
           </Button>
         )}
         {showWaitingConfirmation && (

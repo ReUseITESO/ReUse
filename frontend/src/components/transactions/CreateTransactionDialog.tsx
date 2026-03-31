@@ -93,10 +93,9 @@ export default function CreateTransactionDialog({
     const deliveryLocation = formatMeetingLocation({
       buildingCode,
       roomNumber,
-      meetingDateTime,
     });
 
-    await onSubmit(deliveryLocation);
+    await onSubmit(deliveryLocation, meetingDateTime);
   }
 
   return (

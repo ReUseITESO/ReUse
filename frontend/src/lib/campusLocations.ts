@@ -1,5 +1,3 @@
-import { format } from 'date-fns';
-
 export interface RoomRange {
   start: number;
   end: number;
@@ -141,20 +139,12 @@ export function isCampusClosedDay(date: Date): boolean {
 export function formatMeetingLocation(params: {
   buildingCode: string;
   roomNumber: string;
-  meetingDateTime: Date;
 }): string {
   const normalizedCode = normalizeCampusBuildingCode(params.buildingCode);
 
   if (normalizedCode === 'PUERTA') {
-    return [
-      `Puerta ${params.roomNumber}`,
-      `Reunion ${format(params.meetingDateTime, 'dd/MM/yyyy HH:mm')}`,
-    ].join(' · ');
+    return `Puerta ${params.roomNumber}`;
   }
 
-  return [
-    `Edificio ${normalizedCode}`,
-    `Salon ${params.roomNumber}`,
-    `Reunion ${format(params.meetingDateTime, 'dd/MM/yyyy HH:mm')}`,
-  ].join(' · ');
+  return [`Edificio ${normalizedCode}`, `Salon ${params.roomNumber}`].join(' · ');
 }

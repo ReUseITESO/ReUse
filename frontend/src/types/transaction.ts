@@ -43,6 +43,7 @@ export interface Transaction {
 export interface CreateTransactionPayload {
   product_id: number;
   delivery_location: string;
+  delivery_date: string;
 }
 
 export interface UpdateTransactionStatusPayload {
@@ -60,7 +61,7 @@ export interface CreateTransactionDialogProps {
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
-  onSubmit: (deliveryLocation: string) => Promise<void>;
+  onSubmit: (deliveryLocation: string, deliveryDate: Date) => Promise<void>;
 }
 
 // MeetingLocationFields

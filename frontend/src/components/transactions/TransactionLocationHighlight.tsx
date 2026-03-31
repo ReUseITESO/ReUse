@@ -1,5 +1,8 @@
+import { format } from 'date-fns';
+
 interface TransactionLocationHighlightProps {
   location: string;
+  deliveryDate?: string | null;
   showPrefix?: boolean;
 }
 
@@ -19,9 +22,17 @@ function extractLocationParts(location: string) {
 
 export default function TransactionLocationHighlight({
   location,
+  deliveryDate = null,
   showPrefix = false,
 }: TransactionLocationHighlightProps) {
   const { buildingCode, roomNumber, gateNumber, meeting } = extractLocationParts(location);
+
+  const meetingFromDeliveryDate =
+    deliveryDate && !Number.isNaN(new Date(deliveryDate).getTime())
+      ? format(new Date(deliveryDate), 'dd/MM/yyyy HH:mm')
+      : null;
+
+  const meetingLabel = meetingFromDeliveryDate ?? meeting;
 
   if (!buildingCode && !roomNumber && !gateNumber) {
     return <span>{showPrefix ? `Entrega: ${location}` : location}</span>;
@@ -52,7 +63,7 @@ export default function TransactionLocationHighlight({
         </>
       )}
 
-      {meeting && <span> · Reunion {meeting}</span>}
+      {meetingLabel && <span> · Reunion {meetingLabel}</span>}
     </span>
   );
 }

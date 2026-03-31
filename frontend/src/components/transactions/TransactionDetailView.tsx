@@ -89,7 +89,10 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             <p></p>
             <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
               <MapPin className="h-4 w-4 text-info" />
-              <TransactionLocationHighlight location={transaction.delivery_location} />
+              <TransactionLocationHighlight
+                location={transaction.delivery_location}
+                deliveryDate={transaction.delivery_date}
+              />
             </p>
             <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
               <CalendarClock className="h-4 w-4 text-warning" />

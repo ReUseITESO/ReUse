@@ -53,7 +53,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const canCreateTransaction =
     isAuthenticated && !isOwner && !product.has_active_transaction && product.status === 'disponible';
 
-  async function handleCreateTransaction(deliveryLocation: string) {
+  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
     if (!product) {
       return;
     }
@@ -61,6 +61,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     const transaction = await create({
       product_id: product.id,
       delivery_location: deliveryLocation,
+      delivery_date: deliveryDate.toISOString(),
     });
 
     if (!transaction) {
