@@ -52,15 +52,19 @@ class TransactionApiTests(APITestCase):
     def _auth(self, user):
         self.client.force_authenticate(user=user)
 
-    def _create_transaction(self, user=None, product_id=None):
+    def _create_transaction(self, user=None, product_id=None, delivery_date=None):
         actor = user or self.buyer
         target_product_id = product_id or self.product.pk
+        target_delivery_date = delivery_date or (
+            timezone.now() + timedelta(days=1)
+        ).isoformat()
         self._auth(actor)
         return self.client.post(
             self.TRANSACTIONS_URL,
             {
                 "product_id": target_product_id,
                 "delivery_location": "Biblioteca ITESO",
+                "delivery_date": target_delivery_date,
             },
             format="json",
         )
@@ -76,9 +80,28 @@ class TransactionApiTests(APITestCase):
         response = self._create_transaction()
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNotNone(response.data["delivery_date"])
 
         self.product.refresh_from_db()
         self.assertEqual(self.product.status, "en_proceso")
+
+    def test_create_transaction_strips_legacy_meeting_text_from_location(self):
+        self._auth(self.other_user)
+        response = self.client.post(
+            self.TRANSACTIONS_URL,
+            {
+                "product_id": self.product.pk,
+                "delivery_location": "Edificio A · Salon 101 · Reunion 31/03/2026 19:15",
+                "delivery_date": (timezone.now() + timedelta(days=2)).isoformat(),
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            response.data["delivery_location"],
+            "Edificio A · Salon 101",
+        )
 
     def test_create_own_product_returns_403(self):
         response = self._create_transaction(user=self.seller)
@@ -213,6 +236,7 @@ class TransactionApiTests(APITestCase):
     def test_second_delivery_confirmation_completes_transaction_and_awards_points(self):
         create_response = self._create_transaction()
         transaction_id = create_response.data["id"]
+        scheduled_delivery_date = create_response.data["delivery_date"]
 
         self._auth(self.seller)
         self.client.patch(
@@ -235,6 +259,7 @@ class TransactionApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], "completada")
+        self.assertEqual(response.data["delivery_date"], scheduled_delivery_date)
 
         self.product.refresh_from_db()
         self.assertEqual(self.product.status, "completado")
