@@ -108,67 +108,73 @@ export default function CreateTransactionDialog({
           className="max-h-[94vh] w-full overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div className="max-h-[94vh] overflow-y-auto p-4 sm:p-6">
-        <h2 id="request-item-modal-title" className="inline-flex items-center gap-2 text-h3 font-semibold text-card-fg">
-          <ClipboardCheck className="h-5 w-5 text-info" />
-          Solicitar artículo
-        </h2>
-        <p className="mt-2 text-sm text-muted-fg">
-          Define punto de encuentro en campus para iniciar la solicitud de &quot;{productTitle}&quot;.
-        </p>
+            <h2
+              id="request-item-modal-title"
+              className="inline-flex items-center gap-2 text-h3 font-semibold text-card-fg"
+            >
+              <ClipboardCheck className="h-5 w-5 text-info" />
+              Solicitar artículo
+            </h2>
+            <p className="mt-2 text-sm text-muted-fg">
+              Define punto de encuentro en campus para iniciar la solicitud de &quot;{productTitle}
+              &quot;.
+            </p>
 
-        <div className="mt-4 rounded-lg border border-info/30 bg-info/10 p-3 text-sm text-info">
-          <div className="flex items-center gap-2">
-            <UserRound className="h-4 w-4" />
-            <span className="font-medium">{sellerName}</span>
-          </div>
-          <div className="mt-1 flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            <span>{sellerEmail}</span>
-          </div>
-        </div>
+            <div className="mt-4 rounded-lg border border-info/30 bg-info/10 p-3 text-sm text-info">
+              <div className="flex items-center gap-2">
+                <UserRound className="h-4 w-4" />
+                <span className="font-medium">{sellerName}</span>
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span>{sellerEmail}</span>
+              </div>
+            </div>
 
-        <div className="mt-4">
-          <MeetingLocationFields
-            buildingCode={buildingCode}
-            roomNumber={roomNumber}
-            meetingDateTime={meetingDateTime}
-            disabled={isLoading}
-            onBuildingChange={setBuildingCode}
-            onRoomChange={setRoomNumber}
-            onDateTimeChange={setMeetingDateTime}
-            onTimeErrorChange={setTimeValidationError}
-          />
-        </div>
+            <div className="mt-4">
+              <MeetingLocationFields
+                buildingCode={buildingCode}
+                roomNumber={roomNumber}
+                meetingDateTime={meetingDateTime}
+                disabled={isLoading}
+                onBuildingChange={setBuildingCode}
+                onRoomChange={setRoomNumber}
+                onDateTimeChange={setMeetingDateTime}
+                onTimeErrorChange={setTimeValidationError}
+              />
+            </div>
 
-        {transactionType === 'swap' && (
-          <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-fg">
-            <p className="font-medium">Flujo de intercambio parcial</p>
-            <p className="mt-1">La selección del artículo a intercambiar se implementará en la issue #34.</p>
-            <Button variant="secondary" className="mt-2" disabled>
-              <RefreshCcw className="mr-2 inline h-4 w-4" /> TODO issue #34
-            </Button>
-          </div>
-        )}
+            {transactionType === 'swap' && (
+              <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-fg">
+                <p className="font-medium">Flujo de intercambio parcial</p>
+                <p className="mt-1">
+                  La selección del artículo a intercambiar se implementará en la issue #34.
+                </p>
+                <Button variant="secondary" className="mt-2" disabled>
+                  <RefreshCcw className="mr-2 inline h-4 w-4" /> TODO issue #34
+                </Button>
+              </div>
+            )}
 
-        {(validationError || error) && (
-          <p className="mt-3 inline-flex items-center gap-2 text-sm text-error">
-            <AlertCircle className="h-4 w-4" />
-            {validationError || error}
-          </p>
-        )}
+            {(validationError || error) && (
+              <p className="mt-3 inline-flex items-center gap-2 text-sm text-error">
+                <AlertCircle className="h-4 w-4" />
+                {validationError || error}
+              </p>
+            )}
 
-        <p className="mt-4 text-xs text-muted-fg">
-          Notificación pendiente: integración con CORE.
-        </p>
+            <p className="mt-4 text-xs text-muted-fg">
+              Notificación pendiente: integración con CORE.
+            </p>
 
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="danger-outline" onClick={onCancel} disabled={isLoading}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? 'Enviando...' : 'Enviar solicitud'}
-          </Button>
-        </div>
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <Button variant="danger-outline" onClick={onCancel} disabled={isLoading}>
+                Cancelar
+              </Button>
+              <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
+                {isLoading ? 'Enviando...' : 'Enviar solicitud'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

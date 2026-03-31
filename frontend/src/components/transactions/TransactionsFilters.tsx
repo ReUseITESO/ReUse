@@ -25,10 +25,7 @@ const ROLE_STYLES: Record<'buyer' | 'seller', { active: string; inactive: string
   },
 };
 
-const STATUS_STYLES: Record<
-  TransactionStatus | 'all',
-  { active: string; inactive: string }
-> = {
+const STATUS_STYLES: Record<TransactionStatus | 'all', { active: string; inactive: string }> = {
   all: {
     active: 'bg-info/15 text-fg border border-info/40',
     inactive: 'border border-info/30 text-fg hover:bg-info/10',
@@ -74,7 +71,8 @@ export default function TransactionsFilters({
             onClick={() => onRoleChange('seller')}
             className={`${COMPACT_BUTTON} ${role === 'seller' ? ROLE_STYLES.seller.active : ROLE_STYLES.seller.inactive}`}
           >
-            <ArrowRightLeft className="mr-1 inline h-3.5 w-3.5" />Tus Entregas
+            <ArrowRightLeft className="mr-1 inline h-3.5 w-3.5" />
+            Tus Entregas
           </Button>
         </div>
       </div>
@@ -82,7 +80,7 @@ export default function TransactionsFilters({
       <div className="rounded-lg border border-transparent bg-card p-3 sm:pl-5">
         <label className="text-xs font-medium text-fg">Estado</label>
         <div className="mt-2 flex flex-wrap gap-2">
-          {STATUS_FILTERS.map(filter => (
+          {STATUS_FILTERS.map(filter =>
             (() => {
               const key = filter.value ?? 'all';
               const style = STATUS_STYLES[key];
@@ -98,8 +96,8 @@ export default function TransactionsFilters({
                   <Tag className="mr-1 inline h-3.5 w-3.5" /> {filter.label}
                 </Button>
               );
-            })()
-          ))}
+            })(),
+          )}
         </div>
       </div>
     </div>

@@ -26,7 +26,11 @@ export default function TransactionStatusActions({
   return (
     <div className="flex flex-wrap gap-2">
       {canAccept && (
-        <Button variant="primary" disabled={isUpdating} onClick={() => onChangeStatus('confirmada')}>
+        <Button
+          variant="primary"
+          disabled={isUpdating}
+          onClick={() => onChangeStatus('confirmada')}
+        >
           Aceptar solicitud
         </Button>
       )}
@@ -42,7 +46,11 @@ export default function TransactionStatusActions({
       )}
 
       {canConfirmDelivery && (
-        <Button variant="secondary" disabled={isUpdating} onClick={() => onChangeStatus('completada')}>
+        <Button
+          variant="secondary"
+          disabled={isUpdating}
+          onClick={() => onChangeStatus('completada')}
+        >
           {confirmDeliveryLabel}
         </Button>
       )}

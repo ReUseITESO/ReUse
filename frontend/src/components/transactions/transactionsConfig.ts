@@ -69,7 +69,9 @@ export function getDeliveryConfirmationLabel(actorRole: TransactionRole): string
   return 'Confirmar que lo recibi';
 }
 
-export function getPendingCounterpartLabel(transaction: Transaction): 'vendedor' | 'comprador' | null {
+export function getPendingCounterpartLabel(
+  transaction: Transaction,
+): 'vendedor' | 'comprador' | null {
   if (transaction.seller_confirmation && !transaction.buyer_confirmation) {
     return 'comprador';
   }

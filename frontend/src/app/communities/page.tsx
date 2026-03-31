@@ -40,7 +40,9 @@ export default function CommunitiesPage() {
     try {
       await apiClient(`/communities/${communityId}/join/`, { method: 'POST' });
       await Promise.all([fetchInvitations(), refresh()]);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setLoadingInviteId(null);
   }
 
@@ -104,7 +106,10 @@ export default function CommunitiesPage() {
             </h2>
             <div className="space-y-2">
               {invitations.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <div
+                  key={inv.id}
+                  className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3"
+                >
                   <div>
                     <p className="text-sm font-medium text-gray-900">{inv.community_name}</p>
                     <p className="text-xs text-gray-500">Invitado por {inv.invited_by.full_name}</p>
@@ -142,7 +147,10 @@ export default function CommunitiesPage() {
               className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowForm(false)} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
+              <button
+                onClick={() => setShowForm(false)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              >
                 Cancelar
               </button>
               <button
@@ -157,7 +165,9 @@ export default function CommunitiesPage() {
         )}
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
         )}
 
         {isLoading ? (

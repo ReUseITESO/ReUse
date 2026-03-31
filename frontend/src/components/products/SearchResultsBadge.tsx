@@ -1,8 +1,6 @@
 import { CheckCircle2, Search, SearchX } from 'lucide-react';
 import { SearchResultsBadgeProps } from '@/types/searchs';
 
-
-
 export default function SearchResultsBadge({
   totalCount,
   isLoading,

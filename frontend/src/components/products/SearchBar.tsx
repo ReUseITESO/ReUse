@@ -14,7 +14,6 @@ export default function SearchBar({
   showContainer = true,
   showShowAllButton = true,
 }: SearchBarProps) {
-
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       onSearch(query.trim());

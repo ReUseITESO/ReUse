@@ -50,7 +50,6 @@ export interface UpdateTransactionStatusPayload {
   status: UpdatableTransactionStatus;
 }
 
-
 // CreateTransactionDialog
 export interface CreateTransactionDialogProps {
   isOpen: boolean;

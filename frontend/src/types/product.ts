@@ -70,7 +70,6 @@ export interface ProductUpdatePayload {
   category?: number;
 }
 
-
 export interface EditFormValues {
   title: string;
   description: string;

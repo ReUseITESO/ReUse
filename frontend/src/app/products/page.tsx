@@ -19,7 +19,9 @@ export default function ProductsPage() {
             </span>
             <div>
               <h1 className="text-h1 font-bold text-fg">Productos disponibles</h1>
-              <p className="text-sm text-muted-fg">Explora artículos publicados por la comunidad.</p>
+              <p className="text-sm text-muted-fg">
+                Explora artículos publicados por la comunidad.
+              </p>
             </div>
           </div>
 

@@ -38,8 +38,7 @@ export default function AppSelect({
   triggerClassName,
   contentClassName,
 }: AppSelectProps) {
-  const normalizedValue =
-    value === '' && emptyOptionLabel ? EMPTY_SENTINEL : value || undefined;
+  const normalizedValue = value === '' && emptyOptionLabel ? EMPTY_SENTINEL : value || undefined;
 
   return (
     <Select

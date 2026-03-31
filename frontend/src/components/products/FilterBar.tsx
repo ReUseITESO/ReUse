@@ -38,13 +38,11 @@ const ORDERING_OPTIONS = [
   { value: '-title', label: 'Nombre: Z → A' },
 ] as const;
 
-export default function FilterBar({
-  filters,
-  onChange,
-  showContainer = true,
-}: FilterBarProps) {
+export default function FilterBar({ filters, onChange, showContainer = true }: FilterBarProps) {
   const { categories, isLoading: loadingCats } = useCategories();
-  const hasActiveFilters = Boolean(filters.category || filters.condition || filters.transaction_type || filters.ordering);
+  const hasActiveFilters = Boolean(
+    filters.category || filters.condition || filters.transaction_type || filters.ordering,
+  );
 
   function handleFilter(field: keyof FilterBarFilters, value: string) {
     onChange({ ...filters, [field]: value || undefined });

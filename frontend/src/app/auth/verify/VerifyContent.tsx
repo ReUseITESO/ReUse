@@ -36,7 +36,7 @@ export default function VerifyContent() {
       try {
         const res = await fetch(
           `${base}/auth/email-verification/confirm/?token=${encodeURIComponent(token)}`,
-          { method: 'GET', headers: { Accept: 'application/json' } }
+          { method: 'GET', headers: { Accept: 'application/json' } },
         );
 
         const data: ConfirmResponse | null = await res.json().catch(() => null);
@@ -60,7 +60,9 @@ export default function VerifyContent() {
 
         if (!payload?.tokens?.access || !payload?.tokens?.refresh) {
           setStatus('error');
-          setErrorMsg('Correo verificado, pero el servidor no devolvió tokens para iniciar sesión.');
+          setErrorMsg(
+            'Correo verificado, pero el servidor no devolvió tokens para iniciar sesión.',
+          );
           return;
         }
 

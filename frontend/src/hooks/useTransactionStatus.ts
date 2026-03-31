@@ -25,8 +25,7 @@ export function useTransactionStatus() {
       try {
         return await updateTransactionStatus(transactionId, payload);
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'No se pudo actualizar el estado';
+        const message = err instanceof Error ? err.message : 'No se pudo actualizar el estado';
         setError(message);
         return null;
       } finally {

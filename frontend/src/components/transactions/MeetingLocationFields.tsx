@@ -67,7 +67,9 @@ export default function MeetingLocationFields({
               }
               options={rooms.map(room => ({ value: room, label: room }))}
               disabled={disabled || !buildingCode}
-              emptyMessage={isGate ? 'Sin numeros para esta puerta' : 'Sin salones para este edificio'}
+              emptyMessage={
+                isGate ? 'Sin numeros para esta puerta' : 'Sin salones para este edificio'
+              }
               optionLayout="grid"
               inputClassName="h-8 border-0 bg-transparent px-1 focus:border-transparent focus:ring-0"
             />

@@ -16,8 +16,11 @@ interface ProductDetailProps {
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { create, isLoading: isCreatingTransaction, error: createTransactionError } =
-    useCreateTransaction();
+  const {
+    create,
+    isLoading: isCreatingTransaction,
+    error: createTransactionError,
+  } = useCreateTransaction();
   const { product, setProduct, isLoading, error } = useProductDetail(productId);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
@@ -51,7 +54,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   const isOwner = user?.email === product.seller_email;
   const canCreateTransaction =
-    isAuthenticated && !isOwner && !product.has_active_transaction && product.status === 'disponible';
+    isAuthenticated &&
+    !isOwner &&
+    !product.has_active_transaction &&
+    product.status === 'disponible';
 
   async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
     if (!product) {

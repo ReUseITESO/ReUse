@@ -125,7 +125,12 @@ export default function DateTimePicker({
               }
 
               if (value) {
-                onChange(mergeDateAndTime(selected, selectedTime || `${String(minHour).padStart(2, '0')}:00`));
+                onChange(
+                  mergeDateAndTime(
+                    selected,
+                    selectedTime || `${String(minHour).padStart(2, '0')}:00`,
+                  ),
+                );
                 return;
               }
 
@@ -140,7 +145,8 @@ export default function DateTimePicker({
             }}
             modifiersClassNames={{
               pastDay: '[&>button]:!text-muted-fg [&>button]:!opacity-45',
-              weekendClosed: '[&>button]:!bg-error/10 [&>button]:!text-error [&>button]:line-through',
+              weekendClosed:
+                '[&>button]:!bg-error/10 [&>button]:!text-error [&>button]:line-through',
             }}
             initialFocus
           />
@@ -164,7 +170,9 @@ export default function DateTimePicker({
           maxHour={maxHour}
           disabled={disabled || !value}
           onInvalidSelection={() => {
-            emitValidation(`Horario ITESO: ${String(minHour).padStart(2, '0')}:00 a ${String(maxHour).padStart(2, '0')}:00.`);
+            emitValidation(
+              `Horario ITESO: ${String(minHour).padStart(2, '0')}:00 a ${String(maxHour).padStart(2, '0')}:00.`,
+            );
           }}
           onChange={nextTime => {
             if (!value) {
@@ -178,7 +186,9 @@ export default function DateTimePicker({
             }
 
             if (!isTimeWithinRange(nextTime, minHour, maxHour)) {
-              emitValidation(`Horario ITESO: ${String(minHour).padStart(2, '0')}:00 a ${String(maxHour).padStart(2, '0')}:00.`);
+              emitValidation(
+                `Horario ITESO: ${String(minHour).padStart(2, '0')}:00 a ${String(maxHour).padStart(2, '0')}:00.`,
+              );
               return;
             }
 

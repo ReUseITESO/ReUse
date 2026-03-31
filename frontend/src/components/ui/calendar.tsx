@@ -31,8 +31,10 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day: 'relative h-9 w-9 p-0 text-center text-sm',
         day_button:
           'h-9 w-9 rounded-full text-sm font-medium text-fg cursor-pointer transition-colors hover:bg-primary/10 hover:text-primary aria-selected:bg-primary aria-selected:text-primary-fg aria-selected:hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-transparent',
-        selected: '[&>button]:bg-primary [&>button]:text-primary-fg [&>button]:hover:bg-primary-hover',
-        today: '[&>button]:border [&>button]:border-info/60 [&>button]:bg-info/10 [&>button]:text-fg',
+        selected:
+          '[&>button]:bg-primary [&>button]:text-primary-fg [&>button]:hover:bg-primary-hover',
+        today:
+          '[&>button]:border [&>button]:border-info/60 [&>button]:bg-info/10 [&>button]:text-fg',
         outside: 'text-muted-fg opacity-45',
         disabled: 'opacity-75',
         hidden: 'invisible',

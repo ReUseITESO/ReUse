@@ -109,9 +109,7 @@ export default function TimeScrollPicker({
                 onClick={() => tryCommit(option, minute, period)}
                 className={cn(
                   'w-full rounded-md px-2 py-1 text-sm transition-colors',
-                  option === hour12
-                    ? 'bg-primary text-primary-fg'
-                    : 'text-fg hover:bg-muted',
+                  option === hour12 ? 'bg-primary text-primary-fg' : 'text-fg hover:bg-muted',
                   (disabled || isDisabled) && 'cursor-not-allowed opacity-45 hover:bg-transparent',
                 )}
               >
@@ -137,9 +135,7 @@ export default function TimeScrollPicker({
                 onClick={() => tryCommit(hour12, optionMinute, period)}
                 className={cn(
                   'w-full rounded-md px-2 py-1 text-sm transition-colors',
-                  optionMinute === minute
-                    ? 'bg-primary text-primary-fg'
-                    : 'text-fg hover:bg-muted',
+                  optionMinute === minute ? 'bg-primary text-primary-fg' : 'text-fg hover:bg-muted',
                   (disabled || isDisabled) && 'cursor-not-allowed opacity-45 hover:bg-transparent',
                 )}
               >
@@ -165,9 +161,7 @@ export default function TimeScrollPicker({
                 onClick={() => tryCommit(hour12, minute, option)}
                 className={cn(
                   'w-full rounded-md px-2 py-1 text-sm transition-colors',
-                  option === period
-                    ? 'bg-primary text-primary-fg'
-                    : 'text-fg hover:bg-muted',
+                  option === period ? 'bg-primary text-primary-fg' : 'text-fg hover:bg-muted',
                   (disabled || isDisabled) && 'cursor-not-allowed opacity-45 hover:bg-transparent',
                 )}
               >

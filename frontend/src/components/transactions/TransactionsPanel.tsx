@@ -31,11 +31,7 @@ export default function TransactionsPanel() {
     fetchTransactions,
   } = useTransactions({ role, status });
 
-  const {
-    changeStatus,
-    isLoading: isUpdatingStatus,
-    error: updateError,
-  } = useTransactionStatus();
+  const { changeStatus, isLoading: isUpdatingStatus, error: updateError } = useTransactionStatus();
 
   if (!isAuthenticated) {
     return (

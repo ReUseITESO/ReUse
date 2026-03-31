@@ -20,97 +20,97 @@ import { apiClient } from '@/lib/api';
 import type { EditFormValues, Product, ProductEditFormProps } from '@/types/product';
 
 export default function ProductEditForm({ productId }: ProductEditFormProps) {
-    const router = useRouter();
-    const { isAuthenticated } = useAuth();
-    const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
-    const { updateProduct, isLoading: submitting, error: submitError } = useUpdateProduct();
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
+  const { updateProduct, isLoading: submitting, error: submitError } = useUpdateProduct();
 
-    const [isLoadingProduct, setIsLoadingProduct] = useState(true);
-    const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-    const form = useForm<EditFormValues>();
+  const form = useForm<EditFormValues>();
 
-    useEffect(() => {
-        async function fetchProduct() {
-            setIsLoadingProduct(true);
-            setLoadError(null);
+  useEffect(() => {
+    async function fetchProduct() {
+      setIsLoadingProduct(true);
+      setLoadError(null);
 
-            try {
-                const product = await apiClient<Product>(`/marketplace/products/${productId}/`);
+      try {
+        const product = await apiClient<Product>(`/marketplace/products/${productId}/`);
 
-                form.reset({
-                    title: product.title,
-                    description: product.description,
-                    category: String(product.category.id),
-                    condition: product.condition,
-                    transaction_type: product.transaction_type,
-                    price: product.price ?? '',
-                    image_url: product.image_url ?? '',
-                });
-            } catch (err) {
-                setLoadError(err instanceof Error ? err.message : 'Error al cargar el producto');
-            } finally {
-                setIsLoadingProduct(false);
-            }
-        }
-
-        fetchProduct();
-    }, [form, productId]);
-
-    async function handleUpdateProduct(values: EditFormValues) {
-        const isSale = values.transaction_type === 'sale';
-
-        const result = await updateProduct(productId, {
-            title: values.title,
-            description: values.description,
-            category: Number(values.category),
-            condition: values.condition,
-            transaction_type: values.transaction_type,
-            price: isSale ? Number(values.price) : null,
-            image_url: values.image_url || undefined,
+        form.reset({
+          title: product.title,
+          description: product.description,
+          category: String(product.category.id),
+          condition: product.condition,
+          transaction_type: product.transaction_type,
+          price: product.price ?? '',
+          image_url: product.image_url ?? '',
         });
-
-        if (result) {
-            router.push('/products/my');
-        }
+      } catch (err) {
+        setLoadError(err instanceof Error ? err.message : 'Error al cargar el producto');
+      } finally {
+        setIsLoadingProduct(false);
+      }
     }
 
-    if (!isAuthenticated) {
-        return <ProductFormAuthNotice actionLabel="editar" />;
+    fetchProduct();
+  }, [form, productId]);
+
+  async function handleUpdateProduct(values: EditFormValues) {
+    const isSale = values.transaction_type === 'sale';
+
+    const result = await updateProduct(productId, {
+      title: values.title,
+      description: values.description,
+      category: Number(values.category),
+      condition: values.condition,
+      transaction_type: values.transaction_type,
+      price: isSale ? Number(values.price) : null,
+      image_url: values.image_url || undefined,
+    });
+
+    if (result) {
+      router.push('/products/my');
     }
+  }
 
-    if (isLoadingProduct) {
-        return <Spinner />;
-    }
+  if (!isAuthenticated) {
+    return <ProductFormAuthNotice actionLabel="editar" />;
+  }
 
-    if (loadError) {
-        return <ErrorMessage message={loadError} onRetry={() => window.location.reload()} />;
-    }
+  if (isLoadingProduct) {
+    return <Spinner />;
+  }
 
-    return (
-        <form onSubmit={form.handleSubmit(handleUpdateProduct)} className="mx-auto max-w-2xl">
-            {submitError && (
-                <div className="mb-6 rounded-lg border border-error/20 bg-error/5 px-4 py-3">
-                    <p className="text-sm font-medium text-error">{submitError}</p>
-                </div>
-            )}
+  if (loadError) {
+    return <ErrorMessage message={loadError} onRetry={() => window.location.reload()} />;
+  }
 
-            <fieldset disabled={submitting} className="space-y-8">
-                <ProductMainFields
-                    form={form}
-                    categories={categories}
-                    isLoadingCategories={categoriesLoading}
-                    categoriesError={categoriesError}
-                />
+  return (
+    <form onSubmit={form.handleSubmit(handleUpdateProduct)} className="mx-auto max-w-2xl">
+      {submitError && (
+        <div className="mb-6 rounded-lg border border-error/20 bg-error/5 px-4 py-3">
+          <p className="text-sm font-medium text-error">{submitError}</p>
+        </div>
+      )}
 
-                <EditProductImageSection form={form} />
+      <fieldset disabled={submitting} className="space-y-8">
+        <ProductMainFields
+          form={form}
+          categories={categories}
+          isLoadingCategories={categoriesLoading}
+          categoriesError={categoriesError}
+        />
 
-                <ProductFormActions
-                    isSubmitting={submitting}
-                    submitLabel={submitting ? 'Guardando...' : 'Guardar cambios'}
-                    onCancel={() => router.back()}
-                />
-            </fieldset>
-        </form>
-    );
+        <EditProductImageSection form={form} />
+
+        <ProductFormActions
+          isSubmitting={submitting}
+          submitLabel={submitting ? 'Guardando...' : 'Guardar cambios'}
+          onCancel={() => router.back()}
+        />
+      </fieldset>
+    </form>
+  );
 }

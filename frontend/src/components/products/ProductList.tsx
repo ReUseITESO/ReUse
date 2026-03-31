@@ -66,11 +66,7 @@ export default function ProductList() {
           />
         </div>
 
-        <FilterBar
-          filters={currentFilters}
-          onChange={handleFilterChange}
-          showContainer={false}
-        />
+        <FilterBar filters={currentFilters} onChange={handleFilterChange} showContainer={false} />
       </section>
 
       <SearchResultsBadge totalCount={totalCount} isLoading={isLoading} hasFilters={hasFilters} />
