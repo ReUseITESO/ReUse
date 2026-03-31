@@ -9,7 +9,7 @@ psycopg2.connect(
     user=os.environ.get('DB_USER','reuse_dev'),
     password=os.environ.get('DB_PASSWORD','local_dev_password'),
     host=os.environ.get('DB_HOST','db'),
-    port=os.environ.get('DB_PORT','5432')
+    port=os.environ.get('DB_PORT','5433')
 )" 2>/dev/null; do
     sleep 1
 done

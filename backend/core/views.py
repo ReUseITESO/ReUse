@@ -82,6 +82,7 @@ def verify_email_token(raw_token: str):
 
 
 def send_verification_email(to_email: str, verify_url: str):
+    print("this is the url", verify_url)
     subject = "Verifica tu correo - ReUseITESO"
     message = (
         "Gracias por registrarte.\n\n"
