@@ -15,7 +15,7 @@ export const TRANSACTION_OPTIONS: { value: TransactionType; label: string; descr
   ];
 
 export const INPUT_CLASS =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full rounded-lg border border-input bg-muted px-4 py-2.5 text-fg placeholder:text-muted-fg transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50';
 
 export const SELECT_CLASS =
-  'w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full rounded-lg border border-input bg-muted px-4 py-2.5 text-fg transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50';

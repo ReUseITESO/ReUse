@@ -5,6 +5,11 @@
 from django.urls import path
 from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
+from gamification.views.challenges import (
+    ChallengeListView,
+    JoinChallengeView,
+    MyChallengesView,
+)
 from gamification.views.deduct_points import DeductPointsView
 from gamification.views.points import (
 	CurrentUserLevelProgressionView,
@@ -23,4 +28,11 @@ urlpatterns = [
 	),
     path("award-points/", AwardPointsView.as_view(), name="award-points"),
     path("deduct-points/", DeductPointsView.as_view(), name="deduct-points"),
+    path("challenges/", ChallengeListView.as_view(), name="challenge-list"),
+    path("challenges/me/", MyChallengesView.as_view(), name="my-challenges"),
+    path(
+        "challenges/<int:challenge_id>/join/",
+        JoinChallengeView.as_view(),
+        name="join-challenge",
+    ),
 ]

@@ -71,14 +71,14 @@ export default function TestPointsButtons({
   };
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
-      <h3 className="mb-3 text-sm font-semibold text-slate-900">Botones de prueba</h3>
+    <section className="rounded-lg border border-border bg-card p-4">
+      <h3 className="mb-3 text-sm font-semibold text-fg">Botones de prueba</h3>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
         <button
           type="button"
           onClick={() => runAction('publish_item')}
           disabled={!isAuthenticated || isLoading}
-          className="rounded-md bg-blue-100 px-3 py-2 text-sm font-medium text-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-info/10 px-3 py-2 text-sm font-medium text-info disabled:cursor-not-allowed disabled:opacity-60"
         >
           Publicar (+)
         </button>
@@ -86,7 +86,7 @@ export default function TestPointsButtons({
           type="button"
           onClick={() => runAction('complete_donation')}
           disabled={!isAuthenticated || isLoading}
-          className="rounded-md bg-green-100 px-3 py-2 text-sm font-medium text-green-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-success/10 px-3 py-2 text-sm font-medium text-success disabled:cursor-not-allowed disabled:opacity-60"
         >
           Donacion (+)
         </button>
@@ -94,15 +94,31 @@ export default function TestPointsButtons({
           type="button"
           onClick={() => runAction('receive_positive_review')}
           disabled={!isAuthenticated || isLoading}
-          className="rounded-md bg-purple-100 px-3 py-2 text-sm font-medium text-purple-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-secondary/10 px-3 py-2 text-sm font-medium text-secondary disabled:cursor-not-allowed disabled:opacity-60"
         >
           Review (+)
         </button>
         <button
           type="button"
+          onClick={() => runAction('complete_exchange')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-indigo-100 px-3 py-2 text-sm font-medium text-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Intercambio (+)
+        </button>
+        <button
+          type="button"
+          onClick={() => runAction('complete_sale')}
+          disabled={!isAuthenticated || isLoading}
+          className="rounded-md bg-cyan-100 px-3 py-2 text-sm font-medium text-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Venta (+)
+        </button>
+        <button
+          type="button"
           onClick={() => deduct(5)}
           disabled={!isAuthenticated || isLoading}
-          className="rounded-md bg-red-100 px-3 py-2 text-sm font-medium text-red-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md bg-error/10 px-3 py-2 text-sm font-medium text-error disabled:cursor-not-allowed disabled:opacity-60"
         >
           Restar 5
         </button>
