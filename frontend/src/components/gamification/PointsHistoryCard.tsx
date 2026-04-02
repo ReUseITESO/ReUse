@@ -104,10 +104,16 @@ export default function PointsHistoryCard() {
     fetchHistory,
   } = usePointsHistory(isAuthenticated);
 
-  const [draftFilters, setDraftFilters] = useState<PointsHistoryFilters>({ ordering: '-created_at' });
+  const [draftFilters, setDraftFilters] = useState<PointsHistoryFilters>({
+    ordering: '-created_at',
+  });
 
   const rangeError = useMemo(() => {
-    if (draftFilters.start_date && draftFilters.end_date && draftFilters.start_date > draftFilters.end_date) {
+    if (
+      draftFilters.start_date &&
+      draftFilters.end_date &&
+      draftFilters.start_date > draftFilters.end_date
+    ) {
       return 'La fecha inicial no puede ser mayor que la fecha final.';
     }
     return null;
@@ -161,7 +167,9 @@ export default function PointsHistoryCard() {
 
       <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">Rangos rapidos</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+            Rangos rapidos
+          </span>
           <button
             type="button"
             onClick={() => applyQuickRange(7)}
@@ -179,55 +187,55 @@ export default function PointsHistoryCard() {
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-700">Desde</span>
-          <input
-            type="date"
-            value={draftFilters.start_date ?? ''}
-            onChange={e => handleDraftChange({ start_date: e.target.value || undefined })}
-            className="rounded-md border border-slate-300 px-3 py-2"
-          />
-        </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-slate-700">Desde</span>
+            <input
+              type="date"
+              value={draftFilters.start_date ?? ''}
+              onChange={e => handleDraftChange({ start_date: e.target.value || undefined })}
+              className="rounded-md border border-slate-300 px-3 py-2"
+            />
+          </label>
 
           <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-700">Hasta</span>
-          <input
-            type="date"
-            value={draftFilters.end_date ?? ''}
-            onChange={e => handleDraftChange({ end_date: e.target.value || undefined })}
-            className="rounded-md border border-slate-300 px-3 py-2"
-          />
-        </label>
+            <span className="text-slate-700">Hasta</span>
+            <input
+              type="date"
+              value={draftFilters.end_date ?? ''}
+              onChange={e => handleDraftChange({ end_date: e.target.value || undefined })}
+              className="rounded-md border border-slate-300 px-3 py-2"
+            />
+          </label>
 
           <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-700">Accion</span>
-          <select
-            value={draftFilters.action ?? ''}
-            onChange={e => handleDraftChange({ action: e.target.value || undefined })}
-            className="rounded-md border border-slate-300 px-3 py-2"
-          >
-            {ACTION_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <span className="text-slate-700">Accion</span>
+            <select
+              value={draftFilters.action ?? ''}
+              onChange={e => handleDraftChange({ action: e.target.value || undefined })}
+              className="rounded-md border border-slate-300 px-3 py-2"
+            >
+              {ACTION_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <label className="flex flex-col gap-1 text-sm">
-          <span className="text-slate-700">Orden</span>
-          <select
-            value={draftFilters.ordering ?? '-created_at'}
-            onChange={e => handleDraftChange({ ordering: e.target.value })}
-            className="rounded-md border border-slate-300 px-3 py-2"
-          >
-            {ORDER_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <span className="text-slate-700">Orden</span>
+            <select
+              value={draftFilters.ordering ?? '-created_at'}
+              onChange={e => handleDraftChange({ ordering: e.target.value })}
+              className="rounded-md border border-slate-300 px-3 py-2"
+            >
+              {ORDER_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
@@ -256,7 +264,9 @@ export default function PointsHistoryCard() {
       {isLoading ? (
         <div className="rounded-lg border border-slate-200 bg-white py-8">
           <Spinner />
-          <p className="mt-2 text-center text-sm text-slate-500">Cargando movimientos de puntos...</p>
+          <p className="mt-2 text-center text-sm text-slate-500">
+            Cargando movimientos de puntos...
+          </p>
         </div>
       ) : entries.length === 0 ? (
         <EmptyState
@@ -289,11 +299,15 @@ export default function PointsHistoryCard() {
                       <div className="space-y-0.5">
                         <p>{formatAssociatedLabel(entry.reference_label, entry.reference_id)}</p>
                         {formatReferenceType(entry.reference_type) ? (
-                          <p className="text-xs text-slate-500">{formatReferenceType(entry.reference_type)}</p>
+                          <p className="text-xs text-slate-500">
+                            {formatReferenceType(entry.reference_type)}
+                          </p>
                         ) : null}
                       </div>
                     </td>
-                    <td className={`px-4 py-3 text-right font-semibold ${pointsClass(entry.points)}`}>
+                    <td
+                      className={`px-4 py-3 text-right font-semibold ${pointsClass(entry.points)}`}
+                    >
                       {pointsLabel(entry.points)}
                     </td>
                   </tr>

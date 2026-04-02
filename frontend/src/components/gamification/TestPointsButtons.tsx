@@ -41,7 +41,10 @@ export default function TestPointsButtons({
       setMessage({ type: 'success', text: `Accion aplicada: ${action}` });
       notifyPointsUpdate();
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'No se pudo otorgar puntos' });
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'No se pudo otorgar puntos',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +67,10 @@ export default function TestPointsButtons({
       setMessage({ type: 'success', text: `Descuento aplicado: -${points} puntos` });
       notifyPointsUpdate();
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'No se pudo descontar puntos' });
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'No se pudo descontar puntos',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +130,12 @@ export default function TestPointsButtons({
         </button>
       </div>
       {message ? (
-        <p className={cn('mt-3 text-xs', message.type === 'error' ? 'text-red-600' : 'text-emerald-700')}>
+        <p
+          className={cn(
+            'mt-3 text-xs',
+            message.type === 'error' ? 'text-red-600' : 'text-emerald-700',
+          )}
+        >
           {message.text}
         </p>
       ) : null}

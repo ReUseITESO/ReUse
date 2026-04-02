@@ -34,7 +34,11 @@ export function usePointsHistory(enabled: boolean = true) {
         return;
       }
 
-      if (nextFilters.start_date && nextFilters.end_date && nextFilters.start_date > nextFilters.end_date) {
+      if (
+        nextFilters.start_date &&
+        nextFilters.end_date &&
+        nextFilters.start_date > nextFilters.end_date
+      ) {
         setError('La fecha inicial no puede ser mayor que la fecha final.');
         setEntries([]);
         setCount(0);

@@ -25,7 +25,8 @@ export function useLevelProgression(enabled: boolean = true, refreshTrigger: num
       const response = await apiClient<LevelProgression>('/gamification/level-progression/');
       setData(response);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'No se pudo cargar la progresion de nivel';
+      const message =
+        err instanceof Error ? err.message : 'No se pudo cargar la progresion de nivel';
       setError(message);
       setData(null);
     } finally {

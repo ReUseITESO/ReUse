@@ -67,9 +67,7 @@ export default function UserSearch({ onSearch, onSendRequest, friendIds }: UserS
         </button>
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {results.length > 0 && (
         <div className="space-y-2">
@@ -84,7 +82,11 @@ export default function UserSearch({ onSearch, onSendRequest, friendIds }: UserS
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
                     {user.profile_picture ? (
-                      <img src={user.profile_picture} alt={user.first_name} className="h-10 w-10 rounded-full object-cover" />
+                      <img
+                        src={user.profile_picture}
+                        alt={user.first_name}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
                     ) : (
                       user.first_name?.[0]?.toUpperCase()
                     )}

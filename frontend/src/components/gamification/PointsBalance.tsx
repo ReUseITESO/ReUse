@@ -34,7 +34,9 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
           <span className="text-2xl">⚠️</span>
           <div>
             <p className="text-sm font-medium text-yellow-900">Usuario no autenticado</p>
-            <p className="mt-1 text-xs text-yellow-700">Inicia sesion para ver tus puntos acumulados</p>
+            <p className="mt-1 text-xs text-yellow-700">
+              Inicia sesion para ver tus puntos acumulados
+            </p>
           </div>
         </div>
       </div>
@@ -68,7 +70,9 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     <article className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-medium uppercase tracking-wide text-blue-900">Puntos acumulados</h3>
+          <h3 className="text-sm font-medium uppercase tracking-wide text-blue-900">
+            Puntos acumulados
+          </h3>
           <div className="flex items-center gap-3">
             <p className="text-4xl font-bold text-blue-600">{levelProgression.points}</p>
             <span className="rounded-full bg-blue-200 px-3 py-1 text-xs font-semibold text-blue-900">

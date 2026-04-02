@@ -92,7 +92,9 @@ class CurrentUserLevelProgressionViewTests(APITestCase):
         response = self.client.get(self.URL)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["current_level"]["name"], "Sustainability Leader")
+        self.assertEqual(
+            response.data["current_level"]["name"], "Sustainability Leader"
+        )
         self.assertIsNone(response.data["next_level"])
         self.assertEqual(response.data["progress_percent"], 100)
         self.assertEqual(response.data["points_to_next_level"], 0)

@@ -54,7 +54,9 @@ class PointHistorySerializer(serializers.ModelSerializer):
         reference_id = obj.reference_id
 
         if action == PointAction.PUBLISH_ITEM:
-            product = Products.objects.filter(id=reference_id).only("id", "title").first()
+            product = (
+                Products.objects.filter(id=reference_id).only("id", "title").first()
+            )
             if product:
                 return {
                     "type": "product",

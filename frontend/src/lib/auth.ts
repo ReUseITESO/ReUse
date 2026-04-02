@@ -102,7 +102,7 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<any> {
+export async function signUp(payload: SignUpRequest): Promise<Record<string, unknown>> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -120,7 +120,7 @@ export async function signUp(payload: SignUpRequest): Promise<any> {
     throw new Error(body?.error?.message ?? 'Error al crear la cuenta.');
   }
 
-  return body;
+  return body as Record<string, unknown>;
 }
 
 export async function signOut(): Promise<void> {

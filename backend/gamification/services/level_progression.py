@@ -48,7 +48,9 @@ def build_level_progression(points: int) -> dict:
     current_idx, current_level = _resolve_current_level(safe_points)
     is_max_level = current_idx == len(LEVELS) - 1
     next_level = None if is_max_level else LEVELS[current_idx + 1]
-    points_to_next_level = 0 if is_max_level else max(next_level.min_points - safe_points, 0)
+    points_to_next_level = (
+        0 if is_max_level else max(next_level.min_points - safe_points, 0)
+    )
 
     return {
         "points": safe_points,

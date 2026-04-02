@@ -91,9 +91,7 @@ def _parse_date_boundary(value, *, is_end):
     try:
         parsed_date = datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError as err:
-        raise ValidationError(
-            {"date": "Invalid date format. Use YYYY-MM-DD."}
-        ) from err
+        raise ValidationError({"date": "Invalid date format. Use YYYY-MM-DD."}) from err
 
     boundary_time = time.max if is_end else time.min
     return make_aware(datetime.combine(parsed_date, boundary_time))

@@ -28,9 +28,7 @@ export default function PendingRequests({ requests, onAccept, onReject }: Pendin
 
   if (requests.length === 0) {
     return (
-      <p className="py-6 text-center text-sm text-gray-500">
-        No tienes solicitudes pendientes
-      </p>
+      <p className="py-6 text-center text-sm text-gray-500">No tienes solicitudes pendientes</p>
     );
   }
 
@@ -44,7 +42,11 @@ export default function PendingRequests({ requests, onAccept, onReject }: Pendin
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
               {req.from_user.profile_picture ? (
-                <img src={req.from_user.profile_picture} alt={req.from_user.first_name} className="h-10 w-10 rounded-full object-cover" />
+                <img
+                  src={req.from_user.profile_picture}
+                  alt={req.from_user.first_name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
               ) : (
                 req.from_user.first_name?.[0]?.toUpperCase()
               )}
