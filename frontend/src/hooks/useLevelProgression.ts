@@ -5,12 +5,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import type { LevelProgression } from '@/types/gamification';
 
-export function useLevelProgression() {
+export function useLevelProgression(enabled: boolean = true, refreshTrigger: number = 0) {
   const [data, setData] = useState<LevelProgression | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchLevelProgression = useCallback(async () => {
+    if (!enabled) {
+      setIsLoading(false);
+      setError(null);
+      setData(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -24,11 +31,11 @@ export function useLevelProgression() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     fetchLevelProgression();
-  }, [fetchLevelProgression]);
+  }, [fetchLevelProgression, refreshTrigger]);
 
   return {
     levelProgression: data,

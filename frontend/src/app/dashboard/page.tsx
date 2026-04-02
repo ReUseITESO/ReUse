@@ -5,15 +5,11 @@ import { useState } from 'react';
 import BadgesList from '@/components/gamification/BadgesList';
 import ChallengesBoard from '@/components/gamification/ChallengesBoard';
 import PointsBalance from '@/components/gamification/PointsBalance';
-import TestPointsButtons from '@/components/gamification/TestPointsButtons';
 import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
+import TestPointsButtons from '@/components/gamification/TestPointsButtons';
 
 export default function DashboardPage() {
   const [pointsVersion, setPointsVersion] = useState(0);
-
-  const handlePointsUpdated = () => {
-    setPointsVersion(v => v + 1);
-  };
 
   return (
     <main className="min-h-screen bg-background p-6">
@@ -35,7 +31,7 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-h3 font-semibold text-fg">Mi Gamificación</h2>
             <PointsBalance refreshTrigger={pointsVersion} />
           </div>
-          <TestPointsButtons onPointsUpdated={() => setPointsVersion(v => v + 1)} />
+
           <div>
             <h2 className="mb-4 text-h3 font-semibold text-fg">Insignias</h2>
             <BadgesList />

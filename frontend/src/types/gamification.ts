@@ -89,7 +89,6 @@ export interface UserChallenge {
   end_date: string;
   is_expired: boolean;
 }
-
 export interface PointHistoryEntry {
   id: number;
   action: string;
@@ -107,3 +106,4 @@ export interface PointsHistoryFilters {
   action?: string;
   ordering?: string;
 }
+

@@ -65,7 +65,9 @@ class CurrentUserLevelProgressionViewTests(APITestCase):
     def test_get_level_progression_requires_auth(self):
         response = self.client.get(self.URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data["detail"], "Authentication required.")
+        self.assertIn("error", response.data)
+        self.assertIn("details", response.data["error"])
+        self.assertIn("detail", response.data["error"]["details"])
 
     def test_post_is_not_allowed(self):
         response = self.client.post(self.URL, {}, format="json")

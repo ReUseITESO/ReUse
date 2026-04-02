@@ -11,6 +11,7 @@ from gamification.views.challenges import (
     MyChallengesView,
 )
 from gamification.views.deduct_points import DeductPointsView
+from gamification.views.point_history import PointsHistoryView
 from gamification.views.points import (
 	CurrentUserLevelProgressionView,
 	CurrentUserPointsView,
@@ -20,6 +21,7 @@ from gamification.views.points import (
 urlpatterns = [
 	path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),
 	path("points/", CurrentUserPointsView.as_view(), name="current-user-points"),
+	path("points/history/", PointsHistoryView.as_view(), name="points-history"),
 	path("points/<int:user_id>/", UserPointsView.as_view(), name="user-points"),
 	path(
 		"level-progression/",
