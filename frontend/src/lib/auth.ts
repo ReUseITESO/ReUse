@@ -140,4 +140,30 @@ export async function getProfile(): Promise<User> {
   return authFetch<User>('/auth/profile/');
 }
 
+export async function getMicrosoftAuthUrl(): Promise<string> {
+  const response = await fetch(`${API_BASE}/auth/microsoft/`);
+  if (!response.ok) {
+    throw new Error('No se pudo iniciar el flujo de autenticación con Microsoft.');
+  }
+  const data = await response.json();
+  return data.auth_url;
+}
+
+export async function microsoftSignIn(code: string): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE}/auth/microsoft/callback/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Error al autenticar con Microsoft.');
+  }
+
+  const data: AuthResponse = await response.json();
+  storeTokens(data.tokens);
+  return data;
+}
+
 export { authFetch };
