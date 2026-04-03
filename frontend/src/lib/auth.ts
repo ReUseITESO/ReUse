@@ -53,6 +53,11 @@ async function authFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
     }
   }
 
+  if (response.status === 429) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+  }
+
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const message = body?.error?.message ?? body?.message ?? `Error ${response.status}`;
@@ -91,6 +96,11 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
     body: JSON.stringify(credentials),
   });
 
+  if (response.status === 429) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+  }
+
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const message = body?.error?.message ?? 'Correo o contraseña incorrectos.';
@@ -110,6 +120,10 @@ export async function signUp(payload: SignUpRequest): Promise<any> {
   });
 
   const body = await response.json().catch(() => ({}));
+
+  if (response.status === 429) {
+    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+  }
 
   if (!response.ok) {
     if (body?.error?.details) {

@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
@@ -107,6 +108,7 @@ class SignUpView(generics.CreateAPIView):
 
     serializer_class = SignUpSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
 
     # Cambios realizados para mandar el tocken con verificacion al correo
     def create(self, request, *args, **kwargs):
@@ -143,6 +145,7 @@ class SignInView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request):
         serializer = SignInSerializer(data=request.data)
@@ -263,6 +266,7 @@ class EmailVerificationSendView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [EmailVerificationRateThrottle]
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
