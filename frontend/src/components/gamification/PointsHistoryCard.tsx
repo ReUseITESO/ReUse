@@ -43,7 +43,7 @@ function toIsoDate(date: Date) {
 function buildLastDaysRange(days: number) {
   const end = new Date();
   const start = new Date();
-  start.setDate(end.getDate() - days);
+  start.setDate(end.getDate() - (days - 1));
   return {
     start_date: toIsoDate(start),
     end_date: toIsoDate(end),
@@ -272,7 +272,7 @@ export default function PointsHistoryCard() {
         <EmptyState
           message="No hay movimientos para los filtros seleccionados."
           actionLabel="Quitar filtros"
-          onAction={() => fetchHistory(filters, 1)}
+          onAction={handleClearFilters}
         />
       ) : (
         <>

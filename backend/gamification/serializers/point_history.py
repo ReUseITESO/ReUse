@@ -33,21 +33,27 @@ class PointHistorySerializer(serializers.ModelSerializer):
         return obj.action
 
     def get_reference_type(self, obj):
-        reference = self._resolve_reference(obj)
+        reference = self._get_reference_details(obj)
         if reference:
             return reference["type"]
         return None
 
     def get_reference_label(self, obj):
-        reference = self._resolve_reference(obj)
+        reference = self._get_reference_details(obj)
         if reference:
             return reference["label"]
         if obj.reference_id:
             return f"Referencia #{obj.reference_id}"
         return None
 
-    def _resolve_reference(self, obj):
+    def _get_reference_details(self, obj):
+        cache_attr = "_point_history_reference_details"
+        cached = getattr(obj, cache_attr, None)
+        if cached is not None:
+                        return cached
+
         if not obj.reference_id:
+            setattr(obj, cache_attr, None)
             return None
 
         action = obj.action
@@ -58,10 +64,12 @@ class PointHistorySerializer(serializers.ModelSerializer):
                 Products.objects.filter(id=reference_id).only("id", "title").first()
             )
             if product:
-                return {
+                details = {
                     "type": "product",
                     "label": f"Producto: {product.title}",
                 }
+                setattr(obj, cache_attr, details)
+                return details
 
         if action in {
             PointAction.COMPLETE_DONATION,
@@ -76,18 +84,22 @@ class PointHistorySerializer(serializers.ModelSerializer):
                 .first()
             )
             if transaction:
-                return {
+                details = {
                     "type": "transaction",
                     "label": f"Transaccion #{transaction.id} - {transaction.product.title}",
                 }
+                setattr(obj, cache_attr, details)
+                return details
 
         # Fallback: attempt to resolve either entity for legacy data.
         product = Products.objects.filter(id=reference_id).only("id", "title").first()
         if product:
-            return {
+            details = {
                 "type": "product",
                 "label": f"Producto: {product.title}",
             }
+            setattr(obj, cache_attr, details)
+            return details
 
         transaction = (
             Transaction.objects.filter(id=reference_id)
@@ -96,9 +108,12 @@ class PointHistorySerializer(serializers.ModelSerializer):
             .first()
         )
         if transaction:
-            return {
+            details = {
                 "type": "transaction",
                 "label": f"Transaccion #{transaction.id} - {transaction.product.title}",
             }
+            setattr(obj, cache_attr, details)
+            return details
 
+        setattr(obj, cache_attr, None)
         return None
