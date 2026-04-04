@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
 import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
@@ -83,7 +83,7 @@ export default function ProfilePage() {
                     onClick={() => setIsEditing(true)}
                     className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
                   >
-                    <Pencil className="h-4 w-4" /> Editar perfil
+                    <span aria-hidden="true">✏️</span> Editar perfil
                   </button>
                 </div>
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
@@ -122,6 +122,15 @@ export default function ProfilePage() {
           <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
             <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">Logros y Medallas</h2>
             <BadgesList />
+          </div>
+        </section>
+
+        <section>
+          <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">
+              Historial de puntos
+            </h2>
+            <PointsHistoryCard />
           </div>
         </section>
       </div>

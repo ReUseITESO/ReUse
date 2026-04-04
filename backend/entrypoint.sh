@@ -16,7 +16,7 @@ done
 echo "Database ready"
 
 echo "Running migrations..."
-python manage.py migrate --noinput
+python manage.py migrate --noinput --fake-initial
 
 echo "Seeding development data..."
 python manage.py seed_dev_data

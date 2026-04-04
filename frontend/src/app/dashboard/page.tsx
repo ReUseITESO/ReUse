@@ -5,7 +5,6 @@ import { useState } from 'react';
 import BadgesList from '@/components/gamification/BadgesList';
 import ChallengesBoard from '@/components/gamification/ChallengesBoard';
 import PointsBalance from '@/components/gamification/PointsBalance';
-import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
 import TestPointsButtons from '@/components/gamification/TestPointsButtons';
 
 export default function DashboardPage() {
@@ -35,11 +34,6 @@ export default function DashboardPage() {
           <div>
             <h2 className="mb-4 text-h3 font-semibold text-fg">Insignias</h2>
             <BadgesList />
-          </div>
-
-          <div>
-            <h2 className="mb-4 text-h3 font-semibold text-fg">Historial y desglose</h2>
-            <PointsHistoryCard />
           </div>
 
           <div>
