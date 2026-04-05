@@ -13,6 +13,7 @@ from gamification.views.challenges import (
 )
 from gamification.views.deduct_points import DeductPointsView
 from gamification.views.points import CurrentUserPointsView, UserPointsView
+from gamification.views.avatar import AvatarView
 
 urlpatterns = [
     path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),
@@ -27,4 +28,5 @@ urlpatterns = [
         JoinChallengeView.as_view(),
         name="join-challenge",
     ),
+    path("avatar/", AvatarView.as_view(), name="user-avatar"),
 ]

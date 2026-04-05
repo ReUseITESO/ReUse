@@ -55,7 +55,8 @@ export default function CustomizationPage() {
 				<div className="grid grid-cols-2 
 						gap-4 place-items-center">
 					<ProfilePicture profileBorder={profileBorder}
-						profilePicture={displayUrl}/>
+						profilePicture={displayUrl}
+						onChange={setProfileBorder}/>
 					<ProfileBorderEditor profileBorder={profileBorder}
 						onChange={setProfileBorder}/>
 				</div>				
