@@ -73,3 +73,13 @@ export interface UserChallenge {
   end_date: string;
   is_expired: boolean;
 }
+
+export interface ProfileBorder {
+	width: number;
+	color: string;
+	shadowColor: string;
+	shadowWidth: number;
+  zoomLevel: number;
+  posX: number;
+  posY: number;
+};
