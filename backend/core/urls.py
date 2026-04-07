@@ -22,10 +22,12 @@ urlpatterns = [
         views.EmailVerificationConfirmView.as_view(),
         name="email_verification_confirm",
     ),
-
     # HU-CORE-04: Dashboard
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
-
     # HU-CORE-10: Profile picture upload
-    path("profile/upload-picture/", views.ProfilePictureUploadView.as_view(), name="profile-upload-picture"),
+    path(
+        "profile/upload-picture/",
+        views.ProfilePictureUploadView.as_view(),
+        name="profile-upload-picture",
+    ),
 ]

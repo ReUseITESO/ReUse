@@ -412,12 +412,22 @@ class ProfilePictureUploadView(APIView):
         file = request.FILES.get("file")
         if not file:
             return Response(
-                {"error": {"code": "NO_FILE", "message": "No se envio ningun archivo."}},
+                {
+                    "error": {
+                        "code": "NO_FILE",
+                        "message": "No se envio ningun archivo.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.content_type not in self.ALLOWED_TYPES:
             return Response(
-                {"error": {"code": "INVALID_TYPE", "message": "Solo imagenes (JPEG, PNG, WebP, GIF)."}},
+                {
+                    "error": {
+                        "code": "INVALID_TYPE",
+                        "message": "Solo imagenes (JPEG, PNG, WebP, GIF).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.size > self.MAX_SIZE:

@@ -98,9 +98,7 @@ class TransactionCreateSerializer(serializers.Serializer):
 
     def validate_delivery_date(self, value):
         if value <= timezone.now():
-            raise serializers.ValidationError(
-                "La fecha de entrega debe ser futura."
-            )
+            raise serializers.ValidationError("La fecha de entrega debe ser futura.")
         return value
 
 
@@ -129,7 +127,9 @@ class TransactionHistorySerializer(TransactionSerializer):
         if not request or not request.user.is_authenticated:
             return None
         try:
-            review = TransactionReview.objects.get(transaction=obj, reviewer=request.user)
+            review = TransactionReview.objects.get(
+                transaction=obj, reviewer=request.user
+            )
             return TransactionReviewSerializer(review).data
         except TransactionReview.DoesNotExist:
             return None

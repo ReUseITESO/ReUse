@@ -55,9 +55,9 @@ class TransactionApiTests(APITestCase):
     def _create_transaction(self, user=None, product_id=None, delivery_date=None):
         actor = user or self.buyer
         target_product_id = product_id or self.product.pk
-        target_delivery_date = delivery_date or (
-            timezone.now() + timedelta(days=1)
-        ).isoformat()
+        target_delivery_date = (
+            delivery_date or (timezone.now() + timedelta(days=1)).isoformat()
+        )
         self._auth(actor)
         return self.client.post(
             self.TRANSACTIONS_URL,

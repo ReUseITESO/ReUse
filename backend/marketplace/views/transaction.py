@@ -141,9 +141,25 @@ class TransactionViewSet(
             "Supports filtering by transaction_type, date_from, and date_to."
         ),
         parameters=[
-            OpenApiParameter(name="transaction_type", type=OpenApiTypes.STR, location=OpenApiParameter.QUERY, required=False, enum=["donation", "sale", "swap"]),
-            OpenApiParameter(name="date_from", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="date_to", type=OpenApiTypes.DATE, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(
+                name="transaction_type",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                enum=["donation", "sale", "swap"],
+            ),
+            OpenApiParameter(
+                name="date_from",
+                type=OpenApiTypes.DATE,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="date_to",
+                type=OpenApiTypes.DATE,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
         ],
         responses={200: TransactionHistorySerializer(many=True)},
         tags=["Marketplace > Transactions"],
@@ -166,10 +182,14 @@ class TransactionViewSet(
 
         page = self.paginate_queryset(qs)
         if page is not None:
-            serializer = TransactionHistorySerializer(page, many=True, context=self.get_serializer_context())
+            serializer = TransactionHistorySerializer(
+                page, many=True, context=self.get_serializer_context()
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = TransactionHistorySerializer(qs, many=True, context=self.get_serializer_context())
+        serializer = TransactionHistorySerializer(
+            qs, many=True, context=self.get_serializer_context()
+        )
         return Response(serializer.data)
 
     @extend_schema(
@@ -183,19 +203,37 @@ class TransactionViewSet(
     def review(self, request, pk=None):
         transaction = self.get_object()
 
-        if transaction.seller_id != request.user.id and transaction.buyer_id != request.user.id:
-            return Response({"detail": "No eres parte de esta transaccion."}, status=status.HTTP_403_FORBIDDEN)
+        if (
+            transaction.seller_id != request.user.id
+            and transaction.buyer_id != request.user.id
+        ):
+            return Response(
+                {"detail": "No eres parte de esta transaccion."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         if transaction.status != "completada":
-            return Response({"detail": "Solo puedes calificar transacciones completadas."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Solo puedes calificar transacciones completadas."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        if TransactionReview.objects.filter(transaction=transaction, reviewer=request.user).exists():
-            return Response({"detail": "Ya calificaste esta transaccion."}, status=status.HTTP_400_BAD_REQUEST)
+        if TransactionReview.objects.filter(
+            transaction=transaction, reviewer=request.user
+        ).exists():
+            return Response(
+                {"detail": "Ya calificaste esta transaccion."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = TransactionReviewCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        reviewee = transaction.buyer if transaction.seller_id == request.user.id else transaction.seller
+        reviewee = (
+            transaction.buyer
+            if transaction.seller_id == request.user.id
+            else transaction.seller
+        )
         TransactionReview.objects.create(
             transaction=transaction,
             reviewer=request.user,

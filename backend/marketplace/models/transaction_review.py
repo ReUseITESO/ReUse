@@ -34,4 +34,6 @@ class TransactionReview(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Review by {self.reviewer_id} on tx {self.transaction_id}: {self.rating}/5"
+        return (
+            f"Review by {self.reviewer_id} on tx {self.transaction_id}: {self.rating}/5"
+        )
