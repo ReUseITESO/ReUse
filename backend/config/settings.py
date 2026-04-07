@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "core",
     "marketplace",
     "gamification",
+    "social",
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,13 @@ AUTHENTICATION_BACKENDS = [
     "core.backends.EmailBackend",
 ]
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "reuse-rate-limit",
+    }
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -121,6 +129,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "core.throttles.StandardAnonThrottle",
+        "core.throttles.StandardUserThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+        "auth": "5/minute",
+        "email_verification": "3/minute",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": [
@@ -163,6 +181,10 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "Marketplace > Categories",
             "description": "Product category endpoints.",
+        },
+        {
+            "name": "Marketplace > Transactions",
+            "description": "Transaction flow endpoints for buyer and seller actions.",
         },
     ],
     "CONTACT": {
@@ -252,11 +274,20 @@ logger = logging.getLogger(__name__)
 logger.info("Application started")
 
 FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
+
+MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID", "")
+MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET", "")
+MICROSOFT_TENANT_ID = os.environ.get("MICROSOFT_TENANT_ID", "common")
+MICROSOFT_REDIRECT_URI = os.environ.get(
+    "MICROSOFT_REDIRECT_URI", "http://localhost:3000/auth/microsoft/callback"
+)
 EMAIL_VERIFICATION_EXPIRES_MINUTES = int(
     os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30")
 )
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useEffect } from 'react';
 
 interface FormErrors {
   email?: string;
@@ -30,8 +31,13 @@ export default function SignUpPage() {
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/');
+    }
+  }, [isAuthenticated, router]);
+
   if (isAuthenticated) {
-    router.replace('/products');
     return null;
   }
 
@@ -51,11 +57,11 @@ export default function SignUpPage() {
     if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
     if (/\d/.test(pw)) score++;
     if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 1) return { label: 'Débil', color: 'bg-red-500', width: '20%' };
-    if (score === 2) return { label: 'Regular', color: 'bg-orange-500', width: '40%' };
-    if (score === 3) return { label: 'Aceptable', color: 'bg-yellow-500', width: '60%' };
-    if (score === 4) return { label: 'Fuerte', color: 'bg-green-500', width: '80%' };
-    return { label: 'Muy fuerte', color: 'bg-green-600', width: '100%' };
+    if (score <= 1) return { label: 'Débil', color: 'bg-error', width: '20%' };
+    if (score === 2) return { label: 'Regular', color: 'bg-warning', width: '40%' };
+    if (score === 3) return { label: 'Aceptable', color: 'bg-warning', width: '60%' };
+    if (score === 4) return { label: 'Fuerte', color: 'bg-success', width: '80%' };
+    return { label: 'Muy fuerte', color: 'bg-success', width: '100%' };
   };
 
   const passwordStrength = getPasswordStrength(form.password);
@@ -138,8 +144,7 @@ export default function SignUpPage() {
         password: form.password,
         password_confirm: form.password_confirm,
       });
-      // Account created but needs email verification before login
-      router.push('/auth/verify-notice');
+      router.push(`/auth/check-email?email=${encodeURIComponent(form.email.trim().toLowerCase())}`);
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Error al crear la cuenta.');
     } finally {
@@ -148,28 +153,33 @@ export default function SignUpPage() {
   };
 
   const inputClass = (fieldError?: string) =>
-    `w-full rounded-lg border px-4 py-2.5 text-gray-900 placeholder-gray-400
+    `w-full rounded-lg border px-4 py-2.5 text-fg placeholder-muted-fg
      focus:outline-none focus:ring-2 disabled:opacity-50
-     ${fieldError ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`;
+     ${fieldError ? 'border-error focus:border-error focus:ring-error' : 'border-input focus:border-ring focus:ring-ring'}`;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">ReUseITESO</h1>
-          <p className="mt-2 text-gray-500">Crea tu cuenta con tu correo ITESO</p>
+          <img
+            src="/ReUseITESOLogo.png"
+            alt="ReUseITESO logo"
+            className="mx-auto mb-3 h-12 w-12 object-contain"
+          />
+          <h1 className="text-h1 font-bold text-fg">ReUseITESO</h1>
+          <p className="mt-2 text-muted-fg">Crea tu cuenta con tu correo ITESO</p>
         </div>
 
         {serverError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">
             {serverError}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-              Correo ITESO <span className="text-red-500">*</span>
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-fg">
+              Correo ITESO <span className="text-error">*</span>
             </label>
             <input
               id="email"
@@ -181,13 +191,13 @@ export default function SignUpPage() {
               disabled={isSubmitting}
               className={inputClass(errors.email)}
             />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+            {errors.email && <p className="mt-1 text-xs text-error">{errors.email}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="first_name" className="mb-1 block text-sm font-medium text-gray-700">
-                Nombre <span className="text-red-500">*</span>
+              <label htmlFor="first_name" className="mb-1 block text-sm font-medium text-fg">
+                Nombre <span className="text-error">*</span>
               </label>
               <input
                 id="first_name"
@@ -199,13 +209,11 @@ export default function SignUpPage() {
                 disabled={isSubmitting}
                 className={inputClass(errors.first_name)}
               />
-              {errors.first_name && (
-                <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>
-              )}
+              {errors.first_name && <p className="mt-1 text-xs text-error">{errors.first_name}</p>}
             </div>
             <div>
-              <label htmlFor="last_name" className="mb-1 block text-sm font-medium text-gray-700">
-                Apellido <span className="text-red-500">*</span>
+              <label htmlFor="last_name" className="mb-1 block text-sm font-medium text-fg">
+                Apellido <span className="text-error">*</span>
               </label>
               <input
                 id="last_name"
@@ -217,13 +225,13 @@ export default function SignUpPage() {
                 disabled={isSubmitting}
                 className={inputClass(errors.last_name)}
               />
-              {errors.last_name && <p className="mt-1 text-xs text-red-600">{errors.last_name}</p>}
+              {errors.last_name && <p className="mt-1 text-xs text-error">{errors.last_name}</p>}
             </div>
           </div>
 
           <div>
-            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
-              Teléfono <span className="text-red-500">*</span>
+            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-fg">
+              Teléfono <span className="text-error">*</span>
             </label>
             <input
               id="phone"
@@ -235,12 +243,12 @@ export default function SignUpPage() {
               disabled={isSubmitting}
               className={inputClass(errors.phone)}
             />
-            {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
+            {errors.phone && <p className="mt-1 text-xs text-error">{errors.phone}</p>}
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-              Contraseña <span className="text-red-500">*</span>
+            <label htmlFor="password" className="mb-1 block text-sm font-medium text-fg">
+              Contraseña <span className="text-error">*</span>
             </label>
             <input
               id="password"
@@ -255,25 +263,22 @@ export default function SignUpPage() {
             {form.password && (
               <div className="mt-2">
                 <div className="flex items-center gap-2">
-                  <div className="h-1.5 flex-1 rounded-full bg-gray-200">
+                  <div className="h-1.5 flex-1 rounded-full bg-muted">
                     <div
                       className={`h-1.5 rounded-full transition-all ${passwordStrength.color}`}
                       style={{ width: passwordStrength.width }}
                     />
                   </div>
-                  <span className="text-xs text-gray-500">{passwordStrength.label}</span>
+                  <span className="text-xs text-muted-fg">{passwordStrength.label}</span>
                 </div>
               </div>
             )}
-            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+            {errors.password && <p className="mt-1 text-xs text-error">{errors.password}</p>}
           </div>
 
           <div>
-            <label
-              htmlFor="password_confirm"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Confirmar contraseña <span className="text-red-500">*</span>
+            <label htmlFor="password_confirm" className="mb-1 block text-sm font-medium text-fg">
+              Confirmar contraseña <span className="text-error">*</span>
             </label>
             <input
               id="password_confirm"
@@ -286,23 +291,23 @@ export default function SignUpPage() {
               className={inputClass(errors.password_confirm)}
             />
             {errors.password_confirm && (
-              <p className="mt-1 text-xs text-red-600">{errors.password_confirm}</p>
+              <p className="mt-1 text-xs text-error">{errors.password_confirm}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition-colors
-                       hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded-lg bg-btn-primary px-4 py-2.5 font-medium text-btn-primary-fg transition-colors
+                       hover:bg-primary-hover disabled:opacity-50"
           >
             {isSubmitting ? 'Creando cuenta…' : 'Crear cuenta'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-muted-fg">
           ¿Ya tienes cuenta?{' '}
-          <Link href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link href="/auth/signin" className="font-medium text-primary hover:text-primary-hover">
             Inicia sesión
           </Link>
         </p>

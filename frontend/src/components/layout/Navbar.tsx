@@ -1,105 +1,135 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Bell, LogOut, Menu, Plus, ArrowLeftRight, User, X } from 'lucide-react';
+import { NAV_LINKS } from '@/components/layout/navLinks';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const handleSignOut = async () => {
-    await signOut();
+  function handleSignOut() {
+    signOut();
+    setMenuOpen(false);
+    setProfileOpen(false);
     router.push('/');
-  };
+  }
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+  function isActive(href: string): boolean {
+    return href === '/' ? pathname === '/' : pathname.startsWith(href);
+  }
+
+  const visibleLinks = NAV_LINKS.filter(l => !l.authOnly || isAuthenticated);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-xl font-bold text-blue-600">
-          ReUseITESO
+        <Link href="/" className="flex items-center gap-2 text-h3 font-bold text-primary">
+          <img
+            src="/ReUseITESOLogo.png"
+            alt="ReUseITESO logo"
+            className="h-12 w-12 object-contain"
+          />
+          <span className="hidden sm:inline">ReUseITESO</span>
         </Link>
 
-        <div className="hidden items-center gap-6 sm:flex">
-          <Link
-            href="/products"
-            className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-          >
-            Productos
-          </Link>
+        {/* Desktop nav */}
+        <div className="hidden items-center gap-1 md:flex">
+          {visibleLinks.map(link => {
+            const Icon = link.icon;
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-primary/10 text-primary' : 'text-muted-fg hover:bg-muted hover:text-fg'}`}
+              >
+                <Icon className="h-4 w-4" /> {link.label}
+              </Link>
+            );
+          })}
+        </div>
 
-          {isAuthenticated && (
+        {/* Desktop right */}
+        <div className="hidden items-center gap-3 md:flex">
+          {isLoading ? (
+            <div className="h-8 w-20 animate-pulse rounded-lg bg-muted" />
+          ) : isAuthenticated ? (
             <>
               <Link
-                href="/products/my"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                href="/products/new"
+                className="flex items-center gap-1.5 rounded-lg bg-btn-primary px-3 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
               >
-                Mis artículos
+                <Plus className="h-4 w-4" /> Publicar
               </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-              >
-                Dashboard
-              </Link>
-            </>
-          )}
-
-          {isLoading ? (
-            <div className="h-8 w-20 animate-pulse rounded-lg bg-gray-200" />
-          ) : isAuthenticated ? (
-            <div className="relative">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="relative rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
+                aria-label="Notificaciones"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
-                  {user?.first_name?.[0]?.toUpperCase() ?? 'U'}
-                </span>
-                <span className="hidden md:inline">{user?.first_name}</span>
+                <Bell className="h-5 w-5" />
               </button>
-
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-gray-200 bg-white py-2 shadow-lg">
-                    <div className="border-b border-gray-100 px-4 pb-2">
-                      <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+              <div className="relative">
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${profileOpen ? 'bg-muted' : 'hover:bg-muted'}`}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    {user?.first_name?.[0]?.toUpperCase() ?? 'U'}
+                  </span>
+                  <span className="hidden text-fg lg:inline">{user?.first_name}</span>
+                </button>
+                {profileOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+                    <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg">
+                      <div className="border-b border-border px-4 py-3">
+                        <p className="text-sm font-medium text-fg">{user?.full_name}</p>
+                        <p className="text-xs text-muted-fg">{user?.email}</p>
+                      </div>
+                      <Link
+                        href="/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
+                      >
+                        <User className="h-4 w-4 text-info" /> Mi perfil
+                      </Link>
+                      <Link
+                        href="/transactions"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
+                      >
+                        <ArrowLeftRight className="h-4 w-4 text-info" /> Transacciones
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-error/5"
+                      >
+                        <LogOut className="h-4 w-4" /> Cerrar sesion
+                      </button>
                     </div>
-                    <Link
-                      href="/profile"
-                      onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                    >
-                      Mi perfil
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        handleSignOut();
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+                  </>
+                )}
+              </div>
+            </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Link
                 href="/auth/signin"
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-fg transition-colors hover:bg-muted"
               >
-                Iniciar sesión
+                Iniciar sesion
               </Link>
               <Link
                 href="/auth/signup"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
               >
                 Registrarse
               </Link>
@@ -107,90 +137,97 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* Mobile hamburger */}
         <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 sm:hidden"
-          aria-label="Menú"
+          onClick={() => {
+            setMenuOpen(!menuOpen);
+            setProfileOpen(false);
+          }}
+          className="rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted md:hidden"
+          aria-label={menuOpen ? 'Cerrar menu' : 'Abrir menu'}
         >
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-          >
-            {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            )}
-          </svg>
+          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
+      {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-gray-200 px-4 pb-4 pt-2 sm:hidden">
-          <Link
-            href="/products"
-            onClick={() => setMenuOpen(false)}
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-          >
-            Productos
-          </Link>
+        <div className="border-t border-border bg-card px-4 pb-4 pt-2 md:hidden">
+          <div className="space-y-1">
+            {visibleLinks.map(link => {
+              const Icon = link.icon;
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active ? 'bg-primary/10 text-primary' : 'text-muted-fg hover:bg-muted'}`}
+                >
+                  <Icon className="h-5 w-5" /> {link.label}
+                </Link>
+              );
+            })}
+            {isAuthenticated && (
+              <>
+                <Link
+                  href="/products/new"
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+                >
+                  <Plus className="h-5 w-5" /> Publicar item
+                </Link>
+                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted">
+                  <Bell className="h-5 w-5" /> Notificaciones
+                </button>
+              </>
+            )}
+          </div>
           {isAuthenticated ? (
-            <>
-              <Link
-                href="/products/my"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-              >
-                Mis artículos
-              </Link>
-              <Link
-                href="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-              >
-                Dashboard
-              </Link>
+            <div className="mt-3 border-t border-border pt-3">
+              <div className="flex items-center gap-3 px-3 py-2">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                  {user?.first_name?.[0]?.toUpperCase() ?? 'U'}
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-fg">{user?.full_name}</p>
+                  <p className="text-xs text-muted-fg">{user?.email}</p>
+                </div>
+              </div>
               <Link
                 href="/profile"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+                onClick={closeMenu}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted"
               >
-                Mi perfil
+                <User className="h-5 w-5" /> Mi perfil
               </Link>
-              <div className="my-2 border-t border-gray-100 pt-2">
-                <p className="px-3 text-sm font-medium text-gray-900">{user?.full_name}</p>
-                <p className="px-3 text-xs text-gray-500">{user?.email}</p>
-              </div>
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  handleSignOut();
-                }}
-                className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+              <Link
+                href="/transactions"
+                onClick={closeMenu}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-info transition-colors hover:bg-info/10"
               >
-                Cerrar sesión
+                <ArrowLeftRight className="h-5 w-5" /> Transacciones
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-error transition-colors hover:bg-error/5"
+              >
+                <LogOut className="h-5 w-5" /> Cerrar sesion
               </button>
-            </>
+            </div>
           ) : (
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
               <Link
                 href="/auth/signin"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100"
+                onClick={closeMenu}
+                className="rounded-lg px-3 py-2.5 text-center text-sm font-medium text-fg hover:bg-muted"
               >
-                Iniciar sesión
+                Iniciar sesion
               </Link>
               <Link
                 href="/auth/signup"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-lg bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
+                onClick={closeMenu}
+                className="rounded-lg bg-btn-primary px-3 py-2.5 text-center text-sm font-medium text-btn-primary-fg hover:bg-primary-hover"
               >
                 Registrarse
               </Link>

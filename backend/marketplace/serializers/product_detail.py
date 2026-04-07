@@ -3,6 +3,7 @@ from rest_framework import serializers
 from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
 from marketplace.serializers.product import ImageSerializer
+from marketplace.services.transaction_service import has_active_transaction
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -12,9 +13,13 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     seller_name = serializers.SerializerMethodField()
     seller_email = serializers.EmailField(source="seller.email", read_only=True)
     images = ImageSerializer(many=True, read_only=True)
+    has_active_transaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         return obj.seller.get_full_name()
+
+    def get_has_active_transaction(self, obj):
+        return has_active_transaction(obj)
 
     class Meta:
         model = Products
@@ -30,6 +35,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "category",
             "seller_name",
             "seller_email",
+            "has_active_transaction",
             "created_at",
             "images",
         ]

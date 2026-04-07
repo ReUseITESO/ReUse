@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/auth/", include("core.urls")),
     path("api/marketplace/", include("marketplace.urls")),
     path("api/gamification/", include("gamification.urls")),
+    path("api/social", include("social.urls")),
     # API Documentation (Swagger / OpenAPI)
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

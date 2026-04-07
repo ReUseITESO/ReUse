@@ -1,20 +1,88 @@
-// Scaffolding: TypeScript types for marketplace transactions.
-// Update these interfaces to match the actual backend response shape
-// once the transaction endpoints are implemented.
-// See docs/architecture/contracts.md for typing conventions.
+import type { Category, ProductCondition, ProductStatus, TransactionType } from '@/types/product';
 
-import type { Product } from '@/types/product';
-import type { User } from '@/types/user';
+export type TransactionStatus = 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+export type UpdatableTransactionStatus = 'confirmada' | 'completada' | 'cancelada';
 
-export type TransactionStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
+export interface TransactionUserSummary {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+export interface TransactionProductSummary {
+  id: number;
+  title: string;
+  description: string;
+  condition?: ProductCondition | null;
+  transaction_type: TransactionType;
+  status: ProductStatus;
+  price: string | null;
+  image_url: string | null;
+  category: Category;
+}
 
 export interface Transaction {
   id: number;
-  product: Product;
-  buyer: Pick<User, 'id' | 'first_name' | 'last_name'>;
-  seller: Pick<User, 'id' | 'first_name' | 'last_name'>;
+  product: TransactionProductSummary;
+  seller: TransactionUserSummary;
+  buyer: TransactionUserSummary;
+  transaction_type: TransactionType;
   status: TransactionStatus;
-  message: string | null;
+  seller_confirmation: boolean;
+  seller_confirmed_at: string | null;
+  buyer_confirmation: boolean;
+  buyer_confirmed_at: string | null;
+  delivery_date: string | null;
+  delivery_location: string;
   created_at: string;
-  updated_at: string;
+  expires_at: string;
+  is_expired: boolean;
+}
+
+export interface CreateTransactionPayload {
+  product_id: number;
+  delivery_location: string;
+  delivery_date: string;
+}
+
+export interface UpdateTransactionStatusPayload {
+  status: UpdatableTransactionStatus;
+}
+
+// CreateTransactionDialog
+export interface CreateTransactionDialogProps {
+  isOpen: boolean;
+  productTitle: string;
+  sellerName: string;
+  sellerEmail: string;
+  transactionType: TransactionType;
+  isLoading: boolean;
+  error: string | null;
+  onCancel: () => void;
+  onSubmit: (deliveryLocation: string, deliveryDate: Date) => Promise<void>;
+}
+
+// MeetingLocationFields
+
+export interface MeetingLocationFieldsProps {
+  buildingCode: string;
+  roomNumber: string;
+  meetingDateTime: Date | null;
+  disabled: boolean;
+  onBuildingChange: (value: string) => void;
+  onRoomChange: (value: string) => void;
+  onDateTimeChange: (value: Date | null) => void;
+  onTimeErrorChange?: (message: string | null) => void;
+}
+
+// TransactionsPagination
+
+export interface TransactionsPaginationProps {
+  currentPage: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  onNext: () => void;
+  onPrevious: () => void;
 }
