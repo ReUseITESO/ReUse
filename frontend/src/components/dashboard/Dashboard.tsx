@@ -17,8 +17,18 @@ export default function Dashboard() {
       <WelcomeHeader />
       <QuickActions />
       {isAuthenticated && <StatsSummary data={data} isLoading={isLoading} />}
-      <MyListings products={data?.user_products ?? []} totalCount={data?.user_products_count ?? 0} isLoading={isLoading} isAuthenticated={isAuthenticated} />
-      <RecentProducts products={data?.recent_products ?? []} isLoading={isLoading} error={error} onRetry={refetch} />
+      <MyListings
+        products={data?.user_products ?? []}
+        totalCount={data?.user_products_count ?? 0}
+        isLoading={isLoading}
+        isAuthenticated={isAuthenticated}
+      />
+      <RecentProducts
+        products={data?.recent_products ?? []}
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+      />
     </div>
   );
 }

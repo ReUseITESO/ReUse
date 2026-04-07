@@ -22,7 +22,9 @@ export function useCommunities() {
     }
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   async function createCommunity(name: string, description: string): Promise<string | null> {
     try {

@@ -30,7 +30,9 @@ export function useCommunityDetail(id: string) {
     }
   }, [id]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   async function createPost(content: string): Promise<string | null> {
     try {
@@ -96,8 +98,17 @@ export function useCommunityDetail(id: string) {
   }
 
   return {
-    community, posts, members, isLoading, error,
-    refresh: fetchAll, createPost, deletePost,
-    inviteUser, leaveCommunity, expelMember, deleteCommunity,
+    community,
+    posts,
+    members,
+    isLoading,
+    error,
+    refresh: fetchAll,
+    createPost,
+    deletePost,
+    inviteUser,
+    leaveCommunity,
+    expelMember,
+    deleteCommunity,
   };
 }
