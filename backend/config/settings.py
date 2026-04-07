@@ -115,6 +115,13 @@ AUTHENTICATION_BACKENDS = [
     "core.backends.EmailBackend",
 ]
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "reuse-rate-limit",
+    }
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -122,6 +129,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "core.throttles.StandardAnonThrottle",
+        "core.throttles.StandardUserThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+        "auth": "5/minute",
+        "email_verification": "3/minute",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": [
@@ -164,6 +181,10 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "Marketplace > Categories",
             "description": "Product category endpoints.",
+        },
+        {
+            "name": "Marketplace > Transactions",
+            "description": "Transaction flow endpoints for buyer and seller actions.",
         },
     ],
     "CONTACT": {

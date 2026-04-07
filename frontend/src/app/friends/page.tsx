@@ -72,17 +72,17 @@ export default function FriendsPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50'
+                  isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 {tab.label}
                 {tab.count !== null && tab.count > 0 && (
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${
-                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                  }`}>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
                     {tab.count}
                   </span>
                 )}
@@ -105,9 +105,7 @@ export default function FriendsPage() {
           </div>
         ) : (
           <>
-            {activeTab === 'friends' && (
-              <FriendsList friends={friends} onRemove={removeFriend} />
-            )}
+            {activeTab === 'friends' && <FriendsList friends={friends} onRemove={removeFriend} />}
             {activeTab === 'requests' && (
               <PendingRequests
                 requests={pendingRequests}

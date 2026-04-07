@@ -2,7 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Send, Users, LogOut, Trash2, UserMinus, Crown, UserPlus, Search } from 'lucide-react';
+import {
+  ArrowLeft,
+  Send,
+  Users,
+  LogOut,
+  Trash2,
+  UserMinus,
+  Crown,
+  UserPlus,
+  Search,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -15,8 +25,17 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   const { user } = useAuth();
   const router = useRouter();
   const {
-    community, posts, members, isLoading, error,
-    createPost, deletePost, inviteUser, leaveCommunity, expelMember, deleteCommunity,
+    community,
+    posts,
+    members,
+    isLoading,
+    error,
+    createPost,
+    deletePost,
+    inviteUser,
+    leaveCommunity,
+    expelMember,
+    deleteCommunity,
   } = useCommunityDetail(params.id);
 
   const [postContent, setPostContent] = useState('');
@@ -59,7 +78,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
       const data = await apiClient<{ results: CommunityMember[] } | CommunityMember[]>(
         `/auth/users/search/?q=${encodeURIComponent(searchQuery)}`,
       );
-      const results = Array.isArray(data) ? data : data.results ?? [];
+      const results = Array.isArray(data) ? data : (data.results ?? []);
       setSearchResults(results);
     } catch {
       setSearchResults([]);
@@ -101,7 +120,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   return (
     <main className="min-h-screen p-6">
       <div className="mx-auto max-w-3xl">
-        <Link href="/communities" className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+        <Link
+          href="/communities"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        >
           <ArrowLeft className="h-4 w-4" /> Volver a comunidades
         </Link>
 
@@ -114,18 +136,26 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 <p className="mt-2 text-sm text-gray-600">{community.description}</p>
               )}
               <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {community.member_count} miembros</span>
+                <span className="flex items-center gap-1">
+                  <Users className="h-4 w-4" /> {community.member_count} miembros
+                </span>
                 <span>Creada por {community.created_by_name}</span>
               </div>
             </div>
             <div className="flex gap-2">
               {isMember && !isAdmin && (
-                <button onClick={handleLeave} className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100">
+                <button
+                  onClick={handleLeave}
+                  className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                >
                   <LogOut className="h-3.5 w-3.5" /> Salir
                 </button>
               )}
               {isAdmin && (
-                <button onClick={handleDelete} className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                >
                   <Trash2 className="h-3.5 w-3.5" /> Eliminar
                 </button>
               )}
@@ -167,21 +197,34 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             ) : (
               <div className="space-y-3">
                 {posts.map(post => (
-                  <div key={post.id} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                  <div
+                    key={post.id}
+                    className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
                           {post.author.first_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{post.author.full_name}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {post.author.full_name}
+                          </p>
                           <p className="text-xs text-gray-400">
-                            {new Date(post.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            {new Date(post.created_at).toLocaleDateString('es-MX', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
                           </p>
                         </div>
                       </div>
                       {(post.author.id === user?.id || isAdmin) && (
-                        <button onClick={() => deletePost(post.id)} className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600">
+                        <button
+                          onClick={() => deletePost(post.id)}
+                          className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}
@@ -238,7 +281,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                       const alreadyMember = memberIds.includes(u.id);
                       const alreadyInvited = invitedIds.has(u.id);
                       return (
-                        <div key={u.id} className="flex items-center justify-between rounded bg-white p-2">
+                        <div
+                          key={u.id}
+                          className="flex items-center justify-between rounded bg-white p-2"
+                        >
                           <p className="text-xs font-medium text-gray-900">{u.full_name}</p>
                           {alreadyMember ? (
                             <span className="text-xs text-gray-400">Miembro</span>
@@ -262,14 +308,19 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
             <div className="space-y-2">
               {members.map(m => (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3">
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                >
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
                       {m.user.first_name?.[0]?.toUpperCase()}
                     </div>
                     <p className="text-sm font-medium text-gray-900">
                       {m.user.full_name}
-                      {m.role === 'admin' && <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />}
+                      {m.role === 'admin' && (
+                        <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                      )}
                     </p>
                   </div>
                   {isAdmin && m.user.id !== user?.id && (

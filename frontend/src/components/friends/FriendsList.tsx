@@ -37,7 +37,11 @@ export default function FriendsList({ friends, onRemove }: FriendsListProps) {
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
               {friend.profile_picture ? (
-                <img src={friend.profile_picture} alt={friend.first_name} className="h-10 w-10 rounded-full object-cover" />
+                <img
+                  src={friend.profile_picture}
+                  alt={friend.first_name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
               ) : (
                 friend.first_name?.[0]?.toUpperCase()
               )}
