@@ -115,3 +115,30 @@ export async function updateTransactionStatus(
     body: JSON.stringify(payload),
   });
 }
+
+// ===== Transactions =====
+
+export async function getTransactionHistory(params?: {
+  transaction_type?: string;
+  date_from?: string;
+  date_to?: string;
+  page?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.transaction_type) query.set('transaction_type', params.transaction_type);
+  if (params?.date_from) query.set('date_from', params.date_from);
+  if (params?.date_to) query.set('date_to', params.date_to);
+  if (params?.page && params.page > 1) query.set('page', String(params.page));
+  const qs = query.toString();
+  return apiClient(`/marketplace/transactions/history/${qs ? `?${qs}` : ''}`);
+}
+
+export async function submitTransactionReview(
+  transactionId: number,
+  payload: { rating: number; comment?: string },
+) {
+  return apiClient(`/marketplace/transactions/${transactionId}/review/`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
