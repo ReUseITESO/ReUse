@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { getMicrosoftAuthUrl } from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -13,6 +14,19 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
+
+  async function handleMicrosoftSignIn() {
+    setError('');
+    setIsMicrosoftLoading(true);
+    try {
+      const authUrl = await getMicrosoftAuthUrl();
+      window.location.href = authUrl;
+    } catch {
+      setError('No se pudo iniciar el flujo con Microsoft. Intenta de nuevo.');
+      setIsMicrosoftLoading(false);
+    }
+  }
 
   if (isAuthenticated) {
     router.replace('/products');
@@ -104,6 +118,29 @@ export default function SignInPage() {
             {isSubmitting ? 'Iniciando sesión…' : 'Iniciar sesión'}
           </button>
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <hr className="flex-1 border-border" />
+          <span className="text-xs text-muted-fg">O continúa con</span>
+          <hr className="flex-1 border-border" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleMicrosoftSignIn}
+          disabled={isSubmitting || isMicrosoftLoading}
+          className="flex w-full items-center justify-center gap-3 rounded-lg border border-btn-tmpl-border
+                     bg-btn-tmpl px-4 py-2.5 font-medium text-btn-tmpl-fg transition-colors
+                     hover:bg-btn-tmpl-hover disabled:opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" width="18" height="18" aria-hidden="true">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+            <rect x="11" y="1" width="9" height="9" fill="#00a4ef" />
+            <rect x="1" y="11" width="9" height="9" fill="#7fba00" />
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+          </svg>
+          {isMicrosoftLoading ? 'Redirigiendo…' : 'Continuar con Microsoft'}
+        </button>
 
         <p className="mt-6 text-center text-sm text-muted-fg">
           ¿No tienes cuenta?{' '}
