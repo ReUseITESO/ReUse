@@ -6,6 +6,7 @@ from rest_framework import serializers
 from core.models import User
 from marketplace.models import Products, Transaction, TransactionReview
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.transaction_review import TransactionReviewSerializer
 from marketplace.services.transaction_service import (
     UPDATABLE_TRANSACTION_STATUSES,
     get_expiration_datetime,
@@ -107,17 +108,6 @@ class TransactionStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=UPDATABLE_TRANSACTION_STATUSES)
 
 
-class TransactionReviewReadSerializer(serializers.ModelSerializer):
-    reviewer_name = serializers.SerializerMethodField()
-
-    def get_reviewer_name(self, obj):
-        return f"{obj.reviewer.first_name} {obj.reviewer.last_name}".strip()
-
-    class Meta:
-        model = TransactionReview
-        fields = ["id", "rating", "comment", "reviewer_name", "created_at"]
-
-
 class TransactionHistorySerializer(TransactionSerializer):
     """TransactionSerializer extended with review fields for the history endpoint."""
 
@@ -140,7 +130,7 @@ class TransactionHistorySerializer(TransactionSerializer):
             return None
         try:
             review = TransactionReview.objects.get(transaction=obj, reviewer=request.user)
-            return TransactionReviewReadSerializer(review).data
+            return TransactionReviewSerializer(review).data
         except TransactionReview.DoesNotExist:
             return None
 

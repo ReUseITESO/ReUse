@@ -102,7 +102,7 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<any> {
+export async function signUp(payload: SignUpRequest): Promise<unknown> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
