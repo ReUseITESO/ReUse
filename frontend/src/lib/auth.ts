@@ -55,7 +55,10 @@ async function authFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
 
   if (response.status === 429) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {
@@ -98,7 +101,10 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 
   if (response.status === 429) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {
@@ -122,7 +128,10 @@ export async function signUp(payload: SignUpRequest): Promise<unknown> {
   const body = await response.json().catch(() => ({}));
 
   if (response.status === 429) {
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {

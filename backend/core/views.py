@@ -16,10 +16,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
 
-from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
