@@ -95,9 +95,7 @@ export default function TransactionHistoryCard({ transaction }: { transaction: T
         <div className="border-t border-border pt-3">
           <p className="mb-1 text-xs font-medium text-fg">Tu calificacion</p>
           <StarRating value={myReview.rating} readonly size="sm" />
-          {myReview.comment && (
-            <p className="mt-1 text-xs text-muted-fg">{myReview.comment}</p>
-          )}
+          {myReview.comment && <p className="mt-1 text-xs text-muted-fg">{myReview.comment}</p>}
         </div>
       ) : canReview && !showForm ? (
         <div className="border-t border-border pt-3">
@@ -109,10 +107,7 @@ export default function TransactionHistoryCard({ transaction }: { transaction: T
           </button>
         </div>
       ) : showForm ? (
-        <TransactionReviewForm
-          transactionId={transaction.id}
-          onSubmitted={handleReviewSubmitted}
-        />
+        <TransactionReviewForm transactionId={transaction.id} onSubmitted={handleReviewSubmitted} />
       ) : null}
     </Card>
   );

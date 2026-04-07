@@ -40,7 +40,7 @@ export default function TransactionList({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4].map(i => (
           <SkeletonCard key={i} />
         ))}
       </div>
@@ -65,7 +65,9 @@ export default function TransactionList({
     return (
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-muted/50 p-8 text-center">
         <p className="text-sm font-medium text-fg">Sin transacciones</p>
-        <p className="text-xs text-muted-fg">No se encontraron transacciones con los filtros seleccionados.</p>
+        <p className="text-xs text-muted-fg">
+          No se encontraron transacciones con los filtros seleccionados.
+        </p>
       </div>
     );
   }
@@ -75,7 +77,7 @@ export default function TransactionList({
       <p className="text-xs text-muted-fg">{totalCount} transacciones encontradas</p>
 
       <div className="space-y-3">
-        {transactions.map((tx) => (
+        {transactions.map(tx => (
           <TransactionHistoryCard key={tx.id} transaction={tx} />
         ))}
       </div>

@@ -11,7 +11,10 @@ interface TransactionReviewFormProps {
   onSubmitted: (review: TransactionReview) => void;
 }
 
-export default function TransactionReviewForm({ transactionId, onSubmitted }: TransactionReviewFormProps) {
+export default function TransactionReviewForm({
+  transactionId,
+  onSubmitted,
+}: TransactionReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,10 +29,10 @@ export default function TransactionReviewForm({ transactionId, onSubmitted }: Tr
     setIsLoading(true);
     setError(null);
     try {
-      const review = await submitTransactionReview(transactionId, {
+      const review = (await submitTransactionReview(transactionId, {
         rating,
         ...(comment.trim() && { comment: comment.trim() }),
-      }) as TransactionReview;
+      })) as TransactionReview;
       onSubmitted(review);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al enviar la calificacion.');
@@ -46,7 +49,7 @@ export default function TransactionReviewForm({ transactionId, onSubmitted }: Tr
 
       <textarea
         value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        onChange={e => setComment(e.target.value)}
         placeholder="Comentario opcional..."
         rows={2}
         maxLength={500}

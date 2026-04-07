@@ -18,7 +18,10 @@ export function useTransactionHistory() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getTransactionHistory({ ...activeFilters, page }) as PaginatedResponse<Transaction>;
+      const data = (await getTransactionHistory({
+        ...activeFilters,
+        page,
+      })) as PaginatedResponse<Transaction>;
       setTransactions(data.results);
       setTotalCount(data.count);
       setCurrentPage(page);

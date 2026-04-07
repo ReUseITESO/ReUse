@@ -7,12 +7,17 @@ interface StarRatingProps {
   size?: 'sm' | 'md';
 }
 
-export default function StarRating({ value, onChange, readonly = false, size = 'md' }: StarRatingProps) {
+export default function StarRating({
+  value,
+  onChange,
+  readonly = false,
+  size = 'md',
+}: StarRatingProps) {
   const sizeClass = size === 'sm' ? 'h-4 w-4' : 'h-6 w-6';
 
   return (
     <div className="flex gap-0.5" role={readonly ? undefined : 'group'} aria-label="Calificacion">
-      {[1, 2, 3, 4, 5].map((star) => (
+      {[1, 2, 3, 4, 5].map(star => (
         <button
           key={star}
           type="button"

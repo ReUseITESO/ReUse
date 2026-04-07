@@ -34,7 +34,9 @@ export default function TransactionFiltersPanel({ filters, onApply }: Transactio
     onApply({});
   }
 
-  const hasActiveFilters = Boolean(filters.transaction_type || filters.date_from || filters.date_to);
+  const hasActiveFilters = Boolean(
+    filters.transaction_type || filters.date_from || filters.date_to,
+  );
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
@@ -46,11 +48,11 @@ export default function TransactionFiltersPanel({ filters, onApply }: Transactio
           <select
             id="tx-type"
             value={type}
-            onChange={(e) => setType(e.target.value as TransactionType | '')}
+            onChange={e => setType(e.target.value as TransactionType | '')}
             className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Todos</option>
-            {TRANSACTION_TYPES.map((t) => (
+            {TRANSACTION_TYPES.map(t => (
               <option key={t.value} value={t.value}>
                 {t.label}
               </option>
@@ -67,7 +69,7 @@ export default function TransactionFiltersPanel({ filters, onApply }: Transactio
             type="date"
             value={dateFrom}
             max={dateTo || undefined}
-            onChange={(e) => setDateFrom(e.target.value)}
+            onChange={e => setDateFrom(e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
@@ -81,7 +83,7 @@ export default function TransactionFiltersPanel({ filters, onApply }: Transactio
             type="date"
             value={dateTo}
             min={dateFrom || undefined}
-            onChange={(e) => setDateTo(e.target.value)}
+            onChange={e => setDateTo(e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
