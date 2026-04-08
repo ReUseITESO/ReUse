@@ -1,4 +1,5 @@
 from .category import Category
+from .comment import Comment
 from .forum_question import ForumQuestion
 from .images import Images
 from .product import Products
@@ -8,6 +9,7 @@ from .transaction import Transaction
 
 __all__ = [
     "Category",
+    "Comment",
     "Products",
     "Images",
     "Transaction",
