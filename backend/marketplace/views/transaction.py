@@ -1,3 +1,4 @@
+from django.db import IntegrityError, transaction as db_transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
@@ -12,7 +13,10 @@ from marketplace.serializers.transaction import (
     TransactionSerializer,
     TransactionStatusSerializer,
 )
-from marketplace.serializers.transaction_review import TransactionReviewCreateSerializer
+from marketplace.serializers.transaction_review import (
+    TransactionReviewCreateSerializer,
+    TransactionReviewSerializer,
+)
 from marketplace.services.transaction_service import (
     create_transaction_request,
     list_transactions_for_user,
@@ -196,7 +200,7 @@ class TransactionViewSet(
         summary="Rate a completed transaction",
         description="Submit a 1-5 star rating and optional comment for a completed transaction. Each party can only submit one review per transaction.",
         request=TransactionReviewCreateSerializer,
-        responses={201: None},
+        responses={201: TransactionReviewSerializer},
         tags=["Marketplace > Transactions"],
     )
     @action(detail=True, methods=["post"], url_path="review")
@@ -234,10 +238,21 @@ class TransactionViewSet(
             if transaction.seller_id == request.user.id
             else transaction.seller
         )
-        TransactionReview.objects.create(
-            transaction=transaction,
-            reviewer=request.user,
-            reviewee=reviewee,
-            **serializer.validated_data,
+        try:
+            with db_transaction.atomic():
+                review = TransactionReview.objects.create(
+                    transaction=transaction,
+                    reviewer=request.user,
+                    reviewee=reviewee,
+                    **serializer.validated_data,
+                )
+        except IntegrityError:
+            return Response(
+                {"detail": "Ya calificaste esta transaccion."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        response_serializer = TransactionReviewSerializer(
+            review, context=self.get_serializer_context()
         )
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)

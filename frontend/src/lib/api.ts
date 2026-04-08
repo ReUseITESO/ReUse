@@ -4,6 +4,7 @@ import type { PaginatedResponse } from '@/types/api';
 import type {
   CreateTransactionPayload,
   Transaction,
+  TransactionReview,
   UpdateTransactionStatusPayload,
 } from '@/types/transaction';
 
@@ -136,9 +137,9 @@ export async function getTransactionHistory(params?: {
 export async function submitTransactionReview(
   transactionId: number,
   payload: { rating: number; comment?: string },
-) {
+): Promise<TransactionReview> {
   return apiClient(`/marketplace/transactions/${transactionId}/review/`, {
     method: 'POST',
     body: JSON.stringify(payload),
-  });
+  }) as Promise<TransactionReview>;
 }

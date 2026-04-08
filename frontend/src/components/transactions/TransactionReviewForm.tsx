@@ -29,10 +29,10 @@ export default function TransactionReviewForm({
     setIsLoading(true);
     setError(null);
     try {
-      const review = (await submitTransactionReview(transactionId, {
+      const review = await submitTransactionReview(transactionId, {
         rating,
         ...(comment.trim() && { comment: comment.trim() }),
-      })) as TransactionReview;
+      });
       onSubmitted(review);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al enviar la calificacion.');
