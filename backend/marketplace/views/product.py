@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, mixins, status, viewsets
@@ -65,7 +66,7 @@ from marketplace.services import (
                 name="ordering",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                description="Order results. Options: `created_at`, `-created_at`, `price`, `-price`, `title`, `-title`.",
+                description="Order results. Options: `created_at`, `-created_at`, `price`, `-price`, `title`, `-title`, `-likes_count`.",
                 required=False,
             ),
             OpenApiParameter(
@@ -124,7 +125,7 @@ class ProductViewSet(
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description", "category__name"]
-    ordering_fields = ["created_at", "price", "title"]
+    ordering_fields = ["created_at", "price", "title", "likes_count"]
     ordering = ["-created_at"]
 
     def get_serializer_class(self):
@@ -141,7 +142,9 @@ class ProductViewSet(
     def get_queryset(self):
         queryset = Products.objects.select_related(
             "category", "seller", "transaction"
-        ).prefetch_related("images")
+        ).prefetch_related("images").annotate(
+            likes_count=Count("reactions", filter=Q(reactions__type="like"))
+        )
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
