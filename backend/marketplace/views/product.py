@@ -140,10 +140,10 @@ class ProductViewSet(
         return ProductListSerializer
 
     def get_queryset(self):
-        queryset = Products.objects.select_related(
-            "category", "seller", "transaction"
-        ).prefetch_related("images").annotate(
-            likes_count=Count("reactions", filter=Q(reactions__type="like"))
+        queryset = (
+            Products.objects.select_related("category", "seller", "transaction")
+            .prefetch_related("images")
+            .annotate(likes_count=Count("reactions", filter=Q(reactions__type="like")))
         )
 
         seller_param = self.request.query_params.get("seller")
