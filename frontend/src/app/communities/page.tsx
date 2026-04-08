@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Users, Check, X, Mail } from 'lucide-react';
+import { Plus, Users, Check, Mail } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunities } from '@/hooks/useCommunities';
