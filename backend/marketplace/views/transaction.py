@@ -1,4 +1,5 @@
-from django.db import IntegrityError, transaction as db_transaction
+from django.db import IntegrityError
+from django.db import transaction as db_transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
