@@ -2,9 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 import type { UserConnection, SocialUser } from '@/types/friends';
 
+export type FriendUser = SocialUser;
+export type FriendRequest = {
+  id: number;
+  from_user: SocialUser;
+  created_at: string;
+};
+
 export function useFriends() {
+  const { user } = useAuth();
   const [connections, setConnections] = useState<UserConnection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,17 +36,17 @@ export function useFriends() {
 
   useEffect(() => { fetchConnections(); }, [fetchConnections]);
 
-  function getFriends(userId: number): SocialUser[] {
-    return connections
-      .filter(c => c.status === 'accepted')
-      .map(c => c.requester.id === userId ? c.addressee : c.requester);
-  }
+  const friends: FriendUser[] = user
+    ? connections
+        .filter(c => c.status === 'accepted')
+        .map(c => (c.requester.id === user.id ? c.addressee : c.requester))
+    : [];
 
-  function getPendingRequests(userId: number): UserConnection[] {
-    return connections.filter(
-      c => c.status === 'pending' && c.addressee.id === userId,
-    );
-  }
+  const pendingRequests: FriendRequest[] = user
+    ? connections
+        .filter(c => c.status === 'pending' && c.addressee.id === user.id)
+        .map(c => ({ id: c.id, from_user: c.requester, created_at: c.created_at }))
+    : [];
 
   async function sendRequest(addresseeId: number): Promise<string | null> {
     try {
@@ -52,20 +61,52 @@ export function useFriends() {
     }
   }
 
-  async function respondToRequest(connectionId: number, newStatus: 'accepted' | 'rejected'): Promise<string | null> {
+  async function acceptRequest(connectionId: number): Promise<string | null> {
     try {
       await apiClient(`/social/connections/${connectionId}/respond/`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: 'accepted' }),
       });
       await fetchConnections();
       return null;
     } catch (err) {
-      return err instanceof Error ? err.message : 'Error al responder';
+      return err instanceof Error ? err.message : 'Error al aceptar';
     }
   }
 
-  async function searchUsers(query: string): Promise<SocialUser[]> {
+  async function rejectRequest(connectionId: number): Promise<string | null> {
+    try {
+      await apiClient(`/social/connections/${connectionId}/respond/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'rejected' }),
+      });
+      await fetchConnections();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Error al rechazar';
+    }
+  }
+
+  async function removeFriend(userId: number): Promise<string | null> {
+    const conn = connections.find(
+      c =>
+        c.status === 'accepted' &&
+        (c.requester.id === userId || c.addressee.id === userId),
+    );
+    if (!conn) return 'Conexión no encontrada';
+    try {
+      await apiClient(`/social/connections/${conn.id}/respond/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'rejected' }),
+      });
+      await fetchConnections();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Error al eliminar';
+    }
+  }
+
+  async function searchUsers(query: string): Promise<FriendUser[]> {
     if (query.length < 2) return [];
     try {
       const data = await apiClient<{ results: SocialUser[] } | SocialUser[]>(
@@ -79,14 +120,16 @@ export function useFriends() {
   }
 
   return {
+    friends,
+    pendingRequests,
     connections,
     isLoading,
     error,
     refresh: fetchConnections,
-    getFriends,
-    getPendingRequests,
     sendRequest,
-    respondToRequest,
+    acceptRequest,
+    rejectRequest,
+    removeFriend,
     searchUsers,
   };
 }
