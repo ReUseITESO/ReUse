@@ -23,12 +23,8 @@ export default function CommunitiesPage() {
   const [loadingInviteId, setLoadingInviteId] = useState<number | null>(null);
 
   const fetchInvitations = useCallback(async () => {
-    try {
-      const data = await apiClient<{ results: CommunityInvitation[] }>('/social/communities/invitations/');
-      setInvitations(data.results);
-    } catch {
-      setInvitations([]);
-    }
+    // Daniel's API doesn't have an invitations endpoint
+    setInvitations([]);
   }, []);
 
   useEffect(() => {
