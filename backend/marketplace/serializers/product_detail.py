@@ -11,12 +11,21 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
-    seller_email = serializers.EmailField(source="seller.email", read_only=True)
+    seller_email = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
     has_active_transaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
+        # HU-CORE-17: ocultar nombre si el vendedor está desactivado
+        if getattr(obj.seller, "is_deactivated", False):
+            return "Usuario Desactivado"
         return obj.seller.get_full_name()
+
+    def get_seller_email(self, obj):
+        # HU-CORE-17: ocultar email si el vendedor está desactivado
+        if getattr(obj.seller, "is_deactivated", False):
+            return ""
+        return obj.seller.email
 
     def get_has_active_transaction(self, obj):
         return has_active_transaction(obj)
