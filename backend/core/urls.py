@@ -40,5 +40,9 @@ urlpatterns = [
 
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
-    path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
+    path(
+        "microsoft/callback/",
+        views.MicrosoftCallbackView.as_view(),
+        name="microsoft-callback",
+    ),
 ]

@@ -133,7 +133,13 @@ export default function SignInPage() {
                      bg-btn-tmpl px-4 py-2.5 font-medium text-btn-tmpl-fg transition-colors
                      hover:bg-btn-tmpl-hover disabled:opacity-50"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" width="18" height="18" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 21 21"
+            width="18"
+            height="18"
+            aria-hidden="true"
+          >
             <rect x="1" y="1" width="9" height="9" fill="#f25022" />
             <rect x="11" y="1" width="9" height="9" fill="#00a4ef" />
             <rect x="1" y="11" width="9" height="9" fill="#7fba00" />
