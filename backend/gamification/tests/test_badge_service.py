@@ -4,7 +4,6 @@ from core.models import User
 from core.models.notification import Notification
 from gamification.models.badges import Badges
 from gamification.models.user_badges import UserBadges
-from gamification.services.badge_service import evaluate_milestones
 from marketplace.models.category import Category
 from marketplace.models.product import Products
 from marketplace.models.transaction import Transaction
