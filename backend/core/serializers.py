@@ -159,3 +159,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_phone(self, value: str) -> str:
         return sanitize_phone(value) if value else value
+
+from .models.notification import Notification
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'title', 'body', 'reference_id', 'is_read', 'read_at', 'created_at']
+        read_only_fields = ['id', 'type', 'title', 'body', 'reference_id', 'created_at']

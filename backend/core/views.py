@@ -535,3 +535,23 @@ class ProfilePictureUploadView(APIView):
         user.save(update_fields=["profile_picture"])
 
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
+
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from .models.notification import Notification
+from .serializers import NotificationSerializer
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+    @action(detail=True, methods=['patch'])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save(update_fields=['is_read', 'read_at'])
+        return Response({'status': 'notification marked as read'})
