@@ -9,6 +9,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCreateTransaction } from '@/hooks/useCreateTransaction';
 import { useProductDetail } from '@/hooks/useProductDetail';
 
+import type { CreateTransactionDialogSubmitPayload } from '@/types/transaction';
+
 interface ProductDetailProps {
   productId: string;
 }
@@ -59,16 +61,24 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     !product.has_active_transaction &&
     product.status === 'disponible';
 
-  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
+  async function handleCreateTransaction(payload: CreateTransactionDialogSubmitPayload) {
     if (!product) {
       return;
     }
 
-    const transaction = await create({
-      product_id: product.id,
-      delivery_location: deliveryLocation,
-      delivery_date: deliveryDate.toISOString(),
-    });
+    const transactionPayload =
+      product.transaction_type === 'swap'
+        ? {
+            product_id: product.id,
+            swap_product_id: payload.swapProductId,
+          }
+        : {
+            product_id: product.id,
+            delivery_location: payload.deliveryLocation,
+            delivery_date: payload.deliveryDate?.toISOString(),
+          };
+
+    const transaction = await create(transactionPayload);
 
     if (!transaction) {
       return;
@@ -129,6 +139,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         isLoading={isCreatingTransaction}
         error={createTransactionError}
         onCancel={() => setIsTransactionDialogOpen(false)}
+        onCreateNewProduct={() => {
+          setIsTransactionDialogOpen(false);
+          router.push('/products/new');
+        }}
         onSubmit={handleCreateTransaction}
       />
     </>

@@ -35,7 +35,8 @@ export default function TransactionLocationHighlight({
   const meetingLabel = meetingFromDeliveryDate ?? meeting;
 
   if (!buildingCode && !roomNumber && !gateNumber) {
-    return <span>{showPrefix ? `Entrega: ${location}` : location}</span>;
+    const locationLabel = location.trim() ? location : 'Por definir';
+    return <span>{showPrefix ? `Entrega: ${locationLabel}` : locationLabel}</span>;
   }
 
   return (

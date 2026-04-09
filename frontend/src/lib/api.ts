@@ -3,6 +3,9 @@ import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 import type { PaginatedResponse } from '@/types/api';
 import type {
   CreateTransactionPayload,
+  SwapMeetingProposalPayload,
+  SwapMeetingResponsePayload,
+  SwapProposalPayload,
   Transaction,
   UpdateTransactionStatusPayload,
 } from '@/types/transaction';
@@ -111,6 +114,39 @@ export async function updateTransactionStatus(
   payload: UpdateTransactionStatusPayload,
 ) {
   return apiClient<Transaction>(`/marketplace/transactions/${id}/status/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateSwapProposal(id: number | string, payload: SwapProposalPayload) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap-proposal/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function markSwapNoAccept(id: number | string) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap-no-accept/`, {
+    method: 'PATCH',
+  });
+}
+
+export async function proposeSwapMeeting(
+  id: number | string,
+  payload: SwapMeetingProposalPayload,
+) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap-meeting/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function respondSwapMeeting(
+  id: number | string,
+  payload: SwapMeetingResponsePayload,
+) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap-meeting-response/`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });

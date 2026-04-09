@@ -9,6 +9,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/useAuth';
+import { useSwapTransactionStatus } from '@/hooks/useSwapTransactionStatus';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
 
@@ -31,7 +32,16 @@ export default function TransactionsPanel() {
     fetchTransactions,
   } = useTransactions({ role, status });
 
-  const { changeStatus, isLoading: isUpdatingStatus, error: updateError } = useTransactionStatus();
+  const {
+    changeStatus,
+    isLoading: isUpdatingStatus,
+    error: updateError,
+  } = useTransactionStatus();
+  const {
+    noAcceptSwap,
+    isLoading: isUpdatingSwap,
+    error: updateSwapError,
+  } = useSwapTransactionStatus();
 
   if (!isAuthenticated) {
     return (
@@ -54,6 +64,16 @@ export default function TransactionsPanel() {
     fetchTransactions(currentPage);
   }
 
+  async function handleSwapNoAccept(transactionId: number) {
+    const updated = await noAcceptSwap(transactionId);
+    if (!updated) {
+      return;
+    }
+
+    setNotice('Propuesta marcada como no aceptada. CORE enviará la notificación más adelante.');
+    fetchTransactions(currentPage);
+  }
+
   return (
     <section className="space-y-5">
       <TransactionsFilters
@@ -73,9 +93,9 @@ export default function TransactionsPanel() {
         </div>
       )}
 
-      {(error || updateError) && (
+      {(error || updateError || updateSwapError) && (
         <ErrorMessage
-          message={error || updateError || 'Error no controlado'}
+          message={error || updateError || updateSwapError || 'Error no controlado'}
           onRetry={() => fetchTransactions(currentPage)}
         />
       )}
@@ -91,8 +111,9 @@ export default function TransactionsPanel() {
               key={transaction.id}
               transaction={transaction}
               userId={user!.id}
-              isUpdatingStatus={isUpdatingStatus}
+              isUpdatingStatus={isUpdatingStatus || isUpdatingSwap}
               onStatusChange={handleStatusChange}
+              onSwapNoAccept={handleSwapNoAccept}
             />
           ))}
 

@@ -1,13 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowLeft, CalendarClock, MapPin, Package, UserRound } from 'lucide-react';
-
+import TransactionDetailSummary from '@/components/transactions/detail/TransactionDetailSummary';
+import SwapMeetingPlanner from '@/components/transactions/swapFlow/SwapMeetingPlanner';
+import SwapPendingPanel from '@/components/transactions/swapFlow/SwapPendingPanel';
 import TransactionDeliveryConfirmations from '@/components/transactions/TransactionDeliveryConfirmations';
-import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
 import TransactionProductSection from '@/components/transactions/TransactionProductSection';
 import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
-import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
 import {
   getDeliveryConfirmationLabel,
   getPendingCounterpartLabel,
@@ -17,9 +15,8 @@ import {
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/useAuth';
+import { useTransactionDetailActions } from '@/hooks/useTransactionDetailActions';
 import { useTransactionDetail } from '@/hooks/useTransactionDetail';
-import { useTransactionStatus } from '@/hooks/useTransactionStatus';
-import type { UpdatableTransactionStatus } from '@/types/transaction';
 
 interface TransactionDetailViewProps {
   transactionId: number;
@@ -28,7 +25,15 @@ interface TransactionDetailViewProps {
 export default function TransactionDetailView({ transactionId }: TransactionDetailViewProps) {
   const { user } = useAuth();
   const { transaction, isLoading, error, refetch } = useTransactionDetail(transactionId);
-  const { changeStatus, isLoading: isUpdating, error: updateError } = useTransactionStatus();
+  const {
+    isUpdating,
+    updateError,
+    handleChangeStatus,
+    handleNoAcceptSwap,
+    handleReproposeSwap,
+    handleProposeMeeting,
+    handleRespondMeeting,
+  } = useTransactionDetailActions({ transactionId, refetch });
 
   if (isLoading) {
     return <Spinner />;
@@ -52,69 +57,15 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   const pendingCounterpart = getPendingCounterpartLabel(transaction);
   const showWaitingConfirmation =
     transaction.status === 'confirmada' && actorAlreadyConfirmed && pendingCounterpart;
-  const transactionIdValue = transaction.id;
-
-  async function handleChangeStatus(status: UpdatableTransactionStatus) {
-    const updated = await changeStatus(transactionIdValue, status);
-    if (updated) {
-      refetch();
-    }
-  }
+  const canNoAcceptSwap =
+    transaction.transaction_type === 'swap' &&
+    transaction.status === 'pendiente' &&
+    actorRole === 'seller';
 
   return (
     <section className="space-y-5">
-      <Link
-        href="/transactions"
-        className="inline-flex items-center gap-2 rounded-lg border border-input bg-card px-3 py-1.5 text-sm text-muted-fg transition-colors hover:bg-muted hover:text-fg"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Volver a transacciones
-      </Link>
-
       <div className="space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-h2 font-bold text-fg">Detalle de transacción</h1>
-            <p className="text-sm text-muted-fg">Solicitud #{transaction.id}</p>
-          </div>
-          <TransactionStatusBadge status={transaction.status} />
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-fg">
-            <p className="inline-flex items-center gap-2 font-medium">
-              <Package className="h-4 w-4 text-secondary" />
-              {transaction.product.title}
-            </p>
-            <p></p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
-              <MapPin className="h-4 w-4 text-info" />
-              <TransactionLocationHighlight
-                location={transaction.delivery_location}
-                deliveryDate={transaction.delivery_date}
-              />
-            </p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
-              <CalendarClock className="h-4 w-4 text-warning" />
-              Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
-                <UserRound className="h-4 w-4 text-accent" />
-                Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
-                <UserRound className="h-4 w-4 text-secondary" />
-                Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
-              </p>
-            </div>
-          </div>
-        </div>
+        <TransactionDetailSummary transaction={transaction} />
 
         <TransactionDeliveryConfirmations
           sellerConfirmation={transaction.seller_confirmation}
@@ -125,12 +76,34 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           canAccept={canAccept}
           canCancel={canCancel}
           canConfirmDelivery={canConfirmDelivery}
+          canNoAcceptSwap={canNoAcceptSwap}
           showWaitingConfirmation={Boolean(showWaitingConfirmation)}
           pendingCounterpart={pendingCounterpart}
           confirmDeliveryLabel={confirmDeliveryLabel}
           isUpdating={isUpdating}
           onChangeStatus={handleChangeStatus}
+          onNoAcceptSwap={handleNoAcceptSwap}
         />
+
+        {transaction.transaction_type === 'swap' && transaction.status === 'pendiente' && (
+          <SwapPendingPanel
+            transaction={transaction}
+            actorRole={actorRole}
+            isUpdating={isUpdating}
+            onReproposeSwap={handleReproposeSwap}
+            onNoAcceptSwap={handleNoAcceptSwap}
+          />
+        )}
+
+        {transaction.transaction_type === 'swap' && transaction.status === 'confirmada' && (
+          <SwapMeetingPlanner
+            transaction={transaction}
+            actorRole={actorRole}
+            isUpdating={isUpdating}
+            onProposeMeeting={handleProposeMeeting}
+            onRespondMeeting={handleRespondMeeting}
+          />
+        )}
 
         <TransactionProductSection product={transaction.product} />
 

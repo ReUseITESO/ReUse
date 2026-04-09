@@ -6,22 +6,26 @@ interface TransactionStatusActionsProps {
   canAccept: boolean;
   canCancel: boolean;
   canConfirmDelivery: boolean;
+  canNoAcceptSwap?: boolean;
   showWaitingConfirmation: boolean;
   pendingCounterpart: string | null;
   confirmDeliveryLabel: string;
   isUpdating: boolean;
   onChangeStatus: (status: UpdatableTransactionStatus) => void;
+  onNoAcceptSwap?: () => void;
 }
 
 export default function TransactionStatusActions({
   canAccept,
   canCancel,
   canConfirmDelivery,
+  canNoAcceptSwap = false,
   showWaitingConfirmation,
   pendingCounterpart,
   confirmDeliveryLabel,
   isUpdating,
   onChangeStatus,
+  onNoAcceptSwap,
 }: TransactionStatusActionsProps) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -42,6 +46,12 @@ export default function TransactionStatusActions({
           onClick={() => onChangeStatus('cancelada')}
         >
           Cancelar transacción
+        </Button>
+      )}
+
+      {canNoAcceptSwap && onNoAcceptSwap && (
+        <Button variant="secondary" disabled={isUpdating} onClick={onNoAcceptSwap}>
+          No aceptar
         </Button>
       )}
 

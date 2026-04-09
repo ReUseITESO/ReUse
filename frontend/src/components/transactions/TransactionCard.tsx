@@ -1,7 +1,9 @@
 import Link from 'next/link';
-import { CalendarClock, MapPin, RefreshCcw, User, UserRoundCheck } from 'lucide-react';
+import { CalendarClock, MapPin, User, UserRoundCheck } from 'lucide-react';
 
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
+import SwapProposalAlert from '@/components/transactions/swapFlow/SwapProposalAlert';
+import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
 import {
   getDeliveryConfirmationLabel,
@@ -11,7 +13,6 @@ import {
   hasActorConfirmed,
   shouldAllowStatusChange,
 } from '@/components/transactions/transactionsConfig';
-import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { getTransactionTypeStyle } from '@/lib/productStyles';
 import { formatPrice } from '@/lib/utils';
@@ -23,6 +24,7 @@ interface TransactionCardProps {
   userId: number;
   isUpdatingStatus: boolean;
   onStatusChange: (transactionId: number, status: UpdatableTransactionStatus) => Promise<void>;
+  onSwapNoAccept: (transactionId: number) => Promise<void>;
 }
 
 export default function TransactionCard({
@@ -30,6 +32,7 @@ export default function TransactionCard({
   userId,
   isUpdatingStatus,
   onStatusChange,
+  onSwapNoAccept,
 }: TransactionCardProps) {
   const actorRole = getActorRole(transaction, userId);
   const canAccept = shouldAllowStatusChange(transaction, actorRole, 'confirmada');
@@ -43,12 +46,27 @@ export default function TransactionCard({
 
   const typeLabel = getTransactionTypeLabel(transaction.transaction_type);
   const typeClass = getTransactionTypeStyle(transaction.transaction_type);
+  const canNoAcceptSwap =
+    transaction.transaction_type === 'swap' &&
+    transaction.status === 'pendiente' &&
+    actorRole === 'seller';
+
+  function handleChangeStatus(status: UpdatableTransactionStatus) {
+    onStatusChange(transaction.id, status);
+  }
 
   return (
     <Card className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-h3 font-semibold text-fg">{transaction.product.title}</h3>
+          <h3 className="text-h3 font-semibold text-fg">
+            <Link
+              href={`/products/${transaction.product.id}`}
+              className="hover:text-primary hover:underline"
+            >
+              {transaction.product.title}
+            </Link>
+          </h3>
           <p className="text-sm text-muted-fg">
             {transaction.transaction_type === 'sale'
               ? formatPrice(transaction.product.price)
@@ -87,49 +105,22 @@ export default function TransactionCard({
       </div>
 
       {transaction.transaction_type === 'swap' && (
-        <p className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-fg">
-          <RefreshCcw className="mr-2 inline h-3 w-3" />
-          TODO: flujo completo de intercambio pendiente (issue #34).
-        </p>
+        <SwapProposalAlert swapProduct={transaction.swap_product} />
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        {canAccept && (
-          <Button
-            variant="primary"
-            disabled={isUpdatingStatus}
-            onClick={() => onStatusChange(transaction.id, 'confirmada')}
-          >
-            Aceptar solicitud
-          </Button>
-        )}
-        {canConfirmDelivery && (
-          <Button
-            variant="success"
-            disabled={isUpdatingStatus}
-            onClick={() => onStatusChange(transaction.id, 'completada')}
-          >
-            {confirmDeliveryLabel}
-          </Button>
-        )}
-        {canCancel && (
-          <Button
-            variant="danger-outline"
-            disabled={isUpdatingStatus}
-            onClick={() => onStatusChange(transaction.id, 'cancelada')}
-          >
-            Cancelar
-          </Button>
-        )}
-        {showWaitingConfirmation && (
-          <Button
-            variant="template"
-            disabled
-            className="border-info/40 bg-info/10 text-info hover:bg-info/10"
-          >
-            Esperando confirmación de {pendingCounterpart}
-          </Button>
-        )}
+        <TransactionStatusActions
+          canAccept={canAccept}
+          canCancel={canCancel}
+          canConfirmDelivery={canConfirmDelivery}
+          canNoAcceptSwap={canNoAcceptSwap}
+          showWaitingConfirmation={Boolean(showWaitingConfirmation)}
+          pendingCounterpart={pendingCounterpart}
+          confirmDeliveryLabel={confirmDeliveryLabel}
+          isUpdating={isUpdatingStatus}
+          onChangeStatus={handleChangeStatus}
+          onNoAcceptSwap={() => onSwapNoAccept(transaction.id)}
+        />
         <Link
           href={`/transactions/${transaction.id}`}
           className="rounded-lg border border-input px-3 py-2 text-sm text-fg transition-colors hover:bg-muted"

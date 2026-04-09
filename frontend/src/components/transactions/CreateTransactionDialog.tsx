@@ -1,17 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AlertCircle, ClipboardCheck, Mail, RefreshCcw, UserRound } from 'lucide-react';
+import { AlertCircle, ClipboardCheck, Info, Mail, UserRound } from 'lucide-react';
 
+import { useCreateTransactionDialogForm } from '@/components/transactions/createDialog/useCreateTransactionDialogForm';
 import MeetingLocationFields from '@/components/transactions/MeetingLocationFields';
+import SwapProposalSection from '@/components/transactions/swapFlow/SwapProposalSection';
 import Button from '@/components/ui/Button';
-import {
-  formatMeetingLocation,
-  getRoomsForBuilding,
-  isCampusBuildingCode,
-  isCampusClosedDay,
-  isWithinCampusHours,
-} from '@/lib/campusLocations';
 import type { CreateTransactionDialogProps } from '@/types/transaction';
 
 export default function CreateTransactionDialog({
@@ -23,80 +17,28 @@ export default function CreateTransactionDialog({
   isLoading,
   error,
   onCancel,
+  onCreateNewProduct,
   onSubmit,
 }: CreateTransactionDialogProps) {
-  const [buildingCode, setBuildingCode] = useState('');
-  const [roomNumber, setRoomNumber] = useState('');
-  const [meetingDateTime, setMeetingDateTime] = useState<Date | null>(null);
-  const [timeValidationError, setTimeValidationError] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setBuildingCode('');
-      setRoomNumber('');
-      setMeetingDateTime(null);
-      setTimeValidationError(null);
-      setValidationError(null);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    setRoomNumber('');
-  }, [buildingCode]);
+  const {
+    buildingCode,
+    roomNumber,
+    meetingDateTime,
+    validationError,
+    selectedSwapProductId,
+    setBuildingCode,
+    setRoomNumber,
+    setMeetingDateTime,
+    setTimeValidationError,
+    setSelectedSwapProductId,
+    submit,
+  } = useCreateTransactionDialogForm({
+    isOpen,
+    transactionType,
+    onSubmit,
+  });
 
   if (!isOpen) return null;
-
-  async function handleSubmit() {
-    if (transactionType === 'swap') {
-      setValidationError('Intercambio pendiente de implementación completa en la issue #34.');
-      return;
-    }
-
-    if (!buildingCode || !roomNumber || !meetingDateTime) {
-      setValidationError('Completa edificio, salon y fecha/hora para continuar.');
-      return;
-    }
-
-    if (!isCampusBuildingCode(buildingCode)) {
-      setValidationError('Selecciona un edificio válido del campus.');
-      return;
-    }
-
-    const validRooms = getRoomsForBuilding(buildingCode);
-    if (!validRooms.includes(roomNumber)) {
-      setValidationError('Selecciona un salón válido para el edificio elegido.');
-      return;
-    }
-
-    if (timeValidationError) {
-      setValidationError(timeValidationError);
-      return;
-    }
-
-    if (meetingDateTime <= new Date()) {
-      setValidationError('Selecciona una fecha y hora futura para la reunión.');
-      return;
-    }
-
-    if (isCampusClosedDay(meetingDateTime)) {
-      setValidationError('Solo se permiten reuniones de lunes a viernes.');
-      return;
-    }
-
-    if (!isWithinCampusHours(meetingDateTime)) {
-      setValidationError('El horario permitido es de 07:00 a 22:00.');
-      return;
-    }
-
-    setValidationError(null);
-    const deliveryLocation = formatMeetingLocation({
-      buildingCode,
-      roomNumber,
-    });
-
-    await onSubmit(deliveryLocation, meetingDateTime);
-  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 p-3 sm:p-4">
@@ -131,28 +73,38 @@ export default function CreateTransactionDialog({
               </div>
             </div>
 
-            <div className="mt-4">
-              <MeetingLocationFields
-                buildingCode={buildingCode}
-                roomNumber={roomNumber}
-                meetingDateTime={meetingDateTime}
-                disabled={isLoading}
-                onBuildingChange={setBuildingCode}
-                onRoomChange={setRoomNumber}
-                onDateTimeChange={setMeetingDateTime}
-                onTimeErrorChange={setTimeValidationError}
-              />
-            </div>
+            {transactionType === 'swap' ? (
+              <div className="mt-4">
+                <SwapProposalSection
+                  selectedProductId={selectedSwapProductId}
+                  disabled={isLoading}
+                  showCreateButton
+                  onSelectProduct={setSelectedSwapProductId}
+                  onCreateNewProduct={onCreateNewProduct}
+                />
+              </div>
+            ) : (
+              <div className="mt-4">
+                <MeetingLocationFields
+                  buildingCode={buildingCode}
+                  roomNumber={roomNumber}
+                  meetingDateTime={meetingDateTime}
+                  disabled={isLoading}
+                  onBuildingChange={setBuildingCode}
+                  onRoomChange={setRoomNumber}
+                  onDateTimeChange={setMeetingDateTime}
+                  onTimeErrorChange={setTimeValidationError}
+                />
+              </div>
+            )}
 
             {transactionType === 'swap' && (
-              <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-fg">
-                <p className="font-medium">Flujo de intercambio parcial</p>
-                <p className="mt-1">
-                  La selección del artículo a intercambiar se implementará en la issue #34.
+              <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2">
+                <p className="inline-flex items-start gap-1.5 text-xs text-warning-fg">
+                  <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  Agenda en segunda etapa: primero se valida el artículo y después se acuerdan
+                  fecha y lugar.
                 </p>
-                <Button variant="secondary" className="mt-2" disabled>
-                  <RefreshCcw className="mr-2 inline h-4 w-4" /> TODO issue #34
-                </Button>
               </div>
             )}
 
@@ -171,7 +123,7 @@ export default function CreateTransactionDialog({
               <Button variant="danger-outline" onClick={onCancel} disabled={isLoading}>
                 Cancelar
               </Button>
-              <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
+              <Button variant="primary" onClick={submit} disabled={isLoading}>
                 {isLoading ? 'Enviando...' : 'Enviar solicitud'}
               </Button>
             </div>

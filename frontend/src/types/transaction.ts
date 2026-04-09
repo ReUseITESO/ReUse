@@ -2,6 +2,7 @@ import type { Category, ProductCondition, ProductStatus, TransactionType } from 
 
 export type TransactionStatus = 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
 export type UpdatableTransactionStatus = 'confirmada' | 'completada' | 'cancelada';
+export type SwapMeetingStatus = 'not_defined' | 'pending_acceptance' | 'accepted';
 
 export interface TransactionUserSummary {
   id: number;
@@ -35,6 +36,9 @@ export interface Transaction {
   buyer_confirmed_at: string | null;
   delivery_date: string | null;
   delivery_location: string;
+  swap_product: TransactionProductSummary | null;
+  swap_meeting_status: SwapMeetingStatus | null;
+  swap_meeting_proposed_by: 'buyer' | 'seller' | null;
   created_at: string;
   expires_at: string;
   is_expired: boolean;
@@ -42,12 +46,32 @@ export interface Transaction {
 
 export interface CreateTransactionPayload {
   product_id: number;
-  delivery_location: string;
-  delivery_date: string;
+  delivery_location?: string;
+  delivery_date?: string;
+  swap_product_id?: number;
 }
 
 export interface UpdateTransactionStatusPayload {
   status: UpdatableTransactionStatus;
+}
+
+export interface SwapProposalPayload {
+  swap_product_id: number;
+}
+
+export interface SwapMeetingProposalPayload {
+  delivery_location: string;
+  delivery_date: string;
+}
+
+export interface SwapMeetingResponsePayload {
+  accepted: boolean;
+}
+
+export interface CreateTransactionDialogSubmitPayload {
+  deliveryLocation?: string;
+  deliveryDate?: Date;
+  swapProductId?: number;
 }
 
 // CreateTransactionDialog
@@ -60,7 +84,8 @@ export interface CreateTransactionDialogProps {
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
-  onSubmit: (deliveryLocation: string, deliveryDate: Date) => Promise<void>;
+  onCreateNewProduct: () => void;
+  onSubmit: (payload: CreateTransactionDialogSubmitPayload) => Promise<void>;
 }
 
 // MeetingLocationFields
