@@ -102,6 +102,8 @@ def change_product_status(product, new_status, user):
     product.status = new_status
     product.save(update_fields=["status", "updated_at"])
 
+    product.refresh_from_db()
+
     # === GAMIFICATION: Award points for completing a sale/donation/swap ===
 
     if new_status == "completado":
