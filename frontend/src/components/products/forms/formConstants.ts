@@ -16,6 +16,3 @@ export const TRANSACTION_OPTIONS: { value: TransactionType; label: string; descr
 
 export const INPUT_CLASS =
   'w-full rounded-lg border border-input bg-muted px-4 py-2.5 text-fg placeholder:text-muted-fg transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50';
-
-export const SELECT_CLASS =
-  'w-full rounded-lg border border-input bg-muted px-4 py-2.5 text-fg transition-colors focus:border-ring focus:bg-card focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50';
