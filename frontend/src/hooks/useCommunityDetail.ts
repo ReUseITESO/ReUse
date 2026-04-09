@@ -62,16 +62,9 @@ export function useCommunityDetail(id: string) {
     }
   }
 
-  async function inviteUser(userId: number): Promise<string | null> {
-    try {
-      await apiClient(`/social/communities/${id}/join/`, {
-        method: 'POST',
-        body: JSON.stringify({ user_id: userId }),
-      });
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al invitar';
-    }
+  async function inviteUser(_userId: number): Promise<string | null> {
+    // Daniel's API doesn't have an invite endpoint — join is self-service only
+    return 'La API de comunidades no soporta invitaciones directas. El usuario puede unirse desde la lista de comunidades.';
   }
 
   async function leaveCommunity(): Promise<string | null> {
