@@ -52,6 +52,7 @@ services:
       - ./backend:/app
       - /app/.venv        # This "hides" the container's version from your host's version
       - /app/__pycache__  # Prevents cache conflicts
+      - ./backend/media:/app/media  # Maps local media directly to container root /media
     working_dir: /app
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
@@ -68,7 +69,7 @@ services:
     container_name: reuse_iteso_frontend
     environment:
       WATCHPACK_POLLING: true
-      NEXT_PUBLIC_API_URL: "http://localhost:8000/api"
+      NEXT_PUBLIC_API_URL: "http://backend:8000/api"
     ports:
       - "3000:3000"
     volumes:
@@ -98,6 +99,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  media_volume:
     driver: local
 
 networks:

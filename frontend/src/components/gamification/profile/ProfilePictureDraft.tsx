@@ -1,12 +1,35 @@
 import Image from 'next/image';
 import ZoomSlider from '../../../components/ui/ZoomSlider';
 
-import { ProfileBorder } from '../../../types/gamification';
+import { useAvatar } from '@/hooks/useAvatar';
+
+import { AvatarData } from '../../../types/gamification';
 import { useState, useRef } from 'react';
 
-function getProfileBorderStyle(profileBorder: ProfileBorder) {
+const getImageUrl = (imagePath: string | null | undefined) => {
+  const BACKEND_URL = 'http://localhost:8000';
+  
+  // Handle empty state or null
+  if (!imagePath || imagePath === "") {
+    return `${BACKEND_URL}/media/avatars/default.png`;
+  }
+
+  // Handle absolute URLs
+  if (imagePath.startsWith('http')) return imagePath;
+
+  // Normalize path to plural 'avatars' and include /media/ prefix
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  
+  if (cleanPath.startsWith('/media/')) {
+    return `${BACKEND_URL}${cleanPath}`;
+  }
+
+  return `${BACKEND_URL}/media${cleanPath}`;
+};
+
+function getProfileBorderStyle(profileBorder: AvatarData) {
 	return {
-		boxShadow: `inset 0 0 0 ${profileBorder.width}px ${profileBorder.color} , ${profileBorder.shadowColor} 0px 0px ${profileBorder.shadowWidth}px`,
+		boxShadow: `inset 0 0 0 ${profileBorder.border_thickness}px ${profileBorder.border_color}, ${profileBorder.shadow_color} 0px 0px ${profileBorder.shadow_thickness}px`,
 		//boxShadow: `${profileBorder.shadowColor} 0px 0px ${profileBorder.shadowWidth}px`,
 	}
 }
@@ -18,47 +41,35 @@ function getProfilePictureStyle(zoomLevel: number, posX: number, posY: number) {
 	}
 }
 
-interface ProfilePictureProps {
-	profileBorder: ProfileBorder;
-	profilePicture: string;
-	onChange: (newBorder: ProfileBorder) => void;
-}
-
-export default function ProfilePictureDraft(props: ProfilePictureProps) {
-
-	
-
-	const {profileBorder, profilePicture, onChange} = props;
-	// const fulImageWidth = 500;
-	// const imageWidth = fulImageWidth - profileBorder.width * 2;
-	const [ zoomLevel, setZoomLevel ] = useState(profileBorder.zoomLevel);
-
-	const [pos, setPos] = useState({ x: profileBorder?.posX || 0, y: profileBorder?.posY || 0 });
-	const [isDragging, setIsDragging] = useState(false);
+export default function ProfilePictureDraft() {
+	const { avatarData, setAvatarData, isLoading: isLoadingAvatar , updateAvatar } = useAvatar();
+	console.log('Avatar data in component:', avatarData);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [isDragging, setIsDragging] = useState(false);
+
+	if (isLoadingAvatar) return <p>Cargando...</p>;
+
+	const handleSave = async (): Promise<void> => {
+		const result =  await updateAvatar(avatarData);
+		if (result.success)
+			alert("Saved!");
+	};
 
 
-	const profileBorderStyle = getProfileBorderStyle(profileBorder);
-	const profilePictureStyle = getProfilePictureStyle(zoomLevel, pos.x, pos.y);
+
+	const profileBorderStyle = getProfileBorderStyle(avatarData);
+	const profilePictureStyle = getProfilePictureStyle(avatarData.zoom_level, avatarData.offset_x, avatarData.offset_y);
 
 	const handlePointerMove = (e: React.PointerEvent) => {
 		if (!isDragging) return;
 		
 		// movementX/Y provides the delta since the last event
-		setPos((prev) => ({
-			x: prev.x + e.movementX/zoomLevel, // Adjust movement by zoom level for consistent panning
-			y: prev.y + e.movementY/zoomLevel,
-		}));
-		
-	}
-
-	const saveChanges = () => {
-		onChange({
-			...profileBorder,
-			zoomLevel,
-			posX: pos.x,
-			posY: pos.y,
+		setAvatarData({
+			...avatarData,
+			offset_x: avatarData.offset_x + e.movementX/avatarData.zoom_level, // Adjust for zoom level
+			offset_y: avatarData.offset_y + e.movementY/avatarData.zoom_level, // Adjust for zoom level
 		});
+		
 	}
 
 	return (
@@ -74,33 +85,42 @@ export default function ProfilePictureDraft(props: ProfilePictureProps) {
 					className="relative h-[400px] w-[400px] 
 								rounded-full overflow-hidden 
 								flex items-center justify-center"
-					style={profileBorderStyle}
+					style={{...profileBorderStyle, backgroundColor: avatarData.border_color}}
 					onPointerDown={() => setIsDragging(true)}
 					onPointerUp={() => setIsDragging(false)}
 					onPointerLeave={() => setIsDragging(false)}
 					onPointerMove={handlePointerMove}
 				>
+					{/* Background Color layer */}
+					<div className="absolute inset-0" style={{ backgroundColor: avatarData.border_color }} />
+
 					{/* Image Container */}
-					<div className="absolute inset-0 -z-10" 
+					<div 
 						ref={containerRef}>
 						<Image 
-							src={profilePicture} 
+							src={getImageUrl(avatarData.image)} 
 							alt="profile picture" 
 							fill
 							className="object-cover pointer-events-none"
 							style={profilePictureStyle}
+							unoptimized
 							draggable={true}
 						/>
 					</div>
+
+					{/* 3. Border/Shadow Layer*/}
+					<div 
+						className="absolute inset-0 rounded-full pointer-events-none" 
+						style={getProfileBorderStyle(avatarData)} />
 				</div>
 			</div>
 			<div className="mt-4 text-center mx-[20px] w-full">
 				<ZoomSlider 
-					zoom={zoomLevel} 
-					onChange={setZoomLevel} />
+					zoom={avatarData.zoom_level} 
+					onChange={(newZoom) => setAvatarData((prev : AvatarData) => ({...prev, zoom_level: newZoom}))} />
 			</div>
 			<div className="mt-4 text-center p-4">
-				<button className="bg-btn-primary p-[20px] w-auto rounded" onClick={saveChanges}>Salvar Cambios</button>
+				<button className="bg-btn-primary p-[20px] w-auto rounded" onClick={handleSave}>Salvar Cambios</button>
 			</div>
 		</article>
 	);

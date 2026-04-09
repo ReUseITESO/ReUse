@@ -10,24 +10,58 @@ class AvatarView(APIView):
 	def get(self, request):
 		user = request.user
 
-		if not user or not user.is_authenticated:
-			return Response(
-				{"detail": "Las credenciales de autenticación no se proveyeron."},
-				status=401,
-			)
-
+		if not user.is_authenticated:
+			return Response({"detail": "Not authenticated"}, status=401)
+  
 		try:
-			avatar = Avatar.objects.get(user=user)
+			avatar, created = Avatar.objects.get_or_create(user=user)
+   
+			# # 3. Your debug prints
+			# print(f"--- Debugging Avatar for {user.username} ---")
+			# print(f"File path in DB: {avatar.image.name}")
+   
+			# Check if file actually exists on the server disk
+			file_exists = False
+			if avatar.image.name:
+				file_exists = avatar.image.storage.exists(avatar.image.name)
+			# print(f"File actually exists: {file_exists}")
+            
+			image_url = None
+			if avatar.image and file_exists:
+				image_url = avatar.image.url
 			avatar_data = {
-				"image": avatar.image.url,
+				"image": image_url,
 				"border_color": avatar.border_color,
 				"border_thickness": avatar.border_thickness,
 				"zoom_level": avatar.zoom_level,
 				"offset_x": avatar.offset_x,
 				"offset_y": avatar.offset_y,
 				"shadow_color": avatar.shadow_color,
-				"shadow_thickness": avatar.shadow_thickness,
+				"shadow_thickness": avatar.shadow_thickness, 
 			}
 			return Response(avatar_data)
 		except Avatar.DoesNotExist:
 			return Response({"detail": "Avatar no encontrado."}, status=404)
+
+	def post(self, request):
+		user = request.user
+
+		if not user or not user.is_authenticated:
+			return Response(
+				{"detail": "Credentials failed to be provided"},
+				status=401,
+			)
+
+		data = request.data
+		avatar, created = Avatar.objects.get_or_create(user=user)
+		avatar.image = data.get("image", avatar.image)
+		avatar.border_color = data.get("border_color", avatar.border_color)
+		avatar.border_thickness = data.get("border_thickness", avatar.border_thickness)
+		avatar.zoom_level = data.get("zoom_level", avatar.zoom_level)
+		avatar.offset_x = data.get("offset_x", avatar.offset_x)
+		avatar.offset_y = data.get("offset_y", avatar.offset_y)
+		avatar.shadow_color = data.get("shadow_color", avatar.shadow_color)
+		avatar.shadow_thickness = data.get("shadow_thickness", avatar.shadow_thickness)
+		avatar.save()
+
+		return Response({"detail": "Avatar updated succesfully"})

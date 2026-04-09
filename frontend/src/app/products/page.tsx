@@ -22,7 +22,7 @@ export default function ProductsPage() {
           </Link>
         )}
       </div>
-      <ProductList />
+      <ProductList/>
     </main>
   );
 }

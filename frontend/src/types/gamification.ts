@@ -74,12 +74,13 @@ export interface UserChallenge {
   is_expired: boolean;
 }
 
-export interface ProfileBorder {
-	width: number;
-	color: string;
-	shadowColor: string;
-	shadowWidth: number;
-  zoomLevel: number;
-  posX: number;
-  posY: number;
+export interface AvatarData {
+  image: string | null;
+	border_thickness: number;
+	border_color: string;
+	shadow_color: string;
+	shadow_thickness: number;
+  zoom_level: number;
+  offset_x: number;
+  offset_y: number;
 };
