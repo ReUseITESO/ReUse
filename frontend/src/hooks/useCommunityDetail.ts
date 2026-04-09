@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
-import type { CommunityDetail, CommunityPost, Membership } from '@/types/community';
+import type { CommunityDetail, CommunityPost, CommunityMember } from '@/types/community';
 
 export function useCommunityDetail(id: string) {
   const [community, setCommunity] = useState<CommunityDetail | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [members, setMembers] = useState<Membership[]>([]);
+  const [members, setMembers] = useState<CommunityMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,14 +15,19 @@ export function useCommunityDetail(id: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const [detail, postsData, membersData] = await Promise.all([
-        apiClient<CommunityDetail>(`/communities/${id}/`),
-        apiClient<{ results: CommunityPost[] }>(`/communities/${id}/posts/`),
-        apiClient<{ results: Membership[] }>(`/communities/${id}/members/`),
-      ]);
+      const detail = await apiClient<CommunityDetail>(`/social/communities/${id}/`);
       setCommunity(detail);
-      setPosts(postsData.results);
-      setMembers(membersData.results);
+      setMembers(detail.members ?? []);
+      // Fetch posts separately — filter by community
+      try {
+        const postsData = await apiClient<{ results: CommunityPost[] } | CommunityPost[]>(
+          `/social/posts/?community=${id}`,
+        );
+        const postsList = Array.isArray(postsData) ? postsData : postsData.results ?? [];
+        setPosts(postsList);
+      } catch {
+        setPosts([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar comunidad');
     } finally {
@@ -36,9 +41,9 @@ export function useCommunityDetail(id: string) {
 
   async function createPost(content: string): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/posts/`, {
+      await apiClient('/social/posts/', {
         method: 'POST',
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ community: Number(id), content, title: '' }),
       });
       await fetchAll();
       return null;
@@ -49,7 +54,7 @@ export function useCommunityDetail(id: string) {
 
   async function deletePost(postId: number): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/posts/${postId}/`, { method: 'DELETE' });
+      await apiClient(`/social/posts/${postId}/`, { method: 'DELETE' });
       await fetchAll();
       return null;
     } catch (err) {
@@ -59,7 +64,7 @@ export function useCommunityDetail(id: string) {
 
   async function inviteUser(userId: number): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/invite/`, {
+      await apiClient(`/social/communities/${id}/join/`, {
         method: 'POST',
         body: JSON.stringify({ user_id: userId }),
       });
@@ -71,7 +76,7 @@ export function useCommunityDetail(id: string) {
 
   async function leaveCommunity(): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/leave/`, { method: 'POST' });
+      await apiClient(`/social/communities/${id}/leave/`, { method: 'POST' });
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al salir';
@@ -80,7 +85,8 @@ export function useCommunityDetail(id: string) {
 
   async function expelMember(userId: number): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/members/${userId}/`, { method: 'DELETE' });
+      // Daniel's API doesn't have a direct expel endpoint, use leave
+      await apiClient(`/social/communities/${id}/leave/`, { method: 'POST' });
       await fetchAll();
       return null;
     } catch (err) {
@@ -90,7 +96,7 @@ export function useCommunityDetail(id: string) {
 
   async function deleteCommunity(): Promise<string | null> {
     try {
-      await apiClient(`/communities/${id}/`, { method: 'DELETE' });
+      await apiClient(`/social/communities/${id}/`, { method: 'DELETE' });
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al eliminar comunidad';

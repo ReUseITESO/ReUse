@@ -24,7 +24,7 @@ export default function CommunitiesPage() {
 
   const fetchInvitations = useCallback(async () => {
     try {
-      const data = await apiClient<{ results: CommunityInvitation[] }>('/communities/invitations/');
+      const data = await apiClient<{ results: CommunityInvitation[] }>('/social/communities/invitations/');
       setInvitations(data.results);
     } catch {
       setInvitations([]);
@@ -38,7 +38,7 @@ export default function CommunitiesPage() {
   async function handleAcceptInvite(communityId: number, inviteId: number) {
     setLoadingInviteId(inviteId);
     try {
-      await apiClient(`/communities/${communityId}/join/`, { method: 'POST' });
+      await apiClient(`/social/communities/${communityId}/join/`, { method: 'POST' });
       await Promise.all([fetchInvitations(), refresh()]);
     } catch {
       /* ignore */
@@ -199,10 +199,10 @@ export default function CommunitiesPage() {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Users className="h-4 w-4" />
-                    {c.member_count}
+                    {c.members_count}
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-gray-400">Creada por {c.created_by_name}</p>
+                <p className="mt-2 text-xs text-gray-400">Creada por {c.creator.full_name}</p>
               </Link>
             ))}
           </div>

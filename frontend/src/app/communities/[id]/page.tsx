@@ -19,7 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { apiClient } from '@/lib/api';
 
-import type { CommunityMember } from '@/types/community';
+import type { SocialUser } from '@/types/community';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -44,12 +44,14 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
   const [showInvite, setShowInvite] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CommunityMember[]>([]);
+  const [searchResults, setSearchResults] = useState<SocialUser[]>([]);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
 
-  const isAdmin = community?.user_role === 'admin';
-  const isMember = community?.is_member;
+  // Derive admin/member status from members list
+  const currentMembership = members.find(m => m.user.id === user?.id);
+  const isAdmin = currentMembership?.role === 'admin';
+  const isMember = !!currentMembership;
   const memberIds = members.map(m => m.user.id);
 
   async function handlePost() {
@@ -75,7 +77,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   async function handleSearch() {
     if (searchQuery.length < 2) return;
     try {
-      const data = await apiClient<{ results: CommunityMember[] } | CommunityMember[]>(
+      const data = await apiClient<{ results: SocialUser[] } | SocialUser[]>(
         `/auth/users/search/?q=${encodeURIComponent(searchQuery)}`,
       );
       const results = Array.isArray(data) ? data : (data.results ?? []);
@@ -137,9 +139,9 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               )}
               <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" /> {community.member_count} miembros
+                  <Users className="h-4 w-4" /> {community.members_count} miembros
                 </span>
-                <span>Creada por {community.created_by_name}</span>
+                <span>Creada por {community.creator.full_name}</span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -204,11 +206,11 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                          {post.author.first_name?.[0]?.toUpperCase()}
+                          {post.author_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {post.author.full_name}
+                            {post.author_name}
                           </p>
                           <p className="text-xs text-gray-400">
                             {new Date(post.created_at).toLocaleDateString('es-MX', {
@@ -220,7 +222,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                           </p>
                         </div>
                       </div>
-                      {(post.author.id === user?.id || isAdmin) && (
+                      {(post.user === user?.id || isAdmin) && (
                         <button
                           onClick={() => deletePost(post.id)}
                           className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"

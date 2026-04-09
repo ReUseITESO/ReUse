@@ -43,3 +43,10 @@ export interface CommunityPost {
   created_at: string;
   updated_at: string;
 }
+
+export interface CommunityInvitation {
+  id: number;
+  community: number;
+  community_name: string;
+  invited_by: SocialUser;
+}
