@@ -112,11 +112,18 @@ def change_product_status(product, new_status, user):
         }
         action = action_map.get(product.transaction_type)
         if action:
-            award_points(user=product.seller, action=action, reference_id=product.id)
+            try:
+                award_points(
+                    user=product.seller,
+                    action=action,
+                    reference_id=product.id,
+                )
+            except Exception:
+                pass
 
-    # ==========================================================================
+        # ==========================================================================
 
-    return product
+        return product
 
 
 def delete_product(product, user):

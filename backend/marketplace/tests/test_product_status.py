@@ -119,9 +119,6 @@ class ProductStatusTests(APITestCase):
             {"status": "completado"},
             format="json",
         )
-
-        print("DEBUG RESPONSE:", response.data)
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], "completado")
 
