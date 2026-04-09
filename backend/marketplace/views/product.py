@@ -218,6 +218,7 @@ class ProductViewSet(
     @action(detail=True, methods=["patch"], url_path="status")
     def change_status(self, request, pk=None):
         product = self.get_object()
+        product.refresh_from_db()
         serializer = ProductStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
