@@ -1,5 +1,7 @@
 import hashlib
+import os
 import secrets
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -7,6 +9,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +18,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
+
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
@@ -350,9 +356,6 @@ class EmailVerificationConfirmView(APIView):
 
 # ── Dashboard (HU-CORE-04) ───────────────────────────────
 
-from marketplace.models import Products
-from marketplace.serializers.product import ProductListSerializer
-
 
 class DashboardView(APIView):
     """GET /api/auth/dashboard/ — aggregated home dashboard data."""
@@ -395,10 +398,6 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
-
-from rest_framework.parsers import MultiPartParser
-import os
-import uuid
 
 
 class MicrosoftAuthURLView(APIView):
@@ -507,12 +506,22 @@ class ProfilePictureUploadView(APIView):
         file = request.FILES.get("file")
         if not file:
             return Response(
-                {"error": {"code": "NO_FILE", "message": "No se envio ningun archivo."}},
+                {
+                    "error": {
+                        "code": "NO_FILE",
+                        "message": "No se envio ningun archivo.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.content_type not in self.ALLOWED_TYPES:
             return Response(
-                {"error": {"code": "INVALID_TYPE", "message": "Solo imagenes (JPEG, PNG, WebP, GIF)."}},
+                {
+                    "error": {
+                        "code": "INVALID_TYPE",
+                        "message": "Solo imagenes (JPEG, PNG, WebP, GIF).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.size > self.MAX_SIZE:
@@ -535,23 +544,3 @@ class ProfilePictureUploadView(APIView):
         user.save(update_fields=["profile_picture"])
 
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
-
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from .models.notification import Notification
-from .serializers import NotificationSerializer
-
-class NotificationViewSet(viewsets.ModelViewSet):
-    serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
-
-    @action(detail=True, methods=['patch'])
-    def mark_read(self, request, pk=None):
-        notification = self.get_object()
-        notification.is_read = True
-        notification.read_at = timezone.now()
-        notification.save(update_fields=['is_read', 'read_at'])
-        return Response({'status': 'notification marked as read'})

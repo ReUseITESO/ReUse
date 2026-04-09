@@ -2,12 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { Bell, LogOut, Menu, Plus, ArrowLeftRight, User, X } from 'lucide-react';
+import { useState } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
+import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import api from '@/lib/api';
-import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -15,34 +13,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [activeBadgeNotification, setActiveBadgeNotification] = useState<any>(null);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    let intervalId: NodeJS.Timeout;
-
-    const fetchNotifications = async () => {
-      try {
-        const { data } = await api.get('/core/notifications/');
-        if (Array.isArray(data)) {
-          const unreadBadgeNotifications = data.filter((n: any) => !n.is_read && n.type === 'badge_earned');
-          if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {
-            setActiveBadgeNotification(unreadBadgeNotifications[0]);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch notifications', error);
-      }
-    };
-
-    // Initial fetch
-    fetchNotifications();
-    // Poll every 15 seconds
-    intervalId = setInterval(fetchNotifications, 15000);
-
-    return () => clearInterval(intervalId);
-  }, [isAuthenticated, activeBadgeNotification]);
 
   function handleSignOut() {
     signOut();
@@ -137,6 +107,13 @@ export default function Navbar() {
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
                       >
                         <ArrowLeftRight className="h-4 w-4 text-info" /> Transacciones
+                      </Link>
+                      <Link
+                        href="/transaction-history"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
+                      >
+                        <History className="h-4 w-4 text-info" /> Historial de transacciones
                       </Link>
                       <button
                         onClick={handleSignOut}
@@ -237,6 +214,13 @@ export default function Navbar() {
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-info transition-colors hover:bg-info/10"
               >
                 <ArrowLeftRight className="h-5 w-5" /> Transacciones
+              </Link>
+              <Link
+                href="/transaction-history"
+                onClick={closeMenu}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-info transition-colors hover:bg-info/10"
+              >
+                <History className="h-5 w-5" /> Historial de transacciones
               </Link>
               <button
                 onClick={handleSignOut}

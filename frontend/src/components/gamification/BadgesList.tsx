@@ -81,11 +81,20 @@ export default function BadgesList() {
               }
             `}
           >
-            {/* Sparkle effects for unlocked */}
-            {!isLocked && (
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-700 blur-2xl rounded-full bg-gradient-to-tr from-primary to-accent pointer-events-none z-0" />
-              </div>
+            <img
+              src={badge.icon_url || 'https://via.placeholder.com/64'}
+              alt={badge.name}
+              className="w-16 h-16 mb-3 rounded-full"
+            />
+            <h3 className="font-semibold text-sm mb-1">{badge.name}</h3>
+            <p className="text-xs text-muted-fg mb-2">{badge.description}</p>
+
+            {!isLocked ? (
+              <span className="text-xs font-medium text-success">
+                Obtenido: {new Date(badge.earned_at as string).toLocaleDateString()}
+              </span>
+            ) : (
+              <span className="text-xs font-medium text-muted-fg">Bloqueado</span>
             )}
 
             {/* Icon Container */}

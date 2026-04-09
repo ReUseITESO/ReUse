@@ -4,8 +4,9 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from core.models import User
-from marketplace.models import Products, Transaction
+from marketplace.models import Products, Transaction, TransactionReview
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.transaction_review import TransactionReviewSerializer
 from marketplace.services.transaction_service import (
     UPDATABLE_TRANSACTION_STATUSES,
     get_expiration_datetime,
@@ -97,11 +98,41 @@ class TransactionCreateSerializer(serializers.Serializer):
 
     def validate_delivery_date(self, value):
         if value <= timezone.now():
-            raise serializers.ValidationError(
-                "La fecha de entrega debe ser futura."
-            )
+            raise serializers.ValidationError("La fecha de entrega debe ser futura.")
         return value
 
 
 class TransactionStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=UPDATABLE_TRANSACTION_STATUSES)
+
+
+class TransactionHistorySerializer(TransactionSerializer):
+    """TransactionSerializer extended with review fields for the history endpoint."""
+
+    can_review = serializers.SerializerMethodField()
+    my_review = serializers.SerializerMethodField()
+
+    def get_can_review(self, obj):
+        if obj.status != "completada":
+            return False
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        return not TransactionReview.objects.filter(
+            transaction=obj, reviewer=request.user
+        ).exists()
+
+    def get_my_review(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+        try:
+            review = TransactionReview.objects.get(
+                transaction=obj, reviewer=request.user
+            )
+            return TransactionReviewSerializer(review).data
+        except TransactionReview.DoesNotExist:
+            return None
+
+    class Meta(TransactionSerializer.Meta):
+        fields = TransactionSerializer.Meta.fields + ["can_review", "my_review"]
