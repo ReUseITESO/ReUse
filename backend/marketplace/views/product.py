@@ -225,8 +225,7 @@ class ProductViewSet(
 
         updated_product = change_product_status(product, new_status, request.user)
 
-        response_serializer = ProductListSerializer(
-            updated_product,
-            context=self.get_serializer_context(),
-        )
+        updated_product = Products.objects.get(pk=updated_product.pk)
+
+        response_serializer = ProductListSerializer(updated_product)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
