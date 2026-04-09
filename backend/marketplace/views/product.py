@@ -142,6 +142,9 @@ class ProductViewSet(
         queryset = Products.objects.select_related(
             "category", "seller", "transaction"
         ).prefetch_related("images")
+        
+        if self.action not in ("list",):
+            return queryset
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
@@ -218,7 +221,6 @@ class ProductViewSet(
     @action(detail=True, methods=["patch"], url_path="status")
     def change_status(self, request, pk=None):
         product = self.get_object()
-        product.refresh_from_db()
         serializer = ProductStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
