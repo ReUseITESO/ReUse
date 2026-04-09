@@ -31,7 +31,9 @@ class BadgeServiceTest(TestCase):
 
         Badges.objects.create(name="Primer Artículo", description="test", points=10)
         Badges.objects.create(name="Donador Constante", description="test", points=50)
-        Badges.objects.create(name="Comerciante Frecuente", description="test", points=100)
+        Badges.objects.create(
+            name="Comerciante Frecuente", description="test", points=100
+        )
         Badges.objects.create(name="Primer Intercambio", description="test", points=20)
         Badges.objects.create(name="Centurión de Puntos", description="test", points=0)
 
@@ -44,7 +46,7 @@ class BadgeServiceTest(TestCase):
             condition="nuevo",
             transaction_type="sale",
             price=10.0,
-            status="disponible"
+            status="disponible",
         )
 
         unlocked = evaluate_milestones(self.user)
@@ -52,10 +54,16 @@ class BadgeServiceTest(TestCase):
         self.assertEqual(len(unlocked), 1)
         self.assertEqual(unlocked[0].name, "Primer Artículo")
 
-        self.assertTrue(UserBadges.objects.filter(user=self.user, badges__name="Primer Artículo").exists())
+        self.assertTrue(
+            UserBadges.objects.filter(
+                user=self.user, badges__name="Primer Artículo"
+            ).exists()
+        )
         self.user.refresh_from_db()
         self.assertEqual(self.user.points, 10)
-        self.assertTrue(Notification.objects.filter(user=self.user, type="badge_earned").exists())
+        self.assertTrue(
+            Notification.objects.filter(user=self.user, type="badge_earned").exists()
+        )
 
     def test_evaluate_centurion_de_puntos(self):
         self.user.points = 100
@@ -73,7 +81,7 @@ class BadgeServiceTest(TestCase):
             description="desc",
             condition="usado",
             transaction_type="swap",
-            status="completado"
+            status="completado",
         )
 
         Transaction.objects.create(
@@ -81,7 +89,7 @@ class BadgeServiceTest(TestCase):
             seller=self.user,
             buyer=self.user2,
             transaction_type="swap",
-            status="completada"
+            status="completada",
         )
 
         unlocked = evaluate_milestones(self.user)
@@ -99,14 +107,14 @@ class BadgeServiceTest(TestCase):
                 description="desc",
                 condition="nuevo",
                 transaction_type="donation",
-                status="completado"
+                status="completado",
             )
             Transaction.objects.create(
                 product=product,
                 seller=self.user,
                 buyer=self.user2,
                 transaction_type="donation",
-                status="completada"
+                status="completada",
             )
 
         unlocked = evaluate_milestones(self.user)

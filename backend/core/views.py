@@ -364,7 +364,6 @@ class EmailVerificationConfirmView(APIView):
 # ── Dashboard (HU-CORE-04) ───────────────────────────────
 
 
-
 class DashboardView(APIView):
     """GET /api/auth/dashboard/ — aggregated home dashboard data."""
 
@@ -406,7 +405,6 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
-
 
 
 class MicrosoftAuthURLView(APIView):
@@ -555,19 +553,19 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
-
-
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_at"
+        )
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=["patch"])
     def mark_read(self, request, pk=None):
         notification = self.get_object()
         notification.is_read = True
         notification.read_at = timezone.now()
-        notification.save(update_fields=['is_read', 'read_at'])
-        return Response({'status': 'notification marked as read'})
+        notification.save(update_fields=["is_read", "read_at"])
+        return Response({"status": "notification marked as read"})

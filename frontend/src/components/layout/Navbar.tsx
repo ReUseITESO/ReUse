@@ -23,7 +23,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [activeBadgeNotification, setActiveBadgeNotification] = useState<BadgeNotification | null>(null);
+  const [activeBadgeNotification, setActiveBadgeNotification] = useState<BadgeNotification | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -32,7 +34,9 @@ export default function Navbar() {
       try {
         const data = await apiClient<BadgeNotification[]>('/core/notifications/');
         if (Array.isArray(data)) {
-          const unreadBadgeNotifications = data.filter((n) => !n.is_read && n.type === 'badge_earned');
+          const unreadBadgeNotifications = data.filter(
+            n => !n.is_read && n.type === 'badge_earned',
+          );
           if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {
             setActiveBadgeNotification(unreadBadgeNotifications[0]);
           }

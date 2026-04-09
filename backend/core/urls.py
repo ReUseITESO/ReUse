@@ -31,14 +31,17 @@ urlpatterns = [
         views.ProfilePictureUploadView.as_view(),
         name="profile-upload-picture",
     ),
-
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
-    path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
+    path(
+        "microsoft/callback/",
+        views.MicrosoftCallbackView.as_view(),
+        name="microsoft-callback",
+    ),
 ]
 
 
 router = DefaultRouter()
-router.register(r'notifications', views.NotificationViewSet, basename='notification')
+router.register(r"notifications", views.NotificationViewSet, basename="notification")
 
 urlpatterns += router.urls

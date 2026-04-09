@@ -11,11 +11,13 @@ from marketplace.models.transaction import Transaction
 def product_post_save(sender, instance, created, **kwargs):
     evaluate_milestones(instance.seller)
 
+
 @receiver(post_save, sender=Transaction)
 def transaction_post_save(sender, instance, created, **kwargs):
     if instance.status == "completada":
         evaluate_milestones(instance.seller)
         evaluate_milestones(instance.buyer)
+
 
 @receiver(post_save, sender=User)
 def user_post_save(sender, instance, created, **kwargs):

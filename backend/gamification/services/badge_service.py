@@ -20,7 +20,9 @@ def evaluate_milestones(user):
 
     try:
         # Cache user earned badges
-        earned_badges_ids = list(UserBadges.objects.filter(user=user).values_list('badges_id', flat=True))
+        earned_badges_ids = list(
+            UserBadges.objects.filter(user=user).values_list("badges_id", flat=True)
+        )
 
         new_badges_unlocked = []
 
@@ -30,12 +32,14 @@ def evaluate_milestones(user):
                 try:
                     badge = Badges.objects.get(name=badge_name)
                 except Badges.DoesNotExist:
-                    return # If badge doesn't exist, ignore
+                    return  # If badge doesn't exist, ignore
 
                 if badge.id not in earned_badges_ids:
                     earned_badges_ids.append(badge.id)
                     with transaction.atomic():
-                        obj, created = UserBadges.objects.get_or_create(user=user, badges=badge)
+                        obj, created = UserBadges.objects.get_or_create(
+                            user=user, badges=badge
+                        )
                         if created:
                             # Add points if badge has them
                             if badge.points > 0:
@@ -52,8 +56,14 @@ def evaluate_milestones(user):
                             new_badges_unlocked.append(badge)
 
         # Calculate metrics
-        products_count = Products.objects.filter(seller=user).exclude(status="cancelado").count()
-        libros_count = Products.objects.filter(seller=user, category__name__icontains="libro").exclude(status="cancelado").count()
+        products_count = (
+            Products.objects.filter(seller=user).exclude(status="cancelado").count()
+        )
+        libros_count = (
+            Products.objects.filter(seller=user, category__name__icontains="libro")
+            .exclude(status="cancelado")
+            .count()
+        )
 
         # Completed transactions where user is seller or buyer
         seller_txs = Transaction.objects.filter(seller=user, status="completada")
@@ -61,9 +71,13 @@ def evaluate_milestones(user):
 
         sales_count = seller_txs.filter(transaction_type="sale").count()
         donations_count = seller_txs.filter(transaction_type="donation").count()
-        swap_count = Transaction.objects.filter(Q(seller=user) | Q(buyer=user), status="completada", transaction_type="swap").count()
+        swap_count = Transaction.objects.filter(
+            Q(seller=user) | Q(buyer=user), status="completada", transaction_type="swap"
+        ).count()
 
-        perfil_completo = bool(user.first_name and user.last_name and user.phone and user.profile_picture)
+        perfil_completo = bool(
+            user.first_name and user.last_name and user.phone and user.profile_picture
+        )
 
         check_and_award("Bienvenido a ReUse", True)
         check_and_award("Publicador Novato", products_count >= 1)
