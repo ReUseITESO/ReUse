@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
@@ -36,7 +37,7 @@ urlpatterns = [
     path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
 ]
 
-from rest_framework.routers import DefaultRouter
+
 router = DefaultRouter()
 router.register(r'notifications', views.NotificationViewSet, basename='notification')
 

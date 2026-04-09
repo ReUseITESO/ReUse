@@ -9,6 +9,7 @@ from marketplace.models.category import Category
 from marketplace.models.product import Products
 from marketplace.models.transaction import Transaction
 
+
 class BadgeServiceTest(TestCase):
 
     def setUp(self):
@@ -18,7 +19,7 @@ class BadgeServiceTest(TestCase):
             last_name="Milestone",
             points=0,
         )
-        
+
         self.user2 = User.objects.create(
             email="test.milestone2@iteso.mx",
             first_name="Test",
@@ -45,12 +46,12 @@ class BadgeServiceTest(TestCase):
             price=10.0,
             status="disponible"
         )
-        
+
         unlocked = evaluate_milestones(self.user)
-        
+
         self.assertEqual(len(unlocked), 1)
         self.assertEqual(unlocked[0].name, "Primer Artículo")
-        
+
         self.assertTrue(UserBadges.objects.filter(user=self.user, badges__name="Primer Artículo").exists())
         self.user.refresh_from_db()
         self.assertEqual(self.user.points, 10)
@@ -59,7 +60,7 @@ class BadgeServiceTest(TestCase):
     def test_evaluate_centurion_de_puntos(self):
         self.user.points = 100
         self.user.save()
-        
+
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
         self.assertIn("Centurión de Puntos", badge_names)
@@ -74,7 +75,7 @@ class BadgeServiceTest(TestCase):
             transaction_type="swap",
             status="completado"
         )
-        
+
         Transaction.objects.create(
             product=product,
             seller=self.user,
@@ -82,10 +83,10 @@ class BadgeServiceTest(TestCase):
             transaction_type="swap",
             status="completada"
         )
-        
+
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
-        
+
         self.assertIn("Primer Artículo", badge_names)
         self.assertIn("Primer Intercambio", badge_names)
 
@@ -107,7 +108,7 @@ class BadgeServiceTest(TestCase):
                 transaction_type="donation",
                 status="completada"
             )
-        
+
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
         self.assertIn("Donador Constante", badge_names)

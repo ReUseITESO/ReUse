@@ -8,7 +8,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -22,7 +23,13 @@ from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
 
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
+from .models.notification import Notification
+from .serializers import (
+    NotificationSerializer,
+    SignInSerializer,
+    SignUpSerializer,
+    UserProfileSerializer,
+)
 
 User = get_user_model()
 
@@ -357,6 +364,7 @@ class EmailVerificationConfirmView(APIView):
 # ── Dashboard (HU-CORE-04) ───────────────────────────────
 
 
+
 class DashboardView(APIView):
     """GET /api/auth/dashboard/ — aggregated home dashboard data."""
 
@@ -398,6 +406,7 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
+
 
 
 class MicrosoftAuthURLView(APIView):
@@ -545,10 +554,8 @@ class ProfilePictureUploadView(APIView):
 
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from .models.notification import Notification
-from .serializers import NotificationSerializer
+
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer

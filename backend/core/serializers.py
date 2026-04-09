@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from .models.notification import Notification
+
 User = get_user_model()
 
 
@@ -159,9 +161,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_phone(self, value: str) -> str:
         return sanitize_phone(value) if value else value
-
-from .models.notification import Notification
-
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification

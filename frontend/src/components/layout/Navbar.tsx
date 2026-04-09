@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import api from '@/lib/api';
+import { apiClient } from '@/lib/api';
 import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
 
 export default function Navbar() {
@@ -24,7 +24,7 @@ export default function Navbar() {
 
     const fetchNotifications = async () => {
       try {
-        const { data } = await api.get('/core/notifications/');
+        const data = await apiClient<any>('/core/notifications/');
         if (Array.isArray(data)) {
           const unreadBadgeNotifications = data.filter((n: any) => !n.is_read && n.type === 'badge_earned');
           if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {

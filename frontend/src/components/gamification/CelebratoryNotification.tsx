@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, Award, Sparkles } from 'lucide-react';
-import api from '@/lib/api';
+import { apiClient } from '@/lib/api';
 
 interface NotificationType {
   id: number;
@@ -24,7 +24,7 @@ export function CelebratoryNotification({ notification, onClose }: { notificatio
   const handleClose = async () => {
     setIsVisible(false);
     try {
-      await api.patch(`/core/notifications/${notification.id}/mark_read/`);
+      await apiClient(`/core/notifications/${notification.id}/mark_read/`, { method: 'PATCH' });
     } catch (e) {
       console.error('Error marking notification as read', e);
     }
