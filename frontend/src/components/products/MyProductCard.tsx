@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Pencil, Trash2 } from 'lucide-react';
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import Badge from '@/components/ui/Badge';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -106,7 +108,10 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-sm text-muted-fg">{product.category.name} - Imagen</span>
+            <div className="flex flex-col items-center gap-2 text-muted-fg">
+              <CategoryPlaceholderIcon categoryName={product.category.name} />
+              <span className="text-sm"> Sin imagen </span>
+            </div>
           )}
         </div>
 
@@ -172,9 +177,11 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
               {isDisponible && (
                 <Link
                   href={`/products/${product.id}/edit`}
-                  className="rounded-lg bg-btn-primary px-3 py-1.5 text-xs font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
+                  className="inline-flex items-center rounded-lg bg-btn-primary p-2 text-btn-primary-fg transition-colors hover:bg-primary-hover"
+                  title="Editar producto"
+                  aria-label="Editar producto"
                 >
-                  Editar
+                  <Pencil className="h-4 w-4" />
                 </Link>
               )}
 
@@ -182,9 +189,11 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
                 <button
                   type="button"
                   onClick={() => setIsDeleteOpen(true)}
-                  className="rounded-lg bg-error px-3 py-1.5 text-xs font-medium text-error-fg transition-colors hover:opacity-90"
+                  className="inline-flex items-center rounded-lg bg-error p-2 text-error-fg transition-colors hover:opacity-90"
+                  title="Eliminar producto"
+                  aria-label="Eliminar producto"
                 >
-                  Eliminar
+                  <Trash2 className="h-4 w-4" />
                 </button>
               )}
             </div>

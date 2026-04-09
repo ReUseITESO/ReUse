@@ -7,6 +7,7 @@ import {
   signIn as apiSignIn,
   signUp as apiSignUp,
   signOut as apiSignOut,
+  microsoftSignIn as apiMicrosoftSignIn,
   getProfile,
   getStoredTokens,
   clearTokens,
@@ -19,6 +20,7 @@ interface AuthContextValue {
   signIn: (credentials: SignInRequest) => Promise<void>;
   signUp: (payload: SignUpRequest) => Promise<void>;
   signOut: () => Promise<void>;
+  signInWithMicrosoft: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -56,6 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
+  const signInWithMicrosoft = useCallback(async (code: string) => {
+    const data = await apiMicrosoftSignIn(code);
+    setUser(data.user);
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -64,8 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signUp,
       signOut,
+      signInWithMicrosoft,
     }),
-    [user, isLoading, signIn, signUp, signOut],
+    [user, isLoading, signIn, signUp, signOut, signInWithMicrosoft],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

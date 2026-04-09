@@ -46,6 +46,10 @@ services:
       EMAIL_HOST_PASSWORD: "${SENDGRID_API_KEY:-}"
       DEFAULT_FROM_EMAIL: reuseiteso@outlook.com
       EMAIL_VERIFICATION_EXPIRES_MINUTES: "30"
+      MICROSOFT_CLIENT_ID: "${MICROSOFT_CLIENT_ID:-}"
+      MICROSOFT_CLIENT_SECRET: "${MICROSOFT_CLIENT_SECRET:-}"
+      MICROSOFT_TENANT_ID: "${MICROSOFT_TENANT_ID:-common}"
+      MICROSOFT_REDIRECT_URI: "http://localhost:3000/auth/microsoft/callback"
     ports:
       - "8000:8000"
     volumes:

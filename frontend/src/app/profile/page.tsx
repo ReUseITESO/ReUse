@@ -15,7 +15,10 @@ export default function ProfilePage() {
   const [localUser, setLocalUser] = useState<User | null>(null);
   const displayUser = localUser ?? user;
 
-  function handleSave(updated: User) { setLocalUser(updated); setIsEditing(false); }
+  function handleSave(updated: User) {
+    setLocalUser(updated);
+    setIsEditing(false);
+  }
 
   if (isLoading) {
     return (
@@ -46,21 +49,42 @@ export default function ProfilePage() {
 
         <section className="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
           {isEditing ? (
-            <ProfileEditForm user={displayUser} onSave={handleSave} onCancel={() => setIsEditing(false)} />
+            <ProfileEditForm
+              user={displayUser}
+              onSave={handleSave}
+              onCancel={() => setIsEditing(false)}
+            />
           ) : (
             <div className="flex items-start gap-6">
               <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
                 {displayUser.profile_picture ? (
-                  <img src={displayUser.profile_picture} alt={displayUser.first_name} className="h-20 w-20 rounded-full object-cover" />
-                ) : displayUser.first_name?.charAt(0).toUpperCase()}
+                  <img
+                    src={displayUser.profile_picture}
+                    alt={displayUser.first_name}
+                    className="h-20 w-20 rounded-full object-cover"
+                  />
+                ) : (
+                  displayUser.first_name?.charAt(0).toUpperCase()
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-h3 font-semibold text-fg">{displayUser.full_name || `${displayUser.first_name} ${displayUser.last_name}`.trim()}</h2>
+                    <h2 className="text-h3 font-semibold text-fg">
+                      {displayUser.full_name ||
+                        `${displayUser.first_name} ${displayUser.last_name}`.trim()}
+                    </h2>
                     <p className="mt-1 text-sm text-muted-fg">{displayUser.email}</p>
-                    {displayUser.phone && <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>}
+                    {displayUser.phone && (
+                      <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
+                    )}
                   </div>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                  >
+                    <Pencil className="h-4 w-4" /> Editar perfil
+                  </button>
                   <div className="ml-auto flex items-center gap-2">
                     <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
                       <Pencil className="h-4 w-4" /> Editar Perfil
@@ -82,9 +106,14 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-h3 font-semibold text-fg">Mis Articulos</h2>
-              <p className="mt-1 text-sm text-muted-fg">Administra los productos que has publicado</p>
+              <p className="mt-1 text-sm text-muted-fg">
+                Administra los productos que has publicado
+              </p>
             </div>
-            <Link href="/products/my" className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover">
+            <Link
+              href="/products/my"
+              className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
+            >
               Ver mis articulos
             </Link>
           </div>

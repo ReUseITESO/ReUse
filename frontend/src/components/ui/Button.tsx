@@ -1,13 +1,13 @@
 interface ButtonProps {
   children: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'template' | 'danger' | 'danger-outline';
+  variant?: 'primary' | 'secondary' | 'template' | 'danger' | 'danger-outline' | 'success';
   disabled?: boolean;
   onClick?: () => void;
   className?: string;
 }
 
-export default function Button({
+function Button({
   children,
   type = 'button',
   variant = 'primary',
@@ -23,6 +23,7 @@ export default function Button({
     template: 'border border-btn-tmpl-border bg-btn-tmpl text-primary hover:bg-btn-tmpl-hover',
     danger: 'bg-error text-error-fg hover:opacity-90',
     'danger-outline': 'border border-error bg-transparent text-error hover:bg-error/5',
+    success: 'bg-success text-success-fg hover:bg-success-hover',
   };
 
   return (
@@ -36,3 +37,5 @@ export default function Button({
     </button>
   );
 }
+
+export default Button;

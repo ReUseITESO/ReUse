@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { Clock3, UserRound } from 'lucide-react';
+
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import Badge from '@/components/ui/Badge';
 import { getCategoryStyle, getPriceColor } from '@/lib/productStyles';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
@@ -29,7 +32,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-sm text-muted-fg">{product.category.name} - Imagen</span>
+            <div className="flex flex-col items-center gap-2 text-muted-fg">
+              <CategoryPlaceholderIcon categoryName={product.category.name} />
+              <span className="text-sm"> Sin imagen</span>
+            </div>
           )}
         </div>
 
@@ -41,10 +47,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className={`text-h3 font-bold ${priceColorClass}`}>{transactionDisplay}</p>
 
           <div className="mt-auto flex flex-col gap-1 text-xs text-muted-fg">
-            <span className="flex items-center gap-1">{timeAgo}</span>
+            <span className="inline-flex items-center gap-1">
+              <Clock3 className="h-3.5 w-3.5" />
+              {timeAgo}
+            </span>
           </div>
 
           <div className="mt-2 flex items-center gap-2 border-t border-border pt-3">
+            <UserRound className="h-4 w-4 text-secondary" />
             <span className="text-sm text-fg">{product.seller_name}</span>
           </div>
         </div>
