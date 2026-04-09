@@ -35,3 +35,9 @@ urlpatterns = [
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
     path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
 ]
+
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register(r'notifications', views.NotificationViewSet, basename='notification')
+
+urlpatterns += router.urls
