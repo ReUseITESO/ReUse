@@ -15,6 +15,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     """Serializer for the product list (Object -> JSON)."""
+    status = serializers.CharField()
 
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
