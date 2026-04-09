@@ -195,6 +195,21 @@ class SignInView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        # HU-CORE-17: bloquear login si la cuenta fue desactivada lógicamente
+        if getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Revisa tu correo o solicita un enlace de reactivación en /api/auth/account/reactivate/send/"
+                        ),
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         refresh = RefreshToken.for_user(user)
 
         return Response(
@@ -474,6 +489,19 @@ class MicrosoftCallbackView(APIView):
                     "error": {
                         "code": "ACCOUNT_DISABLED",
                         "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        elif getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Solicita un enlace de reactivación en la pantalla de inicio de sesión."
+                        ),
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,

@@ -4,7 +4,8 @@ from social.models import CommunityMember, CommunityPost
 
 
 class CommunityPostListSerializer(serializers.ModelSerializer):
-    author_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    # HU-CORE-17: ocultar nombre real si el autor está desactivado
+    author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CommunityPost
@@ -21,10 +22,16 @@ class CommunityPostListSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
+
+    def get_author_name(self, obj) -> str:
+        if getattr(obj.user, "is_deactivated", False):
+            return "Usuario Desactivado"
+        return obj.user.get_full_name()
 
 
 class CommunityPostDetailSerializer(serializers.ModelSerializer):
-    author_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    # HU-CORE-17: ocultar nombre real si el autor está desactivado
+    author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = CommunityPost
@@ -41,6 +48,11 @@ class CommunityPostDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
+
+    def get_author_name(self, obj) -> str:
+        if getattr(obj.user, "is_deactivated", False):
+            return "Usuario Desactivado"
+        return obj.user.get_full_name()
 
 
 class CommunityPostWriteSerializer(serializers.ModelSerializer):

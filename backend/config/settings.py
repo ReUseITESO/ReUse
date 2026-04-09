@@ -285,12 +285,18 @@ EMAIL_VERIFICATION_EXPIRES_MINUTES = int(
     os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30")
 )
 
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "apikey")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@reuse.com")
+
+# Si no hay API key de SendGrid configurada, usar consola (los emails se imprimen en el log).
+# Para usar SMTP real, establecer EMAIL_HOST_PASSWORD en el entorno.
+_default_email_backend = (
+    "django.core.mail.backends.console.EmailBackend"
+    if not EMAIL_HOST_PASSWORD
+    else "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", _default_email_backend)

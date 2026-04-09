@@ -54,7 +54,12 @@ class CommunityDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_members(self, obj: Community):
-        memberships = obj.memberships.select_related("user").order_by("joined_at")
+        # HU-CORE-17: excluir miembros con cuenta desactivada
+        memberships = (
+            obj.memberships.select_related("user")
+            .filter(user__is_deactivated=False)
+            .order_by("joined_at")
+        )
         return CommunityMemberSerializer(memberships, many=True).data
 
     def get_members_count(self, obj: Community) -> int:
