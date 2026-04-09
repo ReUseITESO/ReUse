@@ -83,12 +83,7 @@ def change_product_status(product, new_status, user):
                 "No se puede pausar un producto con una transacción activa."
             )
 
-    product.refresh_from_db()
-
-    current_status = (product.status or "").strip().lower()
-    new_status = (new_status or "").strip().lower()
-
-    allowed = VALID_STATUS_TRANSITIONS.get(current_status, [])
+    allowed = VALID_STATUS_TRANSITIONS.get(product.status, [])
 
     if new_status not in allowed:
         raise ValidationError(
@@ -123,7 +118,7 @@ def change_product_status(product, new_status, user):
 
         # ==========================================================================
 
-        return product
+    return product
 
 
 def delete_product(product, user):
