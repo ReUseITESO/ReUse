@@ -48,6 +48,13 @@ export function useFriends() {
         .map(c => ({ id: c.id, from_user: c.requester, created_at: c.created_at }))
     : [];
 
+  // IDs of users we already sent a pending request to
+  const pendingSentIds: number[] = user
+    ? connections
+        .filter(c => c.status === 'pending' && c.requester.id === user.id)
+        .map(c => c.addressee.id)
+    : [];
+
   async function sendRequest(addresseeId: number): Promise<string | null> {
     try {
       await apiClient('/social/connections/', {
@@ -122,6 +129,7 @@ export function useFriends() {
   return {
     friends,
     pendingRequests,
+    pendingSentIds,
     connections,
     isLoading,
     error,
