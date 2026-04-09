@@ -217,7 +217,7 @@ class ProductViewSet(
     )
     @action(detail=True, methods=["patch"], url_path="status")
     def change_status(self, request, pk=None):
-        product = self.get_object()
+        product = Products.objects.get(pk=pk)
         serializer = ProductStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
