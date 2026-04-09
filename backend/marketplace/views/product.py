@@ -142,7 +142,7 @@ class ProductViewSet(
         queryset = Products.objects.select_related(
             "category", "seller", "transaction"
         ).prefetch_related("images")
-        
+
         if self.action not in ("list",):
             return queryset
 
