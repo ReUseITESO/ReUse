@@ -143,9 +143,6 @@ class ProductViewSet(
             "category", "seller", "transaction"
         ).prefetch_related("images")
 
-        if self.action not in ("list",):
-            return queryset
-
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
 
