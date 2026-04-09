@@ -47,16 +47,14 @@ class BadgeServiceTest(TestCase):
             status="disponible",
         )
 
-        unlocked = evaluate_milestones(self.user)
-
-        self.assertEqual(len(unlocked), 1)
-        self.assertEqual(unlocked[0].name, "Publicador Novato")
-
-        self.assertTrue(
-            UserBadges.objects.filter(
-                user=self.user, badges__name="Publicador Novato"
-            ).exists()
+        badge_names = list(
+            UserBadges.objects.filter(user=self.user).values_list(
+                "badges__name", flat=True
+            )
         )
+
+        self.assertIn("Publicador Novato", badge_names)
+
         self.user.refresh_from_db()
         self.assertEqual(self.user.points, 10)
         self.assertTrue(
@@ -68,8 +66,11 @@ class BadgeServiceTest(TestCase):
         self.user.profile_picture = "http://example.com/pic.png"
         self.user.save()
 
-        unlocked = evaluate_milestones(self.user)
-        badge_names = [b.name for b in unlocked]
+        badge_names = list(
+            UserBadges.objects.filter(user=self.user).values_list(
+                "badges__name", flat=True
+            )
+        )
         self.assertIn("Perfil Completo", badge_names)
 
     def test_evaluate_trueque_master(self):
@@ -91,8 +92,11 @@ class BadgeServiceTest(TestCase):
                 status="completada",
             )
 
-        unlocked = evaluate_milestones(self.user)
-        badge_names = [b.name for b in unlocked]
+        badge_names = list(
+            UserBadges.objects.filter(user=self.user).values_list(
+                "badges__name", flat=True
+            )
+        )
 
         self.assertIn("Publicador Novato", badge_names)
         self.assertIn("Trueque Master", badge_names)
@@ -116,6 +120,9 @@ class BadgeServiceTest(TestCase):
                 status="completada",
             )
 
-        unlocked = evaluate_milestones(self.user)
-        badge_names = [b.name for b in unlocked]
+        badge_names = list(
+            UserBadges.objects.filter(user=self.user).values_list(
+                "badges__name", flat=True
+            )
+        )
         self.assertIn("Eco Warrior", badge_names)
