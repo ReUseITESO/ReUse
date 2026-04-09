@@ -27,7 +27,7 @@ class BadgeServiceTest(TestCase):
             points=0,
         )
 
-        self.category = Category.objects.create(name="Libros", description="Libros")
+        self.category = Category.objects.create(name="Libros")
 
         Badges.objects.create(name="Primer Artículo", description="test", points=10)
         Badges.objects.create(name="Donador Constante", description="test", points=50)
