@@ -8,18 +8,13 @@ import {
   Users,
   LogOut,
   Trash2,
-  UserMinus,
   Crown,
   UserPlus,
-  Search,
 } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
-import { apiClient } from '@/lib/api';
-
-import type { SocialUser } from '@/types/community';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -32,10 +27,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     error,
     createPost,
     deletePost,
-    inviteUser,
     leaveCommunity,
     joinCommunity,
-    expelMember,
     deleteCommunity,
   } = useCommunityDetail(params.id);
 
@@ -43,17 +36,9 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
 
-  const [showInvite, setShowInvite] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SocialUser[]>([]);
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
-
-  // Derive admin/member status from members list
   const currentMembership = members.find(m => m.user.id === user?.id);
   const isAdmin = currentMembership?.role === 'admin';
   const isMember = !!currentMembership;
-  const memberIds = members.map(m => m.user.id);
 
   async function handlePost() {
     if (!postContent.trim()) return;
@@ -77,29 +62,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   async function handleDelete() {
     const err = await deleteCommunity();
     if (!err) router.push('/communities');
-  }
-
-  async function handleSearch() {
-    if (searchQuery.length < 2) return;
-    try {
-      const data = await apiClient<{ results: SocialUser[] } | SocialUser[]>(
-        `/auth/users/search/?q=${encodeURIComponent(searchQuery)}`,
-      );
-      const results = Array.isArray(data) ? data : (data.results ?? []);
-      setSearchResults(results);
-    } catch {
-      setSearchResults([]);
-    }
-  }
-
-  async function handleInvite(userId: number) {
-    setInviteError(null);
-    const err = await inviteUser(userId);
-    if (err) {
-      setInviteError(err);
-    } else {
-      setInvitedIds(prev => new Set(prev).add(userId));
-    }
   }
 
   if (isLoading) {
@@ -253,37 +215,22 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
           {/* Members sidebar */}
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Miembros</h2>
-            </div>
-
-
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">Miembros</h2>
             <div className="space-y-2">
               {members.map(m => (
                 <div
                   key={m.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                  className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-3"
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                      {m.user.first_name?.[0]?.toUpperCase()}
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {m.user.full_name}
-                      {m.role === 'admin' && (
-                        <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
-                      )}
-                    </p>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                    {m.user.first_name?.[0]?.toUpperCase()}
                   </div>
-                  {isAdmin && m.user.id !== user?.id && (
-                    <button
-                      onClick={() => expelMember(m.user.id)}
-                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                      title="Expulsar"
-                    >
-                      <UserMinus className="h-4 w-4" />
-                    </button>
-                  )}
+                  <p className="text-sm font-medium text-gray-900">
+                    {m.user.full_name}
+                    {m.role === 'admin' && (
+                      <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                    )}
+                  </p>
                 </div>
               ))}
             </div>

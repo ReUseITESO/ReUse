@@ -62,11 +62,6 @@ export function useCommunityDetail(id: string) {
     }
   }
 
-  async function inviteUser(_userId: number): Promise<string | null> {
-    // Daniel's API doesn't have an invite endpoint — join is self-service only
-    return 'La API de comunidades no soporta invitaciones directas. El usuario puede unirse desde la lista de comunidades.';
-  }
-
   async function leaveCommunity(): Promise<string | null> {
     try {
       await apiClient(`/social/communities/${id}/leave/`, { method: 'POST' });
@@ -83,17 +78,6 @@ export function useCommunityDetail(id: string) {
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al unirse';
-    }
-  }
-
-  async function expelMember(userId: number): Promise<string | null> {
-    try {
-      // Daniel's API doesn't have a direct expel endpoint, use leave
-      await apiClient(`/social/communities/${id}/leave/`, { method: 'POST' });
-      await fetchAll();
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al expulsar';
     }
   }
 
@@ -115,10 +99,8 @@ export function useCommunityDetail(id: string) {
     refresh: fetchAll,
     createPost,
     deletePost,
-    inviteUser,
     leaveCommunity,
     joinCommunity,
-    expelMember,
     deleteCommunity,
   };
 }

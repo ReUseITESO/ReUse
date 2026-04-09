@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Share2, Check, X, Search } from 'lucide-react';
+import { Share2, Check, X } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import type { SocialUser, UserConnection } from '@/types/friends';
