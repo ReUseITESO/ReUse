@@ -5,6 +5,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.models import User
+
 User = get_user_model()
 
 

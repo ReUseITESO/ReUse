@@ -24,7 +24,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     """Miembros de la comunidad ITESO que usan la plataforma"""
 
-    username = None
+    username = None # type: ignore
     email = models.EmailField(
         unique=True,
         validators=[
@@ -46,7 +46,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
-    objects = CustomUserManager()
+    objects = CustomUserManager() # type: ignore
 
     class Meta:
         db_table = "users"

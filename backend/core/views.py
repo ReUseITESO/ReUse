@@ -4,6 +4,8 @@ import secrets
 import uuid
 from datetime import timedelta
 
+from typing import Optional
+
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
@@ -31,7 +33,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: Optional[int] = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.
