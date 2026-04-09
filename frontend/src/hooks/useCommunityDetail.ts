@@ -76,6 +76,16 @@ export function useCommunityDetail(id: string) {
     }
   }
 
+  async function joinCommunity(): Promise<string | null> {
+    try {
+      await apiClient(`/social/communities/${id}/join/`, { method: 'POST' });
+      await fetchAll();
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Error al unirse';
+    }
+  }
+
   async function expelMember(userId: number): Promise<string | null> {
     try {
       // Daniel's API doesn't have a direct expel endpoint, use leave
@@ -107,6 +117,7 @@ export function useCommunityDetail(id: string) {
     deletePost,
     inviteUser,
     leaveCommunity,
+    joinCommunity,
     expelMember,
     deleteCommunity,
   };

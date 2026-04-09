@@ -34,6 +34,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     deletePost,
     inviteUser,
     leaveCommunity,
+    joinCommunity,
     expelMember,
     deleteCommunity,
   } = useCommunityDetail(params.id);
@@ -62,6 +63,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     if (err) setPostError(err);
     else setPostContent('');
     setIsPosting(false);
+  }
+
+  async function handleJoin() {
+    await joinCommunity();
   }
 
   async function handleLeave() {
@@ -145,6 +150,14 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               </div>
             </div>
             <div className="flex gap-2">
+              {!isMember && (
+                <button
+                  onClick={handleJoin}
+                  className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                >
+                  <UserPlus className="h-3.5 w-3.5" /> Unirse
+                </button>
+              )}
               {isMember && !isAdmin && (
                 <button
                   onClick={handleLeave}
