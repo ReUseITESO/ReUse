@@ -140,11 +140,8 @@ class ProductViewSet(
 
     def get_queryset(self):
         queryset = Products.objects.select_related(
-            "category", "seller"
+            "category", "seller", "transaction"
         ).prefetch_related("images")
-
-        if self.action in ("change_status", "partial_update", "destroy"):
-            return queryset
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
@@ -158,18 +155,17 @@ class ProductViewSet(
             else:
                 queryset = queryset.filter(status="disponible")
 
-        if self.action == "list":
-            category_id = self.request.query_params.get("category")
-            if category_id:
-                queryset = queryset.filter(category_id=category_id)
+        category_id = self.request.query_params.get("category")
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
 
-            condition = self.request.query_params.get("condition")
-            if condition:
-                queryset = queryset.filter(condition=condition)
+        condition = self.request.query_params.get("condition")
+        if condition:
+            queryset = queryset.filter(condition=condition)
 
-            transaction_type = self.request.query_params.get("transaction_type")
-            if transaction_type:
-                queryset = queryset.filter(transaction_type=transaction_type)
+        transaction_type = self.request.query_params.get("transaction_type")
+        if transaction_type:
+            queryset = queryset.filter(transaction_type=transaction_type)
 
         return queryset
 
