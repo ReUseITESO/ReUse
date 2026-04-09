@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import ZoomSlider from '../../../components/ui/ZoomSlider';
 
-import { useAvatar } from '@/hooks/useAvatar';
+import { useAvatar } from '@/hooks/profile/useAvatar';
 
 import { AvatarData } from '../../../types/gamification';
 import { useState, useRef } from 'react';

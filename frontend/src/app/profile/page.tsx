@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Pencil } from 'lucide-react';
+import { Pencil, Palette } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
@@ -61,9 +61,14 @@ export default function ProfilePage() {
                     <p className="mt-1 text-sm text-muted-fg">{displayUser.email}</p>
                     {displayUser.phone && <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>}
                   </div>
-                  <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
-                    <Pencil className="h-4 w-4" /> Editar perfil
-                  </button>
+                  <div className="ml-auto flex items-center gap-2">
+                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
+                      <Pencil className="h-4 w-4" /> Editar Perfil
+                    </button>
+                    <Link href="/profile/customization" className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
+                      <Palette  className="h-4 w-4" /> Customizar Perfil
+                    </Link>
+                  </div>
                 </div>
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
                   <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo

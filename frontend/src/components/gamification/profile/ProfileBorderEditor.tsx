@@ -1,6 +1,6 @@
 
 import Slider from '../../../components/ui/Slider'
-import { useAvatar } from '@/hooks/useAvatar';
+import { useAvatar } from '@/hooks/profile/useAvatar';
 
 import { AvatarData } from '../../../types/gamification';
 

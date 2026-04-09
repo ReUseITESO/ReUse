@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { AvatarProvider } from '@/hooks/useAvatar';
+import { AvatarProvider } from '@/hooks/profile/useAvatar';
 // import { set } from 'react-hook-form';
 
 // import User from '@/types/auth';

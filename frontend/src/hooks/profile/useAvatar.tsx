@@ -1,4 +1,4 @@
-// src/hooks/useAvatar.ts
+// src/hooks/profile/useAvatar.tsx
 import { useState, useCallback, useEffect, createContext, useMemo, useContext } from 'react';
 import { apiClient } from '@/lib/api';
 import { AvatarData } from '@/types/gamification';
