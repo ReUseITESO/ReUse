@@ -1,11 +1,12 @@
 from django.db import transaction
 from django.db.models import Q
 
+from core.models.notification import Notification
 from gamification.models.badges import Badges
 from gamification.models.user_badges import UserBadges
 from marketplace.models.product import Products
 from marketplace.models.transaction import Transaction
-from core.models.notification import Notification
+
 
 def evaluate_milestones(user):
     """
@@ -14,7 +15,7 @@ def evaluate_milestones(user):
     # Prevent recursion if user.save() is called inside
     if getattr(user, "_is_evaluating_milestones", False):
         return []
-    
+
     user._is_evaluating_milestones = True
 
     try:
@@ -40,7 +41,7 @@ def evaluate_milestones(user):
                             if badge.points > 0:
                                 user.points += badge.points
                                 user.save(update_fields=["points"])
-                            
+
                             # Create Notification
                             Notification.objects.create(
                                 user=user,
@@ -53,7 +54,7 @@ def evaluate_milestones(user):
         # Calculate metrics
         products_count = Products.objects.filter(seller=user).exclude(status="cancelado").count()
         libros_count = Products.objects.filter(seller=user, category__name__icontains="libro").exclude(status="cancelado").count()
-        
+
         # Completed transactions where user is seller or buyer
         seller_txs = Transaction.objects.filter(seller=user, status="completada")
         buyer_txs = Transaction.objects.filter(buyer=user, status="completada")

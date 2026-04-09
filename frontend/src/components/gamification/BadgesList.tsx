@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { BadgeWithStatus } from '@/types/gamification';
-import Card from '@/components/ui/Card';
+
 import Spinner from '@/components/ui/Spinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { apiClient } from '@/lib/api'; 

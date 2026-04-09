@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from gamification.models.badges import Badges
+
 
 class Command(BaseCommand):
     help = 'Seed initial badges for milestones'

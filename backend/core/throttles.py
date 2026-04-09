@@ -1,4 +1,8 @@
-from rest_framework.throttling import AnonRateThrottle, SimpleRateThrottle, UserRateThrottle
+from rest_framework.throttling import (
+    AnonRateThrottle,
+    SimpleRateThrottle,
+    UserRateThrottle,
+)
 
 
 class AuthRateThrottle(SimpleRateThrottle):
