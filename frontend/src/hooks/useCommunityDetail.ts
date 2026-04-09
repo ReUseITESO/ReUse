@@ -18,13 +18,13 @@ export function useCommunityDetail(id: string) {
       const detail = await apiClient<CommunityDetail>(`/social/communities/${id}/`);
       setCommunity(detail);
       setMembers(detail.members ?? []);
-      // Fetch posts separately — filter by community
+      // Fetch posts — API returns all posts from user's communities, filter client-side
       try {
         const postsData = await apiClient<{ results: CommunityPost[] } | CommunityPost[]>(
-          `/social/posts/?community=${id}`,
+          '/social/posts/',
         );
-        const postsList = Array.isArray(postsData) ? postsData : postsData.results ?? [];
-        setPosts(postsList);
+        const allPosts = Array.isArray(postsData) ? postsData : postsData.results ?? [];
+        setPosts(allPosts.filter(p => String(p.community) === id));
       } catch {
         setPosts([]);
       }
