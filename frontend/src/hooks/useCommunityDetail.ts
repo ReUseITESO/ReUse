@@ -43,7 +43,7 @@ export function useCommunityDetail(id: string) {
     try {
       await apiClient('/social/posts/', {
         method: 'POST',
-        body: JSON.stringify({ community: Number(id), content, title: '' }),
+        body: JSON.stringify({ community: Number(id), content, title: content.slice(0, 50) }),
       });
       await fetchAll();
       return null;
