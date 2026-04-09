@@ -72,7 +72,7 @@ def update_product(product, validated_data, user):
 
 def change_product_status(product, new_status, user):
     product.refresh_from_db()
-    
+
     _check_ownership(product, user)
 
     if new_status == "pausado":
