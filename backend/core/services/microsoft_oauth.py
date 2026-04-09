@@ -50,10 +50,12 @@ def exchange_code(code: str) -> dict:
         error_body = json.loads(exc.read().decode("utf-8"))
         raise ValueError(
             error_body.get("error_description", "Microsoft token exchange failed")
-            ) from exc
+        ) from exc
 
     if "error" in token_data:
-        raise ValueError(token_data.get("error_description", "Microsoft authentication failed"))
+        raise ValueError(
+            token_data.get("error_description", "Microsoft authentication failed")
+        )
 
     id_token = token_data.get("id_token", "")
     if not id_token:
@@ -61,7 +63,9 @@ def exchange_code(code: str) -> dict:
 
     claims = jwt.decode(id_token, options={"verify_signature": False})
 
-    email = (claims.get("email") or claims.get("preferred_username") or "").lower().strip()
+    email = (
+        (claims.get("email") or claims.get("preferred_username") or "").lower().strip()
+    )
     first_name = claims.get("given_name", "")
     last_name = claims.get("family_name", "")
 
