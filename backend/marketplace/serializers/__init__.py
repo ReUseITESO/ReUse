@@ -8,6 +8,9 @@ from .product import (
 )
 from .product_detail import ProductDetailSerializer
 from .transaction import (
+    SwapMeetingProposalSerializer,
+    SwapMeetingResponseSerializer,
+    SwapProposalSerializer,
     TransactionCreateSerializer,
     TransactionSerializer,
     TransactionStatusSerializer,
@@ -21,6 +24,9 @@ __all__ = [
     "ProductStatusSerializer",
     "ProductUpdateSerializer",
     "ImageSerializer",
+    "SwapMeetingProposalSerializer",
+    "SwapMeetingResponseSerializer",
+    "SwapProposalSerializer",
     "TransactionCreateSerializer",
     "TransactionSerializer",
     "TransactionStatusSerializer",

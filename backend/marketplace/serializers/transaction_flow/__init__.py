@@ -1,9 +1,9 @@
-from marketplace.serializers.transaction_flow import (
+from marketplace.serializers.transaction_flow.read import TransactionSerializer
+from marketplace.serializers.transaction_flow.write import (
     SwapMeetingProposalSerializer,
     SwapMeetingResponseSerializer,
     SwapProposalSerializer,
     TransactionCreateSerializer,
-    TransactionSerializer,
     TransactionStatusSerializer,
 )
 
