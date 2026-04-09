@@ -85,7 +85,11 @@ def change_product_status(product, new_status, user):
 
     product.refresh_from_db()
 
-    allowed = VALID_STATUS_TRANSITIONS.get(product.status, [])
+    current_status = (product.status or "").strip().lower()
+    new_status = (new_status or "").strip().lower()
+
+    allowed = VALID_STATUS_TRANSITIONS.get(current_status, [])
+
     if new_status not in allowed:
         raise ValidationError(
             {
