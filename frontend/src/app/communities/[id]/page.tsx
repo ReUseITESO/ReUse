@@ -242,71 +242,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
           <div>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Miembros</h2>
-              {isAdmin && (
-                <button
-                  onClick={() => setShowInvite(!showInvite)}
-                  className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
-                >
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Invitar
-                </button>
-              )}
             </div>
 
-            {/* Invite search */}
-            {showInvite && (
-              <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                      placeholder="Buscar usuario..."
-                      className="w-full rounded-lg border border-gray-300 py-1.5 pl-8 pr-2 text-xs focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSearch}
-                    disabled={searchQuery.length < 2}
-                    className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    Buscar
-                  </button>
-                </div>
-                {inviteError && <p className="mt-2 text-xs text-red-600">{inviteError}</p>}
-                {searchResults.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {searchResults.map(u => {
-                      const alreadyMember = memberIds.includes(u.id);
-                      const alreadyInvited = invitedIds.has(u.id);
-                      return (
-                        <div
-                          key={u.id}
-                          className="flex items-center justify-between rounded bg-white p-2"
-                        >
-                          <p className="text-xs font-medium text-gray-900">{u.full_name}</p>
-                          {alreadyMember ? (
-                            <span className="text-xs text-gray-400">Miembro</span>
-                          ) : alreadyInvited ? (
-                            <span className="text-xs text-green-600">Invitado</span>
-                          ) : (
-                            <button
-                              onClick={() => handleInvite(u.id)}
-                              className="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
-                            >
-                              Invitar
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
 
             <div className="space-y-2">
               {members.map(m => (
