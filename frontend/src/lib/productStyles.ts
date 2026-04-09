@@ -14,6 +14,33 @@ export function getCategoryStyle(categoryName: string): string {
   return CATEGORY_STYLES[categoryName] ?? DEFAULT_CATEGORY_STYLE;
 }
 
+export type CategoryIconKind = 'books' | 'electronics' | 'clothing' | 'default';
+
+export function getCategoryIconKind(categoryName: string): CategoryIconKind {
+  const normalizedCategory = categoryName.toLowerCase();
+
+  if (normalizedCategory.includes('libro')) {
+    return 'books';
+  }
+
+  if (normalizedCategory.includes('electro')) {
+    return 'electronics';
+  }
+
+  if (normalizedCategory.includes('ropa')) {
+    return 'clothing';
+  }
+
+  return 'default';
+}
+
+export function getCategoryTextColorClass(categoryName: string): string {
+  const categoryStyle = getCategoryStyle(categoryName);
+  const textClass = categoryStyle.split(' ').find(className => className.startsWith('text-'));
+
+  return textClass ?? 'text-muted-fg';
+}
+
 const CONDITION_STYLES: Record<ProductCondition, string> = {
   nuevo: 'bg-success/10 text-success border border-success/30',
   como_nuevo: 'bg-success/10 text-success border border-success/30',
@@ -44,6 +71,16 @@ const PRICE_COLOR: Record<TransactionType, string> = {
 
 export function getPriceColor(transactionType: TransactionType): string {
   return PRICE_COLOR[transactionType] ?? 'text-secondary';
+}
+
+const TRANSACTION_TYPE_STYLES: Record<TransactionType, string> = {
+  sale: 'bg-success/10 text-success border border-success/30',
+  donation: 'bg-secondary/10 text-secondary border border-secondary/30',
+  swap: 'bg-warning/10 text-warning border border-warning/30',
+};
+
+export function getTransactionTypeStyle(transactionType: TransactionType): string {
+  return TRANSACTION_TYPE_STYLES[transactionType] ?? 'bg-muted text-muted-fg border border-border';
 }
 
 const STATUS_STYLES: Record<ProductStatus, { label: string; className: string }> = {

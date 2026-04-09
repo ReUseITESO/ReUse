@@ -1,21 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import Badge from '@/components/ui/Badge';
-import ImageGallery from '@/components/products/ImageGallery';
-import ShareButton from '@/components/products/ShareButton';
-import { getProductById } from '@/lib/api';
-import {
-  getCategoryStyle,
-  getConditionLabel,
-  getConditionStyle,
-  getPriceColor,
-} from '@/lib/productStyles';
-import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
-
-import type { ProductDetail } from '@/types/product';
+import ProductDetailContent from '@/components/products/ProductDetailContent';
+import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
+import { useAuth } from '@/hooks/useAuth';
+import { useCreateTransaction } from '@/hooks/useCreateTransaction';
+import { useProductDetail } from '@/hooks/useProductDetail';
 
 interface ProductDetailProps {
   productId: string;
@@ -23,27 +15,15 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const router = useRouter();
-  const [product, setProduct] = useState<ProductDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getProductById(productId);
-        setProduct(data as ProductDetail);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Error al cargar el producto';
-        setError(message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [productId]);
+  const { user, isAuthenticated } = useAuth();
+  const {
+    create,
+    isLoading: isCreatingTransaction,
+    error: createTransactionError,
+  } = useCreateTransaction();
+  const { product, setProduct, isLoading, error } = useProductDetail(productId);
+  const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
+  const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -72,88 +52,85 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     );
   }
 
-  const isSale = product.transaction_type === 'sale';
-  const transactionDisplay = isSale
-    ? formatPrice(product.price)
-    : formatTransactionLabel(product.transaction_type);
-  const timeAgo = formatTimeAgo(product.created_at);
-  const conditionLabel = getConditionLabel(product.condition);
-  const priceColorClass = getPriceColor(product.transaction_type);
-  const categoryClass = getCategoryStyle(product.category.name);
-  const conditionClass = getConditionStyle(product.condition);
+  const isOwner = user?.email === product.seller_email;
+  const canCreateTransaction =
+    isAuthenticated &&
+    !isOwner &&
+    !product.has_active_transaction &&
+    product.status === 'disponible';
 
-  // Prepare images array for gallery
-  const galleryImages =
-    product.images.length > 0
-      ? product.images.map(img => img.image_url)
-      : product.image_url
-        ? [product.image_url]
-        : [];
+  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
+    if (!product) {
+      return;
+    }
+
+    const transaction = await create({
+      product_id: product.id,
+      delivery_location: deliveryLocation,
+      delivery_date: deliveryDate.toISOString(),
+    });
+
+    if (!transaction) {
+      return;
+    }
+
+    setIsTransactionDialogOpen(false);
+    setTransactionNotice('Solicitud enviada. Notificación pendiente: integración con CORE.');
+    setProduct(previous =>
+      previous
+        ? {
+            ...previous,
+            has_active_transaction: true,
+            status: 'en_proceso',
+          }
+        : previous,
+    );
+  }
+
+  function handleMainAction() {
+    if (!isAuthenticated) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (!canCreateTransaction) {
+      return;
+    }
+
+    setIsTransactionDialogOpen(true);
+  }
+
+  const ctaLabel = (() => {
+    if (!isAuthenticated) return 'Inicia sesión para solicitar';
+    if (isOwner) return 'Este producto te pertenece';
+    if (product.has_active_transaction || product.status !== 'disponible') {
+      return 'Transacción en proceso';
+    }
+    return 'Solicitar artículo';
+  })();
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-secondary hover:text-primary"
-      >
-        ← Volver
-      </button>
+    <>
+      <ProductDetailContent
+        product={product}
+        ctaLabel={ctaLabel}
+        canCreateTransaction={canCreateTransaction}
+        transactionNotice={transactionNotice}
+        onBack={() => router.back()}
+        onMainAction={handleMainAction}
+      />
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Left column: Images */}
-        <div>
-          <ImageGallery images={galleryImages} productTitle={product.title} />
-        </div>
-
-        {/* Right column: Product info */}
-        <div className="flex flex-col gap-6">
-          {/* Category badge */}
-          <div>
-            <Badge className={categoryClass}>{product.category.name}</Badge>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-h1 font-bold text-fg">{product.title}</h1>
-
-          {/* Price/Transaction type */}
-          <div className={`text-h1 font-bold ${priceColorClass}`}>{transactionDisplay}</div>
-
-          {/* Condition */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-fg">Condición:</span>
-            <Badge className={conditionClass}>{conditionLabel}</Badge>
-          </div>
-
-          {/* Description */}
-          <div>
-            <h2 className="mb-2 text-h3 font-semibold text-fg">Descripción</h2>
-            <p className="whitespace-pre-wrap text-fg">{product.description}</p>
-          </div>
-
-          {/* Seller info */}
-          <div className="rounded-lg border border-border bg-muted p-4">
-            <h3 className="mb-2 text-sm font-semibold text-fg">Vendedor</h3>
-            <p className="text-fg">{product.seller_name}</p>
-            <p className="text-sm text-muted-fg">{product.seller_email}</p>
-          </div>
-
-          {/* Action button */}
-          <div className="flex gap-3">
-            <button
-              className="flex-1 rounded-lg bg-btn-primary px-6 py-3 font-semibold text-btn-primary-fg hover:bg-primary-hover transition-colors"
-              onClick={() => alert('Funcionalidad de contacto pendiente de implementación')}
-            >
-              Contactar vendedor
-            </button>
-            <ShareButton productId={product.id} productTitle={product.title} />
-          </div>
-
-          {/* Publication date */}
-          <div className="border-t border-border pt-4 text-sm text-muted-fg">
-            Publicado {timeAgo}
-          </div>
-        </div>
-      </div>
-    </div>
+      <CreateTransactionDialog
+        isOpen={isTransactionDialogOpen}
+        productTitle={product.title}
+        sellerName={product.seller_name}
+        sellerEmail={product.seller_email}
+        transactionType={product.transaction_type}
+        isLoading={isCreatingTransaction}
+        error={createTransactionError}
+        onCancel={() => setIsTransactionDialogOpen(false)}
+        onSubmit={handleCreateTransaction}
+      />
+    </>
   );
 }
