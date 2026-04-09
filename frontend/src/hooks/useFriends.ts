@@ -94,23 +94,9 @@ export function useFriends() {
     }
   }
 
-  async function removeFriend(userId: number): Promise<string | null> {
-    const conn = connections.find(
-      c =>
-        c.status === 'accepted' &&
-        (c.requester.id === userId || c.addressee.id === userId),
-    );
-    if (!conn) return 'Conexión no encontrada';
-    try {
-      await apiClient(`/social/connections/${conn.id}/respond/`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: 'rejected' }),
-      });
-      await fetchConnections();
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al eliminar';
-    }
+  async function removeFriend(_userId: number): Promise<string | null> {
+    // Daniel's API doesn't support removing accepted connections
+    return 'No se puede eliminar una conexión aceptada desde la API actual.';
   }
 
   async function searchUsers(query: string): Promise<FriendUser[]> {
