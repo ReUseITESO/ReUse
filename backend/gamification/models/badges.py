@@ -1,9 +1,11 @@
 from django.db import models
 
+
 class Badges(models.Model):
     """
     Model representing the badges available in the system.
     """
+
     name = models.CharField(max_length=100)
     description = models.TextField()
     icon = models.CharField(max_length=255, blank=True, null=True)  # URL or icon name

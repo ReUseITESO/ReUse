@@ -1,10 +1,7 @@
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from marketplace.models import Products
-
 # GAMIFICATION imports
 from gamification.services.point_service import award_points
-
 
 VALID_STATUS_TRANSITIONS = {
     "disponible": ["en_proceso", "cancelado"],
@@ -24,20 +21,14 @@ EDITABLE_FIELDS = [
 
 def _check_ownership(product, user):
     if product.seller_id != user.pk:
-        raise PermissionDenied(
-            "Solo el vendedor puede modificar este producto."
-        )
+        raise PermissionDenied("Solo el vendedor puede modificar este producto.")
 
 
 def _validate_price_rules(transaction_type, price):
     if transaction_type == "donation" and price is not None:
-        raise ValidationError(
-            {"price": "Las donaciones no deben tener precio."}
-        )
+        raise ValidationError({"price": "Las donaciones no deben tener precio."})
     if transaction_type == "sale" and (price is None or price <= 0):
-        raise ValidationError(
-            {"price": "Las ventas deben tener un precio mayor a 0."}
-        )
+        raise ValidationError({"price": "Las ventas deben tener un precio mayor a 0."})
 
 
 def update_product(product, validated_data, user):
@@ -48,9 +39,7 @@ def update_product(product, validated_data, user):
             {"status": "Solo se pueden editar productos con estado disponible."}
         )
 
-    transaction_type = validated_data.get(
-        "transaction_type", product.transaction_type
-    )
+    transaction_type = validated_data.get("transaction_type", product.transaction_type)
     price = validated_data.get("price", product.price)
 
     if "transaction_type" in validated_data or "price" in validated_data:
@@ -75,19 +64,14 @@ def change_product_status(product, new_status, user):
     allowed = VALID_STATUS_TRANSITIONS.get(product.status, [])
     if new_status not in allowed:
         raise ValidationError(
-            {
-                "status": (
-                    f"No se puede cambiar de '{product.status}' "
-                    f"a '{new_status}'."
-                )
-            }
+            {"status": (f"No se puede cambiar de '{product.status}' a '{new_status}'.")}
         )
 
     product.status = new_status
     product.save(update_fields=["status", "updated_at"])
-    
+
     # === GAMIFICATION: Award points for completing a sale/donation/swap ===
-    
+
     if new_status == "completado":
         action_map = {
             "donation": "complete_donation",
@@ -96,14 +80,10 @@ def change_product_status(product, new_status, user):
         }
         action = action_map.get(product.transaction_type)
         if action:
-            award_points(
-                user=product.seller,
-                action=action,
-                reference_id=product.id
-            )
-    
+            award_points(user=product.seller, action=action, reference_id=product.id)
+
     # ==========================================================================
-            
+
     return product
 
 
@@ -112,11 +92,7 @@ def delete_product(product, user):
 
     if product.status != "disponible":
         raise ValidationError(
-            {
-                "status": (
-                    "Solo se pueden eliminar productos con estado disponible."
-                )
-            }
+            {"status": ("Solo se pueden eliminar productos con estado disponible.")}
         )
 
     product.delete()
