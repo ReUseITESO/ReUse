@@ -9,24 +9,30 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
 import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
 
+interface BadgeNotification {
+  id: number;
+  title: string;
+  body: string;
+  type: string;
+  is_read: boolean;
+}
+
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [activeBadgeNotification, setActiveBadgeNotification] = useState<any>(null);
+  const [activeBadgeNotification, setActiveBadgeNotification] = useState<BadgeNotification | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    let intervalId: NodeJS.Timeout;
-
     const fetchNotifications = async () => {
       try {
-        const data = await apiClient<any>('/core/notifications/');
+        const data = await apiClient<BadgeNotification[]>('/core/notifications/');
         if (Array.isArray(data)) {
-          const unreadBadgeNotifications = data.filter((n: any) => !n.is_read && n.type === 'badge_earned');
+          const unreadBadgeNotifications = data.filter((n) => !n.is_read && n.type === 'badge_earned');
           if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {
             setActiveBadgeNotification(unreadBadgeNotifications[0]);
           }
@@ -39,7 +45,7 @@ export default function Navbar() {
     // Initial fetch
     fetchNotifications();
     // Poll every 15 seconds
-    intervalId = setInterval(fetchNotifications, 15000);
+    const intervalId = setInterval(fetchNotifications, 15000);
 
     return () => clearInterval(intervalId);
   }, [isAuthenticated, activeBadgeNotification]);
