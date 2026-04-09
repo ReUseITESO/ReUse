@@ -1,12 +1,22 @@
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework import status
+from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
-# GAMIFICATION imports
-from gamification.services.point_service import award_points
+from marketplace.models import Transaction
 
 VALID_STATUS_TRANSITIONS = {
-    "disponible": ["en_proceso", "cancelado"],
+    "disponible": ["en_proceso", "pausado", "cancelado"],
+    "pausado": ["disponible", "cancelado"],
     "en_proceso": ["disponible", "completado", "cancelado"],
 }
+
+ACTIVE_TRANSACTION_STATUSES = ["pendiente", "confirmada"]
+
+
+class ConflictError(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "La operación no puede completarse por conflicto de estado."
+    default_code = "conflict"
+
 
 EDITABLE_FIELDS = [
     "title",
@@ -61,10 +71,24 @@ def update_product(product, validated_data, user):
 def change_product_status(product, new_status, user):
     _check_ownership(product, user)
 
+    if new_status == "pausado":
+        has_active_transaction = Transaction.objects.filter(
+            product_id=product.pk,
+            status__in=ACTIVE_TRANSACTION_STATUSES,
+        ).exists()
+        if has_active_transaction:
+            raise ConflictError(
+                "No se puede pausar un producto con una transacción activa."
+            )
+
     allowed = VALID_STATUS_TRANSITIONS.get(product.status, [])
     if new_status not in allowed:
         raise ValidationError(
-            {"status": (f"No se puede cambiar de '{product.status}' a '{new_status}'.")}
+            {
+                "status": (
+                    f"No se puede cambiar de '{product.status}' " f"a '{new_status}'."
+                )
+            }
         )
 
     product.status = new_status

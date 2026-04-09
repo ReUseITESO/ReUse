@@ -17,6 +17,20 @@ jobs:
   backend:
     name: Backend Checks
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: backend
@@ -58,8 +72,7 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           ALLOWED_HOSTS: localhost,127.0.0.1
-        run: |
-          pytest --tb=short -q || echo "No tests found or tests skipped"
+        run: pytest --tb=short -q
 
   # ──────────────────────────────────────────────────────
   # Frontend Validation

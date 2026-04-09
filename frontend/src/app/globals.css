@@ -1,3 +1,183 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Pagina para convertir Hex to HSL: https://colordesigner.io/convert/hextohsl*/
+/* ================================================================
+    VARIABLES GLOBALES – ReUseITESO
+    Fuente de verdad de estilos. Basadas en el diseño Figma.
+    No hardcodear colores en componentes. Usar siempre estas variables
+    o las clases Tailwind mapeadas en tailwind.config.js
+    ================================================================ */
+
+:root {
+  /* ── Tipografía ─────────────────────────────────────────────── */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Tamaños */
+  --text-h1: 1.5rem; /* 24px – Título principal */
+  --text-h2: 1.25rem; /* 20px – Título de sección */
+  --text-h3: 1.125rem; /* 18px – Subtítulo */
+  --text-body: 1rem; /* 16px – Texto estándar */
+  --text-sm: 0.875rem; /* 14px – Texto pequeño / metadata */
+  --text-xs: 0.75rem; /* 12px – Labels / timestamps */
+
+  /* Pesos */
+  --font-normal: 400;
+  --font-medium: 500; /* Botones y labels */
+  --font-semibold: 600; /* Títulos de items y precios */
+  --font-bold: 700; /* Títulos de página */
+
+  /* ── Colores Principales ITESO ──────────────────────────────── */
+  --primary: 203 100% 23%; /* Azul principal */
+  --primary-fg: 0 0% 100%;
+  --primary-hover: 200 100% 18%;
+  --secondary: 221 97% 54%; /* Azul claro */
+  --secondary-fg: 0 0% 100%;
+  --secondary-hover: 203 100% 23%;
+  --accent: 142 76% 36%; /* Verde sostenibilidad */
+  --accent-fg: 0 0% 100%;
+
+  /* ── Fondo y Superficie ─────────────────────────────────────── */
+  --bg: 0 0% 100%;
+  --fg: 221 39% 11%;
+  --card: 0 0% 100%;
+  --card-fg: 221 39% 11%;
+  --muted: 210 20% 98%;
+  --muted-fg: 220 9% 46%;
+  --popover: 0 0% 100%;
+  --popover-fg: 221 39% 11%;
+
+  /* ── Status / Feedback ──────────────────────────────────────── */
+  --success: 142 76% 36%;
+  --success-fg: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-fg: 221 39% 11%;
+  --error: 0 72% 51%;
+  --error-fg: 0 0% 100%;
+  --info: 202 100% 32%;
+  --info-fg: 0 0% 100%;
+
+  /* ── Bordes e Inputs ────────────────────────────────────────── */
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 221 97% 54%;
+  --radius: 0.5rem;
+
+  /* ── Categorías ─────────────────────────────────────────────── */
+  --cat-books: 216 100% 58%;
+  --cat-electronics: 273 100% 64%;
+  --cat-clothing: 328 92% 58%;
+  --cat-supplies: 25 100% 50%;
+
+  /* ── Botones / Acciones ─────────────────────────────────────── */
+  /* primary – acción principal de la página */
+  --btn-primary-bg: 203 100% 23%;
+  --btn-primary-fg: 0 0% 100%;
+  --btn-primary-hover: 200 100% 18%;
+
+  /* secondary – acciones secundarias */
+  --btn-secondary-bg: 221 97% 54%;
+  --btn-secondary-fg: 0 0% 100%;
+  --btn-secondary-hover: 203 100% 23%;
+
+  /* disabled – estado deshabilitado */
+  --btn-disabled-bg: 220 13% 91%;
+  --btn-disabled-fg: 218 11% 65%;
+
+  /* template / ghost – sin fondo, con borde y color */
+  --btn-tmpl-bg: transparent;
+  --btn-tmpl-fg: 203 100% 23%;
+  --btn-tmpl-border: 203 100% 23%;
+  --btn-tmpl-hover-bg: 220 14% 96%;
+
+  /* ── Tipografía Decorativa ──────────────────────────────────── */
+  --numeral-hero: 10rem; /* Dígitos decorativos grandes (móvil) */
+  --numeral-hero-lg: 14rem; /* Dígitos decorativos grandes (sm+) */
+}
+
+/* ================================================================
+    BASE LAYER – Estilos automáticos para etiquetas semánticas
+    Aplica la escala tipográfica del Figma sin necesidad de className.
+    Si el componente necesita un tamaño diferente, puede sobreescribir
+    con la clase Tailwind correspondiente (text-h1, text-sm, etc.).
+    ================================================================ */
+@layer base {
+  h1 {
+    @apply text-h1 font-bold;
+  }
+  h2 {
+    @apply text-h2 font-semibold;
+  }
+  h3 {
+    @apply text-h3 font-semibold;
+  }
+  h4 {
+    @apply text-body font-semibold;
+  }
+  p {
+    @apply text-body font-normal;
+  }
+  small {
+    @apply text-xs font-normal;
+  }
+  label {
+    @apply text-sm font-medium;
+  }
+}
+
+.dark {
+  /* ── Colores Principales ITESO (modo oscuro)(si es que existe)───── */
+  --primary: 216 100% 58%;
+  --primary-fg: 0 0% 100%;
+  --primary-hover: 221 97% 54%;
+  --secondary: 221 97% 54%;
+  --secondary-fg: 0 0% 100%;
+  --secondary-hover: 216 100% 58%;
+  --accent: 142 76% 36%;
+  --accent-fg: 0 0% 100%;
+
+  /* ── Fondo y Superficie ─────────────────────────────────────── */
+  --bg: 221 39% 11%;
+  --fg: 210 20% 98%;
+  --card: 215 28% 17%;
+  --card-fg: 210 20% 98%;
+  --muted: 215 28% 17%;
+  --muted-fg: 218 11% 65%;
+  --popover: 215 28% 17%;
+  --popover-fg: 210 20% 98%;
+
+  /* ── Status / Feedback ──────────────────────────────────────── */
+  --success: 142 71% 45%;
+  --success-fg: 0 0% 100%;
+  --warning: 43 96% 56%;
+  --warning-fg: 221 39% 11%;
+  --error: 0 91% 71%;
+  --error-fg: 0 0% 100%;
+  --info: 198 93% 60%;
+  --info-fg: 221 39% 11%;
+
+  /* ── Bordes e Inputs ────────────────────────────────────────── */
+  --border: 217 19% 27%;
+  --input: 217 19% 27%;
+  --ring: 216 100% 58%;
+
+  /* ── Botones / Acciones (modo oscuro) ───────────────────────── */
+  --btn-primary-bg: 216 100% 58%;
+  --btn-primary-fg: 0 0% 100%;
+  --btn-primary-hover: 221 97% 54%;
+
+  --btn-secondary-bg: 221 97% 54%;
+  --btn-secondary-fg: 0 0% 100%;
+  --btn-secondary-hover: 216 100% 58%;
+
+  --btn-disabled-bg: 217 19% 27%;
+  --btn-disabled-fg: 220 9% 46%;
+
+  --btn-tmpl-bg: transparent;
+  --btn-tmpl-fg: 216 100% 58%;
+  --btn-tmpl-border: 216 100% 58%;
+  --btn-tmpl-hover-bg: 215 28% 17%;
+}

@@ -1,9 +1,8 @@
 from rest_framework import serializers
 
-# GAMIFICATION imports
-from gamification.services.point_service import award_points
 from marketplace.models import Images, Products
 from marketplace.serializers.category import CategorySerializer
+from marketplace.services.transaction_service import has_active_transaction
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -20,9 +19,13 @@ class ProductListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
+    has_active_transaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         return obj.seller.get_full_name()
+
+    def get_has_active_transaction(self, obj):
+        return has_active_transaction(obj)
 
     class Meta:
         model = Products
@@ -38,6 +41,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "category",
             "seller_name",
             "seller_id",
+            "has_active_transaction",
             "created_at",
             "updated_at",
         ]
@@ -87,13 +91,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         images_data = validated_data.pop("images", [])
         product = Products.objects.create(**validated_data)
-
-        # === GAMIFICATION: Award points to the seller for publishing an item ===
-        award_points(
-            user=product.seller, action="publish_item", reference_id=product.id
-        )
-
-        # ==========================================================================
 
         # Create Images objects for each URL
         for index, image_url in enumerate(images_data):

@@ -26,7 +26,6 @@ def award_points(user, action, reference_id=None):
 
 
 def deduct_points(user, points, reference_id=None):
-
     if user.points < points:
         raise ValidationError("User does not have enough points")
 

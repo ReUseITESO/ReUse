@@ -1,5 +1,7 @@
 import hashlib
+import os
 import secrets
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -7,11 +9,17 @@ from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from core.services.microsoft_oauth import exchange_code, get_authorization_url
+from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
 
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
@@ -107,6 +115,7 @@ class SignUpView(generics.CreateAPIView):
 
     serializer_class = SignUpSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
 
     # Cambios realizados para mandar el tocken con verificacion al correo
     def create(self, request, *args, **kwargs):
@@ -143,6 +152,7 @@ class SignInView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request):
         serializer = SignInSerializer(data=request.data)
@@ -263,6 +273,7 @@ class EmailVerificationSendView(APIView):
     """
 
     permission_classes = [AllowAny]
+    throttle_classes = [EmailVerificationRateThrottle]
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
@@ -341,3 +352,195 @@ class EmailVerificationConfirmView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+# ── Dashboard (HU-CORE-04) ───────────────────────────────
+
+
+class DashboardView(APIView):
+    """GET /api/auth/dashboard/ — aggregated home dashboard data."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        recent_products = (
+            Products.objects.select_related("category", "seller")
+            .filter(status="disponible")
+            .order_by("-created_at")[:6]
+        )
+
+        user_products = []
+        user_products_count = 0
+        user_points = 0
+
+        if request.user and request.user.is_authenticated:
+            user_qs = (
+                Products.objects.select_related("category", "seller")
+                .filter(seller=request.user)
+                .order_by("-created_at")
+            )
+            user_products_count = user_qs.count()
+            user_products = user_qs[:3]
+            user_points = getattr(request.user, "points", 0)
+
+        data = {
+            "recent_products": ProductListSerializer(recent_products, many=True).data,
+            "user_products": ProductListSerializer(user_products, many=True).data,
+            "user_products_count": user_products_count,
+            "active_transactions_count": 0,
+            "gamification": {
+                "points": user_points,
+                "badges_count": 0,
+            },
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+# ── Profile Picture Upload (HU-CORE-10) ─────────────────
+
+
+class MicrosoftAuthURLView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        if not getattr(settings, "MICROSOFT_CLIENT_ID", ""):
+            return Response(
+                {
+                    "error": {
+                        "code": "OAUTH_NOT_CONFIGURED",
+                        "message": "Microsoft OAuth no está configurado.",
+                    }
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        state = secrets.token_urlsafe(16)
+        auth_url = get_authorization_url(state)
+        return Response({"auth_url": auth_url, "state": state})
+
+
+class MicrosoftCallbackView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        code = (request.data.get("code") or "").strip()
+        if not code:
+            return Response(
+                {
+                    "error": {
+                        "code": "MISSING_CODE",
+                        "message": "Se requiere el código de autorización.",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_info = exchange_code(code)
+        except ValueError as exc:
+            return Response(
+                {"error": {"code": "MICROSOFT_AUTH_FAILED", "message": str(exc)}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        email = user_info["email"]
+        if not email.endswith("@iteso.mx"):
+            return Response(
+                {
+                    "error": {
+                        "code": "INVALID_EMAIL_DOMAIN",
+                        "message": "Se requiere una cuenta @iteso.mx.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "first_name": user_info["first_name"],
+                "last_name": user_info["last_name"],
+                "is_email_verified": True,
+                "is_active": True,
+            },
+        )
+
+        if created:
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+        elif not user.is_active:
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DISABLED",
+                        "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                "message": "Sesión iniciada correctamente.",
+                "user": UserProfileSerializer(user).data,
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class ProfilePictureUploadView(APIView):
+    """POST /api/auth/profile/upload-picture/ — upload profile image."""
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser]
+
+    ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    MAX_SIZE = 5 * 1024 * 1024
+
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response(
+                {
+                    "error": {
+                        "code": "NO_FILE",
+                        "message": "No se envio ningun archivo.",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if file.content_type not in self.ALLOWED_TYPES:
+            return Response(
+                {
+                    "error": {
+                        "code": "INVALID_TYPE",
+                        "message": "Solo imagenes (JPEG, PNG, WebP, GIF).",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if file.size > self.MAX_SIZE:
+            return Response(
+                {"error": {"code": "FILE_TOO_LARGE", "message": "Max 5 MB."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        ext = os.path.splitext(file.name)[1].lower()
+        filename = f"profile_{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join("profile_pictures", filename)
+
+        from django.core.files.storage import default_storage
+
+        saved_path = default_storage.save(filepath, file)
+        file_url = request.build_absolute_uri(f"/media/{saved_path}")
+
+        user = request.user
+        user.profile_picture = file_url
+        user.save(update_fields=["profile_picture"])
+
+        return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)

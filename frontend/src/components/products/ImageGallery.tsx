@@ -1,19 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 
 interface ImageGalleryProps {
   images: string[];
   productTitle: string;
+  categoryName: string;
 }
 
-export default function ImageGallery({ images, productTitle }: ImageGalleryProps) {
+export default function ImageGallery({ images, productTitle, categoryName }: ImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   if (images.length === 0) {
     return (
-      <div className="flex h-96 w-full items-center justify-center rounded-lg bg-gray-100">
-        <span className="text-gray-400">Sin imagen</span>
+      <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted">
+        <CategoryPlaceholderIcon categoryName={categoryName} className="h-10 w-10" />
+        <span className="text-sm text-muted-fg">Sin imagen</span>
       </div>
     );
   }
@@ -23,7 +26,7 @@ export default function ImageGallery({ images, productTitle }: ImageGalleryProps
   return (
     <div className="flex flex-col gap-4">
       {/* Main image */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
         <img
           src={selectedImage}
           alt={`${productTitle} - imagen ${selectedIndex + 1}`}
@@ -31,7 +34,6 @@ export default function ImageGallery({ images, productTitle }: ImageGalleryProps
         />
       </div>
 
-      {/* Thumbnail grid - only show if multiple images */}
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
           {images.map((image, index) => (
@@ -41,9 +43,7 @@ export default function ImageGallery({ images, productTitle }: ImageGalleryProps
               className={`
                 relative aspect-square overflow-hidden rounded-lg border-2 transition-all
                 ${
-                  index === selectedIndex
-                    ? 'border-blue-600'
-                    : 'border-gray-200 hover:border-gray-400'
+                  index === selectedIndex ? 'border-primary' : 'border-border hover:border-muted-fg'
                 }
               `}
             >

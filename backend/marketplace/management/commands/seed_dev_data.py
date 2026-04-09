@@ -13,6 +13,7 @@ from django.utils import timezone
 
 from core.models import User
 from gamification.models.badges import Badges
+from gamification.models.challenge import Challenge, ChallengeType
 from gamification.models.environment_impact import EnvironmentImpact
 from gamification.models.point_rule import PointRule
 from gamification.models.user_badges import UserBadges
@@ -33,6 +34,7 @@ class Command(BaseCommand):
         self._assign_badges(users, badges)
         self._create_environment_impact(users)
         self._create_point_rules()
+        self._create_challenges()
         self._create_transactions(users, products)
 
         self.stdout.write(self.style.SUCCESS("\nSeed completado exitosamente!"))
@@ -681,6 +683,73 @@ class Command(BaseCommand):
 
         self.stdout.write(f"    {count} reglas de puntos creadas")
 
+    def _create_challenges(self):
+        self.stdout.write("  Creando retos de gamificacion...")
+        now = timezone.now()
+        challenges_data = [
+            {
+                "title": "Donate 3 items this week",
+                "description": "Complete 3 donation actions this week.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 3,
+                "bonus_points": 30,
+                "start_date": now - timedelta(days=1),
+                "end_date": now + timedelta(days=7),
+                "is_active": True,
+            },
+            {
+                "title": "Complete 5 exchanges this month",
+                "description": "Complete 5 exchange actions this month.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 5,
+                "bonus_points": 50,
+                "start_date": now - timedelta(days=2),
+                "end_date": now + timedelta(days=30),
+                "is_active": True,
+            },
+            {
+                "title": "Publish 4 items this month",
+                "description": "Publish 4 items before the month ends.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 4,
+                "bonus_points": 25,
+                "start_date": now - timedelta(days=3),
+                "end_date": now + timedelta(days=30),
+                "is_active": True,
+            },
+            {
+                "title": "Complete 2 sales this month",
+                "description": "Complete 2 sale actions this month.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 2,
+                "bonus_points": 35,
+                "start_date": now - timedelta(days=3),
+                "end_date": now + timedelta(days=30),
+                "is_active": True,
+            },
+            {
+                "title": "Get 5 positive reviews",
+                "description": "Receive 5 positive review actions.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 5,
+                "bonus_points": 20,
+                "start_date": now - timedelta(days=3),
+                "end_date": now + timedelta(days=30),
+                "is_active": True,
+            },
+        ]
+
+        count = 0
+        for data in challenges_data:
+            _, created = Challenge.objects.update_or_create(
+                title=data["title"],
+                defaults=data,
+            )
+            if created:
+                count += 1
+
+        self.stdout.write(f"    {count} retos creados")
+
     def _create_transactions(self, users, products):
         self.stdout.write("  Creando transacciones...")
         now = timezone.now()
@@ -752,12 +821,16 @@ class Command(BaseCommand):
                     "delivery_location": t_data["delivery_location"],
                     "seller_confirmation": t_data["seller_confirmation"],
                     "buyer_confirmation": t_data["buyer_confirmation"],
-                    "seller_confirmed_at": now - timedelta(days=t_data["days_ago"])
-                    if t_data["seller_confirmation"]
-                    else None,
-                    "buyer_confirmed_at": now - timedelta(days=t_data["days_ago"])
-                    if t_data["buyer_confirmation"]
-                    else None,
+                    "seller_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["seller_confirmation"]
+                        else None
+                    ),
+                    "buyer_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["buyer_confirmation"]
+                        else None
+                    ),
                 },
             )
             if created:
