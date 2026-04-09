@@ -29,15 +29,13 @@ class BadgeServiceTest(TestCase):
 
         self.category = Category.objects.create(name="Libros")
 
-        Badges.objects.create(name="Primer Artículo", description="test", points=10)
-        Badges.objects.create(name="Donador Constante", description="test", points=50)
-        Badges.objects.create(
-            name="Comerciante Frecuente", description="test", points=100
-        )
-        Badges.objects.create(name="Primer Intercambio", description="test", points=20)
-        Badges.objects.create(name="Centurión de Puntos", description="test", points=0)
+        Badges.objects.create(name="Publicador Novato", description="test", points=10)
+        Badges.objects.create(name="Eco Warrior", description="test", points=50)
+        Badges.objects.create(name="Vendedor Top", description="test", points=100)
+        Badges.objects.create(name="Trueque Master", description="test", points=20)
+        Badges.objects.create(name="Perfil Completo", description="test", points=0)
 
-    def test_evaluate_primer_articulo(self):
+    def test_evaluate_publicador_novato(self):
         Products.objects.create(
             seller=self.user,
             category=self.category,
@@ -52,11 +50,11 @@ class BadgeServiceTest(TestCase):
         unlocked = evaluate_milestones(self.user)
 
         self.assertEqual(len(unlocked), 1)
-        self.assertEqual(unlocked[0].name, "Primer Artículo")
+        self.assertEqual(unlocked[0].name, "Publicador Novato")
 
         self.assertTrue(
             UserBadges.objects.filter(
-                user=self.user, badges__name="Primer Artículo"
+                user=self.user, badges__name="Publicador Novato"
             ).exists()
         )
         self.user.refresh_from_db()
@@ -65,41 +63,42 @@ class BadgeServiceTest(TestCase):
             Notification.objects.filter(user=self.user, type="badge_earned").exists()
         )
 
-    def test_evaluate_centurion_de_puntos(self):
-        self.user.points = 100
+    def test_evaluate_perfil_completo(self):
+        self.user.phone = "1234567890"
+        self.user.profile_picture = "http://example.com/pic.png"
         self.user.save()
 
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
-        self.assertIn("Centurión de Puntos", badge_names)
+        self.assertIn("Perfil Completo", badge_names)
 
-    def test_evaluate_primer_intercambio(self):
-        product = Products.objects.create(
-            seller=self.user,
-            category=self.category,
-            title="Producto",
-            description="desc",
-            condition="usado",
-            transaction_type="swap",
-            status="completado",
-        )
-
-        Transaction.objects.create(
-            product=product,
-            seller=self.user,
-            buyer=self.user2,
-            transaction_type="swap",
-            status="completada",
-        )
+    def test_evaluate_trueque_master(self):
+        for i in range(3):
+            product = Products.objects.create(
+                seller=self.user,
+                category=self.category,
+                title=f"Producto {i}",
+                description="desc",
+                condition="usado",
+                transaction_type="swap",
+                status="completado",
+            )
+            Transaction.objects.create(
+                product=product,
+                seller=self.user,
+                buyer=self.user2,
+                transaction_type="swap",
+                status="completada",
+            )
 
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
 
-        self.assertIn("Primer Artículo", badge_names)
-        self.assertIn("Primer Intercambio", badge_names)
+        self.assertIn("Publicador Novato", badge_names)
+        self.assertIn("Trueque Master", badge_names)
 
-    def test_donador_constante(self):
-        for i in range(5):
+    def test_evaluate_eco_warrior(self):
+        for i in range(3):
             product = Products.objects.create(
                 seller=self.user,
                 category=self.category,
@@ -119,4 +118,4 @@ class BadgeServiceTest(TestCase):
 
         unlocked = evaluate_milestones(self.user)
         badge_names = [b.name for b in unlocked]
-        self.assertIn("Donador Constante", badge_names)
+        self.assertIn("Eco Warrior", badge_names)
