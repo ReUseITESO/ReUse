@@ -48,7 +48,9 @@ def exchange_code(code: str) -> dict:
             token_data = json.loads(response.read())
     except urllib.error.HTTPError as exc:
         error_body = json.loads(exc.read().decode("utf-8"))
-        raise ValueError(error_body.get("error_description", "Microsoft token exchange failed"))
+        raise ValueError(
+            error_body.get("error_description", "Microsoft token exchange failed")
+            ) from exc
 
     if "error" in token_data:
         raise ValueError(token_data.get("error_description", "Microsoft authentication failed"))

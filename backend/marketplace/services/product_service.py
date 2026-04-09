@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
+# Gamification imports
+from gamification.services.point_service import award_points
 from marketplace.models import Transaction
 
 VALID_STATUS_TRANSITIONS = {

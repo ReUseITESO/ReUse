@@ -5,7 +5,6 @@ from core.models import User
 from core.models.notification import Notification
 
 
-
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ["id", "email", "first_name", "last_name", "points", "date_joined"]
