@@ -1,3 +1,4 @@
+from config.exception_handler import logger
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
@@ -113,8 +114,10 @@ def change_product_status(product, new_status, user):
                     action=action,
                     reference_id=product.id,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(
+                    f"Error awarding points for product {product.id}: {str(e)}"
+                )
 
         # ==========================================================================
 
