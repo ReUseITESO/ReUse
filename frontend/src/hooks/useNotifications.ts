@@ -5,8 +5,7 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from '@/lib/api';
-import type { Notification, PaginatedNotifications } from '@/types/notification';
-
+import type { PaginatedNotifications } from '@/types/notification';
 const POLL_INTERVAL = 30_000;
 
 export function useNotificationCount() {
