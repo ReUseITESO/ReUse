@@ -469,7 +469,6 @@ class DashboardView(APIView):
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
 
-
 class MicrosoftAuthURLView(APIView):
     permission_classes = [AllowAny]
 
@@ -574,7 +573,6 @@ class MicrosoftCallbackView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
 
 class ProfilePictureUploadView(APIView):
     """POST /api/auth/profile/upload-picture/ — upload profile image."""

@@ -16,6 +16,12 @@ export interface UserConnection {
   updated_at: string;
 }
 
+export interface FriendRequest {
+  id: number;
+  from_user: SocialUser;
+  created_at: string;
+}
+
 export interface FrequentContact {
   id: number;
   contact: SocialUser;

@@ -127,8 +127,10 @@ class Command(BaseCommand):
                 user.is_email_verified = True
                 user.save()
             else:
-                # Actualizar puntos y perfil si ya existe
+                # Preserve earned points on existing users; only refresh profile metadata.
                 for k, v in data.items():
+                    if k == "points":
+                        continue
                     setattr(user, k, v)
                 user.is_active = True
                 user.is_email_verified = True

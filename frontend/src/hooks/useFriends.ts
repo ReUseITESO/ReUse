@@ -94,7 +94,8 @@ export function useFriends() {
     }
   }
 
-  async function removeFriend(_userId: number): Promise<string | null> {
+  async function removeFriend(userId: number): Promise<string | null> {
+    void userId;
     // Daniel's API doesn't support removing accepted connections
     return 'No se puede eliminar una conexión aceptada desde la API actual.';
   }

@@ -8,49 +8,69 @@ import { cn } from '@/lib/utils';
 
 interface TestPointsButtonsProps {
   onPointsUpdated?: () => void;
+  onPointsChanged?: () => void;
 }
 
-export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtonsProps) {
-  const { isAuthenticated } = useAuth();
+export default function TestPointsButtons({
+  onPointsUpdated,
+  onPointsChanged,
+}: Readonly<TestPointsButtonsProps>) {
+  const { user, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const notifyPointsUpdate = () => {
+    onPointsUpdated?.();
+    onPointsChanged?.();
+  };
 
   const runAction = async (action: string) => {
+    if (!isAuthenticated) {
+      setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
+      return;
+    }
+
     setIsLoading(true);
     setMessage(null);
-    setIsError(false);
 
     try {
       await apiClient('/gamification/award-points/', {
         method: 'POST',
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, user_id: user?.id }),
       });
-      setMessage(`Accion aplicada: ${action}`);
-      onPointsUpdated?.();
+      setMessage({ type: 'success', text: `Accion aplicada: ${action}` });
+      notifyPointsUpdate();
     } catch (err) {
-      setIsError(true);
-      setMessage(err instanceof Error ? err.message : 'No se pudo otorgar puntos');
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'No se pudo otorgar puntos',
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const deduct = async (points: number) => {
+    if (!isAuthenticated) {
+      setMessage({ type: 'error', text: 'Inicia sesion para probar acciones de puntos' });
+      return;
+    }
+
     setIsLoading(true);
     setMessage(null);
-    setIsError(false);
 
     try {
       await apiClient('/gamification/deduct-points/', {
         method: 'POST',
-        body: JSON.stringify({ points }),
+        body: JSON.stringify({ points, user_id: user?.id }),
       });
-      setMessage(`Descuento aplicado: -${points} puntos`);
-      onPointsUpdated?.();
+      setMessage({ type: 'success', text: `Descuento aplicado: -${points} puntos` });
+      notifyPointsUpdate();
     } catch (err) {
-      setIsError(true);
-      setMessage(err instanceof Error ? err.message : 'No se pudo descontar puntos');
+      setMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'No se pudo descontar puntos',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +130,14 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         </button>
       </div>
       {message ? (
-        <p className={cn('mt-3 text-xs', isError ? 'text-error' : 'text-success')}>{message}</p>
+        <p
+          className={cn(
+            'mt-3 text-xs',
+            message.type === 'error' ? 'text-red-600' : 'text-emerald-700',
+          )}
+        >
+          {message.text}
+        </p>
       ) : null}
     </section>
   );

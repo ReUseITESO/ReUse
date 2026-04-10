@@ -141,8 +141,6 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-// — HU-CORE-17: Desactivación / Reactivación de cuenta ──────────────────────
-
 export async function deactivateAccount(): Promise<void> {
   const tokens = getStoredTokens();
   await authFetch('/auth/account/deactivate/', {
@@ -203,7 +201,7 @@ export async function signUp(payload: SignUpRequest): Promise<SignUpResponse> {
     throw new Error(body?.error?.message ?? 'Error al crear la cuenta.');
   }
 
-  return body;
+  return body as Record<string, unknown>;
 }
 
 export async function signOut(): Promise<void> {
