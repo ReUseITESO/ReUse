@@ -6,10 +6,12 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework import generics, serializers as drf_serializers, status
+from rest_framework import generics, status
+from rest_framework import serializers as drf_serializers
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -17,9 +19,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.models.notification import Notification
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
-from core.models.notification import Notification
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
 from social.models import UserConnection
@@ -611,8 +613,6 @@ class ProfilePictureUploadView(APIView):
         ext = os.path.splitext(file.name)[1].lower()
         filename = f"profile_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join("profile_pictures", filename)
-
-        from django.core.files.storage import default_storage
 
         saved_path = default_storage.save(filepath, file)
         file_url = request.build_absolute_uri(f"/media/{saved_path}")
