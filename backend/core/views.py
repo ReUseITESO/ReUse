@@ -405,6 +405,7 @@ class UserSearchView(generics.ListAPIView):
                 | Q(last_name__icontains=query)
                 | Q(email__icontains=query),
                 is_active=True,
+                is_deactivated=False,
             )
             .exclude(id=self.request.user.id)
             .order_by("first_name")[:20]
