@@ -12,7 +12,7 @@ def get_commentable_product(product_id: int) -> Products:
     except Products.DoesNotExist as err:
         # Agregamos 'from err' o 'from None' para cumplir con B904
         raise NotFound("Producto no encontrado.") from err
-        
+
     if product.status not in ALLOWED_COMMENT_STATUSES:
         raise NotFound("Producto no encontrado.")
     return product
