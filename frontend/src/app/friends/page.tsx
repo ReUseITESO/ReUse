@@ -16,6 +16,7 @@ export default function FriendsPage() {
   const {
     friends,
     pendingRequests,
+    pendingSentIds,
     isLoading,
     error,
     sendRequest,
@@ -118,6 +119,7 @@ export default function FriendsPage() {
                 onSearch={searchUsers}
                 onSendRequest={sendRequest}
                 friendIds={friendIds}
+                pendingSentIds={pendingSentIds}
               />
             )}
           </>

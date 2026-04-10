@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Users, Check, X, Mail } from 'lucide-react';
+import { Plus, Users, Check, Mail } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunities } from '@/hooks/useCommunities';
@@ -23,12 +23,8 @@ export default function CommunitiesPage() {
   const [loadingInviteId, setLoadingInviteId] = useState<number | null>(null);
 
   const fetchInvitations = useCallback(async () => {
-    try {
-      const data = await apiClient<{ results: CommunityInvitation[] }>('/communities/invitations/');
-      setInvitations(data.results);
-    } catch {
-      setInvitations([]);
-    }
+    // Daniel's API doesn't have an invitations endpoint
+    setInvitations([]);
   }, []);
 
   useEffect(() => {
@@ -38,7 +34,7 @@ export default function CommunitiesPage() {
   async function handleAcceptInvite(communityId: number, inviteId: number) {
     setLoadingInviteId(inviteId);
     try {
-      await apiClient(`/communities/${communityId}/join/`, { method: 'POST' });
+      await apiClient(`/social/communities/${communityId}/join/`, { method: 'POST' });
       await Promise.all([fetchInvitations(), refresh()]);
     } catch {
       /* ignore */
@@ -199,10 +195,10 @@ export default function CommunitiesPage() {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Users className="h-4 w-4" />
-                    {c.member_count}
+                    {c.members_count}
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-gray-400">Creada por {c.created_by_name}</p>
+                <p className="mt-2 text-xs text-gray-400">Creada por {c.creator.full_name}</p>
               </Link>
             ))}
           </div>

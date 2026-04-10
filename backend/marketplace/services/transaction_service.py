@@ -79,8 +79,10 @@ def _reuse_cancelled_transaction(
 def create_transaction_request(product_id, buyer, delivery_location, delivery_date):
     with db_transaction.atomic():
         try:
-            product = Products.objects.select_for_update().select_related("seller").get(
-                pk=product_id
+            product = (
+                Products.objects.select_for_update()
+                .select_related("seller")
+                .get(pk=product_id)
             )
         except Products.DoesNotExist as err:
             raise StateConflictError("El producto no existe.") from err
@@ -136,11 +138,15 @@ def create_transaction_request(product_id, buyer, delivery_location, delivery_da
 
 def update_transaction_status(transaction_id, new_status, actor):
     with db_transaction.atomic():
-        transaction = Transaction.objects.select_for_update().select_related(
-            "product",
-            "seller",
-            "buyer",
-        ).get(pk=transaction_id)
+        transaction = (
+            Transaction.objects.select_for_update()
+            .select_related(
+                "product",
+                "seller",
+                "buyer",
+            )
+            .get(pk=transaction_id)
+        )
 
         actor_role = get_actor_role(transaction, actor)
 

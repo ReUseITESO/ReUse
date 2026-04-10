@@ -23,13 +23,26 @@ urlpatterns = [
         name="email_verification_confirm",
     ),
 
+    # User search (used by friends and communities)
+    path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+
     # HU-CORE-04: Dashboard
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
-
     # HU-CORE-10: Profile picture upload
-    path("profile/upload-picture/", views.ProfilePictureUploadView.as_view(), name="profile-upload-picture"),
+    path(
+        "profile/upload-picture/",
+        views.ProfilePictureUploadView.as_view(),
+        name="profile-upload-picture",
+    ),
+
+    # HU-CORE-12: Share item with friends
+    path("shares/", views.ShareItemView.as_view(), name="share-item"),
 
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
-    path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
+    path(
+        "microsoft/callback/",
+        views.MicrosoftCallbackView.as_view(),
+        name="microsoft-callback",
+    ),
 ]
