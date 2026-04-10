@@ -16,7 +16,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   if (isInitialLoading) {
     return (
-      <div className="h-24 w-full rounded-lg bg-gradient-to-r from-muted to-muted/50 animate-pulse">
+      <div className="h-28 w-full animate-pulse rounded-2xl bg-gradient-to-r from-muted to-muted/50">
         <div className="flex items-center justify-center h-full">
           <div className="text-sm text-muted-fg">Cargando puntos...</div>
         </div>
@@ -60,17 +60,23 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
   }
 
   return (
-    <article className="rounded-lg bg-gradient-to-br from-primary/5 to-primary/15 border border-primary/20 p-6 shadow-sm">
-      <div className="flex items-center justify-between">
+    <article className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-primary/5 to-emerald-400/10 p-6 shadow-sm">
+      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
+      <div className="pointer-events-none absolute -left-8 -bottom-10 h-28 w-28 rounded-full bg-emerald-400/15 blur-2xl" />
+
+      <div className="relative flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">Puntos Acumulados</h3>
-          <p className="mt-1 text-4xl font-bold text-primary">{points || 0}</p>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">Puntos Acumulados</h3>
+          <p className="mt-2 text-4xl font-extrabold leading-none text-primary">{points || 0}</p>
+          <p className="mt-2 text-sm text-fg/80">Nivel de impacto en ReUse</p>
         </div>
-        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/70 ring-8 ring-primary/15">
           <span className="text-2xl">⭐</span>
         </div>
       </div>
-      <p className="mt-3 text-xs text-muted-fg">
+
+      <p className="relative mt-4 text-xs text-muted-fg">
         Gana puntos publicando, completando transacciones e interactuando con la comunidad.
       </p>
     </article>

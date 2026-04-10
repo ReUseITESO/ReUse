@@ -50,9 +50,30 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
     [fetchChallenges],
   );
 
+  const claimChallengeReward = useCallback(
+    async (challengeId: number) => {
+      await apiClient<UserChallenge>(`/gamification/challenges/${challengeId}/claim/`, {
+        method: 'POST',
+      });
+      await fetchChallenges();
+    },
+    [fetchChallenges],
+  );
   useEffect(() => {
     fetchChallenges();
   }, [fetchChallenges, refreshTrigger]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      fetchChallenges();
+    }, 20_000);
+
+    return () => window.clearInterval(interval);
+  }, [enabled, fetchChallenges]);
 
   return {
     challenges,
@@ -60,6 +81,7 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
     isLoading,
     error,
     joinChallenge,
+    claimChallengeReward,
     refetch: fetchChallenges,
   };
 }

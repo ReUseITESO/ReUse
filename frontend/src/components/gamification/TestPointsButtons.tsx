@@ -27,6 +27,7 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         body: JSON.stringify({ action }),
       });
       setMessage(`Accion aplicada: ${action}`);
+      window.dispatchEvent(new CustomEvent('reuse:points-updated'));
       onPointsUpdated?.();
     } catch (err) {
       setIsError(true);
@@ -47,6 +48,7 @@ export default function TestPointsButtons({ onPointsUpdated }: TestPointsButtons
         body: JSON.stringify({ points }),
       });
       setMessage(`Descuento aplicado: -${points} puntos`);
+      window.dispatchEvent(new CustomEvent('reuse:points-updated'));
       onPointsUpdated?.();
     } catch (err) {
       setIsError(true);
