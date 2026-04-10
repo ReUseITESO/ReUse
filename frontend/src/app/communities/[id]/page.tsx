@@ -8,18 +8,13 @@ import {
   Users,
   LogOut,
   Trash2,
-  UserMinus,
   Crown,
   UserPlus,
-  Search,
 } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
-import { apiClient } from '@/lib/api';
-
-import type { CommunityMember } from '@/types/community';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -32,9 +27,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     error,
     createPost,
     deletePost,
-    inviteUser,
     leaveCommunity,
-    expelMember,
+    joinCommunity,
     deleteCommunity,
   } = useCommunityDetail(params.id);
 
@@ -42,15 +36,9 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
 
-  const [showInvite, setShowInvite] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CommunityMember[]>([]);
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
-
-  const isAdmin = community?.user_role === 'admin';
-  const isMember = community?.is_member;
-  const memberIds = members.map(m => m.user.id);
+  const currentMembership = members.find(m => m.user.id === user?.id);
+  const isAdmin = currentMembership?.role === 'admin';
+  const isMember = !!currentMembership;
 
   async function handlePost() {
     if (!postContent.trim()) return;
@@ -62,6 +50,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     setIsPosting(false);
   }
 
+  async function handleJoin() {
+    await joinCommunity();
+  }
+
   async function handleLeave() {
     const err = await leaveCommunity();
     if (!err) router.push('/communities');
@@ -70,29 +62,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   async function handleDelete() {
     const err = await deleteCommunity();
     if (!err) router.push('/communities');
-  }
-
-  async function handleSearch() {
-    if (searchQuery.length < 2) return;
-    try {
-      const data = await apiClient<{ results: CommunityMember[] } | CommunityMember[]>(
-        `/auth/users/search/?q=${encodeURIComponent(searchQuery)}`,
-      );
-      const results = Array.isArray(data) ? data : (data.results ?? []);
-      setSearchResults(results);
-    } catch {
-      setSearchResults([]);
-    }
-  }
-
-  async function handleInvite(userId: number) {
-    setInviteError(null);
-    const err = await inviteUser(userId);
-    if (err) {
-      setInviteError(err);
-    } else {
-      setInvitedIds(prev => new Set(prev).add(userId));
-    }
   }
 
   if (isLoading) {
@@ -137,12 +106,20 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               )}
               <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" /> {community.member_count} miembros
+                  <Users className="h-4 w-4" /> {community.members_count} miembros
                 </span>
-                <span>Creada por {community.created_by_name}</span>
+                <span>Creada por {community.creator.full_name}</span>
               </div>
             </div>
             <div className="flex gap-2">
+              {!isMember && (
+                <button
+                  onClick={handleJoin}
+                  className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                >
+                  <UserPlus className="h-3.5 w-3.5" /> Unirse
+                </button>
+              )}
               {isMember && !isAdmin && (
                 <button
                   onClick={handleLeave}
@@ -204,11 +181,11 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                          {post.author.first_name?.[0]?.toUpperCase()}
+                          {post.author_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {post.author.full_name}
+                            {post.author_name}
                           </p>
                           <p className="text-xs text-gray-400">
                             {new Date(post.created_at).toLocaleDateString('es-MX', {
@@ -220,7 +197,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                           </p>
                         </div>
                       </div>
-                      {(post.author.id === user?.id || isAdmin) && (
+                      {(post.user === user?.id || isAdmin) && (
                         <button
                           onClick={() => deletePost(post.id)}
                           className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
@@ -238,100 +215,22 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
           {/* Members sidebar */}
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Miembros</h2>
-              {isAdmin && (
-                <button
-                  onClick={() => setShowInvite(!showInvite)}
-                  className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
-                >
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Invitar
-                </button>
-              )}
-            </div>
-
-            {/* Invite search */}
-            {showInvite && (
-              <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                      placeholder="Buscar usuario..."
-                      className="w-full rounded-lg border border-gray-300 py-1.5 pl-8 pr-2 text-xs focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSearch}
-                    disabled={searchQuery.length < 2}
-                    className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    Buscar
-                  </button>
-                </div>
-                {inviteError && <p className="mt-2 text-xs text-red-600">{inviteError}</p>}
-                {searchResults.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {searchResults.map(u => {
-                      const alreadyMember = memberIds.includes(u.id);
-                      const alreadyInvited = invitedIds.has(u.id);
-                      return (
-                        <div
-                          key={u.id}
-                          className="flex items-center justify-between rounded bg-white p-2"
-                        >
-                          <p className="text-xs font-medium text-gray-900">{u.full_name}</p>
-                          {alreadyMember ? (
-                            <span className="text-xs text-gray-400">Miembro</span>
-                          ) : alreadyInvited ? (
-                            <span className="text-xs text-green-600">Invitado</span>
-                          ) : (
-                            <button
-                              onClick={() => handleInvite(u.id)}
-                              className="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
-                            >
-                              Invitar
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">Miembros</h2>
             <div className="space-y-2">
               {members.map(m => (
                 <div
                   key={m.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                  className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-3"
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                      {m.user.first_name?.[0]?.toUpperCase()}
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {m.user.full_name}
-                      {m.role === 'admin' && (
-                        <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
-                      )}
-                    </p>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                    {m.user.first_name?.[0]?.toUpperCase()}
                   </div>
-                  {isAdmin && m.user.id !== user?.id && (
-                    <button
-                      onClick={() => expelMember(m.user.id)}
-                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                      title="Expulsar"
-                    >
-                      <UserMinus className="h-4 w-4" />
-                    </button>
-                  )}
+                  <p className="text-sm font-medium text-gray-900">
+                    {m.user.full_name}
+                    {m.role === 'admin' && (
+                      <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                    )}
+                  </p>
                 </div>
               ))}
             </div>

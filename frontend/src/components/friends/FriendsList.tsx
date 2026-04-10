@@ -1,24 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { UserMinus } from 'lucide-react';
-
-import type { FriendUser } from '@/types/friends';
+import type { SocialUser } from '@/types/friends';
 
 interface FriendsListProps {
-  friends: FriendUser[];
-  onRemove: (userId: number) => Promise<string | null>;
+  friends: SocialUser[];
+  onRemove?: (userId: number) => Promise<string | null>;
 }
 
-export default function FriendsList({ friends, onRemove }: FriendsListProps) {
-  const [removingId, setRemovingId] = useState<number | null>(null);
-
-  async function handleRemove(userId: number) {
-    setRemovingId(userId);
-    await onRemove(userId);
-    setRemovingId(null);
-  }
-
+export default function FriendsList({ friends }: FriendsListProps) {
   if (friends.length === 0) {
     return (
       <p className="py-6 text-center text-sm text-gray-500">
@@ -51,14 +40,6 @@ export default function FriendsList({ friends, onRemove }: FriendsListProps) {
               <p className="text-xs text-gray-500">{friend.email}</p>
             </div>
           </div>
-          <button
-            onClick={() => handleRemove(friend.id)}
-            disabled={removingId === friend.id}
-            className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
-          >
-            <UserMinus className="h-3.5 w-3.5" />
-            Eliminar
-          </button>
         </div>
       ))}
     </div>

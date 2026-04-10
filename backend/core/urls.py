@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+from . import views_deactivation
 
 app_name = "auth"
 
@@ -22,6 +23,10 @@ urlpatterns = [
         views.EmailVerificationConfirmView.as_view(),
         name="email_verification_confirm",
     ),
+
+    # User search (used by friends and communities)
+    path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+
     # HU-CORE-04: Dashboard
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     # HU-CORE-10: Profile picture upload
@@ -31,7 +36,27 @@ urlpatterns = [
         name="profile-upload-picture",
     ),
 
+    # HU-CORE-12: Share item with friends
+    path("shares/", views.ShareItemView.as_view(), name="share-item"),
+
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
     path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
+
+    # HU-CORE-17: Desactivación y reactivación lógica de cuenta
+    path(
+        "account/deactivate/",
+        views_deactivation.AccountDeactivateView.as_view(),
+        name="account-deactivate",
+    ),
+    path(
+        "account/reactivate/send/",
+        views_deactivation.AccountReactivateSendView.as_view(),
+        name="account-reactivate-send",
+    ),
+    path(
+        "account/reactivate/confirm/",
+        views_deactivation.AccountReactivateConfirmView.as_view(),
+        name="account-reactivate-confirm",
+    ),
 ]

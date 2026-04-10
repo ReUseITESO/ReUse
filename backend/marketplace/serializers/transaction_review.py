@@ -7,6 +7,8 @@ class TransactionReviewSerializer(serializers.ModelSerializer):
     reviewer_name = serializers.SerializerMethodField()
 
     def get_reviewer_name(self, obj):
+        if getattr(obj.reviewer, "is_deactivated", False):
+            return "Usuario Desactivado"
         return obj.reviewer.get_full_name()
 
     class Meta:
