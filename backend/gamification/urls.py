@@ -8,6 +8,7 @@ from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
 from gamification.views.challenges import (
     ChallengeListView,
+    ClaimChallengeRewardView,
     JoinChallengeView,
     MyChallengesView,
 )
@@ -26,5 +27,10 @@ urlpatterns = [
         "challenges/<int:challenge_id>/join/",
         JoinChallengeView.as_view(),
         name="join-challenge",
+    ),
+    path(
+        "challenges/<int:challenge_id>/claim/",
+        ClaimChallengeRewardView.as_view(),
+        name="claim-challenge-reward",
     ),
 ]

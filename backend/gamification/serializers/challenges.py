@@ -55,6 +55,8 @@ class UserChallengeSerializer(serializers.ModelSerializer):
             "progress",
             "bonus_points",
             "is_completed",
+            "reward_claimed",
+            "reward_claimed_at",
             "joined_at",
             "completed_at",
             "start_date",
