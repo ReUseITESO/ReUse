@@ -66,7 +66,9 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
       <div className="relative flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">Puntos Acumulados</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">
+            Puntos Acumulados
+          </h3>
           <p className="mt-2 text-4xl font-extrabold leading-none text-primary">{points || 0}</p>
           <p className="mt-2 text-sm text-fg/80">Nivel de impacto en ReUse</p>
         </div>

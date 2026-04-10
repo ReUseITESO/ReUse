@@ -18,7 +18,9 @@ interface ChallengeToast {
 export default function GlobalChallengeToasts() {
   const { isAuthenticated } = useAuth();
   const [toasts, setToasts] = useState<ChallengeToast[]>([]);
-  const previousProgressRef = useRef<Record<number, { progress: number; is_completed: boolean }>>({});
+  const previousProgressRef = useRef<Record<number, { progress: number; is_completed: boolean }>>(
+    {},
+  );
   const hydratedRef = useRef(false);
 
   useEffect(() => {

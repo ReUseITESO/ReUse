@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Award,
-  Box,
-  HandHeart,
-  RefreshCw,
-  Repeat2,
-  Star,
-} from 'lucide-react';
+import { Award, Box, HandHeart, RefreshCw, Repeat2, Star } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useChallenges } from '@/hooks/useChallenges';
@@ -85,7 +78,6 @@ function getBucketFromDates(startDate: string, endDate: string): ChallengeBucket
   return 'monthly';
 }
 
-
 function getProgressTone(progress: number, completed: boolean) {
   if (completed || progress >= 100) {
     return 'from-emerald-500 to-lime-400';
@@ -102,10 +94,8 @@ interface ChallengesBoardProps {
 
 export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardProps) {
   const { isAuthenticated } = useAuth();
-  const { challenges, myChallenges, isLoading, error, claimChallengeReward, refetch } = useChallenges(
-    isAuthenticated,
-    refreshTrigger,
-  );
+  const { challenges, myChallenges, isLoading, error, claimChallengeReward, refetch } =
+    useChallenges(isAuthenticated, refreshTrigger);
   const [message, setMessage] = useState<string | null>(null);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -241,7 +231,9 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
           onClick={() => setActiveBucket('monthly')}
           className={cn(
             'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-            activeBucket === 'monthly' ? 'bg-card text-fg shadow-sm' : 'text-muted-fg hover:text-fg',
+            activeBucket === 'monthly'
+              ? 'bg-card text-fg shadow-sm'
+              : 'text-muted-fg hover:text-fg',
           )}
         >
           Mensuales ({challengesByBucket.monthly.length})
@@ -263,7 +255,9 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
       {visibleChallenges.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
           <p className="text-4xl">🌍</p>
-          <p className="mt-3 text-base font-semibold text-fg">No hay retos activos en esta categoría</p>
+          <p className="mt-3 text-base font-semibold text-fg">
+            No hay retos activos en esta categoría
+          </p>
           <p className="mt-1 text-sm text-muted-fg">Prueba otra pestaña o vuelve más tarde.</p>
         </div>
       ) : (
@@ -291,7 +285,9 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                   isCompleted && 'border-emerald-200 bg-emerald-50/30',
                 )}
               >
-                <div className={cn('rounded-2xl p-2.5 text-white flex-shrink-0 h-fit', theme.accent)}>
+                <div
+                  className={cn('rounded-2xl p-2.5 text-white flex-shrink-0 h-fit', theme.accent)}
+                >
                   <ChallengeIcon className="h-5 w-5" />
                 </div>
 
@@ -317,7 +313,9 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                   </div>
 
                   <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-fg">
-                    <span>{Math.min(currentValue, challenge.goal)} / {challenge.goal}</span>
+                    <span>
+                      {Math.min(currentValue, challenge.goal)} / {challenge.goal}
+                    </span>
                     <button
                       type="button"
                       onClick={async () => {
@@ -337,7 +335,13 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                         claimingId === challenge.id && 'opacity-70',
                       )}
                     >
-                      {isClaimed ? '✓ Reclamado' : claimingId === challenge.id ? 'Reclamando...' : isCompleted ? 'Reclamar' : 'En progreso'}
+                      {isClaimed
+                        ? '✓ Reclamado'
+                        : claimingId === challenge.id
+                          ? 'Reclamando...'
+                          : isCompleted
+                            ? 'Reclamar'
+                            : 'En progreso'}
                     </button>
                   </div>
                 </div>
