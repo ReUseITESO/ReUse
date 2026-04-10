@@ -21,3 +21,9 @@ export interface FrequentContact {
   contact: SocialUser;
   created_at: string;
 }
+
+export interface FriendRequest {
+  id: number;
+  from_user: SocialUser;
+  created_at: string;
+}

@@ -1,16 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
-import type { UserConnection, SocialUser } from '@/types/friends';
+import { apiClient } from '@/lib/api';
+import type { FriendRequest, SocialUser, UserConnection } from '@/types/friends';
 
 export type FriendUser = SocialUser;
-export type FriendRequest = {
-  id: number;
-  from_user: SocialUser;
-  created_at: string;
-};
 
 export function useFriends() {
   const { user } = useAuth();
@@ -25,7 +20,7 @@ export function useFriends() {
       const data = await apiClient<{ results: UserConnection[] } | UserConnection[]>(
         '/social/connections/',
       );
-      const results = Array.isArray(data) ? data : (data.results ?? []);
+      const results = Array.isArray(data) ? data : data.results ?? [];
       setConnections(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar conexiones');
@@ -50,7 +45,6 @@ export function useFriends() {
         .map(c => ({ id: c.id, from_user: c.requester, created_at: c.created_at }))
     : [];
 
-  // IDs of users we already sent a pending request to
   const pendingSentIds: number[] = user
     ? connections
         .filter(c => c.status === 'pending' && c.requester.id === user.id)
@@ -97,7 +91,6 @@ export function useFriends() {
   }
 
   async function removeFriend(): Promise<string | null> {
-    // Daniel's API doesn't support removing accepted connections
     return 'No se puede eliminar una conexión aceptada desde la API actual.';
   }
 
