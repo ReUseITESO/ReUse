@@ -13,9 +13,9 @@ from gamification.serializers.challenges import (
 from gamification.services.challenge_service import (
     claim_challenge_reward,
     ensure_user_active_challenges,
+    get_rotative_challenges,
     join_challenge,
     refresh_user_challenge_progress,
-    get_rotative_challenges,
 )
 
 
@@ -31,7 +31,7 @@ class ChallengeListView(APIView):
         ensure_user_active_challenges(user=request.user, now=now)
         # Get rotative challenges (3 daily, 3 weekly, 3 monthly)
         challenges = get_rotative_challenges(now)
-        
+
         joined_ids = set(
             UserChallenge.objects.filter(
                 user=request.user,

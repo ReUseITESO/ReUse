@@ -1,8 +1,9 @@
+import random
+
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
-import random
 
 from gamification.models import (
     Challenge,
@@ -222,61 +223,61 @@ def refresh_user_active_challenges(*, user, challenge_types=None, now=None):
 def get_rotative_challenges(now=None):
     """
     Select a subset of challenges that rotate daily/weekly/monthly.
-    
+
     For each challenge type:
     - Daily: 3 challenges rotate each day
-    - Weekly: 3 challenges rotate each week  
+    - Weekly: 3 challenges rotate each week
     - Monthly: 3 challenges rotate each month
-    
+
     Uses deterministic random selection based on date.
     """
     if now is None:
         now = timezone.now()
-    
+
     daily_seed = now.date().day
     week_num = now.date().isocalendar()[1]
     month_num = now.date().month
-    
+
     # Get all active challenges
     all_active = Challenge.objects.filter(
         is_active=True,
         start_date__lte=now,
         end_date__gte=now,
     ).order_by("id")
-    
+
     # Categorize by duration
     daily_challenges = []
     weekly_challenges = []
     monthly_challenges = []
-    
+
     for challenge in all_active:
         duration_days = (challenge.end_date - challenge.start_date).days
-        
+
         if duration_days <= 2:
             daily_challenges.append(challenge)
         elif duration_days <= 10:
             weekly_challenges.append(challenge)
         else:
             monthly_challenges.append(challenge)
-    
+
     selected = []
-    
+
     # Select 3 daily challenges deterministically
     if daily_challenges:
         random.seed(daily_seed)
         daily_count = min(3, len(daily_challenges))
         selected.extend(random.sample(daily_challenges, daily_count))
-    
-    # Select 3 weekly challenges deterministically  
+
+    # Select 3 weekly challenges deterministically
     if weekly_challenges:
         random.seed(week_num)
         weekly_count = min(3, len(weekly_challenges))
         selected.extend(random.sample(weekly_challenges, weekly_count))
-    
+
     # Select 3 monthly challenges deterministically
     if monthly_challenges:
         random.seed(month_num)
         monthly_count = min(3, len(monthly_challenges))
         selected.extend(random.sample(monthly_challenges, monthly_count))
-    
+
     return selected
