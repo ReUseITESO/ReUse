@@ -86,4 +86,3 @@ class NotificationMarkAllReadView(APIView):
             read_at=timezone.now(),
         )
         return Response({"message": "Todas las notificaciones marcadas como leídas."})
-    
