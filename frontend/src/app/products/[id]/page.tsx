@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   return (
-    <main className="p-8">
+    <main className="px-4 py-8 sm:px-6">
       <ProductDetail productId={params.id} />
     </main>
   );

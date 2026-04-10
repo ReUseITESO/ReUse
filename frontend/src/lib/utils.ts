@@ -36,14 +36,14 @@ export function formatPrice(price: string | null): string {
 }
 
 const SECONDS_IN_MINUTE = 60;
-const SECONDS_IN_HOUR = 3_600;
-const SECONDS_IN_DAY = 86_400;
-const SECONDS_IN_WEEK = 604_800;
+const SECONDS_IN_HOUR = 3600;
+const SECONDS_IN_DAY = 86400;
+const SECONDS_IN_WEEK = 604800;
 
 export function formatTimeAgo(isoDate: string): string {
   const now = Date.now();
   const then = new Date(isoDate).getTime();
-  const diffSeconds = Math.floor((now - then) / 1_000);
+  const diffSeconds = Math.floor((now - then) / 1000);
 
   if (diffSeconds < SECONDS_IN_MINUTE) return 'Hace un momento';
   if (diffSeconds < SECONDS_IN_HOUR) {

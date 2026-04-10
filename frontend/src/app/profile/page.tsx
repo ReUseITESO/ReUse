@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
@@ -83,7 +84,7 @@ export default function ProfilePage() {
                     onClick={() => setIsEditing(true)}
                     className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
                   >
-                    <span aria-hidden="true">✏️</span> Editar perfil
+                    <Pencil className="h-4 w-4" /> Editar perfil
                   </button>
                 </div>
                 <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
