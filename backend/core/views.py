@@ -17,9 +17,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.models.notification import Notification
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
-from core.models.notification import Notification
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
 from social.models import UserConnection
