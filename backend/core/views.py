@@ -1,12 +1,16 @@
 import hashlib
+import os
 import secrets
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +19,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
+
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
 
@@ -350,10 +357,6 @@ class EmailVerificationConfirmView(APIView):
 
 # ── Dashboard (HU-CORE-04) ───────────────────────────────
 
-from marketplace.models import Products
-from marketplace.serializers.product import ProductListSerializer
-
-
 class DashboardView(APIView):
     """GET /api/auth/dashboard/ — aggregated home dashboard data."""
 
@@ -395,11 +398,6 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
-
-from rest_framework.parsers import MultiPartParser
-import os
-import uuid
-
 
 class MicrosoftAuthURLView(APIView):
     permission_classes = [AllowAny]
@@ -524,8 +522,6 @@ class ProfilePictureUploadView(APIView):
         ext = os.path.splitext(file.name)[1].lower()
         filename = f"profile_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join("profile_pictures", filename)
-
-        from django.core.files.storage import default_storage
 
         saved_path = default_storage.save(filepath, file)
         file_url = request.build_absolute_uri(f"/media/{saved_path}")

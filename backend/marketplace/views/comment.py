@@ -6,7 +6,11 @@ from rest_framework.response import Response
 
 from marketplace.models import Comment
 from marketplace.serializers import CommentCreateSerializer, CommentSerializer
-from marketplace.services import create_comment, delete_comment, get_commentable_product
+from marketplace.services import (
+    create_comment,
+    delete_comment,
+    get_commentable_product,
+)
 
 
 @extend_schema_view(
@@ -81,6 +85,8 @@ class CommentViewSet(
                 pk=pk, product_id=product_pk
             )
         except Comment.DoesNotExist:
-            raise NotFound("Comentario no encontrado.")
+            # Fix B904: Usamos 'from None' para limpiar el encadenamiento
+            raise NotFound("Comentario no encontrado.") from None
+            
         delete_comment(comment, request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -9,8 +9,10 @@ ALLOWED_COMMENT_STATUSES = {"disponible", "en_proceso"}
 def get_commentable_product(product_id: int) -> Products:
     try:
         product = Products.objects.get(pk=product_id)
-    except Products.DoesNotExist:
-        raise NotFound("Producto no encontrado.")
+    except Products.DoesNotExist as err:
+        # Agregamos 'from err' o 'from None' para cumplir con B904
+        raise NotFound("Producto no encontrado.") from err
+        
     if product.status not in ALLOWED_COMMENT_STATUSES:
         raise NotFound("Producto no encontrado.")
     return product
