@@ -1,7 +1,7 @@
 'use client';
 
-import { useUserPoints } from '@/hooks/useUserPoints';
 import { useAuth } from '@/hooks/useAuth';
+import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { cn } from '@/lib/utils';
 
 interface PointsBalanceProps {
@@ -10,15 +10,18 @@ interface PointsBalanceProps {
 
 export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { points, isLoading, error, refetch } = useUserPoints(isAuthenticated, refreshTrigger);
+  const { levelProgression, isLoading, error, refetch } = useLevelProgression(
+    isAuthenticated,
+    refreshTrigger,
+  );
 
-  const isInitialLoading = authLoading || (isLoading && points === null && !error);
+  const isInitialLoading = authLoading || (isLoading && !levelProgression && !error);
 
   if (isInitialLoading) {
     return (
-      <div className="h-28 w-full animate-pulse rounded-2xl bg-gradient-to-r from-muted to-muted/50">
-        <div className="flex items-center justify-center h-full">
-          <div className="text-sm text-muted-fg">Cargando puntos...</div>
+      <div className="h-24 w-full animate-pulse rounded-lg bg-gradient-to-r from-slate-100 to-slate-50">
+        <div className="flex h-full items-center justify-center">
+          <div className="text-sm text-slate-500">Cargando puntos...</div>
         </div>
       </div>
     );
@@ -26,13 +29,13 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-lg bg-warning/5 border border-warning/20 p-4">
+      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
         <div className="flex items-start gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-sm text-fg font-medium">Usuario no autenticado</p>
-            <p className="mt-1 text-xs text-warning">
-              Inicia sesión para ver tus puntos acumulados
+            <p className="text-sm font-medium text-yellow-900">Usuario no autenticado</p>
+            <p className="mt-1 text-xs text-yellow-700">
+              Inicia sesion para ver tus puntos acumulados
             </p>
           </div>
         </div>
@@ -42,21 +45,25 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   if (error) {
     return (
-      <div className="rounded-lg bg-error/5 border border-error/20 p-4">
-        <p className="text-sm text-error font-medium">{error}</p>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="text-sm font-medium text-red-700">{error}</p>
         <button
           onClick={refetch}
           className={cn(
-            'mt-3 px-4 py-2 text-sm font-medium',
-            'rounded-md bg-error/10 text-error',
-            'hover:bg-error/20 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            'mt-3 rounded-md px-4 py-2 text-sm font-medium',
+            'bg-red-100 text-red-700',
+            'transition-colors hover:bg-red-200',
+            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
           )}
         >
           Reintentar
         </button>
       </div>
     );
+  }
+
+  if (!levelProgression) {
+    return null;
   }
 
   return (

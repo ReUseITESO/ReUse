@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: 'Plataforma compraventa de artículos de segunda mano para estudiantes del ITESO',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={cn('font-sans', inter.variable)}>
       <body className="bg-bg text-fg">

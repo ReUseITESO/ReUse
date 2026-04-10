@@ -30,6 +30,25 @@ export interface GamificationSummary {
   impact: EnvironmentImpact | null;
 }
 
+export interface UserPoints {
+  points: number;
+}
+
+export interface LevelDefinition {
+  name: string;
+  min_points: number;
+  icon: string;
+}
+
+export interface LevelProgression {
+  points: number;
+  current_level: LevelDefinition;
+  next_level: LevelDefinition | null;
+  progress_percent: number;
+  points_to_next_level: number;
+  is_max_level: boolean;
+}
+
 export interface BadgeWithStatus {
   id: number;
   name: string;
@@ -38,9 +57,6 @@ export interface BadgeWithStatus {
   rarity: string;
   points: number;
   earned_at: string | null;
-}
-export interface UserPoints {
-  points: number;
 }
 
 export type ChallengeType = 'donation' | 'exchange' | 'sale' | 'publish' | 'review';
@@ -74,4 +90,21 @@ export interface UserChallenge {
   start_date: string;
   end_date: string;
   is_expired: boolean;
+}
+export interface PointHistoryEntry {
+  id: number;
+  action: string;
+  action_display: string;
+  points: number;
+  reference_id: number | null;
+  reference_type: 'product' | 'transaction' | null;
+  reference_label: string | null;
+  created_at: string;
+}
+
+export interface PointsHistoryFilters {
+  start_date?: string;
+  end_date?: string;
+  action?: string;
+  ordering?: string;
 }

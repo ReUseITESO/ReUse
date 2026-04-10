@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const router = useRouter();
