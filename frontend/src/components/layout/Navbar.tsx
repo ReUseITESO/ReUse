@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -76,6 +77,7 @@ export default function Navbar() {
               >
                 <Bell className="h-5 w-5" />
               </button>
+              <ThemeToggle />
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
@@ -128,6 +130,7 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link
                 href="/auth/signin"
                 className="rounded-lg px-4 py-2 text-sm font-medium text-fg transition-colors hover:bg-muted"
@@ -144,17 +147,20 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => {
-            setMenuOpen(!menuOpen);
-            setProfileOpen(false);
-          }}
-          className="rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted md:hidden"
-          aria-label={menuOpen ? 'Cerrar menu' : 'Abrir menu'}
-        >
-          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile right */}
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <button
+            onClick={() => {
+              setMenuOpen(!menuOpen);
+              setProfileOpen(false);
+            }}
+            className="rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
+            aria-label={menuOpen ? 'Cerrar menu' : 'Abrir menu'}
+          >
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
