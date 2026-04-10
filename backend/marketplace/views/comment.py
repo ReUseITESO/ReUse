@@ -64,6 +64,7 @@ class CommentViewSet(
         return (
             Comment.objects.filter(product_id=product_pk)
             .select_related("author")
+            .exclude(author__is_deactivated=True)
             .order_by("created_at")
         )
 

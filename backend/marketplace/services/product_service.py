@@ -1,6 +1,9 @@
+from config.exception_handler import logger
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
+# Gamification imports
+from gamification.services.point_service import award_points
 from marketplace.models import Transaction
 
 VALID_STATUS_TRANSITIONS = {
@@ -82,6 +85,7 @@ def change_product_status(product, new_status, user):
             )
 
     allowed = VALID_STATUS_TRANSITIONS.get(product.status, [])
+
     if new_status not in allowed:
         raise ValidationError(
             {
@@ -93,6 +97,30 @@ def change_product_status(product, new_status, user):
 
     product.status = new_status
     product.save(update_fields=["status", "updated_at"])
+
+    # === GAMIFICATION: Award points for completing a sale/donation/swap ===
+
+    if new_status == "completado":
+        action_map = {
+            "donation": "complete_donation",
+            "sale": "complete_sale",
+            "swap": "complete_exchange",
+        }
+        action = action_map.get(product.transaction_type)
+        if action:
+            try:
+                award_points(
+                    user=product.seller,
+                    action=action,
+                    reference_id=product.id,
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error awarding points for product {product.id}: {str(e)}"
+                )
+
+        # ==========================================================================
+
     return product
 
 

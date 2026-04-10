@@ -36,7 +36,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: int | None = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.
@@ -135,11 +135,13 @@ class SignUpView(generics.CreateAPIView):
         user.email_verified_at = None
         user.save(update_fields=["is_active", "is_email_verified", "email_verified_at"])
 
-        # Genera token y manda correo
-        raw_token = create_email_verification_token(user)
+        # Genera token y manda correo — atómico para evitar token huérfano si falla el envío
+        from django.db import transaction as db_transaction
         frontend_base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3001")
-        verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
-        send_verification_email(user.email, verify_url)
+        with db_transaction.atomic():
+            raw_token = create_email_verification_token(user)
+            verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
+            send_verification_email(user.email, verify_url)
 
         return Response(
             {
@@ -195,6 +197,21 @@ class SignInView(APIView):
                     "error": {
                         "code": "ACCOUNT_DISABLED",
                         "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # HU-CORE-17: bloquear login si la cuenta fue desactivada lógicamente
+        if getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Revisa tu correo o solicita un enlace de reactivación en /api/auth/account/reactivate/send/"
+                        ),
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,
@@ -390,6 +407,7 @@ class UserSearchView(generics.ListAPIView):
                 | Q(last_name__icontains=query)
                 | Q(email__icontains=query),
                 is_active=True,
+                is_deactivated=False,
             )
             .exclude(id=self.request.user.id)
             .order_by("first_name")[:20]
@@ -526,6 +544,19 @@ class MicrosoftCallbackView(APIView):
                     "error": {
                         "code": "ACCOUNT_DISABLED",
                         "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        elif getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Solicita un enlace de reactivación en la pantalla de inicio de sesión."
+                        ),
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,
