@@ -4,7 +4,6 @@ import { useNotifications, useNotificationCount } from '@/hooks/useNotifications
 import NotificationItem from '@/components/notifications/NotificationItem';
 import Spinner from '@/components/ui/Spinner';
 import EmptyState from '@/components/ui/EmptyState';
-import { Bell } from 'lucide-react';
 
 export default function NotificationsPage() {
   const { data, loading, error, page, setPage, markRead, markAll } = useNotifications();

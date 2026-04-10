@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Gift, Star, ArrowLeftRight, Users, Heart, Share2 } from 'lucide-react';
+import { Bell, Gift, Star, ArrowLeftRight, Heart, Share2 } from 'lucide-react';
 import type { Notification, NotificationType } from '@/types/notification';
 
 const ICON_MAP: Record<NotificationType, React.ReactNode> = {

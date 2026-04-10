@@ -1,8 +1,8 @@
+from django.utils import timezone
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import serializers, status
-from django.utils import timezone
 
 from core.models.notification import Notification
 
@@ -19,6 +19,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 class NotificationListView(APIView):
     """GET /api/core/notifications/ — list notifications paginated, newest first."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -44,6 +45,7 @@ class NotificationListView(APIView):
 
 class NotificationCountView(APIView):
     """GET /api/core/notifications/count/ — unread count."""
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -53,6 +55,7 @@ class NotificationCountView(APIView):
 
 class NotificationMarkReadView(APIView):
     """PATCH /api/core/notifications/{id}/read/ — mark single as read."""
+
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
@@ -74,6 +77,7 @@ class NotificationMarkReadView(APIView):
 
 class NotificationMarkAllReadView(APIView):
     """POST /api/core/notifications/read-all/ — mark all as read."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
