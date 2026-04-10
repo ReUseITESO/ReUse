@@ -135,11 +135,13 @@ class SignUpView(generics.CreateAPIView):
         user.email_verified_at = None
         user.save(update_fields=["is_active", "is_email_verified", "email_verified_at"])
 
-        # Genera token y manda correo
-        raw_token = create_email_verification_token(user)
+        # Genera token y manda correo — atómico para evitar token huérfano si falla el envío
+        from django.db import transaction as db_transaction
         frontend_base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3001")
-        verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
-        send_verification_email(user.email, verify_url)
+        with db_transaction.atomic():
+            raw_token = create_email_verification_token(user)
+            verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
+            send_verification_email(user.email, verify_url)
 
         return Response(
             {

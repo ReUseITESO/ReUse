@@ -144,7 +144,12 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 // — HU-CORE-17: Desactivación / Reactivación de cuenta ──────────────────────
 
 export async function deactivateAccount(): Promise<void> {
-  await authFetch('/auth/account/deactivate/', { method: 'POST' });
+  const tokens = getStoredTokens();
+  await authFetch('/auth/account/deactivate/', {
+    method: 'POST',
+    body: JSON.stringify({ refresh: tokens?.refresh ?? null }),
+  });
+  clearTokens();
 }
 
 export async function requestReactivationEmail(email: string): Promise<void> {

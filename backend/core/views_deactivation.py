@@ -14,6 +14,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models.account_reactivation_token import AccountReactivationToken
 from .throttles import ReactivationRateThrottle
@@ -41,6 +43,14 @@ class AccountDeactivateView(APIView):
         user.is_deactivated = True
         user.deactivated_at = timezone.now()
         user.save(update_fields=["is_deactivated", "deactivated_at"])
+
+        # HU-CORE-17: invalidar refresh token para forzar cierre de sesión inmediato
+        refresh_token = request.data.get("refresh")
+        if refresh_token:
+            try:
+                RefreshToken(refresh_token).blacklist()
+            except TokenError:
+                pass
 
         return Response(
             {"message": "Cuenta desactivada correctamente."},
@@ -142,12 +152,14 @@ class AccountReactivateConfirmView(APIView):
 
         user = token_obj.user
 
-        token_obj.used_at = timezone.now()
-        token_obj.save(update_fields=["used_at"])
+        # HU-CORE-17: atómico — si falla el save del usuario, el token no queda marcado como usado
+        with transaction.atomic():
+            token_obj.used_at = timezone.now()
+            token_obj.save(update_fields=["used_at"])
 
-        user.is_deactivated = False
-        user.deactivated_at = None
-        user.save(update_fields=["is_deactivated", "deactivated_at"])
+            user.is_deactivated = False
+            user.deactivated_at = None
+            user.save(update_fields=["is_deactivated", "deactivated_at"])
 
         return Response(
             {
