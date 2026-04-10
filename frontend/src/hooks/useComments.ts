@@ -12,6 +12,7 @@ interface UseCommentsReturn {
   isLoading: boolean;
   isSubmitting: boolean;
   error: string | null;
+  loadMoreError: string | null;
   hasMore: boolean;
   loadMore: () => void;
   submitComment: (content: string) => Promise<void>;
@@ -26,6 +27,7 @@ export function useComments(productId: number): UseCommentsReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,13 +60,14 @@ export function useComments(productId: number): UseCommentsReturn {
 
   const loadMore = useCallback(async () => {
     const nextPage = page + 1;
+    setLoadMoreError(null);
     try {
       const data = await listComments(productId, nextPage);
       setComments(prev => [...prev, ...data.results]);
       setHasMore(data.next !== null);
       setPage(nextPage);
-    } catch {
-      // Silent fail on load more — existing comments remain visible
+    } catch (err) {
+      setLoadMoreError(err instanceof Error ? err.message : 'Error al cargar más comentarios');
     }
   }, [productId, page]);
 
@@ -97,6 +100,7 @@ export function useComments(productId: number): UseCommentsReturn {
     isLoading,
     isSubmitting,
     error,
+    loadMoreError,
     hasMore,
     loadMore,
     submitComment,

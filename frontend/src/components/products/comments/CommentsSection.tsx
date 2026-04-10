@@ -17,7 +17,7 @@ interface CommentsSectionProps {
 
 export default function CommentsSection({ productId, productSellerId }: CommentsSectionProps) {
   const { user, isAuthenticated } = useAuth();
-  const { comments, count, isLoading, isSubmitting, error, hasMore, loadMore, submitComment, removeComment } =
+  const { comments, count, isLoading, isSubmitting, error, loadMoreError, hasMore, loadMore, submitComment, removeComment } =
     useComments(productId);
 
   function canDeleteComment(authorId: number) {
@@ -67,6 +67,10 @@ export default function CommentsSection({ productId, productSellerId }: Comments
               onDelete={removeComment}
             />
           ))}
+
+          {loadMoreError && (
+            <p className="text-center text-sm text-error">{loadMoreError}</p>
+          )}
 
           {hasMore && (
             <div className="pt-2 text-center">
