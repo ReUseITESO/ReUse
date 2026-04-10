@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import type { Community } from '@/types/community';
 
-export function useCommunities() {
+interface UseCommunitiesOptions {
+  onlyJoined?: boolean;
+}
+
+export function useCommunities(options?: UseCommunitiesOptions) {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,8 +17,10 @@ export function useCommunities() {
     setIsLoading(true);
     setError(null);
     try {
+      // Add query parameter to filter for only joined communities
+      const params = options?.onlyJoined ? '?scope=joined' : '';
       const data = await apiClient<{ results: Community[] } | Community[]>(
-        '/social/communities/',
+        `/social/communities/${params}`,
       );
       const results = Array.isArray(data) ? data : data.results ?? [];
       setCommunities(results);
@@ -23,7 +29,7 @@ export function useCommunities() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [options?.onlyJoined]);
 
   useEffect(() => {
     fetch();

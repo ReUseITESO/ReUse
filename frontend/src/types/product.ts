@@ -6,6 +6,15 @@ export type TransactionType = 'donation' | 'sale' | 'swap';
 
 export type ProductReactionType = 'like' | 'dislike';
 
+export interface Community {
+  id: number;
+  name: string;
+  description: string;
+  icon?: string | null;
+  is_private: boolean;
+  is_active: boolean;
+}
+
 export interface ProductReactionSummary {
   likes_count: number;
   dislikes_count: number;
@@ -34,6 +43,7 @@ export interface Product {
   price: string | null;
   image_url: string;
   category: Category;
+  community?: Community | null;
   seller_id: number;
   seller_name: string;
   has_active_transaction: boolean;
@@ -69,6 +79,7 @@ export interface ProductCreatePayload {
   image_url?: string;
   category: number;
   images?: string[];
+  community?: number;
 }
 
 export interface ProductUpdatePayload {
@@ -104,6 +115,7 @@ export interface FormValues {
   price: string;
   image_url: string;
   images: string[];
+  community?: string;
 }
 
 export interface ChangeStatusResult {
@@ -113,4 +125,5 @@ export interface ChangeStatusResult {
 
 export interface ProductCardProps {
   product: Product;
+  showCommunityBadge?: boolean;
 }
