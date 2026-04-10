@@ -219,3 +219,6 @@ out/
 # Django migrations in backend (do not commit generated migration files)
 backend/**/migrations/*.py
 !backend/**/migrations/__init__.py
+
+# Not import to git the avatar images 
+backend/media/profile_pictures/*

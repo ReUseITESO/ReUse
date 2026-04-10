@@ -6,6 +6,7 @@ import { Camera } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { getStoredTokens } from '@/lib/auth';
 import type { User } from '@/types/auth';
+import { useAvatar } from '@/hooks/profile/useAvatar';
 
 interface ProfileFormValues {
   first_name: string;
@@ -26,6 +27,8 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
   const [picturePreview, setPicturePreview] = useState<string | null>(user.profile_picture);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {avatarData, setAvatarData, updateAvatar} = useAvatar();
+
 
   const {
     register,
@@ -47,6 +50,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
       return;
     }
     setPictureFile(file);
+    setAvatarData(prev => ({ ...prev, image: URL.createObjectURL(file) })); // Update avatar context for immediate preview
     setPicturePreview(URL.createObjectURL(file));
     setError(null);
   }
@@ -74,6 +78,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
     try {
       let pic = user.profile_picture;
       if (pictureFile) pic = await uploadPicture();
+      await updateAvatar({ ...avatarData, image: pic }); // Update avatar context immediately
       const updated = await apiClient<User>('/auth/profile/', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -105,7 +110,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
           onClick={() => fileInputRef.current?.click()}
         >
           {picturePreview ? (
-            <img src={picturePreview} alt="Preview" className="h-full w-full object-cover" />
+            <img src={avatarData.image} alt="Preview" className="h-full w-full object-cover" />
           ) : (
             <span className="text-2xl font-bold text-primary">
               {user.first_name?.charAt(0).toUpperCase()}

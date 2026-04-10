@@ -8,9 +8,11 @@ import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
 import type { User } from '@/types/auth';
+import { useAvatar } from '@/hooks/profile/useAvatar';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const {avatarData} = useAvatar();
   const [isEditing, setIsEditing] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const displayUser = localUser ?? user;
@@ -57,9 +59,9 @@ export default function ProfilePage() {
           ) : (
             <div className="flex items-start gap-6">
               <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {displayUser.profile_picture ? (
+                {avatarData.image ? (
                   <img
-                    src={displayUser.profile_picture}
+                    src={avatarData.image}
                     alt={displayUser.first_name}
                     className="h-20 w-20 rounded-full object-cover"
                   />
@@ -79,12 +81,6 @@ export default function ProfilePage() {
                       <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
                     )}
                   </div>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
-                  >
-                    <Pencil className="h-4 w-4" /> Editar perfil
-                  </button>
                   <div className="ml-auto flex items-center gap-2">
                     <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
                       <Pencil className="h-4 w-4" /> Editar Perfil

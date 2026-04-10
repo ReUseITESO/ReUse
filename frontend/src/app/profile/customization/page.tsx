@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { AvatarProvider } from '@/hooks/profile/useAvatar';
 // import { set } from 'react-hook-form';
 
 // import User from '@/types/auth';
@@ -29,10 +28,8 @@ export default function CustomizationPage() {
 
 				<div className="grid grid-cols-2 
 						gap-4 place-items-center">
-					<AvatarProvider>
-						<ProfilePicture/>
-						<ProfileBorderEditor/>
-					</AvatarProvider>
+					<ProfilePicture/>
+					<ProfileBorderEditor/>
 				</div>				
 			</div>
 		</main>

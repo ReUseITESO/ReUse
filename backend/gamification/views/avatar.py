@@ -15,22 +15,8 @@ class AvatarView(APIView):
   
 		try:
 			avatar, created = Avatar.objects.get_or_create(user=user)
-   
-			# # 3. Your debug prints
-			# print(f"--- Debugging Avatar for {user.username} ---")
-			# print(f"File path in DB: {avatar.image.name}")
-   
-			# Check if file actually exists on the server disk
-			file_exists = False
-			if avatar.image.name:
-				file_exists = avatar.image.storage.exists(avatar.image.name)
-			# print(f"File actually exists: {file_exists}")
-            
-			image_url = None
-			if avatar.image and file_exists:
-				image_url = avatar.image.url
 			avatar_data = {
-				"image": image_url,
+				"image": avatar.image,
 				"border_color": avatar.border_color,
 				"border_thickness": avatar.border_thickness,
 				"zoom_level": avatar.zoom_level,

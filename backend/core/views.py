@@ -544,4 +544,5 @@ class ProfilePictureUploadView(APIView):
         user.profile_picture = file_url
         user.save(update_fields=["profile_picture"])
 
+        print("Profile picture updated for user", user.id, "URL:", file_url)
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)

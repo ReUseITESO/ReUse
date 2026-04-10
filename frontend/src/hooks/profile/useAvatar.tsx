@@ -1,17 +1,19 @@
+'use client';
+
 // src/hooks/profile/useAvatar.tsx
 import { useState, useCallback, useEffect, createContext, useMemo, useContext } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient, getBackendUrl } from '@/lib/api';
 import { AvatarData } from '@/types/gamification';
 
 const defaultAvatarData = {
-  image: null,
+  image: '/../media/avatars/default.png',
   border_thickness: 10,
   border_color: "#000A9A",
   shadow_color: "#4e0072",
   shadow_thickness: 20,
   zoom_level: 1,
-  offset_x: 50,
-  offset_y: 50,
+  offset_x: -120,
+  offset_y: 0,
 };
 
 interface AvatarContextValue {
@@ -31,11 +33,13 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
 
   const fetchAvatar = useCallback(async () => {
     setIsLoading(true);
+
     try {
       // apiClient handles http://localhost:8000 and credentials/CSRF
       const data = await apiClient<Partial<AvatarData>>('/gamification/avatar/');
-
-      setAvatarData({...defaultAvatarData, ...data}); // Merge with defaults
+      console.log('Fetched avatar data:', data);
+      const image = data.image || getBackendUrl(defaultAvatarData.image);
+      setAvatarData({...defaultAvatarData, ...data, image}); // Merge with defaults
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading avatar');
     } finally {
@@ -49,6 +53,7 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
         method: 'POST',
         body: JSON.stringify(newData),
       });
+      console.log('new data:', await newData);
       setAvatarData(newData);
       return { success: true };
     } catch (err) {
