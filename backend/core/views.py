@@ -36,7 +36,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: int | None = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.

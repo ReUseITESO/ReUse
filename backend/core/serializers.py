@@ -1,9 +1,13 @@
 import html
 import re
+from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+
+if TYPE_CHECKING:
+    from core.models import User
 
 User = get_user_model()
 
@@ -24,7 +28,6 @@ def sanitize_phone(value: str) -> str:
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
     password = serializers.CharField(
         write_only=True,
         min_length=8,
