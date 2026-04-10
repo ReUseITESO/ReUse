@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+from . import views_notifications
 
 app_name = "auth"
 
@@ -45,4 +46,10 @@ urlpatterns = [
         views.MicrosoftCallbackView.as_view(),
         name="microsoft-callback",
     ),
+
+    # HU-CORE-14: Notifications
+    path("notifications/", views_notifications.NotificationListView.as_view(), name="notifications-list"),
+    path("notifications/count/", views_notifications.NotificationCountView.as_view(), name="notifications-count"),
+    path("notifications/read-all/", views_notifications.NotificationMarkAllReadView.as_view(), name="notifications-read-all"),
+    path("notifications/<int:pk>/read/", views_notifications.NotificationMarkReadView.as_view(), name="notifications-read"),
 ]

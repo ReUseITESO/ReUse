@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -70,12 +71,7 @@ export default function Navbar() {
               >
                 <Plus className="h-4 w-4" /> Publicar
               </Link>
-              <button
-                className="relative rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
-                aria-label="Notificaciones"
-              >
-                <Bell className="h-5 w-5" />
-              </button>
+              <NotificationBell />
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
@@ -184,9 +180,13 @@ export default function Navbar() {
                 >
                   <Plus className="h-5 w-5" /> Publicar item
                 </Link>
-                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted">
+                <Link
+                  href="/notifications"
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted"
+                >
                   <Bell className="h-5 w-5" /> Notificaciones
-                </button>
+                </Link>
               </>
             )}
           </div>

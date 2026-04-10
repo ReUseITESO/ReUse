@@ -1,6 +1,5 @@
 import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
-
 import type { PaginatedResponse } from '@/types/api';
 import type {
   CreateTransactionPayload,
@@ -8,6 +7,7 @@ import type {
   TransactionReview,
   UpdateTransactionStatusPayload,
 } from '@/types/transaction';
+import type { Notification, NotificationCount, PaginatedNotifications } from '@/types/notification';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
@@ -159,4 +159,23 @@ export async function deleteProductReaction(id: string | number): Promise<Produc
   return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
     method: 'DELETE',
   });
+}
+
+// ===== Notifications =====
+
+export async function getNotifications(page = 1): Promise<PaginatedNotifications> {
+  const query = page > 1 ? `?page=${page}` : '';
+  return apiClient<PaginatedNotifications>(`/core/notifications/${query}`);
+}
+
+export async function getNotificationCount(): Promise<NotificationCount> {
+  return apiClient<NotificationCount>('/core/notifications/count/');
+}
+
+export async function markNotificationRead(id: number): Promise<Notification> {
+  return apiClient<Notification>(`/core/notifications/${id}/read/`, { method: 'PATCH' });
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  return apiClient<void>('/core/notifications/read-all/', { method: 'POST' });
 }
