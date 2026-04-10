@@ -3,6 +3,7 @@ import { ArrowLeft, CircleCheckBig, Clock3, Mail, ShoppingBag } from 'lucide-rea
 import Button from '@/components/ui/Button';
 import ProductBasicDetails from '@/components/products/ProductBasicDetails';
 import ImageGallery from '@/components/products/ImageGallery';
+import ShareButton from '@/components/products/ShareButton';
 
 import { formatTimeAgo } from '@/lib/utils';
 
@@ -70,14 +71,17 @@ export default function ProductDetailContent({
             </p>
           </div>
 
-          <Button
-            className="inline-flex w-full items-center justify-center gap-2 px-6 py-3"
-            onClick={onMainAction}
-            disabled={!canCreateTransaction}
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {ctaLabel}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              className="inline-flex flex-1 items-center justify-center gap-2 px-6 py-3"
+              onClick={onMainAction}
+              disabled={!canCreateTransaction}
+            >
+              <ShoppingBag className="h-4 w-4" />
+              {ctaLabel}
+            </Button>
+            <ShareButton productId={product.id} productTitle={product.title} />
+          </div>
 
           {transactionNotice && (
             <p className="inline-flex items-center gap-2 rounded-lg border border-info/30 bg-info/10 px-3 py-2 text-sm text-info">

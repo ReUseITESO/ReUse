@@ -265,6 +265,46 @@ La paginación está configurada a **20 elementos por página**.
 
 ---
 
+#### Comments
+
+Public comments on a product. Reading is open to all; posting and deleting require authentication.
+
+| Método   | Endpoint                                                         | Auth     | Descripción                                              |
+| -------- | ---------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `GET`  | `/api/marketplace/products/{id}/comments/`                     | No       | Lista comentarios del producto (paginado, cronológico) |
+| `POST` | `/api/marketplace/products/{id}/comments/`                     | Required | Crea un comentario en el producto                        |
+| `DELETE` | `/api/marketplace/products/{id}/comments/{comment_id}/`        | Required | Elimina un comentario (autor o dueño del producto)      |
+
+**Request body (POST):**
+```json
+{ "content": "¿Todavía está disponible?" }
+```
+
+**Response (POST 201 / GET item):**
+```json
+{
+  "id": 42,
+  "author": {
+    "id": 7,
+    "name": "Luis Buyer",
+    "avatar": null
+  },
+  "content": "¿Todavía está disponible?",
+  "created_at": "2026-04-07T15:30:00Z"
+}
+```
+
+**Validation:**
+- `content` is required, non-empty (after trimming), max 500 characters.
+- Product must have status `disponible` or `en_proceso`.
+
+**Permissions:**
+- `GET`: public (no auth required).
+- `POST`: any authenticated user.
+- `DELETE`: comment author OR product seller. Returns 403 otherwise.
+
+---
+
 #### Parámetros de búsqueda y filtros
 
 ##### `search` — Búsqueda por palabra clave

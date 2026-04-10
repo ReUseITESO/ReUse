@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from marketplace.models import Images, Products
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 from marketplace.services.transaction_service import has_active_transaction
 
 
@@ -13,13 +14,16 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "order_number"]
 
 
-class ProductListSerializer(serializers.ModelSerializer):
+class ProductListSerializer(ReactionSerializerFieldsMixin, serializers.ModelSerializer):
     """Serializer for the product list (Object -> JSON)."""
 
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
     has_active_transaction = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         return obj.seller.get_full_name()
@@ -42,6 +46,9 @@ class ProductListSerializer(serializers.ModelSerializer):
             "seller_name",
             "seller_id",
             "has_active_transaction",
+            "likes_count",
+            "dislikes_count",
+            "user_reaction",
             "created_at",
             "updated_at",
         ]

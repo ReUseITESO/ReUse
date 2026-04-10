@@ -1,6 +1,8 @@
 import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
+import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
 
 import type { PaginatedResponse } from '@/types/api';
+import type { Comment } from '@/types/comment';
 import type {
   CreateTransactionPayload,
   Transaction,
@@ -117,6 +119,24 @@ export async function updateTransactionStatus(
   });
 }
 
+// ===== Marketplace Comments =====
+
+export async function listComments(productId: number, page = 1) {
+  const query = page > 1 ? `?page=${page}` : '';
+  return apiClient<PaginatedResponse<Comment>>(
+    `/marketplace/products/${productId}/comments/${query}`,
+  );
+}
+
+export async function createComment(productId: number, content: string) {
+  return apiClient<Comment>(`/marketplace/products/${productId}/comments/`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function deleteComment(productId: number, commentId: number) {
+  return apiClient<null>(`/marketplace/products/${productId}/comments/${commentId}/`, {
 // ===== Transactions =====
 
 export async function getTransactionHistory(params?: {
@@ -142,4 +162,20 @@ export async function submitTransactionReview(
     method: 'POST',
     body: JSON.stringify(payload),
   }) as Promise<TransactionReview>;
+}
+
+export async function postProductReaction(
+  id: string | number,
+  type: ProductReactionType,
+): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'POST',
+    body: JSON.stringify({ type }),
+  });
+}
+
+export async function deleteProductReaction(id: string | number): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'DELETE',
+  });
 }

@@ -6,9 +6,12 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework import serializers as drf_serializers
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -16,10 +19,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.models.notification import Notification
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
+from social.models import UserConnection
 
 from .models.email_verification import EmailVerificationToken
 from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
@@ -354,6 +359,43 @@ class EmailVerificationConfirmView(APIView):
         )
 
 
+# ── User Search ──────────────────────────────────────────
+
+
+class UserSearchView(generics.ListAPIView):
+    """GET /api/auth/users/search/?q=query — search users by name or email."""
+
+    permission_classes = [IsAuthenticated]
+
+    class UserSearchSerializer(drf_serializers.ModelSerializer):
+        full_name = drf_serializers.SerializerMethodField()
+
+        class Meta:
+            model = User
+            fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+            read_only_fields = fields
+
+        def get_full_name(self, obj):
+            return obj.get_full_name()
+
+    serializer_class = UserSearchSerializer
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "").strip()
+        if len(query) < 2:
+            return User.objects.none()
+        return (
+            User.objects.filter(
+                Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(email__icontains=query),
+                is_active=True,
+            )
+            .exclude(id=self.request.user.id)
+            .order_by("first_name")[:20]
+        )
+
+
 # ── Dashboard (HU-CORE-04) ───────────────────────────────
 
 
@@ -383,9 +425,19 @@ class DashboardView(APIView):
             user_products = user_qs[:3]
             user_points = getattr(request.user, "points", 0)
 
+        serializer_context = {"request": request}
+
         data = {
-            "recent_products": ProductListSerializer(recent_products, many=True).data,
-            "user_products": ProductListSerializer(user_products, many=True).data,
+            "recent_products": ProductListSerializer(
+                recent_products,
+                many=True,
+                context=serializer_context,
+            ).data,
+            "user_products": ProductListSerializer(
+                user_products,
+                many=True,
+                context=serializer_context,
+            ).data,
             "user_products_count": user_products_count,
             "active_transactions_count": 0,
             "gamification": {
@@ -534,8 +586,6 @@ class ProfilePictureUploadView(APIView):
         filename = f"profile_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join("profile_pictures", filename)
 
-        from django.core.files.storage import default_storage
-
         saved_path = default_storage.save(filepath, file)
         file_url = request.build_absolute_uri(f"/media/{saved_path}")
 
@@ -544,3 +594,66 @@ class ProfilePictureUploadView(APIView):
         user.save(update_fields=["profile_picture"])
 
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
+
+
+# ── Share Item with Friends (HU-CORE-12) ─────────────────
+
+
+class ShareItemView(APIView):
+    """POST /api/auth/shares/ — share a product with friends via notifications."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        product_id = request.data.get("product_id")
+        friend_ids = request.data.get("friend_ids", [])
+
+        if not product_id:
+            return Response(
+                {"error": {"code": "MISSING_FIELD", "message": "product_id es requerido."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not friend_ids or not isinstance(friend_ids, list):
+            return Response(
+                {"error": {"code": "MISSING_FIELD", "message": "friend_ids es requerido (lista de IDs)."}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            product = Products.objects.get(pk=product_id, status="disponible")
+        except Products.DoesNotExist:
+            return Response(
+                {"error": {"code": "NOT_FOUND", "message": "Producto no encontrado o no disponible."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        user = request.user
+        accepted_connections = UserConnection.objects.filter(
+            Q(requester=user, status="accepted") | Q(addressee=user, status="accepted")
+        )
+        connected_ids = set()
+        for conn in accepted_connections:
+            connected_ids.add(conn.requester_id if conn.addressee_id == user.id else conn.addressee_id)
+
+        invalid_ids = [fid for fid in friend_ids if fid not in connected_ids]
+        if invalid_ids:
+            return Response(
+                {"error": {"code": "NOT_FRIENDS", "message": f"No eres amigo de los usuarios: {invalid_ids}"}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        notifications = []
+        for fid in friend_ids:
+            notifications.append(Notification(
+                user_id=fid,
+                type="shared_item",
+                title=f"{user.get_full_name()} te compartio un producto",
+                body=product.title,
+                reference_id=product.id,
+            ))
+        Notification.objects.bulk_create(notifications)
+
+        return Response(
+            {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
+            status=status.HTTP_201_CREATED,
+        )
