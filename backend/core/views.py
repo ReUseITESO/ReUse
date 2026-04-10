@@ -10,7 +10,8 @@ from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework import generics, serializers as drf_serializers, status
+from rest_framework import generics, status
+from rest_framework import serializers as drf_serializers
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
