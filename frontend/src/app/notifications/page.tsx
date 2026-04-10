@@ -39,9 +39,7 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      {error && (
-        <p className="text-center text-sm text-error">{error}</p>
-      )}
+      {error && <p className="text-center text-sm text-error">{error}</p>}
 
       {!loading && !error && data && (
         <>

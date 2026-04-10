@@ -46,9 +46,7 @@ export default function NotificationItem({ notification, onMarkRead }: Props) {
         {body && <p className="mt-0.5 text-xs text-muted-fg line-clamp-2">{body}</p>}
         <p className="mt-1 text-xs text-muted-fg">{timeAgo(created_at)}</p>
       </div>
-      {!is_read && (
-        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-      )}
+      {!is_read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
     </button>
   );
 }
