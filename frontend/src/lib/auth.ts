@@ -1,5 +1,13 @@
 import type { AuthResponse, SignInRequest, SignUpRequest, User, AuthTokens } from '@/types/auth';
 
+type SignUpResponse = Record<string, unknown>;
+type SignUpErrorResponse = {
+  error?: {
+    message?: string;
+    details?: Record<string, string[]>;
+  };
+};
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 const ACCESS_KEY = 'reuse_access_token';
@@ -55,7 +63,10 @@ async function authFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
 
   if (response.status === 429) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {
@@ -98,7 +109,10 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 
   if (response.status === 429) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {
@@ -112,17 +126,20 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<any> {
+export async function signUp(payload: SignUpRequest): Promise<SignUpResponse> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
   });
 
-  const body = await response.json().catch(() => ({}));
+  const body = (await response.json().catch(() => ({}))) as SignUpResponse & SignUpErrorResponse;
 
   if (response.status === 429) {
-    throw new Error(body?.error?.message ?? 'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.');
+    throw new Error(
+      body?.error?.message ??
+        'Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.',
+    );
   }
 
   if (!response.ok) {

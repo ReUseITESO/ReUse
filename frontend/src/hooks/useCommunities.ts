@@ -13,8 +13,11 @@ export function useCommunities() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient<{ results: Community[] }>('/communities/');
-      setCommunities(data.results);
+      const data = await apiClient<{ results: Community[] } | Community[]>(
+        '/social/communities/',
+      );
+      const results = Array.isArray(data) ? data : data.results ?? [];
+      setCommunities(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar comunidades');
     } finally {
@@ -28,7 +31,7 @@ export function useCommunities() {
 
   async function createCommunity(name: string, description: string): Promise<string | null> {
     try {
-      await apiClient('/communities/', {
+      await apiClient('/social/communities/', {
         method: 'POST',
         body: JSON.stringify({ name, description }),
       });
