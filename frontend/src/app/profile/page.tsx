@@ -154,7 +154,7 @@ export default function ProfilePage() {
             <h2 className="text-h3 font-semibold text-fg mb-1">Zona de peligro</h2>
             <p className="text-sm text-muted-fg mb-4">
               Al desactivar tu cuenta dejarás de aparecer en la plataforma. Podrás reactivarla en
-              cualquier momento desde el correo que te enviaremos.
+              cualquier momento solicitando un correo de reactivación.
             </p>
             <button
               onClick={() => { setDeactivateError(''); setShowDeactivateModal(true); }}
@@ -173,8 +173,8 @@ export default function ProfilePage() {
           <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
             <h3 className="text-h3 font-bold text-fg mb-2">¿Desactivar tu cuenta?</h3>
             <p className="text-sm text-muted-fg mb-4">
-              Tu cuenta quedará desactivada y cerraremos tu sesión. Te enviaremos un correo con un
-              enlace para reactivarla cuando quieras.
+              Tu cuenta quedará desactivada y cerraremos tu sesión. Para reactivarla, podrás
+              solicitar un correo con enlace de reactivación cuando quieras.
             </p>
 
             {deactivateError && (
