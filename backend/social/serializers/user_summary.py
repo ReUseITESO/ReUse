@@ -19,3 +19,14 @@ class SocialUserSummarySerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj: User) -> str:
         return obj.get_full_name()
+
+    # HU-CORE-17: ocultar datos personales de usuarios desactivados
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if getattr(instance, "is_deactivated", False):
+            data["first_name"] = "Usuario"
+            data["last_name"] = "Desactivado"
+            data["full_name"] = "Usuario Desactivado"
+            data["email"] = ""
+            data["profile_picture"] = None
+        return data

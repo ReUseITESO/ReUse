@@ -10,6 +10,19 @@ type SignUpErrorResponse = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
+/**
+ * HU-CORE-17: Error con código de API para distinguir tipos de fallo.
+ * Extiende Error para mantener compatibilidad con código existente.
+ */
+export class ApiError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+  }
+}
+
 const ACCESS_KEY = 'reuse_access_token';
 const REFRESH_KEY = 'reuse_refresh_token';
 
@@ -117,13 +130,52 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message = body?.error?.message ?? 'Correo o contraseña incorrectos.';
-    throw new Error(message);
+    const code: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'Correo o contraseña incorrectos.';
+    // Lanzar ApiError para que el llamador pueda distinguir por código
+    throw new ApiError(message, code);
   }
 
   const data: AuthResponse = await response.json();
   storeTokens(data.tokens);
   return data;
+}
+
+// — HU-CORE-17: Desactivación / Reactivación de cuenta ──────────────────────
+
+export async function deactivateAccount(): Promise<void> {
+  const tokens = getStoredTokens();
+  await authFetch('/auth/account/deactivate/', {
+    method: 'POST',
+    body: JSON.stringify({ refresh: tokens?.refresh ?? null }),
+  });
+  clearTokens();
+}
+
+export async function requestReactivationEmail(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/account/reactivate/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Error al enviar el correo de reactivación.');
+  }
+}
+
+export async function confirmReactivation(token: string): Promise<{ message: string; email: string }> {
+  const response = await fetch(
+    `${API_BASE}/auth/account/reactivate/confirm/?token=${encodeURIComponent(token)}`,
+    { method: 'GET', headers: { Accept: 'application/json' } },
+  );
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    const code: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'No se pudo reactivar la cuenta.';
+    throw new ApiError(message, code);
+  }
+  return body;
 }
 
 export async function signUp(payload: SignUpRequest): Promise<SignUpResponse> {

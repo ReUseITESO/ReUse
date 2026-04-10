@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { getMicrosoftAuthUrl } from '@/lib/auth';
+import { getMicrosoftAuthUrl, requestReactivationEmail, ApiError } from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -15,6 +15,10 @@ export default function SignInPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
+
+  // HU-CORE-17: estado para mostrar el panel de cuenta desactivada
+  const [deactivatedEmail, setDeactivatedEmail] = useState<string | null>(null);
+  const [isSendingReactivation, setIsSendingReactivation] = useState(false);
 
   async function handleMicrosoftSignIn() {
     setError('');
@@ -28,6 +32,21 @@ export default function SignInPage() {
     }
   }
 
+  // HU-CORE-17: solicitar email de reactivación y redirigir
+  async function handleRequestReactivation() {
+    if (!deactivatedEmail) return;
+    setIsSendingReactivation(true);
+    try {
+      await requestReactivationEmail(deactivatedEmail);
+      router.push('/auth/reactivate-notice');
+    } catch {
+      setError('No se pudo enviar el correo de reactivación. Intenta de nuevo.');
+      setDeactivatedEmail(null);
+    } finally {
+      setIsSendingReactivation(false);
+    }
+  }
+
   if (isAuthenticated) {
     router.replace('/products');
     return null;
@@ -36,6 +55,7 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setDeactivatedEmail(null);
 
     if (!email.trim() || !password) {
       setError('Todos los campos son obligatorios.');
@@ -47,7 +67,12 @@ export default function SignInPage() {
       await signIn({ email: email.trim().toLowerCase(), password });
       router.push('/products');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
+      // HU-CORE-17: detectar cuenta desactivada por código de error
+      if (err instanceof ApiError && err.code === 'ACCOUNT_DEACTIVATED') {
+        setDeactivatedEmail(email.trim().toLowerCase());
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -69,6 +94,37 @@ export default function SignInPage() {
         {error && (
           <div className="mb-4 rounded-lg border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">
             {error}
+          </div>
+        )}
+
+        {/* HU-CORE-17: Panel de cuenta desactivada */}
+        {deactivatedEmail && (
+          <div className="mb-4 rounded-lg border border-warning/30 bg-warning/5 px-5 py-4">
+            <p className="font-semibold text-fg mb-1">Cuenta desactivada</p>
+            <p className="text-sm text-muted-fg mb-4">
+              Tu cuenta está desactivada. ¿Deseas reactivarla? Te enviaremos un correo con un
+              enlace para recuperar el acceso.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleRequestReactivation}
+                disabled={isSendingReactivation}
+                className="flex-1 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium
+                           text-btn-primary-fg transition-colors hover:bg-primary-hover disabled:opacity-50"
+              >
+                {isSendingReactivation ? 'Enviando…' : 'Reactivar por correo'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeactivatedEmail(null)}
+                disabled={isSendingReactivation}
+                className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium
+                           text-fg transition-colors hover:bg-muted disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         )}
 
