@@ -20,7 +20,7 @@ export function useFriends() {
       const data = await apiClient<{ results: UserConnection[] } | UserConnection[]>(
         '/social/connections/',
       );
-      const results = Array.isArray(data) ? data : data.results ?? [];
+      const results = Array.isArray(data) ? data : (data.results ?? []);
       setConnections(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar conexiones');
