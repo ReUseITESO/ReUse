@@ -32,6 +32,7 @@ const TRANSACTION_TYPES = [
 const ORDERING_OPTIONS = [
   { value: '', label: 'Más recientes primero' },
   { value: 'created_at', label: 'Más antiguos primero' },
+  { value: '-likes_count', label: 'Más populares' },
   { value: 'price', label: 'Precio: menor a mayor' },
   { value: '-price', label: 'Precio: mayor a menor' },
   { value: 'title', label: 'Nombre: A → Z' },

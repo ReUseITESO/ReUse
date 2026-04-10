@@ -1,4 +1,4 @@
-export interface FriendUser {
+export interface SocialUser {
   id: number;
   email: string;
   first_name: string;
@@ -7,15 +7,17 @@ export interface FriendUser {
   profile_picture: string | null;
 }
 
-export interface FriendRequest {
+export interface UserConnection {
   id: number;
-  from_user: FriendUser;
-  to_user: FriendUser;
-  status: 'pending' | 'accepted' | 'rejected';
+  requester: SocialUser;
+  addressee: SocialUser;
+  status: 'pending' | 'accepted' | 'rejected' | 'blocked';
   created_at: string;
+  updated_at: string;
 }
 
-export interface FriendsListResponse {
-  count: number;
-  results: FriendUser[];
+export interface FrequentContact {
+  id: number;
+  contact: SocialUser;
+  created_at: string;
 }

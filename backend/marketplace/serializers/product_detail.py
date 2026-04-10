@@ -3,17 +3,26 @@ from rest_framework import serializers
 from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
 from marketplace.serializers.product import ImageSerializer
+from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 from marketplace.services.transaction_service import has_active_transaction
 
 
-class ProductDetailSerializer(serializers.ModelSerializer):
+class ProductDetailSerializer(
+    ReactionSerializerFieldsMixin, serializers.ModelSerializer
+):
     """Serializer for product detail view with full information including images."""
 
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
+    
+    seller_id = serializers.IntegerField(source="seller.id", read_only=True)
     seller_email = serializers.SerializerMethodField()
+
     images = ImageSerializer(many=True, read_only=True)
     has_active_transaction = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         # HU-CORE-17: ocultar nombre si el vendedor está desactivado
@@ -43,8 +52,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "image_url",
             "category",
             "seller_name",
+            "seller_id",
             "seller_email",
             "has_active_transaction",
+            "likes_count",
+            "dislikes_count",
+            "user_reaction",
             "created_at",
             "images",
         ]

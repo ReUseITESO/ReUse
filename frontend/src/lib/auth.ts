@@ -1,5 +1,13 @@
 import type { AuthResponse, SignInRequest, SignUpRequest, User, AuthTokens } from '@/types/auth';
 
+type SignUpResponse = Record<string, unknown>;
+type SignUpErrorResponse = {
+  error?: {
+    message?: string;
+    details?: Record<string, string[]>;
+  };
+};
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 /**
@@ -133,7 +141,7 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-// ── HU-CORE-17: Desactivación / Reactivación de cuenta ──────────────────────
+// — HU-CORE-17: Desactivación / Reactivación de cuenta ──────────────────────
 
 export async function deactivateAccount(): Promise<void> {
   await authFetch('/auth/account/deactivate/', { method: 'POST' });
@@ -165,14 +173,14 @@ export async function confirmReactivation(token: string): Promise<{ message: str
   return body;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<unknown> {
+export async function signUp(payload: SignUpRequest): Promise<SignUpResponse> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
   });
 
-  const body = await response.json().catch(() => ({}));
+  const body = (await response.json().catch(() => ({}))) as SignUpResponse & SignUpErrorResponse;
 
   if (response.status === 429) {
     throw new Error(
