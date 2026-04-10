@@ -131,9 +131,15 @@ class SignInSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    """Serializer público del perfil de usuario."""
+    """
+    Serializer público del perfil de usuario.
+    HU-CORE-17: si el usuario tiene is_deactivated=True, retorna un perfil
+    anónimo ("cuenta desactivada") sin exponer datos personales ni foto.
+    """
 
     full_name = serializers.SerializerMethodField()
+    # HU-CORE-17: visible para que el frontend y otros módulos puedan reaccionar
+    is_deactivated = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
@@ -148,11 +154,30 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "profile_picture",
             "date_joined",
             "last_login",
+            "is_deactivated",
         ]
-        read_only_fields = ["id", "email", "points", "date_joined", "last_login"]
+        read_only_fields = ["id", "email", "points", "date_joined", "last_login", "is_deactivated"]
 
     def get_full_name(self, obj: User) -> str:
         return obj.get_full_name()
+
+    def to_representation(self, instance):
+        """
+        HU-CORE-17: si la cuenta está desactivada, enmascaramos los datos personales.
+        El id y is_deactivated se exponen para que otros módulos puedan detectar el estado.
+        """
+        data = super().to_representation(instance)
+
+        if getattr(instance, "is_deactivated", False):
+            data["first_name"] = "Usuario"
+            data["last_name"] = "Desactivado"
+            data["full_name"] = "Usuario con cuenta desactivada"
+            data["email"] = ""
+            data["phone"] = ""
+            data["profile_picture"] = None
+            data["points"] = 0
+
+        return data
 
     def validate_first_name(self, value: str) -> str:
         return sanitize_string(value)

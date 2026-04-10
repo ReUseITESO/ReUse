@@ -175,7 +175,7 @@ class ProductViewSet(
                 else:
                     return Products.objects.none()
             else:
-                queryset = queryset.filter(status="disponible")
+                queryset = queryset.filter(status="disponible").exclude(seller__is_deactivated=True)
 
         category_id = self.request.query_params.get("category")
         if category_id:

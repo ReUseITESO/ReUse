@@ -31,8 +31,11 @@ class UserConnectionViewSet(
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserConnection.objects.select_related("requester", "addressee").filter(
-            Q(requester=self.request.user) | Q(addressee=self.request.user)
+        return (
+            UserConnection.objects.select_related("requester", "addressee")
+            .filter(Q(requester=self.request.user) | Q(addressee=self.request.user))
+            .exclude(requester__is_deactivated=True)
+            .exclude(addressee__is_deactivated=True)
         )
 
     def get_serializer_class(self):

@@ -43,6 +43,10 @@ class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(blank=True, null=True)
 
+    # HU-CORE-17: logical account deactivation (no physical delete)
+    is_deactivated = models.BooleanField(default=False)
+    deactivated_at = models.DateTimeField(blank=True, null=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 

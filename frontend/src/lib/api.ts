@@ -137,6 +137,10 @@ export async function createComment(productId: number, content: string) {
 
 export async function deleteComment(productId: number, commentId: number) {
   return apiClient<null>(`/marketplace/products/${productId}/comments/${commentId}/`, {
+    method: 'DELETE',
+  });
+}
+
 // ===== Transactions =====
 
 export async function getTransactionHistory(params?: {
