@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  Send,
-  Users,
-  LogOut,
-  Trash2,
-  Crown,
-  UserPlus,
-} from 'lucide-react';
+import { ArrowLeft, Send, Users, LogOut, Trash2, Crown, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -184,9 +176,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                           {post.author_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {post.author_name}
-                          </p>
+                          <p className="text-sm font-medium text-gray-900">{post.author_name}</p>
                           <p className="text-xs text-gray-400">
                             {new Date(post.created_at).toLocaleDateString('es-MX', {
                               day: 'numeric',

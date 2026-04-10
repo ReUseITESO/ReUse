@@ -23,7 +23,7 @@ export function useCommunityDetail(id: string) {
         const postsData = await apiClient<{ results: CommunityPost[] } | CommunityPost[]>(
           '/social/posts/',
         );
-        const allPosts = Array.isArray(postsData) ? postsData : postsData.results ?? [];
+        const allPosts = Array.isArray(postsData) ? postsData : (postsData.results ?? []);
         setPosts(allPosts.filter(p => String(p.community) === id));
       } catch {
         setPosts([]);
