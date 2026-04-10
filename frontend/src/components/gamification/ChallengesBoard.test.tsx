@@ -81,7 +81,9 @@ describe('ChallengesBoard', () => {
     render(React.createElement(ChallengesBoard));
 
     expect(screen.getByText('Retos')).toBeInTheDocument();
-    expect(screen.getByText('Inicia sesión para ver y participar en retos activos.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Inicia sesión para ver y participar en retos activos.'),
+    ).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
