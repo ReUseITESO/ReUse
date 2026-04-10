@@ -371,7 +371,14 @@ class UserSearchView(generics.ListAPIView):
 
         class Meta:
             model = User
-            fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+            fields = [
+                "id",
+                "email",
+                "first_name",
+                "last_name",
+                "full_name",
+                "profile_picture",
+            ]
             read_only_fields = fields
 
         def get_full_name(self, obj):
@@ -611,12 +618,22 @@ class ShareItemView(APIView):
 
         if not product_id:
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "product_id es requerido."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "product_id es requerido.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not friend_ids or not isinstance(friend_ids, list):
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "friend_ids es requerido (lista de IDs)."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "friend_ids es requerido (lista de IDs).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -624,7 +641,12 @@ class ShareItemView(APIView):
             product = Products.objects.get(pk=product_id, status="disponible")
         except Products.DoesNotExist:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Producto no encontrado o no disponible."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Producto no encontrado o no disponible.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -634,24 +656,33 @@ class ShareItemView(APIView):
         )
         connected_ids = set()
         for conn in accepted_connections:
-            connected_ids.add(conn.requester_id if conn.addressee_id == user.id else conn.addressee_id)
+            connected_ids.add(
+                conn.requester_id if conn.addressee_id == user.id else conn.addressee_id
+            )
 
         invalid_ids = [fid for fid in friend_ids if fid not in connected_ids]
         if invalid_ids:
             return Response(
-                {"error": {"code": "NOT_FRIENDS", "message": f"No eres amigo de los usuarios: {invalid_ids}"}},
+                {
+                    "error": {
+                        "code": "NOT_FRIENDS",
+                        "message": f"No eres amigo de los usuarios: {invalid_ids}",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         notifications = []
         for fid in friend_ids:
-            notifications.append(Notification(
-                user_id=fid,
-                type="shared_item",
-                title=f"{user.get_full_name()} te compartio un producto",
-                body=product.title,
-                reference_id=product.id,
-            ))
+            notifications.append(
+                Notification(
+                    user_id=fid,
+                    type="shared_item",
+                    title=f"{user.get_full_name()} te compartio un producto",
+                    body=product.title,
+                    reference_id=product.id,
+                )
+            )
         Notification.objects.bulk_create(notifications)
 
         return Response(

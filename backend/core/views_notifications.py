@@ -11,8 +11,14 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = [
-            "id", "type", "title", "body",
-            "reference_id", "is_read", "read_at", "created_at",
+            "id",
+            "type",
+            "title",
+            "body",
+            "reference_id",
+            "is_read",
+            "read_at",
+            "created_at",
         ]
         read_only_fields = fields
 
@@ -29,18 +35,20 @@ class NotificationListView(APIView):
 
         qs = Notification.objects.filter(user=request.user).order_by("-created_at")
         total = qs.count()
-        notifications = qs[offset: offset + page_size]
+        notifications = qs[offset : offset + page_size]
 
         base_url = request.build_absolute_uri(request.path)
         next_url = f"{base_url}?page={page + 1}" if offset + page_size < total else None
         prev_url = f"{base_url}?page={page - 1}" if page > 1 else None
 
-        return Response({
-            "count": total,
-            "next": next_url,
-            "previous": prev_url,
-            "results": NotificationSerializer(notifications, many=True).data,
-        })
+        return Response(
+            {
+                "count": total,
+                "next": next_url,
+                "previous": prev_url,
+                "results": NotificationSerializer(notifications, many=True).data,
+            }
+        )
 
 
 class NotificationCountView(APIView):
@@ -63,7 +71,12 @@ class NotificationMarkReadView(APIView):
             notification = Notification.objects.get(pk=pk, user=request.user)
         except Notification.DoesNotExist:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Notificación no encontrada."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Notificación no encontrada.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
