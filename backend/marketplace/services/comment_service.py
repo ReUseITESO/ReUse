@@ -1,6 +1,5 @@
-from rest_framework.exceptions import NotFound, PermissionDenied
-
 from marketplace.models import Comment, Products
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 
 ALLOWED_COMMENT_STATUSES = {"disponible", "en_proceso"}
