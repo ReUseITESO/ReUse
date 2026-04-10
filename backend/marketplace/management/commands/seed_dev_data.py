@@ -686,69 +686,192 @@ class Command(BaseCommand):
     def _create_challenges(self):
         self.stdout.write("  Creando retos de gamificacion...")
         now = timezone.now()
-        challenges_data = [
-            {
-                "title": "Donate 3 items this week",
-                "description": "Complete 3 donation actions this week.",
-                "challenge_type": ChallengeType.DONATION,
-                "goal": 3,
-                "bonus_points": 30,
-                "start_date": now - timedelta(days=1),
-                "end_date": now + timedelta(days=7),
-                "is_active": True,
+        period_specs = {
+            "daily": {
+                "duration": timedelta(days=1, hours=4),
+                "start_offset": timedelta(hours=6),
             },
-            {
-                "title": "Complete 5 exchanges this month",
-                "description": "Complete 5 exchange actions this month.",
-                "challenge_type": ChallengeType.EXCHANGE,
-                "goal": 5,
-                "bonus_points": 50,
-                "start_date": now - timedelta(days=2),
-                "end_date": now + timedelta(days=30),
-                "is_active": True,
+            "weekly": {
+                "duration": timedelta(days=7, hours=6),
+                "start_offset": timedelta(days=1),
             },
+            "monthly": {
+                "duration": timedelta(days=30, hours=8),
+                "start_offset": timedelta(days=2),
+            },
+        }
+
+        challenge_catalog = [
             {
-                "title": "Publish 4 items this month",
-                "description": "Publish 4 items before the month ends.",
+                "period": "daily",
+                "title": "Publica 1 articulo util hoy",
+                "description": "Sube un articulo en buen estado con descripcion clara y foto para que alguien del campus pueda reutilizarlo hoy.",
                 "challenge_type": ChallengeType.PUBLISH,
-                "goal": 4,
-                "bonus_points": 25,
-                "start_date": now - timedelta(days=3),
-                "end_date": now + timedelta(days=30),
-                "is_active": True,
+                "goal": 1,
+                "bonus_points": 15,
             },
             {
-                "title": "Complete 2 sales this month",
-                "description": "Complete 2 sale actions this month.",
+                "period": "daily",
+                "title": "Concreta 2 ventas express",
+                "description": "Cierra dos ventas y acuerda puntos de entrega en ITESO para mover articulos rapidamente y con seguridad.",
                 "challenge_type": ChallengeType.SALE,
                 "goal": 2,
-                "bonus_points": 35,
-                "start_date": now - timedelta(days=3),
-                "end_date": now + timedelta(days=30),
-                "is_active": True,
+                "bonus_points": 18,
             },
             {
-                "title": "Get 5 positive reviews",
-                "description": "Receive 5 positive review actions.",
-                "challenge_type": ChallengeType.REVIEW,
-                "goal": 5,
+                "period": "daily",
+                "title": "Completa 2 intercambios inteligentes",
+                "description": "Intercambia dos articulos por cosas que realmente te sirvan y confirma las transacciones dentro de la app.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 2,
                 "bonus_points": 20,
-                "start_date": now - timedelta(days=3),
-                "end_date": now + timedelta(days=30),
-                "is_active": True,
+            },
+            {
+                "period": "daily",
+                "title": "Dona 2 articulos que ya no uses",
+                "description": "Entrega dos articulos funcionales que puedan tener segunda vida con otras personas de la comunidad ITESO.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 2,
+                "bonus_points": 22,
+            },
+            {
+                "period": "daily",
+                "title": "Gana 2 resenas positivas",
+                "description": "Brinda buenas experiencias en tus transacciones para recibir dos calificaciones positivas hoy.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 2,
+                "bonus_points": 16,
+            },
+            {
+                "period": "daily",
+                "title": "Publica 2 articulos de estudio",
+                "description": "Sube dos articulos academicos (libros, apuntes o material) con detalles suficientes para facilitar su reutilizacion.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 2,
+                "bonus_points": 24,
+            },
+            {
+                "period": "weekly",
+                "title": "Semana circular: publica 4 articulos",
+                "description": "Mantente activo durante la semana y publica cuatro articulos en categorias distintas del marketplace.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 4,
+                "bonus_points": 40,
+            },
+            {
+                "period": "weekly",
+                "title": "Vendedor confiable: completa 3 ventas",
+                "description": "Completa tres ventas en la semana manteniendo comunicacion clara y entregas acordadas.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 3,
+                "bonus_points": 45,
+            },
+            {
+                "period": "weekly",
+                "title": "Intercambio activo: 2 trueques cerrados",
+                "description": "Conecta con otros estudiantes y concreta dos intercambios que beneficien a ambas partes.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 2,
+                "bonus_points": 42,
+            },
+            {
+                "period": "weekly",
+                "title": "Solidaridad ITESO: dona 3 articulos",
+                "description": "Dona tres articulos en buen estado para apoyar a otras personas y reducir desperdicio en campus.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 3,
+                "bonus_points": 50,
+            },
+            {
+                "period": "weekly",
+                "title": "Reputacion en crecimiento: 3 resenas positivas",
+                "description": "Consigue tres resenas positivas durante la semana con entregas puntuales y trato amable.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 3,
+                "bonus_points": 36,
+            },
+            {
+                "period": "weekly",
+                "title": "Limpieza de closet: vende 2 articulos",
+                "description": "Activa tus articulos de ropa o accesorios y completa dos ventas durante la semana.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 2,
+                "bonus_points": 38,
+            },
+            {
+                "period": "monthly",
+                "title": "Mes sostenible: publica 10 articulos",
+                "description": "Construye un catalogo util para la comunidad publicando diez articulos durante el mes.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 10,
+                "bonus_points": 90,
+            },
+            {
+                "period": "monthly",
+                "title": "Mercado en movimiento: completa 8 ventas",
+                "description": "Ayuda a que mas objetos encuentren nuevo duenio completando ocho ventas en el mes.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 8,
+                "bonus_points": 95,
+            },
+            {
+                "period": "monthly",
+                "title": "Comunidad colaborativa: 6 intercambios",
+                "description": "Consolida habitos de reutilizacion cerrando seis intercambios con entregas confirmadas.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 6,
+                "bonus_points": 92,
+            },
+            {
+                "period": "monthly",
+                "title": "Impacto social: dona 8 articulos",
+                "description": "Dona articulos utiles para que sigan en uso y evita que terminen en desecho dentro de la comunidad.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 8,
+                "bonus_points": 105,
+            },
+            {
+                "period": "monthly",
+                "title": "Servicio top: 10 resenas positivas",
+                "description": "Gana diez resenas positivas en el mes ofreciendo experiencias de transaccion consistentes.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 10,
+                "bonus_points": 88,
+            },
+            {
+                "period": "monthly",
+                "title": "Recircula tecnologia: publica 5 articulos",
+                "description": "Publica al menos cinco articulos de tecnologia para impulsar su reutilizacion en la comunidad.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 5,
+                "bonus_points": 84,
             },
         ]
 
-        count = 0
-        for data in challenges_data:
-            _, created = Challenge.objects.update_or_create(
-                title=data["title"],
-                defaults=data,
-            )
-            if created:
-                count += 1
+        challenges_data = []
+        for index, challenge in enumerate(challenge_catalog):
+            spec = period_specs[challenge["period"]]
+            start_date = now - timedelta(minutes=30) - timedelta(minutes=index)
+            end_date = start_date + spec["duration"]
 
-        self.stdout.write(f"    {count} retos creados")
+            challenges_data.append(
+                {
+                    "title": challenge["title"],
+                    "description": challenge["description"],
+                    "challenge_type": challenge["challenge_type"],
+                    "goal": challenge["goal"],
+                    "bonus_points": challenge["bonus_points"],
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "is_active": True,
+                }
+            )
+
+        deleted_count, _ = Challenge.objects.all().delete()
+        Challenge.objects.bulk_create(Challenge(**data) for data in challenges_data)
+
+        self.stdout.write(f"    {deleted_count} retos eliminados")
+        self.stdout.write(f"    {len(challenges_data)} retos creados")
 
     def _create_transactions(self, users, products):
         self.stdout.write("  Creando transacciones...")
