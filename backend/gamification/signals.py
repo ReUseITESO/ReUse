@@ -96,3 +96,13 @@ def award_points_on_positive_review(sender, instance, created, **kwargs):
         )
     except ValidationError:
         return
+
+
+@receiver(post_save, sender=User)
+def user_post_save(sender, instance, created, **kwargs):
+    if created:
+        evaluate_milestones(instance)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "phone" in update_fields or "profile_picture" in update_fields:
+            evaluate_milestones(instance)
