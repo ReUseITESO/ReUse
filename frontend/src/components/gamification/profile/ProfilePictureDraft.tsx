@@ -1,99 +1,8 @@
-import Image from 'next/image';
 import ZoomSlider from '../../../components/ui/ZoomSlider';
 
 import { useAvatar } from '@/hooks/profile/useAvatar';
-
 import { AvatarData } from '../../../types/gamification';
-import { useState, useRef } from 'react';
-import { getImageUrl } from '@/lib/utils';
-import { Avatar } from 'radix-ui';
-
-function MovableAvatar() {
-	const { avatarData, setAvatarData } = useAvatar();
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [isDragging, setIsDragging] = useState(false);
-
-	const profileBorderStyle = getProfileBorderStyle(avatarData);
-	const profilePictureStyle = getProfilePictureStyle(avatarData.zoom_level, avatarData.offset_x, avatarData.offset_y);
-
-	const handlePointerMove = (e: React.PointerEvent) => {
-		if (!isDragging) return;
-		
-		// movementX/Y provides the delta since the last event
-		setAvatarData({
-			...avatarData,
-			offset_x: avatarData.offset_x + e.movementX/avatarData.zoom_level, // Adjust for zoom level
-			offset_y: avatarData.offset_y + e.movementY/avatarData.zoom_level, // Adjust for zoom level
-		});
-		
-	}
-
-	return (
-		<>
-			{/* Profile Border Container */}
-			<div 
-				id="profile-border" 
-				className="relative h-[400px] w-[400px] 
-							rounded-full overflow-hidden 
-							flex items-center justify-center"
-				style={{...profileBorderStyle, backgroundColor: avatarData.border_color}}
-				onPointerDown={() => setIsDragging(true)}
-				onPointerUp={() => setIsDragging(false)}
-				onPointerLeave={() => setIsDragging(false)}
-				onPointerMove={handlePointerMove}
-			>
-				{/* Background Color layer */}
-				<div className="absolute inset-0" style={avatarData.border_type == "custom" ? { backgroundColor: avatarData.border_color } : {backgroundColor: "#000000"}} />
-
-				{/* Image Container */}
-				<div 
-					ref={containerRef}>
-					<Image 
-						src={getImageUrl(avatarData.image)} 
-						alt="profile picture" 
-						fill
-						className="object-cover pointer-events-none"
-						style={profilePictureStyle}
-						unoptimized
-						draggable={true}
-					/>
-				</div>
-
-				{avatarData.border_type == "custom" ? (
-					/* 3. Border/Shadow Layer*/
-					<div 
-						className="absolute inset-0 rounded-full pointer-events-none" 
-						style={getProfileBorderStyle(avatarData)} />
-				): (
-					/* 4 Preset Border Layer */
-					<div className="absolute inset-0 rounded-full pointer-events-none">
-						<Image 
-							src={getImageUrl(`/media/avatars/borders/${avatarData.border_name}.png`)}
-							alt={avatarData.border_name || 'preset border'}
-							fill
-							className="object-contain p-1"	
-							unoptimized
-						/>
-					</div>
-				)}
-			</div>
-		</>
-	)
-}
-
-function getProfileBorderStyle(profileBorder: AvatarData) {
-	return {
-		boxShadow: `inset 0 0 0 ${profileBorder.border_thickness}px ${profileBorder.border_color}, ${profileBorder.shadow_color} 0px 0px ${profileBorder.shadow_thickness}px`,
-		//boxShadow: `${profileBorder.shadowColor} 0px 0px ${profileBorder.shadowWidth}px`,
-	}
-}
-
-function getProfilePictureStyle(zoomLevel: number, posX: number, posY: number) {
-	return {
-		transform: `scale(${zoomLevel})`, // For your zoom feature
-		objectPosition: `${posX}px ${posY}px` // For your positioning feature
-	}
-}
+import Avatar from '../../../components/gamification/profile/Avatar'
 
 export default function ProfilePictureDraft() {
 	const { avatarData, setAvatarData, isLoading: isLoadingAvatar , updateAvatar } = useAvatar();
@@ -110,13 +19,13 @@ export default function ProfilePictureDraft() {
 	return (
 		<article className="rounded-lg bg-gradient-to-br 
 							from-primary/5 to-primary/15 border 
-							border-primary/20 p-6 shadow-sm
+							border-primary/20 p-6 shadow-sm w-full h-full
 							w-full h-full flex flex-col items-center justify-center">
 								
-			<div className="flex items-center justify-center w-full h-full mx-[20px]">
-				<MovableAvatar/>
+			<div className="flex items-center justify-center aspect-square w-full mx-[20px] p-4">
+				<Avatar movable={true}/>
 			</div>
-			<div className="mt-4 text-center mx-[20px] w-full">
+			<div className="mt-4 text-center mx-[20px] w-full h-auto p-4">
 				<ZoomSlider 
 					zoom={avatarData.zoom_level} 
 					onChange={(newZoom) => setAvatarData((prev : AvatarData) => ({...prev, zoom_level: newZoom}))} />

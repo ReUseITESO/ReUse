@@ -26,7 +26,7 @@ export default function CustomizationPage() {
 						text-white ">
 				<h1 className="mb-8 text-h1 font-bold text-fg">Customizar el Perfil</h1>
 
-				<div className="grid grid-cols-2 
+				<div className="w-[1200px] h-[900px] p-[10px] grid grid-cols-2 
 						gap-4 place-items-center">
 					<ProfilePicture/>
 					<ProfileBorderEditor/>

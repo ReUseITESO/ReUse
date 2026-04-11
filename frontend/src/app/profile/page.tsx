@@ -8,12 +8,10 @@ import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
 import type { User } from '@/types/auth';
-import { useAvatar } from '@/hooks/profile/useAvatar';
-import { getImageUrl } from '@/lib/utils';
+import Avatar from '../../components/gamification/profile/Avatar'
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const {avatarData} = useAvatar();
   const [isEditing, setIsEditing] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const displayUser = localUser ?? user;
@@ -59,8 +57,8 @@ export default function ProfilePage() {
             />
           ) : (
             <div className="flex items-start gap-6">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {avatarData.image ? (
+              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                {/* {avatarData.image ? (
                   <img
                     src={getImageUrl(avatarData.image)}
                     alt={displayUser.first_name}
@@ -68,7 +66,8 @@ export default function ProfilePage() {
                   />
                 ) : (
                   displayUser.first_name?.charAt(0).toUpperCase()
-                )}
+                )} */}
+                <Avatar/>
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">

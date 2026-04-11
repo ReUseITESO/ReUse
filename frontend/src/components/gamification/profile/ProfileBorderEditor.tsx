@@ -4,12 +4,9 @@ import { useAvatar } from '@/hooks/profile/useAvatar';
 
 import { AvatarData } from '../../../types/gamification';
 import { useState } from 'react';
-import { useEffect } from 'react';
 
 import Image from 'next/image';
 import { getImageUrl } from '@/lib/utils';
-
-import { apiClient } from '@/lib/api';
 
 function CustomTab() {
 	const { avatarData, setAvatarData } = useAvatar();
@@ -35,7 +32,7 @@ function CustomTab() {
 			<Slider 
 				value={avatarData.shadow_thickness} 
 				onChange={(value: number) => setAvatarData( (prev : AvatarData) => ({...prev, shadow_thickness: value}))} 
-				min={0} max={50}/>
+				min={0} max={150}/>
 		</div>)
 }
 
