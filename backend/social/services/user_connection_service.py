@@ -17,6 +17,9 @@ def create_connection_request(requester, addressee_id: int) -> UserConnection:
     if addressee is None:
         raise ValidationError({"addressee_id": "User not found."})
 
+    if getattr(addressee, "is_deactivated", False):
+        raise ValidationError({"addressee_id": "User not found."})
+
     existing_connection = UserConnection.objects.filter(
         Q(requester=requester, addressee=addressee)
         | Q(requester=addressee, addressee=requester)

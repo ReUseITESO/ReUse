@@ -17,6 +17,7 @@ export function useCreateProduct() {
         const product = await apiClient<Product>('/marketplace/products/', {
           method: 'POST',
           body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' },
         });
         return product;
       } catch (err) {

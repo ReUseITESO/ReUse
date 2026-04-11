@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import ProductDetailContent from '@/components/products/ProductDetailContent';
+import CommentsSection from '@/components/products/comments/CommentsSection';
 import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import ReportProductDialog from '@/components/products/ReportProductDialog';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
@@ -152,6 +153,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         onMainAction={handleMainAction}
         onReport={() => setIsReportDialogOpen(true)}
       />
+
+      <div className="mx-auto mt-12 max-w-6xl border-t border-border pt-10">
+        <CommentsSection productId={product.id} productSellerId={product.seller_id} />
+      </div>
 
       <div className="mx-auto mt-4 flex max-w-6xl justify-end">
         <ProductReactionButtons

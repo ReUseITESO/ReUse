@@ -34,12 +34,7 @@ export default function ProductDetailContent({
 }: ProductDetailContentProps) {
   const timeAgo = formatTimeAgo(product.created_at);
 
-  const galleryImages =
-    product.images.length > 0
-      ? product.images.map(img => img.image_url)
-      : product.image_url
-        ? [product.image_url]
-        : [];
+  const galleryImages = product.images.length > 0 ? product.images.map(img => img.image_url) : [];
 
   return (
     <div className="mx-auto max-w-6xl">

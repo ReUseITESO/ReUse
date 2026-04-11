@@ -6,10 +6,13 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework import generics, serializers as drf_serializers, status
+from rest_framework import generics, status, viewsets
+from rest_framework import serializers as drf_serializers
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -17,15 +20,20 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.models.notification import Notification
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
-from core.models.notification import Notification
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
 from social.models import UserConnection
 
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
+from .serializers import (
+    NotificationSerializer,
+    SignInSerializer,
+    SignUpSerializer,
+    UserProfileSerializer,
+)
 
 User = get_user_model()
 
@@ -34,7 +42,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: int | None = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.
@@ -133,11 +141,14 @@ class SignUpView(generics.CreateAPIView):
         user.email_verified_at = None
         user.save(update_fields=["is_active", "is_email_verified", "email_verified_at"])
 
-        # Genera token y manda correo
-        raw_token = create_email_verification_token(user)
+        # Genera token y manda correo — atómico para evitar token huérfano si falla el envío
+        from django.db import transaction as db_transaction
+
         frontend_base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3001")
-        verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
-        send_verification_email(user.email, verify_url)
+        with db_transaction.atomic():
+            raw_token = create_email_verification_token(user)
+            verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
+            send_verification_email(user.email, verify_url)
 
         return Response(
             {
@@ -193,6 +204,21 @@ class SignInView(APIView):
                     "error": {
                         "code": "ACCOUNT_DISABLED",
                         "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # HU-CORE-17: bloquear login si la cuenta fue desactivada lógicamente
+        if getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Revisa tu correo o solicita un enlace de reactivación en /api/auth/account/reactivate/send/"
+                        ),
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,
@@ -370,7 +396,14 @@ class UserSearchView(generics.ListAPIView):
 
         class Meta:
             model = User
-            fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+            fields = [
+                "id",
+                "email",
+                "first_name",
+                "last_name",
+                "full_name",
+                "profile_picture",
+            ]
             read_only_fields = fields
 
         def get_full_name(self, obj):
@@ -388,6 +421,7 @@ class UserSearchView(generics.ListAPIView):
                 | Q(last_name__icontains=query)
                 | Q(email__icontains=query),
                 is_active=True,
+                is_deactivated=False,
             )
             .exclude(id=self.request.user.id)
             .order_by("first_name")[:20]
@@ -528,6 +562,19 @@ class MicrosoftCallbackView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        elif getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Solicita un enlace de reactivación en la pantalla de inicio de sesión."
+                        ),
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         refresh = RefreshToken.for_user(user)
         return Response(
@@ -584,8 +631,6 @@ class ProfilePictureUploadView(APIView):
         filename = f"profile_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join("profile_pictures", filename)
 
-        from django.core.files.storage import default_storage
-
         saved_path = default_storage.save(filepath, file)
         file_url = request.build_absolute_uri(f"/media/{saved_path}")
 
@@ -596,7 +641,22 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
-# ── Share Item with Friends (HU-CORE-12) ─────────────────
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_at"
+        )
+
+    @action(detail=True, methods=["patch"])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save(update_fields=["is_read", "read_at"])
+        return Response({"status": "notification marked as read"})
 
 
 class ShareItemView(APIView):
@@ -610,12 +670,22 @@ class ShareItemView(APIView):
 
         if not product_id:
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "product_id es requerido."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "product_id es requerido.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not friend_ids or not isinstance(friend_ids, list):
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "friend_ids es requerido (lista de IDs)."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "friend_ids es requerido (lista de IDs).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -623,7 +693,12 @@ class ShareItemView(APIView):
             product = Products.objects.get(pk=product_id, status="disponible")
         except Products.DoesNotExist:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Producto no encontrado o no disponible."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Producto no encontrado o no disponible.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -633,24 +708,33 @@ class ShareItemView(APIView):
         )
         connected_ids = set()
         for conn in accepted_connections:
-            connected_ids.add(conn.requester_id if conn.addressee_id == user.id else conn.addressee_id)
+            connected_ids.add(
+                conn.requester_id if conn.addressee_id == user.id else conn.addressee_id
+            )
 
         invalid_ids = [fid for fid in friend_ids if fid not in connected_ids]
         if invalid_ids:
             return Response(
-                {"error": {"code": "NOT_FRIENDS", "message": f"No eres amigo de los usuarios: {invalid_ids}"}},
+                {
+                    "error": {
+                        "code": "NOT_FRIENDS",
+                        "message": f"No eres amigo de los usuarios: {invalid_ids}",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         notifications = []
         for fid in friend_ids:
-            notifications.append(Notification(
-                user_id=fid,
-                type="shared_item",
-                title=f"{user.get_full_name()} te compartio un producto",
-                body=product.title,
-                reference_id=product.id,
-            ))
+            notifications.append(
+                Notification(
+                    user_id=fid,
+                    type="shared_item",
+                    title=f"{user.get_full_name()} te compartio un producto",
+                    body=product.title,
+                    reference_id=product.id,
+                )
+            )
         Notification.objects.bulk_create(notifications)
 
         return Response(

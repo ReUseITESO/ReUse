@@ -83,30 +83,30 @@ export default function VerifyContent() {
 
   return (
     <main className="min-h-[70vh] flex items-center justify-center px-4 py-12">
-      <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg border border-gray-100 text-center">
+      <section className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg border border-border text-center">
         {status === 'loading' && (
           <>
-            <h2 className="text-2xl font-bold text-gray-900">Verificando tu correo...</h2>
-            <p className="mt-3 text-gray-600">Esto puede tardar unos segundos.</p>
+            <h2 className="text-2xl font-bold text-fg">Verificando tu correo...</h2>
+            <p className="mt-3 text-muted-fg">Esto puede tardar unos segundos.</p>
           </>
         )}
 
         {status === 'success' && (
           <>
-            <h2 className="text-2xl font-bold text-gray-900">Verificación completada</h2>
-            <p className="mt-3 text-gray-600">Iniciando sesión automáticamente...</p>
+            <h2 className="text-2xl font-bold text-fg">Verificación completada</h2>
+            <p className="mt-3 text-muted-fg">Iniciando sesión automáticamente...</p>
           </>
         )}
 
         {status === 'error' && (
           <>
-            <h2 className="text-2xl font-bold text-gray-900">No se pudo verificar</h2>
-            <p className="mt-3 text-gray-600">{errorMsg}</p>
+            <h2 className="text-2xl font-bold text-fg">No se pudo verificar</h2>
+            <p className="mt-3 text-muted-fg">{errorMsg}</p>
 
             <div className="mt-6">
               <button
                 onClick={() => router.replace('/auth/signin')}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-btn-primary px-4 py-2.5 font-medium text-btn-primary-fg hover:bg-primary-hover transition-colors"
               >
                 Ir a iniciar sesión
               </button>

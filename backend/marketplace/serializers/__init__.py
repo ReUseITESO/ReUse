@@ -1,4 +1,5 @@
 from .category import CategorySerializer
+from .comment import CommentCreateSerializer, CommentSerializer
 from .report import ReportCreateSerializer
 from .product import (
     ImageSerializer,
@@ -25,6 +26,8 @@ from .transaction_review import (
 
 __all__ = [
     "CategorySerializer",
+    "CommentSerializer",
+    "CommentCreateSerializer",
     "ReportCreateSerializer",
     "ProductCreateSerializer",
     "ProductListSerializer",

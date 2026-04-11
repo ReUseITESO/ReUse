@@ -1,4 +1,10 @@
+from marketplace.services.comment_service import (
+    create_comment,
+    delete_comment,
+    get_commentable_product,
+)
 from marketplace.services.product_service import (
+    attach_images_to_product,
     change_product_status,
     delete_product,
     update_product,
@@ -20,6 +26,10 @@ from marketplace.services.transaction_service import (
 )
 
 __all__ = [
+    "attach_images_to_product",
+    "create_comment",
+    "delete_comment",
+    "get_commentable_product",
     "change_product_status",
     "delete_product",
     "update_product",

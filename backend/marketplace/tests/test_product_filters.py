@@ -128,7 +128,6 @@ class ProductFilterSetupMixin:
 # 1. General listing
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductListTests(ProductFilterSetupMixin, APITestCase):
-
     def test_list_returns_only_available(self):
         """Only products with status='available' are returned."""
         response = self.client.get(PRODUCTS_URL)
@@ -160,7 +159,7 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
             "seller_name",
             "created_at",
@@ -172,7 +171,6 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
 # 2. Filter by category
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByCategoryTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_by_libros_returns_two_products(self):
         """Filtering by Books returns exactly 2 available books."""
         response = self.client.get(PRODUCTS_URL, {"category": self.cat_libros.id})
@@ -204,7 +202,6 @@ class ProductFilterByCategoryTests(ProductFilterSetupMixin, APITestCase):
 # 3. Filter by condition
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByConditionTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_condition_nuevo(self):
         """Filtering by 'nuevo' returns only the new book."""
         response = self.client.get(PRODUCTS_URL, {"condition": "nuevo"})
@@ -242,7 +239,6 @@ class ProductFilterByConditionTests(ProductFilterSetupMixin, APITestCase):
 # 4. Filter by transaction type
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductFilterByTransactionTypeTests(ProductFilterSetupMixin, APITestCase):
-
     def test_filter_transaction_sale(self):
         """Filtering by 'sale' returns 3 products (new book, mouse, keyboard)."""
         response = self.client.get(PRODUCTS_URL, {"transaction_type": "sale"})
@@ -274,7 +270,6 @@ class ProductFilterByTransactionTypeTests(ProductFilterSetupMixin, APITestCase):
 # 5. Combined filters
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductCombinedFilterTests(ProductFilterSetupMixin, APITestCase):
-
     def test_category_and_condition(self):
         """Books + buen_estado -> only 'Marketing Kotler'."""
         response = self.client.get(
@@ -343,7 +338,6 @@ class ProductCombinedFilterTests(ProductFilterSetupMixin, APITestCase):
 # 6. Text search
 # ─────────────────────────────────────────────────────────────────────────────
 class ProductSearchTests(ProductFilterSetupMixin, APITestCase):
-
     def test_search_by_title(self):
         """Searching 'mouse' finds the Mouse Logitech product."""
         response = self.client.get(PRODUCTS_URL, {"search": "mouse"})
@@ -389,7 +383,6 @@ class ProductSearchTests(ProductFilterSetupMixin, APITestCase):
 # 7. Categories endpoint
 # ─────────────────────────────────────────────────────────────────────────────
 class CategoryEndpointTests(ProductFilterSetupMixin, APITestCase):
-
     def test_list_categories(self):
         """Listing categories returns the 3 categories created in setup."""
         response = self.client.get(CATEGORIES_URL)
