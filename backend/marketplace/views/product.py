@@ -413,7 +413,9 @@ class ProductViewSet(
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"detail": "Reporte enviado correctamente."}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"detail": "Reporte enviado correctamente."}, status=status.HTTP_201_CREATED
+        )
 
 
 @extend_schema_view(
