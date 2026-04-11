@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import EcoImpactCard from '@/components/gamification/EcoImpact';
 import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
@@ -115,6 +116,9 @@ export default function ProfilePage() {
           <div>
             <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
             <PointsBalance />
+            <div className="mt-6">
+              <EcoImpactCard />
+            </div>
           </div>
         </section>
 
