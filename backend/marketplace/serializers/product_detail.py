@@ -14,7 +14,7 @@ class ProductDetailSerializer(
 
     category = CategorySerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
-    
+
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
     seller_email = serializers.SerializerMethodField()
 

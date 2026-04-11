@@ -158,7 +158,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "last_login",
             "is_deactivated",
         ]
-        read_only_fields = ["id", "email", "points", "date_joined", "last_login", "is_deactivated"]
+        read_only_fields = [
+            "id",
+            "email",
+            "points",
+            "date_joined",
+            "last_login",
+            "is_deactivated",
+        ]
 
     def get_full_name(self, obj: User) -> str:
         return obj.get_full_name()

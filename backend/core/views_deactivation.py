@@ -2,24 +2,25 @@
 HU-CORE-17: Account deactivation / reactivation views.
 Kept separate from views.py to avoid merge conflicts with other teams.
 """
+
 import hashlib
 import secrets
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models.account_reactivation_token import AccountReactivationToken
 from .throttles import ReactivationRateThrottle
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -69,7 +70,9 @@ class AccountReactivateSendView(APIView):
 
     def post(self, request):
         email = (request.data.get("email") or "").strip().lower()
-        generic = {"message": "Si la cuenta existe, recibirás un correo de reactivación."}
+        generic = {
+            "message": "Si la cuenta existe, recibirás un correo de reactivación."
+        }
 
         if not email:
             return Response(generic, status=status.HTTP_200_OK)
@@ -100,7 +103,9 @@ class AccountReactivateSendView(APIView):
                     f"Este enlace expira en {REACTIVATION_EXPIRES_MINUTES} minutos.\n\n"
                     "Si no solicitaste esto, ignora este mensaje."
                 ),
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@reuse.com"),
+                from_email=getattr(
+                    settings, "DEFAULT_FROM_EMAIL", "no-reply@reuse.com"
+                ),
                 recipient_list=[user.email],
                 fail_silently=False,
             )

@@ -17,8 +17,18 @@ interface CommentsSectionProps {
 
 export default function CommentsSection({ productId, productSellerId }: CommentsSectionProps) {
   const { user, isAuthenticated } = useAuth();
-  const { comments, count, isLoading, isSubmitting, error, loadMoreError, hasMore, loadMore, submitComment, removeComment } =
-    useComments(productId);
+  const {
+    comments,
+    count,
+    isLoading,
+    isSubmitting,
+    error,
+    loadMoreError,
+    hasMore,
+    loadMore,
+    submitComment,
+    removeComment,
+  } = useComments(productId);
 
   function canDeleteComment(authorId: number) {
     if (!user) return false;
@@ -30,8 +40,7 @@ export default function CommentsSection({ productId, productSellerId }: Comments
       <div className="flex items-center gap-2 border-b border-border pb-4">
         <MessageSquare className="h-5 w-5 text-primary" />
         <h2 className="text-fg">
-          Comentarios{' '}
-          {!isLoading && <span className="text-muted-fg">({count})</span>}
+          Comentarios {!isLoading && <span className="text-muted-fg">({count})</span>}
         </h2>
       </div>
 
@@ -44,10 +53,7 @@ export default function CommentsSection({ productId, productSellerId }: Comments
       {isLoading && <CommentsSkeleton />}
 
       {!isLoading && error && (
-        <ErrorMessage
-          message={error}
-          onRetry={() => window.location.reload()}
-        />
+        <ErrorMessage message={error} onRetry={() => window.location.reload()} />
       )}
 
       {!isLoading && !error && comments.length === 0 && (
@@ -68,9 +74,7 @@ export default function CommentsSection({ productId, productSellerId }: Comments
             />
           ))}
 
-          {loadMoreError && (
-            <p className="text-center text-sm text-error">{loadMoreError}</p>
-          )}
+          {loadMoreError && <p className="text-center text-sm text-error">{loadMoreError}</p>}
 
           {hasMore && (
             <div className="pt-2 text-center">

@@ -164,7 +164,9 @@ export async function requestReactivationEmail(email: string): Promise<void> {
   }
 }
 
-export async function confirmReactivation(token: string): Promise<{ message: string; email: string }> {
+export async function confirmReactivation(
+  token: string,
+): Promise<{ message: string; email: string }> {
   const response = await fetch(
     `${API_BASE}/auth/account/reactivate/confirm/?token=${encodeURIComponent(token)}`,
     { method: 'GET', headers: { Accept: 'application/json' } },

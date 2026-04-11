@@ -32,9 +32,7 @@ export default function ReactivateContent() {
           return;
         }
         setStatus('error');
-        setErrorMsg(
-          err instanceof ApiError ? err.message : 'No se pudo reactivar la cuenta.',
-        );
+        setErrorMsg(err instanceof ApiError ? err.message : 'No se pudo reactivar la cuenta.');
       }
     };
 

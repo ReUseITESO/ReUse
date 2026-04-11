@@ -7,7 +7,8 @@ export type TransactionType = 'donation' | 'sale' | 'swap';
 export type ProductReactionType = 'like' | 'dislike';
 
 // Import Community type from community.ts to avoid duplication
-export type { Community } from './community';
+import type { Community } from './community';
+export type { Community };
 
 export interface ProductReactionSummary {
   likes_count: number;
@@ -83,6 +84,7 @@ export interface ProductUpdatePayload {
   transaction_type?: TransactionType;
   price?: number | null;
   category?: number;
+  image_url?: string;
 }
 
 export interface EditFormValues {
@@ -92,6 +94,7 @@ export interface EditFormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
+  image_url?: string;
 }
 
 export interface ProductEditFormProps {

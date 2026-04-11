@@ -28,7 +28,6 @@ from marketplace.serializers.product import ProductListSerializer
 from social.models import UserConnection
 
 from .models.email_verification import EmailVerificationToken
-from .models.notification import Notification
 from .serializers import (
     NotificationSerializer,
     SignInSerializer,
@@ -144,6 +143,7 @@ class SignUpView(generics.CreateAPIView):
 
         # Genera token y manda correo — atómico para evitar token huérfano si falla el envío
         from django.db import transaction as db_transaction
+
         frontend_base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3001")
         with db_transaction.atomic():
             raw_token = create_email_verification_token(user)
@@ -483,6 +483,7 @@ class DashboardView(APIView):
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
 
+
 class MicrosoftAuthURLView(APIView):
     permission_classes = [AllowAny]
 
@@ -585,6 +586,7 @@ class MicrosoftCallbackView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
 
 class ProfilePictureUploadView(APIView):
     """POST /api/auth/profile/upload-picture/ — upload profile image."""

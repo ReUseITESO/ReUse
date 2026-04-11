@@ -199,7 +199,9 @@ def claim_challenge_reward(*, user, challenge):
 
         refreshed.reward_claimed = True
         refreshed.reward_claimed_at = timezone.now()
-        refreshed.save(update_fields=["reward_claimed", "reward_claimed_at", "updated_at"])
+        refreshed.save(
+            update_fields=["reward_claimed", "reward_claimed_at", "updated_at"]
+        )
 
     return refreshed
 
