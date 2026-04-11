@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from . import views, views_deactivation, views_notifications
+from . import views, views_deactivation
 
 app_name = "auth"
 
@@ -54,31 +54,4 @@ urlpatterns = [
         views_deactivation.AccountReactivateConfirmView.as_view(),
         name="account-reactivate-confirm",
     ),
-    # HU-CORE-14: Notifications
-    path(
-        "notifications/count/",
-        views_notifications.NotificationCountView.as_view(),
-        name="notifications-count",
-    ),
-    path(
-        "notifications/read-all/",
-        views_notifications.NotificationMarkAllReadView.as_view(),
-        name="notifications-read-all",
-    ),
-    path(
-        "notifications/<int:pk>/read/",
-        views_notifications.NotificationMarkReadView.as_view(),
-        name="notifications-read",
-    ),
-    path(
-        "notifications/",
-        views_notifications.NotificationListView.as_view(),
-        name="notifications-list",
-    ),
 ]
-
-
-router = DefaultRouter()
-router.register(r"notifications", views.NotificationViewSet, basename="notification")
-
-urlpatterns += router.urls
