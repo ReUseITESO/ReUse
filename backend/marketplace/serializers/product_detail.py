@@ -20,6 +20,7 @@ class ProductDetailSerializer(
 
     images = ImageSerializer(many=True, read_only=True)
     has_active_transaction = serializers.SerializerMethodField()
+    has_reported = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
     dislikes_count = serializers.SerializerMethodField()
     user_reaction = serializers.SerializerMethodField()
@@ -39,6 +40,12 @@ class ProductDetailSerializer(
     def get_has_active_transaction(self, obj):
         return has_active_transaction(obj)
 
+    def get_has_reported(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.reports.filter(reporter=request.user).exists()
+
     class Meta:
         model = Products
         fields = [
@@ -55,6 +62,7 @@ class ProductDetailSerializer(
             "seller_id",
             "seller_email",
             "has_active_transaction",
+            "has_reported",
             "likes_count",
             "dislikes_count",
             "user_reaction",
