@@ -13,6 +13,7 @@ from .product_reaction import (
     ProductReactionRequestSerializer,
     ProductReactionSummarySerializer,
 )
+from .report import ReportCreateSerializer
 from .transaction import (
     TransactionCreateSerializer,
     TransactionHistorySerializer,
