@@ -40,11 +40,17 @@ export default function MicrosoftCallbackContent() {
           apiErr?.code === 'ACCOUNT_DEACTIVATED' ||
           (err instanceof Error && err.message.includes('desactivada'));
         if (isDeactivated) {
-          setDeactivatedEmail(apiErr?.email ?? '');
+          const email = apiErr?.email ?? null;
+          if (email) {
+            setDeactivatedEmail(email);
+          } else {
+            router.replace('/auth/signin');
+          }
         } else {
           setError(err instanceof Error ? err.message : 'Error al autenticar con Microsoft.');
         }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleRequestReactivation() {
@@ -61,7 +67,7 @@ export default function MicrosoftCallbackContent() {
     }
   }
 
-  if (deactivatedEmail !== null) {
+  if (deactivatedEmail) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg text-center">
