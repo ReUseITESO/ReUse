@@ -24,6 +24,8 @@ class AvatarView(APIView):
 				"offset_y": avatar.offset_y,
 				"shadow_color": avatar.shadow_color,
 				"shadow_thickness": avatar.shadow_thickness, 
+				"border_type": avatar.border_type,
+				"border_name": avatar.border_name,
 			}
 			return Response(avatar_data)
 		except Avatar.DoesNotExist:
@@ -48,6 +50,8 @@ class AvatarView(APIView):
 		avatar.offset_y = data.get("offset_y", avatar.offset_y)
 		avatar.shadow_color = data.get("shadow_color", avatar.shadow_color)
 		avatar.shadow_thickness = data.get("shadow_thickness", avatar.shadow_thickness)
+		avatar.border_type = data.get("border_type", avatar.border_type)
+		avatar.border_name = data.get("border_name", avatar.border_name)
 		avatar.save()
 
 		return Response({"detail": "Avatar updated succesfully"})

@@ -83,4 +83,6 @@ export interface AvatarData {
   zoom_level: number;
   offset_x: number;
   offset_y: number;
+  border_type: string | null;
+  border_name: string | null;
 };

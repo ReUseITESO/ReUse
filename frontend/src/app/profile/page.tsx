@@ -9,6 +9,7 @@ import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
 import type { User } from '@/types/auth';
 import { useAvatar } from '@/hooks/profile/useAvatar';
+import { getImageUrl } from '@/lib/utils';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -61,7 +62,7 @@ export default function ProfilePage() {
               <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
                 {avatarData.image ? (
                   <img
-                    src={avatarData.image}
+                    src={getImageUrl(avatarData.image)}
                     alt={displayUser.first_name}
                     className="h-20 w-20 rounded-full object-cover"
                   />

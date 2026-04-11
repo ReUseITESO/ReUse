@@ -14,6 +14,8 @@ const defaultAvatarData = {
   zoom_level: 1,
   offset_x: -120,
   offset_y: 0,
+  border_type: 'custom',
+  border_name: null,
 };
 
 interface AvatarContextValue {

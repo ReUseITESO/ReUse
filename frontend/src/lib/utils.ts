@@ -64,3 +64,25 @@ export function formatTimeAgo(isoDate: string): string {
     month: 'short',
   });
 }
+
+export function getImageUrl (imagePath: string | null | undefined): string {
+  const BACKEND_URL = 'http://localhost:8000';
+  
+  // Handle empty state or null
+  if (!imagePath || imagePath === "") {
+    return `${BACKEND_URL}/media/avatars/default.png`;
+  }
+
+  // Handle absolute URLs
+  if (imagePath.startsWith('http')) return imagePath;
+
+  // Normalize path to plural 'avatars' and include /media/ prefix
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  
+  if (cleanPath.startsWith('/media/')) {
+    return `${BACKEND_URL}${cleanPath}`;
+  }
+
+  return `${BACKEND_URL}/media${cleanPath}`;
+};
+
