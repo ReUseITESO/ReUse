@@ -6,12 +6,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-<<<<<<< HEAD
 from .models.notification import Notification
-=======
+
 if TYPE_CHECKING:
     from core.models import User
->>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
 
 User = get_user_model()
 

@@ -16,10 +16,12 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
  */
 export class ApiError extends Error {
   code: string;
-  constructor(message: string, code: string) {
+  email?: string;
+  constructor(message: string, code: string, email?: string) {
     super(message);
     this.name = 'ApiError';
     this.code = code;
+    this.email = email;
   }
 }
 
@@ -239,7 +241,10 @@ export async function microsoftSignIn(code: string): Promise<AuthResponse> {
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Error al autenticar con Microsoft.');
+    const code_: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'Error al autenticar con Microsoft.';
+    const email: string | undefined = body?.error?.email;
+    throw new ApiError(message, code_, email);
   }
 
   const data: AuthResponse = await response.json();

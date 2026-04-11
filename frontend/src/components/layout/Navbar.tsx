@@ -6,9 +6,9 @@ import { useState, useEffect } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-<<<<<<< HEAD
 import { apiClient } from '@/lib/api';
 import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface BadgeNotification {
   id: number;
@@ -17,9 +17,6 @@ interface BadgeNotification {
   type: string;
   is_read: boolean;
 }
-=======
-import ThemeToggle from '@/components/ui/ThemeToggle';
->>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
