@@ -34,7 +34,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     deleteCommunity,
   } = useCommunityDetail(params.id);
 
-  const { products, isLoading: productsLoading, error: productsError } = useCommunityMarketplace(
+  const { products, isLoading: productsLoading, error: productsError, refresh: refreshProducts } = useCommunityMarketplace(
     params.id,
   );
 
@@ -252,10 +252,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             communityName={community?.name || ''}
             isAdmin={isAdmin}
             communityId={Number(params.id)}
-            onProductRemoved={() => {
-              // Refresh products after deletion
-              window.location.reload();
-            }}
+            onProductRemoved={refreshProducts}
           />
         </div>
       </div>

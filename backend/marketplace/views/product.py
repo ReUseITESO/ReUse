@@ -3,7 +3,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from marketplace.models import ProductReaction, Products
@@ -152,7 +152,7 @@ class ProductViewSet(
     search_fields = ["title", "description", "category__name"]
     ordering_fields = ["created_at", "price", "title", "likes_count"]
     ordering = ["-created_at"]
-    permission_classes = [IsAuthenticated, CanPublishToCommunity, IsCommunityMember]
+    permission_classes = [IsAuthenticatedOrReadOnly, CanPublishToCommunity, IsCommunityMember]
 
     def get_serializer_class(self):
         if self.action == "create":

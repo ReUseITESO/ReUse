@@ -6,14 +6,8 @@ export type TransactionType = 'donation' | 'sale' | 'swap';
 
 export type ProductReactionType = 'like' | 'dislike';
 
-export interface Community {
-  id: number;
-  name: string;
-  description: string;
-  icon?: string | null;
-  is_private: boolean;
-  is_active: boolean;
-}
+// Import Community type from community.ts to avoid duplication
+export type { Community } from './community';
 
 export interface ProductReactionSummary {
   likes_count: number;

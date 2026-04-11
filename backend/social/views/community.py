@@ -129,7 +129,7 @@ class CommunityViewSet(
         permission_classes=[IsAuthenticated],
     )
     def products(self, request, pk=None):
-        from django.core.paginator import Paginator
+        from django.core.paginator import Paginator, EmptyPage
         from marketplace.models import Products
         from marketplace.serializers import ProductListSerializer
 
@@ -153,7 +153,7 @@ class CommunityViewSet(
         paginator = Paginator(products, 20)  # 20 items per page
         try:
             paginated_products = paginator.page(page)
-        except:
+        except EmptyPage:
             paginated_products = paginator.page(1)
 
         serializer = ProductListSerializer(paginated_products, many=True)
@@ -173,7 +173,7 @@ class CommunityViewSet(
         tags=["Social > Communities > Marketplace"],
     )
     @action(
-        detail=False,
+        detail=True,
         methods=["delete"],
         url_path="products/(?P<product_id>\\d+)",
         permission_classes=[IsAuthenticated],
