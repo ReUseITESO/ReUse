@@ -19,6 +19,7 @@ from gamification.views.points import (
     CurrentUserPointsView,
     UserPointsView,
 )
+from gamification.views.impact import UserImpactView
 
 urlpatterns = [
     path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),
@@ -44,4 +45,5 @@ urlpatterns = [
         ClaimChallengeRewardView.as_view(),
         name="claim-challenge-reward",
     ),
+    path("impact/", UserImpactView.as_view(), name="user-impact"),
 ]
