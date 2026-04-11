@@ -16,6 +16,7 @@ interface ProductDetailContentProps {
   canCreateTransaction: boolean;
   transactionNotice: string | null;
   canReport: boolean;
+  hasReported: boolean;
   onBack: () => void;
   onMainAction: () => void;
   onReport: () => void;
@@ -28,6 +29,7 @@ export default function ProductDetailContent({
   canCreateTransaction,
   transactionNotice,
   canReport,
+  hasReported,
   onBack,
   onMainAction,
   onReport,
@@ -102,7 +104,12 @@ export default function ProductDetailContent({
               Publicado {timeAgo}
             </p>
 
-            {canReport && (
+            {hasReported ? (
+              <p className="inline-flex items-center gap-1.5 text-xs text-success">
+                <Flag className="h-3.5 w-3.5" />
+                Producto reportado correctamente
+              </p>
+            ) : canReport && (
               <button
                 type="button"
                 onClick={onReport}
