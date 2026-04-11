@@ -1,6 +1,5 @@
 from .category import CategorySerializer
 from .comment import CommentCreateSerializer, CommentSerializer
-from .report import ReportCreateSerializer
 from .product import (
     ImageSerializer,
     ProductCreateSerializer,
@@ -13,6 +12,7 @@ from .product_reaction import (
     ProductReactionRequestSerializer,
     ProductReactionSummarySerializer,
 )
+from .report import ReportCreateSerializer
 from .transaction import (
     TransactionCreateSerializer,
     TransactionHistorySerializer,

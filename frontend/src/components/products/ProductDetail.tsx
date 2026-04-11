@@ -111,7 +111,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   async function handleReport(reason: string, description: string) {
     if (!product) return;
-    const success = await reportProduct(product.id, { reason, description: description || undefined });
+    const success = await reportProduct(product.id, {
+      reason,
+      description: description || undefined,
+    });
     if (success) {
       setIsReportDialogOpen(false);
       setHasReported(true);

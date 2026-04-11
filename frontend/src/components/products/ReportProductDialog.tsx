@@ -68,8 +68,7 @@ export default function ReportProductDialog({
         </div>
 
         <p className="mb-5 text-sm text-muted-fg">
-          Estás reportando:{' '}
-          <span className="font-medium text-fg">{productTitle}</span>
+          Estás reportando: <span className="font-medium text-fg">{productTitle}</span>
         </p>
 
         <div className="space-y-4">
@@ -87,8 +86,7 @@ export default function ReportProductDialog({
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-fg">
-              Descripción adicional{' '}
-              <span className="text-muted-fg">(opcional)</span>
+              Descripción adicional <span className="text-muted-fg">(opcional)</span>
             </label>
             <textarea
               rows={3}
@@ -98,9 +96,7 @@ export default function ReportProductDialog({
               className={INPUT_CLASS}
               placeholder="Agrega más detalles sobre el problema..."
             />
-            <p className="mt-1 text-right text-xs text-muted-fg">
-              {description.length}/300
-            </p>
+            <p className="mt-1 text-right text-xs text-muted-fg">{description.length}/300</p>
           </div>
         </div>
 

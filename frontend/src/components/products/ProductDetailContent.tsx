@@ -105,15 +105,17 @@ export default function ProductDetailContent({
                 <Flag className="h-3.5 w-3.5" />
                 Producto reportado correctamente
               </p>
-            ) : canReport && (
-              <button
-                type="button"
-                onClick={onReport}
-                className="inline-flex items-center gap-1.5 text-xs text-muted-fg transition-colors hover:text-error"
-              >
-                <Flag className="h-3.5 w-3.5" />
-                Reportar
-              </button>
+            ) : (
+              canReport && (
+                <button
+                  type="button"
+                  onClick={onReport}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-fg transition-colors hover:text-error"
+                >
+                  <Flag className="h-3.5 w-3.5" />
+                  Reportar
+                </button>
+              )
             )}
           </div>
         </div>
