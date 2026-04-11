@@ -1,3 +1,4 @@
+import time
 import uuid
 
 import boto3
@@ -6,6 +7,9 @@ from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
 _s3_client = None
+_presigned_cache: dict[str, tuple[str, float]] = {}
+_PRESIGNED_EXPIRATION = 3600
+_CACHE_TTL = 3000  # refresh 10 min before expiry
 
 
 def _get_s3_client():
@@ -44,8 +48,8 @@ def upload_product_images(product_id: int, files: list) -> list[str]:
     return urls
 
 
-def get_presigned_url(image_url: str, expiration: int = 3600) -> str:
-    """Return a presigned URL for a stored S3 image URL. Expires in `expiration` seconds."""
+def get_presigned_url(image_url: str) -> str:
+    """Return a cached presigned URL for a stored S3 image URL."""
     prefix = (
         f"https://{settings.AWS_STORAGE_BUCKET_NAME}"
         f".s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/"
@@ -53,12 +57,19 @@ def get_presigned_url(image_url: str, expiration: int = 3600) -> str:
     if not image_url or not image_url.startswith(prefix):
         return image_url
     key = image_url[len(prefix):]
+
+    cached = _presigned_cache.get(key)
+    if cached and cached[1] > time.monotonic():
+        return cached[0]
+
     client = _get_s3_client()
     try:
-        return client.generate_presigned_url(
+        url = client.generate_presigned_url(
             "get_object",
             Params={"Bucket": settings.AWS_STORAGE_BUCKET_NAME, "Key": key},
-            ExpiresIn=expiration,
+            ExpiresIn=_PRESIGNED_EXPIRATION,
         )
+        _presigned_cache[key] = (url, time.monotonic() + _CACHE_TTL)
+        return url
     except (BotoCoreError, ClientError):
         return image_url
