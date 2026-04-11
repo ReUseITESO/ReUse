@@ -101,9 +101,9 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
     <>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
         <div className="flex h-36 items-center justify-center bg-muted">
-          {product.image_url ? (
+          {product.images?.[0]?.image_url ? (
             <img
-              src={product.image_url}
+              src={product.images[0].image_url}
               alt={product.title}
               className="h-full w-full object-cover"
             />

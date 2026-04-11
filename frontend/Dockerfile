@@ -6,7 +6,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+RUN chmod +x entrypoint.sh
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["./entrypoint.sh"]

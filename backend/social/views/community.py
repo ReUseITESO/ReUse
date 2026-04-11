@@ -96,7 +96,12 @@ class CommunityViewSet(
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(summary="Join a public community", tags=["Social > Communities"])
-    @action(detail=True, methods=["post"], url_path="join", permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="join",
+        permission_classes=[IsAuthenticated],
+    )
     def join(self, request, pk=None):
         community = self.get_object()
         membership = join_community(community, request.user)
@@ -109,7 +114,12 @@ class CommunityViewSet(
         )
 
     @extend_schema(summary="Leave a community", tags=["Social > Communities"])
-    @action(detail=True, methods=["post"], url_path="leave", permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="leave",
+        permission_classes=[IsAuthenticated],
+    )
     def leave(self, request, pk=None):
         community = self.get_object()
         leave_community(community, request.user)

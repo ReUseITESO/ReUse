@@ -48,5 +48,26 @@ export function useUserPoints(enabled: boolean = true, refreshTrigger: number = 
     fetchPoints();
   }, [fetchPoints, refreshTrigger]);
 
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onPointsUpdated = () => {
+      fetchPoints();
+    };
+
+    window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+
+    const interval = window.setInterval(() => {
+      fetchPoints();
+    }, 10000);
+
+    return () => {
+      window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+      window.clearInterval(interval);
+    };
+  }, [enabled, fetchPoints]);
+
   return { points, isLoading, error, refetch: fetchPoints };
 }

@@ -22,9 +22,9 @@ export default function ProductCard({ product, showCommunityBadge }: ProductCard
     <Link href={`/products/${product.id}`}>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md cursor-pointer">
         <div className="flex h-44 items-center justify-center bg-muted">
-          {product.image_url ? (
+          {product.images?.[0]?.image_url ? (
             <img
-              src={product.image_url}
+              src={product.images[0].image_url}
               alt={product.title}
               className="h-full w-full object-cover"
             />

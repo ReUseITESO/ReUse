@@ -48,6 +48,9 @@ class TransactionApiTests(APITestCase):
         PointRule.objects.create(action="complete_sale", points=15, is_active=True)
         PointRule.objects.create(action="complete_donation", points=20, is_active=True)
         PointRule.objects.create(action="complete_exchange", points=18, is_active=True)
+        PointRule.objects.create(
+            action="receive_positive_review", points=3, is_active=True
+        )
 
     def _auth(self, user):
         self.client.force_authenticate(user=user)
@@ -343,3 +346,36 @@ class TransactionApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
+
+    def test_positive_review_awards_points_to_reviewee(self):
+        create_response = self._create_transaction(user=self.buyer)
+        transaction_id = create_response.data["id"]
+
+        self._auth(self.seller)
+        self.client.patch(
+            self._status_url(transaction_id),
+            {"status": "confirmada"},
+            format="json",
+        )
+        self.client.patch(
+            self._status_url(transaction_id),
+            {"status": "completada"},
+            format="json",
+        )
+
+        self._auth(self.buyer)
+        self.client.patch(
+            self._status_url(transaction_id),
+            {"status": "completada"},
+            format="json",
+        )
+
+        review_response = self.client.post(
+            f"{self.TRANSACTIONS_URL}{transaction_id}/review/",
+            {"rating": 5, "comment": "Excelente trato"},
+            format="json",
+        )
+
+        self.assertEqual(review_response.status_code, status.HTTP_201_CREATED)
+        self.seller.refresh_from_db()
+        self.assertEqual(self.seller.points, 18)

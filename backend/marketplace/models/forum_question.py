@@ -59,5 +59,11 @@ class ForumQuestion(models.Model):
                 raise ValidationError("Reply must belong to the same post thread.")
 
     def __str__(self) -> str:
-        target = self.product.title if self.product_id else self.post.title
+        if self.product is not None:
+            target = self.product.title
+        elif self.post is not None:
+            target = self.post.title
+        else:
+            target = "Unknown"
+
         return f"Question on {target} by {self.user.get_full_name()}"

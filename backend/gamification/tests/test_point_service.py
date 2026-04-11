@@ -7,7 +7,6 @@ from gamification.services.point_service import award_points
 
 
 class AwardPointsServiceTest(TestCase):
-
     def setUp(self):
         self.user = User.objects.create(
             email="test.user@iteso.mx",

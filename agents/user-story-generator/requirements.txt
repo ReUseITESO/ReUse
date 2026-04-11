@@ -1,8 +1,0 @@
-# User Story Generator Agent - Dependencies
-
-# No external dependencies required for basic functionality
-# The agent uses only Python standard library
-
-# Optional: for enhanced features
-# pytest>=7.0.0  # For running tests
-# pyyaml>=6.0    # For YAML input support

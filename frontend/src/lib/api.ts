@@ -14,8 +14,9 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 export async function apiClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const tokens = getStoredTokens();
+  const isFormData = options?.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(!isFormData && { 'Content-Type': 'application/json' }),
     ...(options?.headers as Record<string, string>),
   };
 
@@ -137,6 +138,10 @@ export async function createComment(productId: number, content: string) {
 
 export async function deleteComment(productId: number, commentId: number) {
   return apiClient<null>(`/marketplace/products/${productId}/comments/${commentId}/`, {
+    method: 'DELETE',
+  });
+}
+
 // ===== Transactions =====
 
 export async function getTransactionHistory(params?: {
