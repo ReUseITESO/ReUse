@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation';
 import ProductDetailContent from '@/components/products/ProductDetailContent';
 import CommentsSection from '@/components/products/comments/CommentsSection';
 import ProductReactionButtons from '@/components/products/ProductReactionButtons';
+import ReportProductDialog from '@/components/products/ReportProductDialog';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateTransaction } from '@/hooks/useCreateTransaction';
 import { useProductDetail } from '@/hooks/useProductDetail';
+import { useReportProduct } from '@/hooks/useReportProduct';
 
 import type { ProductReactionSummary } from '@/types/product';
 
@@ -28,6 +30,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const { product, setProduct, isLoading, error } = useProductDetail(productId);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [hasReported, setHasReported] = useState(false);
+  const { reportProduct, isLoading: isReporting, error: reportError } = useReportProduct();
 
   const handleReactionChange = (summary: ProductReactionSummary) => {
     setProduct(current => {
@@ -69,6 +74,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   }
 
   const isOwner = user?.email === product.seller_email;
+  const canReport = isAuthenticated && !isOwner && !hasReported;
   const canCreateTransaction =
     isAuthenticated &&
     !isOwner &&
@@ -103,6 +109,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     );
   }
 
+  async function handleReport(reason: string, description: string) {
+    if (!product) return;
+    const success = await reportProduct(product.id, { reason, description: description || undefined });
+    if (success) {
+      setIsReportDialogOpen(false);
+      setHasReported(true);
+    }
+  }
+
   function handleMainAction() {
     if (!isAuthenticated) {
       router.push('/auth/signin');
@@ -132,8 +147,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         ctaLabel={ctaLabel}
         canCreateTransaction={canCreateTransaction}
         transactionNotice={transactionNotice}
+        canReport={canReport}
         onBack={() => router.back()}
         onMainAction={handleMainAction}
+        onReport={() => setIsReportDialogOpen(true)}
         reactionsNode={
           <ProductReactionButtons
             productId={product.id}
@@ -152,6 +169,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="mx-auto mt-12 max-w-6xl border-t border-border pt-10">
         <CommentsSection productId={product.id} productSellerId={product.seller_id} />
       </div>
+
+      <ReportProductDialog
+        isOpen={isReportDialogOpen}
+        productTitle={product.title}
+        isLoading={isReporting}
+        error={reportError}
+        onCancel={() => setIsReportDialogOpen(false)}
+        onSubmit={handleReport}
+      />
 
       {/* Reactions moved inline into ProductBasicDetails */}
 
