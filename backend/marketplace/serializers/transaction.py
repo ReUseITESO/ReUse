@@ -22,6 +22,7 @@ class TransactionUserSerializer(serializers.ModelSerializer):
 
 class TransactionProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Products
@@ -35,6 +36,10 @@ class TransactionProductSerializer(serializers.ModelSerializer):
             "image_url",
             "category",
         ]
+
+    def get_image_url(self, obj):
+        first = obj.images.order_by("order_number").first()
+        return first.image_url if first else None
 
 
 class TransactionSerializer(serializers.ModelSerializer):
