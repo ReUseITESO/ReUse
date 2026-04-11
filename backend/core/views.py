@@ -10,13 +10,9 @@ from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
-<<<<<<< HEAD
 from rest_framework import generics, status, viewsets
-from rest_framework.decorators import action
-=======
-from rest_framework import generics, status
 from rest_framework import serializers as drf_serializers
->>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -643,7 +639,6 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
-<<<<<<< HEAD
 class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
@@ -660,8 +655,6 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
         notification.read_at = timezone.now()
         notification.save(update_fields=["is_read", "read_at"])
         return Response({"status": "notification marked as read"})
-=======
-# ── Share Item with Friends (HU-CORE-12) ─────────────────
 
 
 class ShareItemView(APIView):
@@ -746,4 +739,3 @@ class ShareItemView(APIView):
             {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
             status=status.HTTP_201_CREATED,
         )
->>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
