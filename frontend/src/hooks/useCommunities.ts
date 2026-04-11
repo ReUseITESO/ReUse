@@ -13,10 +13,8 @@ export function useCommunities() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiClient<{ results: Community[] } | Community[]>(
-        '/social/communities/',
-      );
-      const results = Array.isArray(data) ? data : data.results ?? [];
+      const data = await apiClient<{ results: Community[] } | Community[]>('/social/communities/');
+      const results = Array.isArray(data) ? data : (data.results ?? []);
       setCommunities(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar comunidades');

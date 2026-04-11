@@ -33,10 +33,10 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
       const data = await apiClient<{ results: UserConnection[] } | UserConnection[]>(
         '/social/connections/',
       );
-      const connections = Array.isArray(data) ? data : data.results ?? [];
+      const connections = Array.isArray(data) ? data : (data.results ?? []);
       const accepted = connections
         .filter(c => c.status === 'accepted')
-        .map(c => c.requester.id === user?.id ? c.addressee : c.requester);
+        .map(c => (c.requester.id === user?.id ? c.addressee : c.requester));
       setFriends(accepted);
     } catch {
       setFriends([]);
@@ -64,7 +64,10 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
         body: JSON.stringify({ product_id: productId, friend_ids: Array.from(selectedIds) }),
       });
       setSuccess(true);
-      setTimeout(() => { setIsOpen(false); setSuccess(false); }, 2000);
+      setTimeout(() => {
+        setIsOpen(false);
+        setSuccess(false);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al compartir');
     } finally {
@@ -87,14 +90,23 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
           <div className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-h3 font-semibold text-fg">Compartir con amigos</h3>
-              <button onClick={() => setIsOpen(false)} className="rounded-lg p-1 text-muted-fg hover:bg-muted">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="rounded-lg p-1 text-muted-fg hover:bg-muted"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <p className="mb-4 text-sm text-muted-fg">Selecciona amigos para compartir &quot;{productTitle}&quot;</p>
+            <p className="mb-4 text-sm text-muted-fg">
+              Selecciona amigos para compartir &quot;{productTitle}&quot;
+            </p>
 
-            {error && <div className="mb-3 rounded-lg border border-error/20 bg-error/5 p-2 text-sm text-error">{error}</div>}
+            {error && (
+              <div className="mb-3 rounded-lg border border-error/20 bg-error/5 p-2 text-sm text-error">
+                {error}
+              </div>
+            )}
 
             {success ? (
               <div className="flex flex-col items-center gap-2 py-6">
@@ -103,10 +115,14 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
               </div>
             ) : isLoading ? (
               <div className="space-y-2">
-                {[1, 2, 3].map(i => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />)}
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />
+                ))}
               </div>
             ) : friends.length === 0 ? (
-              <p className="py-6 text-center text-sm text-muted-fg">No tienes amigos para compartir. Agrega amigos primero.</p>
+              <p className="py-6 text-center text-sm text-muted-fg">
+                No tienes amigos para compartir. Agrega amigos primero.
+              </p>
             ) : (
               <>
                 <div className="max-h-60 space-y-2 overflow-y-auto">
@@ -117,7 +133,9 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
                         key={friend.id}
                         onClick={() => toggleFriend(friend.id)}
                         className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
-                          isSelected ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted'
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:bg-muted'
                         }`}
                       >
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">

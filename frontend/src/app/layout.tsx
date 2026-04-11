@@ -5,6 +5,7 @@ import GlobalChallengeToasts from '@/components/gamification/GlobalChallengeToas
 import Navbar from '@/components/layout/Navbar';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import { ThemeProvider } from 'next-themes';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -15,13 +16,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={cn('font-sans', inter.variable)}>
+    <html lang="es" className={cn('font-sans', inter.variable)} suppressHydrationWarning>
       <body className="bg-bg text-fg">
-        <AuthProvider>
-          <GlobalChallengeToasts />
-          <Navbar />
-          <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <GlobalChallengeToasts />
+            <Navbar />
+            <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
