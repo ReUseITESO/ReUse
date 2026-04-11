@@ -147,6 +147,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         canCreateTransaction={canCreateTransaction}
         transactionNotice={transactionNotice}
         canReport={canReport}
+        hasReported={hasReported}
         onBack={() => router.back()}
         onMainAction={handleMainAction}
         onReport={() => setIsReportDialogOpen(true)}
