@@ -63,6 +63,7 @@ export interface ProductBasicDetailsProps {
 export interface ProductDetail extends Product {
   seller_email: string;
   images: ProductImage[];
+  has_reported: boolean;
 }
 
 export interface ProductCreatePayload {

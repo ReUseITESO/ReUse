@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import ProductDetailContent from '@/components/products/ProductDetailContent';
@@ -32,6 +32,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [hasReported, setHasReported] = useState(false);
+  useEffect(() => {
+    if (product?.has_reported) setHasReported(true);
+  }, [product?.has_reported]);
   const { reportProduct, isLoading: isReporting, error: reportError } = useReportProduct();
 
   const handleReactionChange = (summary: ProductReactionSummary) => {
