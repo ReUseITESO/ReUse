@@ -45,16 +45,21 @@ ignore = [
     "B008",   # do not perform function calls in argument defaults
 ]
 
+[tool.ruff.lint.isort]
+known-first-party = ["core", "marketplace", "social"]
+
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+disable_error_code = ["misc"]
 
 [tool.django-stubs]
 django_settings_module = "config.settings"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
+addopts = "--nomigrations"
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

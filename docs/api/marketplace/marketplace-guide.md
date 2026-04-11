@@ -1,8 +1,8 @@
 # Marketplace – Guía de Configuración y API
 
-**Módulo:** Marketplace - Buscar productos  
+**Módulo:** Marketplace - Buscar productos
 **Responsable:** @victortelles
-**Fecha:** 20 de febrero de 2026  
+**Fecha:** 20 de febrero de 2026
 **Versión:** 1.0
 
 ---
@@ -38,13 +38,13 @@
 
 ### Pre-requisitos (Backend)
 
-| Requisito | Versión mínima |
-|-----------|----------------|
-| Python | 3.11+ |
-| pip | Última estable |
-| Docker Desktop | Última estable |
-| PostgreSQL (via Docker) | 15+ |
-| Git | Última estable |
+| Requisito               | Versión mínima |
+| ----------------------- | ---------------- |
+| Python                  | 3.11+            |
+| pip                     | Última estable  |
+| Docker Desktop          | Última estable  |
+| PostgreSQL (via Docker) | 15+              |
+| Git                     | Última estable  |
 
 ---
 
@@ -96,7 +96,7 @@ docker-compose up -d db
 sleep 10
 cd backend
 python manage.py migrate
-python manage.py loaddata seeds/seed_v1.json
+python manage.py loaddata seeds/seed_dev_fixed.json
 ```
 
 ---
@@ -116,13 +116,13 @@ docker-compose up -d adminer
 
 **Credenciales:**
 
-| Campo | Valor |
-|-------|-------|
-| System | `PostgreSQL` |
-| Server | `db` |
-| Username | `reuse_dev` |
+| Campo    | Valor                  |
+| -------- | ---------------------- |
+| System   | `PostgreSQL`         |
+| Server   | `db`                 |
+| Username | `reuse_dev`          |
 | Password | `local_dev_password` |
-| Database | `reuse_iteso_dev` |
+| Database | `reuse_iteso_dev`    |
 
 > Adminer permite ejecutar queries SQL, ver estructura de tablas, exportar datos y más, todo desde el navegador.
 
@@ -177,6 +177,7 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+
 #### 4. Ejecutar migraciones
 
 ```bash
@@ -201,17 +202,17 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `DEBUG` | Modo debug | `True` |
-| `SECRET_KEY` | Clave secreta de Django | dev key (cambiar en prod) |
-| `DB_NAME` | Nombre de la base de datos | `reuseiteso` |
-| `DB_USER` | Usuario de PostgreSQL | `postgres` |
-| `DB_PASSWORD` | Contraseña de PostgreSQL | `postgres` |
-| `DB_HOST` | Host de la base de datos | `localhost` |
-| `DB_PORT` | Puerto de la base de datos | `5432` |
+| Variable                 | Descripción                              | Default                   |
+| ------------------------ | ----------------------------------------- | ------------------------- |
+| `DEBUG`                | Modo debug                                | `True`                  |
+| `SECRET_KEY`           | Clave secreta de Django                   | dev key (cambiar en prod) |
+| `DB_NAME`              | Nombre de la base de datos                | `reuseiteso`            |
+| `DB_USER`              | Usuario de PostgreSQL                     | `postgres`              |
+| `DB_PASSWORD`          | Contraseña de PostgreSQL                 | `postgres`              |
+| `DB_HOST`              | Host de la base de datos                  | `localhost`             |
+| `DB_PORT`              | Puerto de la base de datos                | `5432`                  |
 | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos (separados por coma) | `http://localhost:3000` |
-| `ALLOWED_HOSTS` | Hosts permitidos (separados por coma) | `localhost,127.0.0.1` |
+| `ALLOWED_HOSTS`        | Hosts permitidos (separados por coma)     | `localhost,127.0.0.1`   |
 
 > **⚠️ Importante:** Las credenciales del `.env` deben coincidir con las definidas en `docker-compose.yml`.
 
@@ -233,23 +234,23 @@ La API estará disponible en: `http://localhost:8000/api/marketplace/`
 
 **Base URL:** `http://localhost:8000/api/marketplace/`
 
-La autenticación está deshabilitada por ahora (`AllowAny`). Se habilitará JWT cuando el módulo Core esté listo.  
+La autenticación está deshabilitada por ahora (`AllowAny`). Se habilitará JWT cuando el módulo Core esté listo.
 La paginación está configurada a **20 elementos por página**.
 
 ---
 
 #### Products
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/marketplace/products/` | Lista todos los productos disponibles (paginado) |
-| `GET` | `/api/marketplace/products/{id}/` | Detalle de un producto específico |
-| `GET` | `/api/marketplace/products/?search=keyword` | Busca productos por palabra clave |
-| `GET` | `/api/marketplace/products/?category={id}` | Filtra productos por categoría |
-| `GET` | `/api/marketplace/products/?condition={valor}` | Filtra por condición |
-| `GET` | `/api/marketplace/products/?transaction_type={tipo}` | Filtra por tipo de transacción |
-| `GET` | `/api/marketplace/products/?ordering={campo}` | Ordena resultados |
-| `GET` | `/api/marketplace/products/?page={num}` | Paginación |
+| Método | Endpoint                                               | Descripción                                     |
+| ------- | ------------------------------------------------------ | ------------------------------------------------ |
+| `GET` | `/api/marketplace/products/`                         | Lista todos los productos disponibles (paginado) |
+| `GET` | `/api/marketplace/products/{id}/`                    | Detalle de un producto específico               |
+| `GET` | `/api/marketplace/products/?search=keyword`          | Busca productos por palabra clave                |
+| `GET` | `/api/marketplace/products/?category={id}`           | Filtra productos por categoría                  |
+| `GET` | `/api/marketplace/products/?condition={valor}`       | Filtra por condición                            |
+| `GET` | `/api/marketplace/products/?transaction_type={tipo}` | Filtra por tipo de transacción                  |
+| `GET` | `/api/marketplace/products/?ordering={campo}`        | Ordena resultados                                |
+| `GET` | `/api/marketplace/products/?page={num}`              | Paginación                                      |
 
 > **Nota:** Solo se listan productos con `status = "disponible"`.
 
@@ -257,10 +258,50 @@ La paginación está configurada a **20 elementos por página**.
 
 #### Categories
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/marketplace/categories/` | Lista todas las categorías |
-| `GET` | `/api/marketplace/categories/{id}/` | Detalle de una categoría |
+| Método | Endpoint                              | Descripción                |
+| ------- | ------------------------------------- | --------------------------- |
+| `GET` | `/api/marketplace/categories/`      | Lista todas las categorías |
+| `GET` | `/api/marketplace/categories/{id}/` | Detalle de una categoría   |
+
+---
+
+#### Comments
+
+Public comments on a product. Reading is open to all; posting and deleting require authentication.
+
+| Método   | Endpoint                                                         | Auth     | Descripción                                              |
+| -------- | ---------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `GET`  | `/api/marketplace/products/{id}/comments/`                     | No       | Lista comentarios del producto (paginado, cronológico) |
+| `POST` | `/api/marketplace/products/{id}/comments/`                     | Required | Crea un comentario en el producto                        |
+| `DELETE` | `/api/marketplace/products/{id}/comments/{comment_id}/`        | Required | Elimina un comentario (autor o dueño del producto)      |
+
+**Request body (POST):**
+```json
+{ "content": "¿Todavía está disponible?" }
+```
+
+**Response (POST 201 / GET item):**
+```json
+{
+  "id": 42,
+  "author": {
+    "id": 7,
+    "name": "Luis Buyer",
+    "avatar": null
+  },
+  "content": "¿Todavía está disponible?",
+  "created_at": "2026-04-07T15:30:00Z"
+}
+```
+
+**Validation:**
+- `content` is required, non-empty (after trimming), max 500 characters.
+- Product must have status `disponible` or `en_proceso`.
+
+**Permissions:**
+- `GET`: public (no auth required).
+- `POST`: any authenticated user.
+- `DELETE`: comment author OR product seller. Returns 403 otherwise.
 
 ---
 
@@ -269,6 +310,7 @@ La paginación está configurada a **20 elementos por página**.
 ##### `search` — Búsqueda por palabra clave
 
 Busca coincidencias parciales (case-insensitive) en:
+
 - Título del producto (`title`)
 - Descripción del producto (`description`)
 - Nombre de la categoría (`category__name`)
@@ -302,7 +344,7 @@ GET /api/marketplace/products/?transaction_type=sale
 
 ##### `ordering` — Ordenar resultados
 
-Campos disponibles: `created_at`, `price`, `title`  
+Campos disponibles: `created_at`, `price`, `title`
 Prefijo `-` para orden descendente.
 
 ```
@@ -441,14 +483,15 @@ curl "http://localhost:8000/api/marketplace/products/?category=1&ordering=price"
 
 ### Pre-requisitos (Frontend)
 
-| Requisito | Versión mínima |
-|-----------|----------------|
-| Node.js | 18+ |
-| npm (o pnpm) | Última estable |
-| Backend corriendo | `http://localhost:8000` |
-| Base de datos corriendo | PostgreSQL via Docker |
+| Requisito               | Versión mínima          |
+| ----------------------- | ------------------------- |
+| Node.js                 | 18+                       |
+| npm (o pnpm)            | Última estable           |
+| Backend corriendo       | `http://localhost:8000` |
+| Base de datos corriendo | PostgreSQL via Docker     |
 
 > **El frontend depende del backend y la base de datos.** Antes de iniciar el frontend, asegúrate de que:
+>
 > 1. Docker Desktop esté corriendo con el contenedor de PostgreSQL activo.
 > 2. El servidor backend esté levantado en `http://localhost:8000`.
 
@@ -476,8 +519,8 @@ Crear un archivo `.env` dentro de `frontend/`:
 NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ```
 
-| Variable | Descripción | Default |
-|----------|-------------|---------|
+| Variable                | Descripción                   | Default                       |
+| ----------------------- | ------------------------------ | ----------------------------- |
 | `NEXT_PUBLIC_API_URL` | URL base de la API del backend | `http://localhost:8000/api` |
 
 ---
@@ -498,10 +541,10 @@ Si todo está configurado correctamente, deberás visualizar productos en la rut
 
 ### Rutas disponibles
 
-| Ruta | Descripción | Componente |
-|------|-------------|------------|
-| `/` | Página principal — landing con enlace a productos | `app/page.tsx` |
-| `/products` | Lista de productos con barra de búsqueda y filtros | `app/products/page.tsx` |
+| Ruta               | Descripción                                                 | Componente                     |
+| ------------------ | ------------------------------------------------------------ | ------------------------------ |
+| `/`              | Página principal — landing con enlace a productos          | `app/page.tsx`               |
+| `/products`      | Lista de productos con barra de búsqueda y filtros          | `app/products/page.tsx`      |
 | `/products/{id}` | Detalle de un producto específico con galería de imágenes | `app/products/[id]/page.tsx` |
 
 #### Funcionalidades de `/products`
@@ -550,13 +593,13 @@ docker exec -it reuse_iteso_db psql -U reuse_dev -d reuse_iteso_dev -c "SELECT 1
 
 **Soluciones comunes:**
 
-| Problema | Solución |
-|----------|----------|
-| Docker Desktop no está abierto | Abrir Docker Desktop y esperar a que inicie |
-| El contenedor existe pero está detenido | `docker-compose start db` |
-| El contenedor no existe | `docker-compose up -d db` |
-| Puerto 5432 ocupado | Detener otro servicio PostgreSQL local o cambiar el puerto en `docker-compose.yml` y `.env` |
-| Credenciales no coinciden | Verificar que `.env` del backend coincida con `docker-compose.yml` |
+| Problema                                 | Solución                                                                                       |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Docker Desktop no está abierto          | Abrir Docker Desktop y esperar a que inicie                                                     |
+| El contenedor existe pero está detenido | `docker-compose start db`                                                                     |
+| El contenedor no existe                  | `docker-compose up -d db`                                                                     |
+| Puerto 5432 ocupado                      | Detener otro servicio PostgreSQL local o cambiar el puerto en `docker-compose.yml` y `.env` |
+| Credenciales no coinciden                | Verificar que `.env` del backend coincida con `docker-compose.yml`                          |
 
 ---
 
@@ -594,12 +637,12 @@ netstat -ano | findstr :8000
 lsof -i :8000
 ```
 
-| Problema | Solución |
-|----------|----------|
-| `ModuleNotFoundError` | Activar venv y reinstalar: `pip install -r requirements.txt` |
-| `django.db.utils.OperationalError: could not connect` | La BD no está corriendo → `docker-compose up -d` |
-| `No migrations to apply` seguido de error | Verificar que las migraciones estén creadas: `python manage.py makemigrations` |
-| `Port 8000 already in use` | Matar el proceso o usar otro puerto: `python manage.py runserver 8001` |
+| Problema                                                | Solución                                                                        |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `ModuleNotFoundError`                                 | Activar venv y reinstalar:`pip install -r requirements.txt`                    |
+| `django.db.utils.OperationalError: could not connect` | La BD no está corriendo →`docker-compose up -d`                              |
+| `No migrations to apply` seguido de error             | Verificar que las migraciones estén creadas:`python manage.py makemigrations` |
+| `Port 8000 already in use`                            | Matar el proceso o usar otro puerto:`python manage.py runserver 8001`          |
 
 ---
 
@@ -625,12 +668,12 @@ cat frontend/.env
 # (Next.js requiere restart al cambiar variables de entorno)
 ```
 
-| Problema | Solución |
-|----------|----------|
-| `NEXT_PUBLIC_API_URL` no definida | Crear `frontend/.env` con la URL del backend |
-| Error CORS en consola del navegador | Agregar `http://localhost:3000` a `CORS_ALLOWED_ORIGINS` en `backend/.env` |
-| `fetch failed` / `ECONNREFUSED` | El backend no está corriendo → levantarlo en puerto 8000 |
-| Cambié `.env` pero no toma efecto | Reiniciar el servidor de Next.js (`Ctrl+C` → `npm run dev`) |
+| Problema                             | Solución                                                                        |
+| ------------------------------------ | -------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` no definida  | Crear `frontend/.env` con la URL del backend                                   |
+| Error CORS en consola del navegador  | Agregar `http://localhost:3000` a `CORS_ALLOWED_ORIGINS` en `backend/.env` |
+| `fetch failed` / `ECONNREFUSED`  | El backend no está corriendo → levantarlo en puerto 8000                       |
+| Cambié `.env` pero no toma efecto | Reiniciar el servidor de Next.js (`Ctrl+C` → `npm run dev`)                 |
 
 ---
 

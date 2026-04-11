@@ -4,17 +4,20 @@ Crea usuarios, categorías, productos con imágenes, badges y transacciones.
 
 Uso: python manage.py seed_dev_data
 """
+
+import random
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from datetime import timedelta
-import random
 
 from core.models import User
-from marketplace.models import Category, Products, Images, Transaction
 from gamification.models.badges import Badges
-from gamification.models.user_badges import UserBadges
+from gamification.models.challenge import Challenge, ChallengeType
 from gamification.models.environment_impact import EnvironmentImpact
 from gamification.models.point_rule import PointRule
+from gamification.models.user_badges import UserBadges
+from marketplace.models import Category, Images, Products, Transaction
 
 
 class Command(BaseCommand):
@@ -31,6 +34,7 @@ class Command(BaseCommand):
         self._assign_badges(users, badges)
         self._create_environment_impact(users)
         self._create_point_rules()
+        self._create_challenges()
         self._create_transactions(users, products)
 
         self.stdout.write(self.style.SUCCESS("\nSeed completado exitosamente!"))
@@ -123,8 +127,10 @@ class Command(BaseCommand):
                 user.is_email_verified = True
                 user.save()
             else:
-                # Actualizar puntos y perfil si ya existe
+                # Preserve earned points on existing users; only refresh profile metadata.
                 for k, v in data.items():
+                    if k == "points":
+                        continue
                     setattr(user, k, v)
                 user.is_active = True
                 user.is_email_verified = True
@@ -208,7 +214,6 @@ class Command(BaseCommand):
                 "price": "450.00",
                 "image_url": "https://images.unsplash.com/photo-1589998059171-988d887df646?w=400",
             },
-
             # Electronica
             {
                 "seller": users[0],  # Jose
@@ -260,7 +265,6 @@ class Command(BaseCommand):
                 "price": "1200.00",
                 "image_url": "https://images.unsplash.com/photo-1564466809058-bf4114d55352?w=400",
             },
-
             # Ropa y Accesorios
             {
                 "seller": users[5],  # Sofía
@@ -292,7 +296,6 @@ class Command(BaseCommand):
                 "price": "600.00",
                 "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
             },
-
             # Muebles
             {
                 "seller": users[0],  # Jose
@@ -324,7 +327,6 @@ class Command(BaseCommand):
                 "price": None,
                 "image_url": "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400",
             },
-
             # Deportes
             {
                 "seller": users[4],  # Diego
@@ -356,7 +358,6 @@ class Command(BaseCommand):
                 "price": "280.00",
                 "image_url": "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400",
             },
-
             # Transporte
             {
                 "seller": users[2],  # Carlos
@@ -378,7 +379,6 @@ class Command(BaseCommand):
                 "price": "5500.00",
                 "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400",
             },
-
             # Instrumentos Musicales
             {
                 "seller": users[6],  # Pedro
@@ -400,7 +400,6 @@ class Command(BaseCommand):
                 "price": None,
                 "image_url": "https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400",
             },
-
             # Arte y Papeleria
             {
                 "seller": users[3],  # Ana
@@ -422,7 +421,6 @@ class Command(BaseCommand):
                 "price": "1200.00",
                 "image_url": "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=400",
             },
-
             # Cocina y Hogar
             {
                 "seller": users[5],  # Sofía
@@ -444,7 +442,6 @@ class Command(BaseCommand):
                 "price": "380.00",
                 "image_url": "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400",
             },
-
             # Videojuegos
             {
                 "seller": users[4],  # Diego
@@ -685,6 +682,196 @@ class Command(BaseCommand):
 
         self.stdout.write(f"    {count} reglas de puntos creadas")
 
+    def _create_challenges(self):
+        self.stdout.write("  Creando retos de gamificacion...")
+        now = timezone.now()
+        period_specs = {
+            "daily": {
+                "duration": timedelta(days=1, hours=4),
+                "start_offset": timedelta(hours=6),
+            },
+            "weekly": {
+                "duration": timedelta(days=7, hours=6),
+                "start_offset": timedelta(days=1),
+            },
+            "monthly": {
+                "duration": timedelta(days=30, hours=8),
+                "start_offset": timedelta(days=2),
+            },
+        }
+
+        challenge_catalog = [
+            {
+                "period": "daily",
+                "title": "Publica 1 articulo util hoy",
+                "description": "Sube un articulo en buen estado con descripcion clara y foto para que alguien del campus pueda reutilizarlo hoy.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 1,
+                "bonus_points": 15,
+            },
+            {
+                "period": "daily",
+                "title": "Concreta 2 ventas express",
+                "description": "Cierra dos ventas y acuerda puntos de entrega en ITESO para mover articulos rapidamente y con seguridad.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 2,
+                "bonus_points": 18,
+            },
+            {
+                "period": "daily",
+                "title": "Completa 2 intercambios inteligentes",
+                "description": "Intercambia dos articulos por cosas que realmente te sirvan y confirma las transacciones dentro de la app.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 2,
+                "bonus_points": 20,
+            },
+            {
+                "period": "daily",
+                "title": "Dona 2 articulos que ya no uses",
+                "description": "Entrega dos articulos funcionales que puedan tener segunda vida con otras personas de la comunidad ITESO.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 2,
+                "bonus_points": 22,
+            },
+            {
+                "period": "daily",
+                "title": "Gana 2 resenas positivas",
+                "description": "Brinda buenas experiencias en tus transacciones para recibir dos calificaciones positivas hoy.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 2,
+                "bonus_points": 16,
+            },
+            {
+                "period": "daily",
+                "title": "Publica 2 articulos de estudio",
+                "description": "Sube dos articulos academicos (libros, apuntes o material) con detalles suficientes para facilitar su reutilizacion.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 2,
+                "bonus_points": 24,
+            },
+            {
+                "period": "weekly",
+                "title": "Semana circular: publica 4 articulos",
+                "description": "Mantente activo durante la semana y publica cuatro articulos en categorias distintas del marketplace.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 4,
+                "bonus_points": 40,
+            },
+            {
+                "period": "weekly",
+                "title": "Vendedor confiable: completa 3 ventas",
+                "description": "Completa tres ventas en la semana manteniendo comunicacion clara y entregas acordadas.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 3,
+                "bonus_points": 45,
+            },
+            {
+                "period": "weekly",
+                "title": "Intercambio activo: 2 trueques cerrados",
+                "description": "Conecta con otros estudiantes y concreta dos intercambios que beneficien a ambas partes.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 2,
+                "bonus_points": 42,
+            },
+            {
+                "period": "weekly",
+                "title": "Solidaridad ITESO: dona 3 articulos",
+                "description": "Dona tres articulos en buen estado para apoyar a otras personas y reducir desperdicio en campus.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 3,
+                "bonus_points": 50,
+            },
+            {
+                "period": "weekly",
+                "title": "Reputacion en crecimiento: 3 resenas positivas",
+                "description": "Consigue tres resenas positivas durante la semana con entregas puntuales y trato amable.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 3,
+                "bonus_points": 36,
+            },
+            {
+                "period": "weekly",
+                "title": "Limpieza de closet: vende 2 articulos",
+                "description": "Activa tus articulos de ropa o accesorios y completa dos ventas durante la semana.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 2,
+                "bonus_points": 38,
+            },
+            {
+                "period": "monthly",
+                "title": "Mes sostenible: publica 10 articulos",
+                "description": "Construye un catalogo util para la comunidad publicando diez articulos durante el mes.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 10,
+                "bonus_points": 90,
+            },
+            {
+                "period": "monthly",
+                "title": "Mercado en movimiento: completa 8 ventas",
+                "description": "Ayuda a que mas objetos encuentren nuevo duenio completando ocho ventas en el mes.",
+                "challenge_type": ChallengeType.SALE,
+                "goal": 8,
+                "bonus_points": 95,
+            },
+            {
+                "period": "monthly",
+                "title": "Comunidad colaborativa: 6 intercambios",
+                "description": "Consolida habitos de reutilizacion cerrando seis intercambios con entregas confirmadas.",
+                "challenge_type": ChallengeType.EXCHANGE,
+                "goal": 6,
+                "bonus_points": 92,
+            },
+            {
+                "period": "monthly",
+                "title": "Impacto social: dona 8 articulos",
+                "description": "Dona articulos utiles para que sigan en uso y evita que terminen en desecho dentro de la comunidad.",
+                "challenge_type": ChallengeType.DONATION,
+                "goal": 8,
+                "bonus_points": 105,
+            },
+            {
+                "period": "monthly",
+                "title": "Servicio top: 10 resenas positivas",
+                "description": "Gana diez resenas positivas en el mes ofreciendo experiencias de transaccion consistentes.",
+                "challenge_type": ChallengeType.REVIEW,
+                "goal": 10,
+                "bonus_points": 88,
+            },
+            {
+                "period": "monthly",
+                "title": "Recircula tecnologia: publica 5 articulos",
+                "description": "Publica al menos cinco articulos de tecnologia para impulsar su reutilizacion en la comunidad.",
+                "challenge_type": ChallengeType.PUBLISH,
+                "goal": 5,
+                "bonus_points": 84,
+            },
+        ]
+
+        challenges_data = []
+        for index, challenge in enumerate(challenge_catalog):
+            spec = period_specs[challenge["period"]]
+            start_date = now - timedelta(minutes=30) - timedelta(minutes=index)
+            end_date = start_date + spec["duration"]
+
+            challenges_data.append(
+                {
+                    "title": challenge["title"],
+                    "description": challenge["description"],
+                    "challenge_type": challenge["challenge_type"],
+                    "goal": challenge["goal"],
+                    "bonus_points": challenge["bonus_points"],
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "is_active": True,
+                }
+            )
+
+        deleted_count, _ = Challenge.objects.all().delete()
+        Challenge.objects.bulk_create(Challenge(**data) for data in challenges_data)
+
+        self.stdout.write(f"    {deleted_count} retos eliminados")
+        self.stdout.write(f"    {len(challenges_data)} retos creados")
+
     def _create_transactions(self, users, products):
         self.stdout.write("  Creando transacciones...")
         now = timezone.now()
@@ -756,8 +943,16 @@ class Command(BaseCommand):
                     "delivery_location": t_data["delivery_location"],
                     "seller_confirmation": t_data["seller_confirmation"],
                     "buyer_confirmation": t_data["buyer_confirmation"],
-                    "seller_confirmed_at": now - timedelta(days=t_data["days_ago"]) if t_data["seller_confirmation"] else None,
-                    "buyer_confirmed_at": now - timedelta(days=t_data["days_ago"]) if t_data["buyer_confirmation"] else None,
+                    "seller_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["seller_confirmation"]
+                        else None
+                    ),
+                    "buyer_confirmed_at": (
+                        now - timedelta(days=t_data["days_ago"])
+                        if t_data["buyer_confirmation"]
+                        else None
+                    ),
                 },
             )
             if created:

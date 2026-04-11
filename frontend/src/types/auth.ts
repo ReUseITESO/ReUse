@@ -9,6 +9,8 @@ export interface User {
   profile_picture: string | null;
   date_joined: string;
   last_login: string | null;
+  // HU-CORE-17: flag de desactivación lógica
+  is_deactivated?: boolean;
 }
 
 export interface AuthTokens {

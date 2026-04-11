@@ -1,2 +1,16 @@
-# Force LF for shell scripts (prevents CRLF issues on Windows)
+# Normalize line endings
+* text=auto
+
+# Force LF for shell scripts (critical for Docker/Linux compatibility)
 *.sh text eol=lf
+
+# Force LF for Python files
+*.py text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

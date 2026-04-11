@@ -1,13 +1,12 @@
 from django.test import TestCase
 
 from core.models import User
-from gamification.models.point_rule import PointRule, PointAction
+from gamification.models.point_rule import PointAction, PointRule
 from gamification.models.point_transaction import PointTransaction
 from gamification.services.point_service import award_points
 
 
 class AwardPointsServiceTest(TestCase):
-
     def setUp(self):
         self.user = User.objects.create(
             email="test.user@iteso.mx",
@@ -17,9 +16,7 @@ class AwardPointsServiceTest(TestCase):
         )
 
         self.rule = PointRule.objects.create(
-            action=PointAction.PUBLISH_ITEM,
-            points=5,
-            is_active=True
+            action=PointAction.PUBLISH_ITEM, points=5, is_active=True
         )
 
     def test_award_points_increases_user_points(self):

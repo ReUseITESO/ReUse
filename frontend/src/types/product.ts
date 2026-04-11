@@ -1,8 +1,16 @@
-export type ProductStatus = 'disponible' | 'en_proceso' | 'completado' | 'cancelado';
+export type ProductStatus = 'disponible' | 'pausado' | 'en_proceso' | 'completado' | 'cancelado';
 
 export type ProductCondition = 'nuevo' | 'como_nuevo' | 'buen_estado' | 'usado';
 
 export type TransactionType = 'donation' | 'sale' | 'swap';
+
+export type ProductReactionType = 'like' | 'dislike';
+
+export interface ProductReactionSummary {
+  likes_count: number;
+  dislikes_count: number;
+  user_reaction: ProductReactionType | null;
+}
 
 export interface Category {
   id: number;
@@ -28,8 +36,23 @@ export interface Product {
   category: Category;
   seller_id: number;
   seller_name: string;
+  has_active_transaction: boolean;
+  likes_count: number;
+  dislikes_count: number;
+  user_reaction: ProductReactionType | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProductBasicDetailsProps {
+  title: string;
+  description: string;
+  categoryName: string;
+  condition?: ProductCondition | null;
+  fallbackConditionLabel?: string;
+  transactionType?: TransactionType;
+  price?: string | null;
+  showTransactionBadge?: boolean;
 }
 
 export interface ProductDetail extends Product {
@@ -65,4 +88,13 @@ export interface FormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
+}
+
+export interface ChangeStatusResult {
+  product: Product | null;
+  error: string | null;
+}
+
+export interface ProductCardProps {
+  product: Product;
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ArrowLeft, PackagePlus, Shapes } from 'lucide-react';
 
 import MyProductList from '@/components/products/MyProductList';
 
@@ -10,25 +11,37 @@ export const metadata: Metadata = {
 
 export default function MyProductsPage() {
   return (
-    <main className="px-6 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
+    <main className="space-y-6 px-4 py-8 sm:px-6">
+      <Link
+        href="/profile"
+        className="inline-flex items-center gap-2 rounded-lg border border-input bg-card px-3 py-1.5 text-sm text-muted-fg transition-colors hover:bg-muted hover:text-fg"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Volver a perfil
+      </Link>
+
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-2">
+              <Shapes className="h-5 w-5 text-secondary" />
+              <h1 className="text-h1 font-bold text-fg">Mis artículos</h1>
+            </div>
+            <p className="text-sm text-muted-fg">
+              Gestiona disponibilidad, edición y estado de tus publicaciones.
+            </p>
+          </div>
+
           <Link
-            href="/profile"
-            className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-700"
+            href="/products/new"
+            className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-ring/20 focus:ring-offset-2"
           >
-            &larr; Volver a perfil
+            <PackagePlus className="h-4 w-4" />
+            Publicar artículo
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">Mis artículos</h1>
         </div>
-        <Link
-          href="/products/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2"
-        >
-          <span aria-hidden="true">+</span>
-          Publicar artículo
-        </Link>
       </div>
+
       <MyProductList />
     </main>
   );

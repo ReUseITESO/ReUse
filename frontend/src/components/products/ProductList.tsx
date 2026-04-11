@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronLeft, ChevronRight, ListFilter } from 'lucide-react';
 
 import SearchBar from '@/components/products/SearchBar';
 import FilterBar from '@/components/products/FilterBar';
 import SearchResultsBadge from '@/components/products/SearchResultsBadge';
 import ProductCard from '@/components/products/ProductCard';
+import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import EmptyState from '@/components/ui/EmptyState';
@@ -14,91 +16,116 @@ import { useProducts } from '@/hooks/useProducts';
 import type { ProductFilters } from '@/hooks/useProducts';
 
 export default function ProductList() {
-    const {
-        products, totalCount, currentPage, hasNextPage, hasPrevPage,
-        isLoading, error, hasFilters, fetchProducts, goToPage,
-    } = useProducts();
+  const {
+    products,
+    totalCount,
+    currentPage,
+    hasNextPage,
+    hasPrevPage,
+    isLoading,
+    error,
+    hasFilters,
+    fetchProducts,
+    goToPage,
+  } = useProducts();
 
-    // Search text and filter selects are tracked separately so each can reset
-    // independently, but they are always merged into one API call.
-    const [currentSearch, setCurrentSearch] = useState('');
-    const [currentFilters, setCurrentFilters] = useState<Omit<ProductFilters, 'search'>>({});
+  const [currentSearch, setCurrentSearch] = useState('');
+  const [currentFilters, setCurrentFilters] = useState<Omit<ProductFilters, 'search'>>({});
 
-    function handleSearch(query: string) {
-        setCurrentSearch(query);
-        fetchProducts({ ...currentFilters, search: query }); // resets to page 1
-    }
+  function handleSearch() {
+    fetchProducts({ ...currentFilters, search: currentSearch.trim() });
+  }
 
-    function handleFilterChange(filters: Omit<ProductFilters, 'search'>) {
-        setCurrentFilters(filters);
-        fetchProducts({ ...filters, search: currentSearch }); // resets to page 1
-    }
+  function handleFilterChange(filters: Omit<ProductFilters, 'search'>) {
+    setCurrentFilters(filters);
+    fetchProducts({ ...filters, search: currentSearch.trim() });
+  }
 
-    function handleShowAll() {
-        setCurrentSearch('');
-        setCurrentFilters({});
-        fetchProducts();
-    }
+  function handleShowAll() {
+    setCurrentSearch('');
+    setCurrentFilters({});
+    fetchProducts();
+  }
 
-    return (
-        <>
-            <SearchBar onSearch={handleSearch} onShowAll={handleShowAll} />
-            <FilterBar filters={currentFilters} onChange={handleFilterChange} />
+  return (
+    <>
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-card to-secondary/5 p-4 shadow-sm">
+        <span className="inline-flex items-center gap-2 text-sm font-semibold text-fg">
+          <ListFilter className="h-4 w-4 text-info" />
+          Buscar y filtrar marketplace
+        </span>
 
-            {hasFilters && (
-                <SearchResultsBadge totalCount={totalCount} isLoading={isLoading} />
-            )}
+        <div className="mt-4">
+          <SearchBar
+            query={currentSearch}
+            onQueryChange={setCurrentSearch}
+            onSearch={() => handleSearch()}
+            onShowAll={handleShowAll}
+            showContainer={false}
+            showShowAllButton={hasFilters}
+          />
+        </div>
 
-            <section className="mt-6">
-                {isLoading && <Spinner />}
+        <FilterBar filters={currentFilters} onChange={handleFilterChange} showContainer={false} />
+      </section>
 
-                {error && (
-                    <ErrorMessage message={error} onRetry={() => fetchProducts()} />
-                )}
+      <SearchResultsBadge totalCount={totalCount} isLoading={isLoading} hasFilters={hasFilters} />
 
-                {!isLoading && !error && products.length === 0 && (
-                    <EmptyState
-                        message={hasFilters ? 'No se encontraron productos con esos filtros' : 'No se ha registrado ningun articulo o producto'}
-                        actionLabel={hasFilters ? 'Mostrar todos' : undefined}
-                        onAction={hasFilters ? handleShowAll : undefined}
-                    />
-                )}
+      <section className="mt-6">
+        {isLoading && <Spinner />}
 
-                {!isLoading && !error && products.length > 0 && (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {products.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                )}
+        {error && <ErrorMessage message={error} onRetry={() => fetchProducts()} />}
 
-                {/* ── Pagination ─────────────────────────────────────────── */}
-                {!isLoading && !error && (hasNextPage || hasPrevPage) && (
-                    <div className="mt-8 flex items-center justify-center gap-4">
-                        <button
-                            type="button"
-                            disabled={!hasPrevPage}
-                            onClick={() => goToPage(currentPage - 1)}
-                            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                            ← Anterior
-                        </button>
+        {!isLoading && !error && products.length === 0 && (
+          <EmptyState
+            message={
+              hasFilters
+                ? 'No se encontraron productos con esos filtros'
+                : 'No se ha registrado ningun articulo o producto'
+            }
+            actionLabel={hasFilters ? 'Mostrar todos' : undefined}
+            onAction={hasFilters ? handleShowAll : undefined}
+          />
+        )}
 
-                        <span className="text-sm text-gray-500">
-                            Página {currentPage} &nbsp;·&nbsp; {totalCount} productos
-                        </span>
+        {!isLoading && !error && products.length > 0 && (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
-                        <button
-                            type="button"
-                            disabled={!hasNextPage}
-                            onClick={() => goToPage(currentPage + 1)}
-                            className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                            Siguiente →
-                        </button>
-                    </div>
-                )}
-            </section>
-        </>
-    );
+        {!isLoading && !error && (hasNextPage || hasPrevPage) && (
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <Button
+              type="button"
+              variant="template"
+              disabled={!hasPrevPage}
+              onClick={() => goToPage(currentPage - 1)}
+              className="inline-flex items-center gap-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
+            </Button>
+
+            <span className="text-sm text-muted-fg">
+              Página {currentPage} &nbsp;·&nbsp; {totalCount} productos
+            </span>
+
+            <Button
+              type="button"
+              variant="template"
+              disabled={!hasNextPage}
+              onClick={() => goToPage(currentPage + 1)}
+              className="inline-flex items-center gap-2"
+            >
+              Siguiente →
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </section>
+    </>
+  );
 }

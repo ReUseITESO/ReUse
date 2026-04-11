@@ -1,7 +1,8 @@
+import logging
+import os
 from datetime import timedelta
 from pathlib import Path
 
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     "core",
     "marketplace",
     "gamification",
+    "social",
 ]
 
 MIDDLEWARE = [
@@ -113,6 +115,13 @@ AUTHENTICATION_BACKENDS = [
     "core.backends.EmailBackend",
 ]
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "reuse-rate-limit",
+    }
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -120,6 +129,17 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "core.throttles.StandardAnonThrottle",
+        "core.throttles.StandardUserThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+        "auth": "5/minute",
+        "email_verification": "3/minute",
+        "reactivation": "3/hour",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": [
@@ -151,9 +171,22 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "TAGS": [
-        {"name": "Core > Auth", "description": "Authentication endpoints (register, login, token refresh)."},
-        {"name": "Marketplace > Products", "description": "Product listing and detail endpoints."},
-        {"name": "Marketplace > Categories", "description": "Product category endpoints."},
+        {
+            "name": "Core > Auth",
+            "description": "Authentication endpoints (register, login, token refresh).",
+        },
+        {
+            "name": "Marketplace > Products",
+            "description": "Product listing and detail endpoints.",
+        },
+        {
+            "name": "Marketplace > Categories",
+            "description": "Product category endpoints.",
+        },
+        {
+            "name": "Marketplace > Transactions",
+            "description": "Transaction flow endpoints for buyer and seller actions.",
+        },
     ],
     "CONTACT": {
         "name": "ReUseITESO Team",
@@ -187,18 +220,18 @@ SPECTACULAR_SETTINGS = {
 
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002"
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002",
 ).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -211,34 +244,33 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "x-mock-user-id",  # For mock authentication in development
 ]
-
 # LOGGING CONFIGURATION
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'timestamp_format': {
-            'format': '%(asctime)s - %(levelname)s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "timestamp_format": {
+            "format": "%(asctime)s - %(levelname)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'app.log',
-            'mode': 'a',
-            'formatter': 'timestamp_format',
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "app.log",
+            "mode": "a",
+            "formatter": "timestamp_format",
         },
     },
-    'root': { 
-        'handlers': ['file'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["file"],
+        "level": "INFO",
     },
 }
 
-import logging
 logger = logging.getLogger(__name__)
 logger.info("Application started")
 
@@ -248,12 +280,29 @@ AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
 AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
 
 FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
-EMAIL_VERIFICATION_EXPIRES_MINUTES = int(os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30"))
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID", "")
+MICROSOFT_CLIENT_SECRET = os.environ.get("MICROSOFT_CLIENT_SECRET", "")
+MICROSOFT_TENANT_ID = os.environ.get("MICROSOFT_TENANT_ID", "common")
+MICROSOFT_REDIRECT_URI = os.environ.get(
+    "MICROSOFT_REDIRECT_URI", "http://localhost:3000/auth/microsoft/callback"
+)
+EMAIL_VERIFICATION_EXPIRES_MINUTES = int(
+    os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30")
+)
+
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "apikey")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@reuse.com")
+
+# Si no hay API key de SendGrid configurada, usar consola (los emails se imprimen en el log).
+# Para usar SMTP real, establecer EMAIL_HOST_PASSWORD en el entorno.
+_default_email_backend = (
+    "django.core.mail.backends.console.EmailBackend"
+    if not EMAIL_HOST_PASSWORD
+    else "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", _default_email_backend)

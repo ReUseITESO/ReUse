@@ -44,10 +44,10 @@ services:
       EMAIL_HOST_PASSWORD: "${SENDGRID_API_KEY:-}"
       DEFAULT_FROM_EMAIL: reuseiteso@outlook.com
       EMAIL_VERIFICATION_EXPIRES_MINUTES: "30"
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_STORAGE_BUCKET_NAME: "${AWS_STORAGE_BUCKET_NAME:-iteso-reuse-product-images}"
-      AWS_S3_REGION_NAME: "${AWS_S3_REGION_NAME:-us-east-2}"
+      MICROSOFT_CLIENT_ID: "${MICROSOFT_CLIENT_ID:-}"
+      MICROSOFT_CLIENT_SECRET: "${MICROSOFT_CLIENT_SECRET:-}"
+      MICROSOFT_TENANT_ID: "${MICROSOFT_TENANT_ID:-common}"
+      MICROSOFT_REDIRECT_URI: "http://localhost:3000/auth/microsoft/callback"
     ports:
       - "8000:8000"
     volumes:

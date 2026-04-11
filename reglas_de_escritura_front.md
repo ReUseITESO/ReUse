@@ -249,6 +249,201 @@ export default function ProductsPage() {
   )}>
   ```
 
+### Variables Globales de Color y Tipografía
+
+Los colores, tipografía y variantes de botones están centralizados en dos archivos. **No existe otra fuente de verdad.**
+
+- `src/app/globals.css` — define las variables CSS en `:root` (light) y `.dark`
+- `tailwind.config.js` — mapea cada variable a una clase utilitaria de Tailwind
+
+**Regla obligatoria:** Nunca hardcodear colores en componentes.
+
+```tsx
+// MAL – color hardcodeado
+<button className="bg-[#004976] text-white">Publicar</button>
+<div style={{ color: '#155DFC' }}>Texto</div>
+<div className="text-blue-700">Texto</div>   {/* color nativo Tailwind */}
+
+// BIEN – usando variables globales
+<button className="bg-btn-primary text-btn-primary-fg">Publicar</button>
+<div className="text-secondary">Texto</div>
+```
+
+#### Por qué los colores están en formato HSL (y no hex)
+
+Los colores en `globals.css` están definidos como **valores HSL sin wrapper** (p. ej. `203 100% 23%`), no como hex (`#004976`). Esto es obligatorio para que Tailwind pueda aplicar modificadores de opacidad con la sintaxis barra (`/`).
+
+**Cómo funciona internamente:**
+
+Cuando Tailwind ve `bg-primary/10`, necesita inyectar el canal alpha en la declaración CSS. Para lograrlo, en `tailwind.config.js` cada color se mapea con el placeholder `<alpha-value>`:
+
+```js
+// tailwind.config.js
+primary: 'hsl(var(--primary) / <alpha-value>)'
+```
+
+Tailwind reemplaza `<alpha-value>` por el número de la barra dividido entre 100:
+- `bg-primary` → `hsl(var(--primary) / 1)` (100% opaco)
+- `bg-primary/10` → `hsl(var(--primary) / 0.1)` (10% opaco)
+- `bg-primary/30` → `hsl(var(--primary) / 0.3)` (30% opaco)
+
+**Por qué hex no funciona:**
+
+Con hex, el CSS generado sería `rgb(#004976 / 0.1)`, que es inválido. Con HSL (valores sueltos `H S% L%`), el CSS generado es `hsl(203 100% 23% / 0.1)`, que es perfectamente válido en CSS moderno.
+
+**Escala de opacidad `/N`:**
+
+```
+/10  →  10% opaco  → fondo muy suave (ideal para badges)
+/20  →  20% opaco
+/30  →  30% opaco  → borde sutil (ideal para bordes de badges)
+/50  →  50% opaco  → semitransparente
+/100 → 100% opaco  → color sólido (equivale a no poner barra)
+```
+
+Cuanto más bajo el número, más transparente. Los badges de este proyecto usan el patrón `bg-{color}/10 text-{color} border border-{color}/30` precisamente por esto.
+
+#### Tipografía
+
+| Nivel | Clase Tailwind | Variable CSS | Tamaño |
+|-------|----------------|--------------|--------|
+| Título principal | `text-h1` | `--text-h1` | 24px |
+| Título de sección | `text-h2` | `--text-h2` | 20px |
+| Subtítulo | `text-h3` | `--text-h3` | 18px |
+| Cuerpo | `text-body` | `--text-body` | 16px |
+| Pequeño / metadata | `text-sm` | `--text-sm` | 14px |
+| Labels / timestamps | `text-xs` | `--text-xs` | 12px |
+
+| Peso | Clase Tailwind | Variable CSS |
+|------|----------------|---------------|
+| Regular | `font-normal` | `--font-normal` |
+| Medio (botones) | `font-medium` | `--font-medium` |
+| Semibold (precios) | `font-semibold` | `--font-semibold` |
+| Negrita (títulos) | `font-bold` | `--font-bold` |
+
+Las etiquetas semánticas HTML tienen estilos aplicados automáticamente vía `@layer base` en `globals.css`. **No es necesario agregar clases de tamaño manualmente** a `h1`, `h2`, `h3`, `h4`, `p`, `small` ni `label`.
+
+| Etiqueta | Tamaño automático | Peso automático |
+|----------|-------------------|-----------------|
+| `<h1>` | `text-h1` (24px) | `font-bold` |
+| `<h2>` | `text-h2` (20px) | `font-semibold` |
+| `<h3>` | `text-h3` (18px) | `font-semibold` |
+| `<h4>` | `text-body` (16px) | `font-semibold` |
+| `<p>` | `text-body` (16px) | `font-normal` |
+| `<small>` | `text-xs` (12px) | `font-normal` |
+| `<label>` | `text-sm` (14px) | `font-medium` |
+
+```tsx
+// BIEN – las etiquetas semánticas ya tienen el tamaño correcto
+<h1 className="text-fg">Productos disponibles</h1>
+<h2 className="text-fg">Categorías</h2>
+<p className="text-fg">Descripción del item</p>
+<span className="text-xs font-medium text-muted-fg">Hace 2h</span>
+
+// También BIEN – sobreescribir cuando el diseño lo requiera
+<h2 className="text-h3 font-bold text-primary">Caso especial</h2>
+
+// MAL – tamaño hardcodeado
+<h1 className="text-[24px]">Productos</h1>
+<p  className="text-base">Texto</p>   {/* clase nativa Tailwind */}
+```
+
+#### Clases de color disponibles
+
+| Categoría | Clases Tailwind | Variable CSS |
+|-----------|-----------------|---------------|
+| **Principales** | `bg-primary` / `text-primary` | `--primary` |
+| | `bg-secondary` / `text-secondary` | `--secondary` |
+| | `bg-accent` / `text-accent` | `--accent` |
+| **Superficie** | `bg-bg` / `text-fg` | `--bg`, `--fg` |
+| | `bg-card` / `text-card-fg` | `--card` |
+| | `bg-muted` / `text-muted-fg` | `--muted-fg` |
+| **Feedback** | `bg-success` / `text-success-fg` | `--success` |
+| | `bg-warning` / `text-warning-fg` | `--warning` |
+| | `bg-error` / `text-error-fg` | `--error` |
+| | `bg-info` / `text-info-fg` | `--info` |
+| **Categorías** | `bg-cat-books` | `--cat-books` |
+| | `bg-cat-electronics` | `--cat-electronics` |
+| | `bg-cat-clothing` | `--cat-clothing` |
+| | `bg-cat-supplies` | `--cat-supplies` |
+
+#### Variantes de botones
+
+| Variante | Uso | Clases base |
+|----------|-----|-------------|
+| `primary` | Acción principal | `bg-btn-primary text-btn-primary-fg hover:bg-primary-hover` |
+| `secondary` | Acción secundaria | `bg-btn-secondary text-btn-secondary-fg hover:bg-secondary-hover` |
+| `template` | Ghost / outline | `bg-btn-tmpl text-btn-tmpl-fg border border-btn-tmpl-border hover:bg-btn-tmpl-hover` |
+| `disabled` | Deshabilitado | `bg-btn-disabled text-btn-disabled-fg cursor-not-allowed` |
+
+```tsx
+// Ejemplos de variantes de botón
+<button className="bg-btn-primary text-btn-primary-fg rounded px-4 py-2 hover:bg-primary-hover">
+  Publicar item
+</button>
+
+<button className="bg-btn-secondary text-btn-secondary-fg rounded px-4 py-2 hover:bg-secondary-hover">
+  Ver más
+</button>
+
+<button className="bg-btn-tmpl text-btn-tmpl-fg border border-btn-tmpl-border rounded px-4 py-2 hover:bg-btn-tmpl-hover">
+  Cancelar
+</button>
+
+<button
+  className="bg-btn-disabled text-btn-disabled-fg rounded px-4 py-2 cursor-not-allowed"
+  disabled
+>
+  No disponible
+</button>
+```
+
+#### Agregar nuevos colores
+
+Si necesitas un color que no existe:
+
+1. Convierte el color a HSL (usa una herramienta como [hslpicker.com](https://hslpicker.com) o el devtools del navegador). El valor debe ser **solo los tres números** sin la función `hsl()`:
+   ```css
+   /* ✅ Correcto — solo valores H S% L% */
+   --mi-color: 260 80% 55%;
+
+   /* ❌ Incorrecto — no incluir hex ni wrapper hsl() */
+   --mi-color: #7c3aed;
+   --mi-color: hsl(260, 80%, 55%);
+   ```
+2. Agrégalo en `src/app/globals.css` dentro de `:root` Y su equivalente en `.dark`:
+   ```css
+   :root {
+     --mi-color: 260 80% 55%;
+   }
+   .dark {
+     --mi-color: 270 85% 65%;
+   }
+   ```
+3. Mapéalo en `tailwind.config.js` con el formato `<alpha-value>` para habilitar modificadores de opacidad:
+   ```js
+   'mi-color': 'hsl(var(--mi-color) / <alpha-value>)',
+   ```
+4. Usa la nueva clase Tailwind en el componente. Ya puedes usar modificadores de opacidad:
+   ```tsx
+   <div className="bg-mi-color/10 text-mi-color border border-mi-color/30">...</div>
+   ```
+
+**Prohibido:**
+
+```tsx
+<div className="bg-[#7c3aed]">...</div>       // Valor hex hardcodeado
+<div style={{ color: '#7c3aed' }}>...</div>   // Style inline con hex
+<div className="text-purple-600">...</div>     // Color nativo de Tailwind
+```
+
+**Prohibido también en globals.css:**
+
+```css
+/* ❌ No registrar colores en hex — rompe los modificadores de opacidad de Tailwind */
+--mi-color: #7c3aed;
+```
+
 ---
 
 ## 5. Manejo de Estados de UI

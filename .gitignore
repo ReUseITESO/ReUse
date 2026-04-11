@@ -62,6 +62,11 @@ db.sqlite3-journal
 # Ignore Django migrations
 **/migrations/
 !**/migrations/__init__.py
+**/migrations/core/
+**/migrations/marketplace/
+**/migrations/gamification/
+!backend/social/migrations/
+!backend/social/migrations/*.py
 
 # Flask stuff:
 instance/
@@ -212,3 +217,9 @@ __marimo__/
 node_modules/
 .next/
 out/
+
+# Django migrations in backend (do not commit generated migration files)
+backend/**/migrations/*.py
+!backend/social/migrations/
+!backend/social/migrations/*.py
+!backend/**/migrations/__init__.py
