@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
 import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 interface BadgeNotification {
   id: number;
@@ -47,11 +48,8 @@ export default function Navbar() {
       }
     };
 
-    // Initial fetch
     fetchNotifications();
-    // Poll every 15 seconds
     const intervalId = setInterval(fetchNotifications, 15000);
-
     return () => clearInterval(intervalId);
   }, [isAuthenticated, activeBadgeNotification]);
 
@@ -111,12 +109,7 @@ export default function Navbar() {
               >
                 <Plus className="h-4 w-4" /> Publicar
               </Link>
-              <button
-                className="relative rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
-                aria-label="Notificaciones"
-              >
-                <Bell className="h-5 w-5" />
-              </button>
+              <NotificationBell />
               <ThemeToggle />
               <div className="relative">
                 <button
@@ -230,9 +223,13 @@ export default function Navbar() {
                 >
                   <Plus className="h-5 w-5" /> Publicar item
                 </Link>
-                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted">
+                <Link
+                  href="/notifications"
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted"
+                >
                   <Bell className="h-5 w-5" /> Notificaciones
-                </button>
+                </Link>
               </>
             )}
           </div>

@@ -2,8 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from . import views
-from . import views_deactivation
+from . import views, views_deactivation, views_notifications
 
 app_name = "auth"
 
@@ -39,7 +38,6 @@ urlpatterns = [
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
     path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
-
     # HU-CORE-17: Desactivación y reactivación lógica de cuenta
     path(
         "account/deactivate/",
@@ -55,6 +53,27 @@ urlpatterns = [
         "account/reactivate/confirm/",
         views_deactivation.AccountReactivateConfirmView.as_view(),
         name="account-reactivate-confirm",
+    ),
+    # HU-CORE-14: Notifications
+    path(
+        "notifications/count/",
+        views_notifications.NotificationCountView.as_view(),
+        name="notifications-count",
+    ),
+    path(
+        "notifications/read-all/",
+        views_notifications.NotificationMarkAllReadView.as_view(),
+        name="notifications-read-all",
+    ),
+    path(
+        "notifications/<int:pk>/read/",
+        views_notifications.NotificationMarkReadView.as_view(),
+        name="notifications-read",
+    ),
+    path(
+        "notifications/",
+        views_notifications.NotificationListView.as_view(),
+        name="notifications-list",
     ),
 ]
 
