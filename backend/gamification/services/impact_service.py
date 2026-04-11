@@ -26,7 +26,6 @@ def get_user_impact(user):
 
     return {
         "items_reused": items_reused,
-        "items_saved_from_waste": items_reused,
         "co2_avoided": round(co2_avoided, 2),
         "community_average_items": round(float(avg_items), 2),
         "community_average_co2": round(float(avg_co2), 2),

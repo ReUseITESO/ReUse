@@ -29,7 +29,6 @@ export default function EcoImpactCard() {
     return (
       <div className="rounded-lg bg-warning/5 border border-warning/20 p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">⚠️</span>
           <div>
             <p className="text-sm text-fg font-medium">
               Usuario no autenticado
@@ -79,16 +78,11 @@ export default function EcoImpactCard() {
             {data.items_reused} items reutilizados
           </p>
         </div>
-
-        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-500/10">
-          <span className="text-2xl">🌱</span>
-        </div>
       </div>
 
       {/* Métricas */}
       <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
         <Metric title="Reutilizados" value={data.items_reused} />
-        <Metric title="Salvados" value={data.items_saved_from_waste} />
         <Metric title="CO₂ evitado" value={`${data.co2_avoided} kg`} />
         <Metric title="Promedio comunidad" value={data.community_average_items} />
       </div>
