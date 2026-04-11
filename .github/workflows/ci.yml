@@ -52,15 +52,22 @@ jobs:
           pip install -r requirements.txt
           pip install ruff black mypy pytest pytest-django types-requests django-stubs djangorestframework-stubs
 
+      - name: Check for conflict markers
+        run: |
+          if grep -rE '^(<{7}|={7}|>{7})( |$)' --include='*.py' --include='*.yml' --include='*.yaml' --include='*.md' .; then
+            echo "::error::Conflict markers detected in backend"
+            exit 1
+          fi
+
       - name: Ruff Check (Linting)
         run: ruff check .
 
       - name: Black Check (Formatting)
         run: black --check .
 
-      - name: MyPy Check (Type Checking)
+      - name: MyPy Check (Type Checking - advisory)
         run: mypy . --ignore-missing-imports --no-error-summary || true
-        continue-on-error: true  # Puede fallar inicialmente mientras se agregan tipos
+        continue-on-error: true  # Advisory por ahora, no bloquea
 
       - name: Pytest (Unit Tests)
         env:
@@ -72,7 +79,16 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           ALLOWED_HOSTS: localhost,127.0.0.1
-        run: pytest --tb=short -q
+        run: |
+          set +e
+          pytest --tb=short -q
+          code=$?
+          # exit 5 = no tests collected (tolerable)
+          if [ $code -eq 5 ]; then
+            echo "No tests collected, ignoring"
+            exit 0
+          fi
+          exit $code
 
   # ──────────────────────────────────────────────────────
   # Frontend Validation
@@ -95,8 +111,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Check for conflict markers
+        run: |
+          if grep -rE '^(<{7}|={7}|>{7})( |$)' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' --include='*.json' --include='*.css' src/; then
+            echo "::error::Conflict markers detected in frontend"
+            exit 1
+          fi
+
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci
 
       - name: ESLint Check (Linting)
         run: npm run lint

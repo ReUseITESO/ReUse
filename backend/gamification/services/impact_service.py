@@ -1,5 +1,5 @@
-from django.db.models import Avg
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 
 from gamification.models.environment_impact import EnvironmentImpact
 
@@ -17,8 +17,7 @@ def get_user_impact(user):
 
     # community stats
     aggs = EnvironmentImpact.objects.aggregate(
-        avg_items=Avg("reused_products"),
-        avg_co2=Avg("kg_co2_saved")
+        avg_items=Avg("reused_products"), avg_co2=Avg("kg_co2_saved")
     )
 
     avg_items = aggs.get("avg_items") or 0.0

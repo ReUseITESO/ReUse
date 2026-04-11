@@ -26,9 +26,12 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     deleteCommunity,
   } = useCommunityDetail(params.id);
 
-  const { products, isLoading: productsLoading, error: productsError, refresh: refreshProducts } = useCommunityMarketplace(
-    params.id,
-  );
+  const {
+    products,
+    isLoading: productsLoading,
+    error: productsError,
+    refresh: refreshProducts,
+  } = useCommunityMarketplace(params.id);
 
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);

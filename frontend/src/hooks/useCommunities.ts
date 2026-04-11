@@ -22,7 +22,7 @@ export function useCommunities(options?: UseCommunitiesOptions) {
       const data = await apiClient<{ results: Community[] } | Community[]>(
         `/social/communities/${params}`,
       );
-      const results = Array.isArray(data) ? data : data.results ?? [];
+      const results = Array.isArray(data) ? data : (data.results ?? []);
       setCommunities(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar comunidades');

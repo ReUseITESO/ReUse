@@ -75,8 +75,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     !product.has_active_transaction &&
     product.status === 'disponible';
 
-  const galleryImages = product.images.map((img) => img.image_url);
-
   async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
     if (!product) {
       return;

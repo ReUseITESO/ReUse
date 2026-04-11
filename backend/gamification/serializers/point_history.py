@@ -50,7 +50,7 @@ class PointHistorySerializer(serializers.ModelSerializer):
         cache_attr = "_point_history_reference_details"
         cached = getattr(obj, cache_attr, None)
         if cached is not None:
-                        return cached
+            return cached
 
         if not obj.reference_id:
             setattr(obj, cache_attr, None)

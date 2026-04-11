@@ -54,14 +54,12 @@ class CommunityViewSet(
             queryset = queryset.filter(is_private=True)
         elif visibility == "public":
             queryset = queryset.filter(is_private=False)
-        
+
         # Filter for only communities the user is a member of
         scope = self.request.query_params.get("scope")
         if scope == "joined" and self.request.user.is_authenticated:
-            queryset = queryset.filter(
-                memberships__user=self.request.user
-            ).distinct()
-        
+            queryset = queryset.filter(memberships__user=self.request.user).distinct()
+
         return queryset
 
     def get_serializer_class(self):
@@ -139,7 +137,8 @@ class CommunityViewSet(
         permission_classes=[IsAuthenticated],
     )
     def products(self, request, pk=None):
-        from django.core.paginator import Paginator, EmptyPage
+        from django.core.paginator import EmptyPage, Paginator
+
         from marketplace.models import Products
         from marketplace.serializers import ProductListSerializer
 
@@ -149,14 +148,19 @@ class CommunityViewSet(
         is_member = community.memberships.filter(user=request.user).exists()
         if not is_member:
             return Response(
-                {"detail": "You must be a member of this community to view its marketplace items."},
+                {
+                    "detail": "You must be a member of this community to view its marketplace items."
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         # Get community items
-        products = Products.objects.filter(
-            community=community, status="disponible"
-        ).select_related("seller", "category").prefetch_related("images").order_by("-created_at")
+        products = (
+            Products.objects.filter(community=community, status="disponible")
+            .select_related("seller", "category")
+            .prefetch_related("images")
+            .order_by("-created_at")
+        )
 
         # Apply pagination
         page = request.query_params.get("page", 1)
@@ -214,6 +218,8 @@ class CommunityViewSet(
         product.delete()
 
         return Response(
-            {"detail": f"Product '{product_title}' has been removed from the community."},
+            {
+                "detail": f"Product '{product_title}' has been removed from the community."
+            },
             status=status.HTTP_204_NO_CONTENT,
         )
