@@ -1,5 +1,39 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+<<<<<<< HEAD
+
+from core.models.user import User
+from gamification.services.badge_service import evaluate_milestones
+from marketplace.models.product import Products
+from marketplace.models.transaction import Transaction
+
+
+@receiver(post_save, sender=Products)
+def product_post_save(sender, instance, created, **kwargs):
+    if created:
+        evaluate_milestones(instance.seller)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "status" in update_fields or "transaction_type" in update_fields:
+            evaluate_milestones(instance.seller)
+
+
+@receiver(post_save, sender=Transaction)
+def transaction_post_save(sender, instance, created, **kwargs):
+    if instance.status == "completada":
+        evaluate_milestones(instance.seller)
+        evaluate_milestones(instance.buyer)
+
+
+@receiver(post_save, sender=User)
+def user_post_save(sender, instance, created, **kwargs):
+    if created:
+        evaluate_milestones(instance)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "phone" in update_fields or "profile_picture" in update_fields:
+            evaluate_milestones(instance)
+=======
 from rest_framework.exceptions import ValidationError
 
 from gamification.models import ChallengeType, PointAction, PointTransaction
@@ -81,3 +115,4 @@ def award_points_on_positive_review(sender, instance, created, **kwargs):
     except ValidationError:
         # If point rules are missing, keep review saved and skip gamification points.
         return
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45

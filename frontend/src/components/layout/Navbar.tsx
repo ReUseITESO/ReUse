@@ -2,11 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+<<<<<<< HEAD
+import { apiClient } from '@/lib/api';
+import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
+
+interface BadgeNotification {
+  id: number;
+  title: string;
+  body: string;
+  type: string;
+  is_read: boolean;
+}
+=======
 import ThemeToggle from '@/components/ui/ThemeToggle';
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -14,6 +27,36 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [activeBadgeNotification, setActiveBadgeNotification] = useState<BadgeNotification | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const data = await apiClient<BadgeNotification[]>('/core/notifications/');
+        if (Array.isArray(data)) {
+          const unreadBadgeNotifications = data.filter(
+            n => !n.is_read && n.type === 'badge_earned',
+          );
+          if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {
+            setActiveBadgeNotification(unreadBadgeNotifications[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications', error);
+      }
+    };
+
+    // Initial fetch
+    fetchNotifications();
+    // Poll every 15 seconds
+    const intervalId = setInterval(fetchNotifications, 15000);
+
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, activeBadgeNotification]);
 
   function handleSignOut() {
     signOut();
@@ -254,6 +297,13 @@ export default function Navbar() {
             </div>
           )}
         </div>
+      )}
+
+      {activeBadgeNotification && (
+        <CelebratoryNotification
+          notification={activeBadgeNotification}
+          onClose={() => setActiveBadgeNotification(null)}
+        />
       )}
     </nav>
   );
