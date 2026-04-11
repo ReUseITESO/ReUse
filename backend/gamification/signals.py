@@ -2,7 +2,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.exceptions import ValidationError
 
+from core.models.user import User
 from gamification.models import ChallengeType, PointAction, PointTransaction
+from gamification.services.badge_service import evaluate_milestones
 from gamification.services.challenge_service import refresh_user_active_challenges
 from gamification.services.point_service import award_points
 from marketplace.models import Products, Transaction, TransactionReview
@@ -29,6 +31,16 @@ def refresh_challenges_on_point_transaction(sender, instance, created, **kwargs)
 
 
 @receiver(post_save, sender=Products)
+def product_post_save(sender, instance, created, **kwargs):
+    if created:
+        evaluate_milestones(instance.seller)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "status" in update_fields or "transaction_type" in update_fields:
+            evaluate_milestones(instance.seller)
+
+
+@receiver(post_save, sender=Products)
 def award_points_on_product_publish(sender, instance, created, **kwargs):
     if not created:
         return
@@ -40,14 +52,18 @@ def award_points_on_product_publish(sender, instance, created, **kwargs):
             reference_id=instance.id,
         )
     except ValidationError:
-        # If point rules are missing, keep product published and skip gamification points.
         return
 
 
 @receiver(post_save, sender=Transaction)
+def transaction_post_save(sender, instance, created, **kwargs):
+    if instance.status == "completada":
+        evaluate_milestones(instance.seller)
+        evaluate_milestones(instance.buyer)
+
+
+@receiver(post_save, sender=Transaction)
 def refresh_challenges_on_completed_transaction(sender, instance, **kwargs):
-    # Fallback update for challenge progress when transaction status changes,
-    # even if point rules are missing or points were not awarded.
     if instance.status != "completada":
         return
 
@@ -79,5 +95,4 @@ def award_points_on_positive_review(sender, instance, created, **kwargs):
             reference_id=instance.id,
         )
     except ValidationError:
-        # If point rules are missing, keep review saved and skip gamification points.
         return
