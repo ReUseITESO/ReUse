@@ -486,7 +486,6 @@ class Command(BaseCommand):
                     "condition": data["condition"],
                     "transaction_type": data["transaction_type"],
                     "price": data["price"],
-                    "image_url": data.get("image_url", ""),
                 },
             )
             created.append(product)
@@ -532,9 +531,7 @@ class Command(BaseCommand):
         }
 
         for product in products:
-            urls = extra_images.get(
-                product.title, [product.image_url] if product.image_url else []
-            )
+            urls = extra_images.get(product.title, [])
             for i, url in enumerate(urls):
                 _, created = Images.objects.get_or_create(
                     product=product,

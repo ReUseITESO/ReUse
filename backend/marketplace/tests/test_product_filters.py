@@ -159,7 +159,7 @@ class ProductListTests(ProductFilterSetupMixin, APITestCase):
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
             "seller_name",
             "created_at",

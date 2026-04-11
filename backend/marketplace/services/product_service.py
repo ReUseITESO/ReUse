@@ -2,9 +2,15 @@ from config.exception_handler import logger
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
 
+from marketplace.models import Images, Products
+from marketplace.services.s3_service import upload_product_images
+
 # Gamification imports
 from gamification.services.point_service import award_points
 from marketplace.models import Transaction
+
+MAX_IMAGES_PER_PRODUCT = 5
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 VALID_STATUS_TRANSITIONS = {
     "disponible": ["en_proceso", "pausado", "cancelado"],
@@ -27,9 +33,29 @@ EDITABLE_FIELDS = [
     "condition",
     "transaction_type",
     "price",
-    "image_url",
     "category",
 ]
+
+
+def attach_images_to_product(product, files: list) -> None:
+    """Validate files, upload to S3, and create Images records for a product."""
+    if len(files) > MAX_IMAGES_PER_PRODUCT:
+        raise ValidationError(
+            {"images": f"A product can have at most {MAX_IMAGES_PER_PRODUCT} images."}
+        )
+
+    for file in files:
+        if file.content_type not in ALLOWED_CONTENT_TYPES:
+            raise ValidationError(
+                {"images": f"Unsupported type: {file.content_type}. Use JPEG, PNG or WebP."}
+            )
+
+    urls = upload_product_images(product.id, files)
+
+    Images.objects.bulk_create([
+        Images(product=product, image_url=url, order_number=index)
+        for index, url in enumerate(urls)
+    ])
 
 
 def _check_ownership(product, user):

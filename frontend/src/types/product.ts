@@ -32,7 +32,7 @@ export interface Product {
   transaction_type: TransactionType;
   status: ProductStatus;
   price: string | null;
-  image_url: string;
+  images: ProductImage[];
   category: Category;
   seller_id: number;
   seller_name: string;
@@ -57,18 +57,6 @@ export interface ProductBasicDetailsProps {
 
 export interface ProductDetail extends Product {
   seller_email: string;
-  images: ProductImage[];
-}
-
-export interface ProductCreatePayload {
-  title: string;
-  description: string;
-  condition: ProductCondition;
-  transaction_type: TransactionType;
-  price?: number | null;
-  image_url?: string;
-  category: number;
-  images?: string[];
 }
 
 export interface ProductUpdatePayload {
@@ -77,7 +65,6 @@ export interface ProductUpdatePayload {
   condition?: ProductCondition;
   transaction_type?: TransactionType;
   price?: number | null;
-  image_url?: string;
   category?: number;
 }
 
@@ -88,7 +75,6 @@ export interface EditFormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
 }
 
 export interface ProductEditFormProps {
@@ -102,8 +88,6 @@ export interface FormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
-  images: string[];
 }
 
 export interface ChangeStatusResult {

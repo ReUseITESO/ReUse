@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import CharField, Count, OuterRef, Q, Subquery, Value
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
@@ -16,6 +17,7 @@ from marketplace.serializers import (
     ProductUpdateSerializer,
 )
 from marketplace.services import (
+    attach_images_to_product,
     change_product_status,
     delete_product,
     get_product_reaction_summary,
@@ -194,7 +196,12 @@ class ProductViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(seller=request.user)
+
+        with transaction.atomic():
+            serializer.save(seller=request.user)
+            images = request.FILES.getlist("images")
+            if images:
+                attach_images_to_product(serializer.instance, images)
 
         response_serializer = ProductListSerializer(
             serializer.instance,
