@@ -553,7 +553,7 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
-class NotificationViewSet(viewsets.ModelViewSet):
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
 

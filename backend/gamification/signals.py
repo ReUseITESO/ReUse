@@ -9,7 +9,12 @@ from marketplace.models.transaction import Transaction
 
 @receiver(post_save, sender=Products)
 def product_post_save(sender, instance, created, **kwargs):
-    evaluate_milestones(instance.seller)
+    if created:
+        evaluate_milestones(instance.seller)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "status" in update_fields or "transaction_type" in update_fields:
+            evaluate_milestones(instance.seller)
 
 
 @receiver(post_save, sender=Transaction)
@@ -21,4 +26,9 @@ def transaction_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def user_post_save(sender, instance, created, **kwargs):
-    evaluate_milestones(instance)
+    if created:
+        evaluate_milestones(instance)
+    else:
+        update_fields = kwargs.get("update_fields")
+        if not update_fields or "phone" in update_fields or "profile_picture" in update_fields:
+            evaluate_milestones(instance)
