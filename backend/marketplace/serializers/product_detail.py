@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
-from marketplace.serializers.product import ImageSerializer
+from marketplace.serializers.images import ImageSerializer
 from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 from marketplace.services.transaction_service import has_active_transaction
 
@@ -49,7 +49,7 @@ class ProductDetailSerializer(
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
             "seller_name",
             "seller_id",
@@ -59,5 +59,4 @@ class ProductDetailSerializer(
             "dislikes_count",
             "user_reaction",
             "created_at",
-            "images",
         ]

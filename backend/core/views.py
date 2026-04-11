@@ -10,8 +10,13 @@ from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
+<<<<<<< HEAD
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
+=======
 from rest_framework import generics, status
 from rest_framework import serializers as drf_serializers
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -27,7 +32,13 @@ from marketplace.serializers.product import ProductListSerializer
 from social.models import UserConnection
 
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
+from .models.notification import Notification
+from .serializers import (
+    NotificationSerializer,
+    SignInSerializer,
+    SignUpSerializer,
+    UserProfileSerializer,
+)
 
 User = get_user_model()
 
@@ -36,7 +47,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: int | None = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.
@@ -389,7 +400,14 @@ class UserSearchView(generics.ListAPIView):
 
         class Meta:
             model = User
-            fields = ["id", "email", "first_name", "last_name", "full_name", "profile_picture"]
+            fields = [
+                "id",
+                "email",
+                "first_name",
+                "last_name",
+                "full_name",
+                "profile_picture",
+            ]
             read_only_fields = fields
 
         def get_full_name(self, obj):
@@ -468,7 +486,6 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
-
 
 class MicrosoftAuthURLView(APIView):
     permission_classes = [AllowAny]
@@ -575,7 +592,6 @@ class MicrosoftCallbackView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
 class ProfilePictureUploadView(APIView):
     """POST /api/auth/profile/upload-picture/ — upload profile image."""
 
@@ -627,6 +643,24 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
+<<<<<<< HEAD
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_at"
+        )
+
+    @action(detail=True, methods=["patch"])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save(update_fields=["is_read", "read_at"])
+        return Response({"status": "notification marked as read"})
+=======
 # ── Share Item with Friends (HU-CORE-12) ─────────────────
 
 
@@ -641,12 +675,22 @@ class ShareItemView(APIView):
 
         if not product_id:
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "product_id es requerido."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "product_id es requerido.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not friend_ids or not isinstance(friend_ids, list):
             return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "friend_ids es requerido (lista de IDs)."}},
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "friend_ids es requerido (lista de IDs).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -654,7 +698,12 @@ class ShareItemView(APIView):
             product = Products.objects.get(pk=product_id, status="disponible")
         except Products.DoesNotExist:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Producto no encontrado o no disponible."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Producto no encontrado o no disponible.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -664,27 +713,37 @@ class ShareItemView(APIView):
         )
         connected_ids = set()
         for conn in accepted_connections:
-            connected_ids.add(conn.requester_id if conn.addressee_id == user.id else conn.addressee_id)
+            connected_ids.add(
+                conn.requester_id if conn.addressee_id == user.id else conn.addressee_id
+            )
 
         invalid_ids = [fid for fid in friend_ids if fid not in connected_ids]
         if invalid_ids:
             return Response(
-                {"error": {"code": "NOT_FRIENDS", "message": f"No eres amigo de los usuarios: {invalid_ids}"}},
+                {
+                    "error": {
+                        "code": "NOT_FRIENDS",
+                        "message": f"No eres amigo de los usuarios: {invalid_ids}",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         notifications = []
         for fid in friend_ids:
-            notifications.append(Notification(
-                user_id=fid,
-                type="shared_item",
-                title=f"{user.get_full_name()} te compartio un producto",
-                body=product.title,
-                reference_id=product.id,
-            ))
+            notifications.append(
+                Notification(
+                    user_id=fid,
+                    type="shared_item",
+                    title=f"{user.get_full_name()} te compartio un producto",
+                    body=product.title,
+                    reference_id=product.id,
+                )
+            )
         Notification.objects.bulk_create(notifications)
 
         return Response(
             {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
             status=status.HTTP_201_CREATED,
         )
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45

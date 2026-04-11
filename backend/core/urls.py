@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
@@ -23,10 +24,8 @@ urlpatterns = [
         views.EmailVerificationConfirmView.as_view(),
         name="email_verification_confirm",
     ),
-
     # User search (used by friends and communities)
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
-
     # HU-CORE-04: Dashboard
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     # HU-CORE-10: Profile picture upload
@@ -35,10 +34,16 @@ urlpatterns = [
         views.ProfilePictureUploadView.as_view(),
         name="profile-upload-picture",
     ),
-
+<<<<<<< HEAD
+    # HU-CORE-15: Microsoft OAuth
+    path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
+    path(
+        "microsoft/callback/",
+        views.MicrosoftCallbackView.as_view(),
+        name="microsoft-callback",
+=======
     # HU-CORE-12: Share item with friends
     path("shares/", views.ShareItemView.as_view(), name="share-item"),
-
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
     path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
@@ -58,5 +63,12 @@ urlpatterns = [
         "account/reactivate/confirm/",
         views_deactivation.AccountReactivateConfirmView.as_view(),
         name="account-reactivate-confirm",
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
     ),
 ]
+
+
+router = DefaultRouter()
+router.register(r"notifications", views.NotificationViewSet, basename="notification")
+
+urlpatterns += router.urls

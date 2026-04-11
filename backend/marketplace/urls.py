@@ -4,12 +4,14 @@ from rest_framework.routers import DefaultRouter
 from marketplace.views import (
     CategoryViewSet,
     CommentViewSet,
+    CommunityMarketplaceViewSet,
     ProductViewSet,
     TransactionViewSet,
 )
 
 router = DefaultRouter()
 router.register("products", ProductViewSet, basename="products")
+router.register("community-products", CommunityMarketplaceViewSet, basename="community-products")
 router.register("categories", CategoryViewSet, basename="categories")
 router.register("transactions", TransactionViewSet, basename="transactions")
 

@@ -75,6 +75,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     !product.has_active_transaction &&
     product.status === 'disponible';
 
+  const galleryImages = product.images.map((img) => img.image_url);
+
   async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
     if (!product) {
       return;
@@ -139,6 +141,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="mx-auto mt-12 max-w-6xl border-t border-border pt-10">
         <CommentsSection productId={product.id} productSellerId={product.seller_id} />
       </div>
+
       <div className="mx-auto mt-4 flex max-w-6xl justify-end">
         <ProductReactionButtons
           productId={product.id}

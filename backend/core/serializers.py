@@ -1,9 +1,17 @@
 import html
 import re
+from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+
+<<<<<<< HEAD
+from .models.notification import Notification
+=======
+if TYPE_CHECKING:
+    from core.models import User
+>>>>>>> 4d3465df85cc2992e20bf566c58da49dfe2c6a45
 
 User = get_user_model()
 
@@ -24,7 +32,6 @@ def sanitize_phone(value: str) -> str:
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
     password = serializers.CharField(
         write_only=True,
         min_length=8,
@@ -184,3 +191,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def validate_phone(self, value: str) -> str:
         return sanitize_phone(value) if value else value
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = [
+            "id",
+            "type",
+            "title",
+            "body",
+            "reference_id",
+            "is_read",
+            "read_at",
+            "created_at",
+        ]
+        read_only_fields = ["id", "type", "title", "body", "reference_id", "created_at"]

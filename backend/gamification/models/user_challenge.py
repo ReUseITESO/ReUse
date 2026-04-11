@@ -14,6 +14,8 @@ class UserChallenge(models.Model):
     )
     progress = models.PositiveIntegerField(default=0)
     is_completed = models.BooleanField(default=False)
+    reward_claimed = models.BooleanField(default=False)
+    reward_claimed_at = models.DateTimeField(blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

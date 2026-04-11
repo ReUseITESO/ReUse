@@ -8,6 +8,9 @@ import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import ChallengesBoard from '@/components/gamification/ChallengesBoard';
+import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
+import EcoImpactCard from '@/components/gamification/EcoImpact';
 import { deactivateAccount } from '@/lib/auth';
 import type { User } from '@/types/auth';
 
@@ -139,12 +142,29 @@ export default function ProfilePage() {
             <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
             <PointsBalance />
           </div>
+          <div>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Retos</h2>
+            <ChallengesBoard />
+          </div>
+          <div>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Impacto Ecologico</h2>
+            <EcoImpactCard />
+          </div>
         </section>
 
         <section>
           <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
             <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">Logros y Medallas</h2>
             <BadgesList />
+          </div>
+        </section>
+
+        <section>
+          <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">
+              Historial de puntos
+            </h2>
+            <PointsHistoryCard />
           </div>
         </section>
 

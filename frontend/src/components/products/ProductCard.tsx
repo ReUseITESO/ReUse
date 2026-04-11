@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Clock3, UserRound } from 'lucide-react';
+import { Clock3, UserRound, Users } from 'lucide-react';
 
 import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import Badge from '@/components/ui/Badge';
@@ -9,7 +9,7 @@ import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils'
 
 import type { ProductCardProps } from '@/types/product';
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, showCommunityBadge }: ProductCardProps) {
   const timeAgo = formatTimeAgo(product.created_at);
   const isSale = product.transaction_type === 'sale';
   const transactionDisplay = isSale
@@ -22,9 +22,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`}>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md cursor-pointer">
         <div className="flex h-44 items-center justify-center bg-muted">
-          {product.image_url ? (
+          {product.images?.[0]?.image_url ? (
             <img
-              src={product.image_url}
+              src={product.images[0].image_url}
               alt={product.title}
               className="h-full w-full object-cover"
             />
@@ -37,7 +37,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-4">
-          <Badge className={categoryClass}>{product.category.name}</Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className={categoryClass}>{product.category.name}</Badge>
+            {showCommunityBadge && product.community && (
+              <Badge className="bg-secondary/10 text-secondary border-secondary/20">
+                <Users className="h-3 w-3" />
+                {product.community.name}
+              </Badge>
+            )}
+          </div>
 
           <h3 className="line-clamp-2 text-body font-semibold text-card-fg">{product.title}</h3>
 

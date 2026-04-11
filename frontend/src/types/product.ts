@@ -6,6 +6,9 @@ export type TransactionType = 'donation' | 'sale' | 'swap';
 
 export type ProductReactionType = 'like' | 'dislike';
 
+// Import Community type from community.ts to avoid duplication
+export type { Community } from './community';
+
 export interface ProductReactionSummary {
   likes_count: number;
   dislikes_count: number;
@@ -32,8 +35,9 @@ export interface Product {
   transaction_type: TransactionType;
   status: ProductStatus;
   price: string | null;
-  image_url: string;
+  images: ProductImage[];
   category: Category;
+  community?: Community | null;
   seller_id: number;
   seller_name: string;
   has_active_transaction: boolean;
@@ -69,6 +73,7 @@ export interface ProductCreatePayload {
   image_url?: string;
   category: number;
   images?: string[];
+  community?: number;
 }
 
 export interface ProductUpdatePayload {
@@ -77,7 +82,6 @@ export interface ProductUpdatePayload {
   condition?: ProductCondition;
   transaction_type?: TransactionType;
   price?: number | null;
-  image_url?: string;
   category?: number;
 }
 
@@ -88,7 +92,6 @@ export interface EditFormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
 }
 
 export interface ProductEditFormProps {
@@ -104,6 +107,7 @@ export interface FormValues {
   price: string;
   image_url: string;
   images: string[];
+  community?: string;
 }
 
 export interface ChangeStatusResult {
@@ -113,4 +117,5 @@ export interface ChangeStatusResult {
 
 export interface ProductCardProps {
   product: Product;
+  showCommunityBadge?: boolean;
 }

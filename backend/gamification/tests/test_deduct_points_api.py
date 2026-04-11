@@ -4,7 +4,6 @@ from core.models import User
 
 
 class DeductPointsAPITest(APITestCase):
-
     def setUp(self):
 
         self.user = User.objects.create(

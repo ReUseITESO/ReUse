@@ -14,7 +14,12 @@ interface UserSearchProps {
   pendingSentIds?: number[];
 }
 
-export default function UserSearch({ onSearch, onSendRequest, friendIds, pendingSentIds = [] }: UserSearchProps) {
+export default function UserSearch({
+  onSearch,
+  onSendRequest,
+  friendIds,
+  pendingSentIds = [],
+}: UserSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<FriendUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
