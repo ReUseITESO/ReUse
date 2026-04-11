@@ -1,4 +1,4 @@
-import { ArrowLeft, CircleCheckBig, Clock3, Mail, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, CircleCheckBig, Clock3, Flag, Mail, ShoppingBag } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import ProductBasicDetails from '@/components/products/ProductBasicDetails';
@@ -14,8 +14,10 @@ interface ProductDetailContentProps {
   ctaLabel: string;
   canCreateTransaction: boolean;
   transactionNotice: string | null;
+  canReport: boolean;
   onBack: () => void;
   onMainAction: () => void;
+  onReport: () => void;
 }
 
 export default function ProductDetailContent({
@@ -23,8 +25,10 @@ export default function ProductDetailContent({
   ctaLabel,
   canCreateTransaction,
   transactionNotice,
+  canReport,
   onBack,
   onMainAction,
+  onReport,
 }: ProductDetailContentProps) {
   const timeAgo = formatTimeAgo(product.created_at);
 
@@ -60,6 +64,9 @@ export default function ProductDetailContent({
             description={product.description}
             categoryName={product.category.name}
             condition={product.condition}
+            transactionType={product.transaction_type}
+            price={product.price}
+            showTransactionBadge={true}
           />
 
           <div className="rounded-lg border border-border bg-muted p-4">
@@ -90,11 +97,22 @@ export default function ProductDetailContent({
             </p>
           )}
 
-          <div className="border-t border-border pt-4">
+          <div className="flex items-center justify-between border-t border-border pt-4">
             <p className="inline-flex items-center gap-2 text-sm text-muted-fg">
               <Clock3 className="h-4 w-4" />
               Publicado {timeAgo}
             </p>
+
+            {canReport && (
+              <button
+                type="button"
+                onClick={onReport}
+                className="inline-flex items-center gap-1.5 text-xs text-muted-fg transition-colors hover:text-error"
+              >
+                <Flag className="h-3.5 w-3.5" />
+                Reportar
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
+from django.db import IntegrityError
 from django.db.models import CharField, Count, OuterRef, Q, Subquery, Value
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from marketplace.models import ProductReaction, Products
@@ -14,6 +16,7 @@ from marketplace.serializers import (
     ProductReactionSummarySerializer,
     ProductStatusSerializer,
     ProductUpdateSerializer,
+    ReportCreateSerializer,
 )
 from marketplace.services import (
     change_product_status,
@@ -297,3 +300,43 @@ class ProductViewSet(
 
         summary = get_product_reaction_summary(product=product, user=request.user)
         return Response(summary, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="Report a product",
+        description=(
+            "Submits a report on a product. <br>"
+            "A user cannot report their own product. <br>"
+            "Each user can only submit one report per product. <br>"
+            "Requires JWT authentication."
+        ),
+        request=ReportCreateSerializer,
+        responses={201: None},
+        tags=["Marketplace > Products"],
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="report",
+        permission_classes=[IsAuthenticated],
+    )
+    def report(self, request, pk=None):
+        product = self.get_object()
+
+        if product.seller_id == request.user.id:
+            return Response(
+                {"detail": "No puedes reportar tu propio producto."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = ReportCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer.save(product=product, reporter=request.user)
+        except IntegrityError:
+            return Response(
+                {"detail": "Ya reportaste este producto anteriormente."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(status=status.HTTP_201_CREATED)
