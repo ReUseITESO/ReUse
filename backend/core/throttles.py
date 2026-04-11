@@ -27,6 +27,7 @@ class EmailVerificationRateThrottle(SimpleRateThrottle):
 
 class ReactivationRateThrottle(SimpleRateThrottle):
     """HU-CORE-17: limitar solicitudes de reactivación para evitar spam de correos."""
+
     scope = "reactivation"
 
     def get_cache_key(self, request, view):

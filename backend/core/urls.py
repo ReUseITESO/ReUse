@@ -37,7 +37,11 @@ urlpatterns = [
     path("shares/", views.ShareItemView.as_view(), name="share-item"),
     # HU-CORE-15: Microsoft OAuth
     path("microsoft/", views.MicrosoftAuthURLView.as_view(), name="microsoft-auth-url"),
-    path("microsoft/callback/", views.MicrosoftCallbackView.as_view(), name="microsoft-callback"),
+    path(
+        "microsoft/callback/",
+        views.MicrosoftCallbackView.as_view(),
+        name="microsoft-callback",
+    ),
     # HU-CORE-17: Desactivación y reactivación lógica de cuenta
     path(
         "account/deactivate/",

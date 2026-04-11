@@ -71,7 +71,12 @@ class NotificationMarkReadView(APIView):
             notification = Notification.objects.get(pk=pk, user=request.user)
         except Notification.DoesNotExist:
             return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Notificación no encontrada."}},
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Notificación no encontrada.",
+                    }
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 

@@ -45,7 +45,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           condition: product.condition,
           transaction_type: product.transaction_type,
           price: product.price ?? '',
-          image_url: product.image_url ?? '',
+          image_url: product.images?.[0]?.image_url ?? '',
         });
       } catch (err) {
         setLoadError(err instanceof Error ? err.message : 'Error al cargar el producto');

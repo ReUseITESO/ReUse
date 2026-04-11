@@ -64,8 +64,12 @@ class CommentListCreateTests(APITestCase):
         self.assertEqual(response.data["results"], [])
 
     def test_list_returns_comments_in_chronological_order(self):
-        Comment.objects.create(product=self.product, author=self.buyer, content="Primero")
-        Comment.objects.create(product=self.product, author=self.other, content="Segundo")
+        Comment.objects.create(
+            product=self.product, author=self.buyer, content="Primero"
+        )
+        Comment.objects.create(
+            product=self.product, author=self.other, content="Segundo"
+        )
         response = self.client.get(self.url)
         contents = [c["content"] for c in response.data["results"]]
         self.assertEqual(contents, ["Primero", "Segundo"])
@@ -123,9 +127,7 @@ class CommentListCreateTests(APITestCase):
 
     def test_create_content_exceeding_500_chars_returns_400(self):
         self.client.force_authenticate(user=self.buyer)
-        response = self.client.post(
-            self.url, {"content": "x" * 501}, format="json"
-        )
+        response = self.client.post(self.url, {"content": "x" * 501}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_on_nonexistent_product_returns_404(self):

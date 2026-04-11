@@ -56,7 +56,7 @@ def get_presigned_url(image_url: str) -> str:
     )
     if not image_url or not image_url.startswith(prefix):
         return image_url
-    key = image_url[len(prefix):]
+    key = image_url[len(prefix) :]
 
     cached = _presigned_cache.get(key)
     if cached and cached[1] > time.monotonic():

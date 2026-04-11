@@ -14,7 +14,10 @@ import { useState } from 'react';
 export default function CommunitiesMarketplacePage() {
   const { communities } = useCommunities({ onlyJoined: true });
   const [selectedCommunity, setSelectedCommunity] = useState<string>('placeholder');
-  const communityId = selectedCommunity && selectedCommunity !== 'placeholder' ? Number(selectedCommunity) : undefined;
+  const communityId =
+    selectedCommunity && selectedCommunity !== 'placeholder'
+      ? Number(selectedCommunity)
+      : undefined;
   const { products, isLoading, error, totalCount } = useCommunityProducts(communityId);
 
   return (

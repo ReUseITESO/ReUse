@@ -8,17 +8,14 @@ export default function EcoImpactCard() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { data, isLoading, error, refetch } = useUserImpact(isAuthenticated);
 
-  const isInitialLoading =
-    authLoading || (isLoading && data === null && !error);
+  const isInitialLoading = authLoading || (isLoading && data === null && !error);
 
   // Loading (igual estilo que PointsBalance)
   if (isInitialLoading) {
     return (
       <div className="h-32 w-full rounded-lg bg-gradient-to-r from-muted to-muted/50 animate-pulse">
         <div className="flex items-center justify-center h-full">
-          <div className="text-sm text-muted-fg">
-            Cargando impacto ecológico...
-          </div>
+          <div className="text-sm text-muted-fg">Cargando impacto ecológico...</div>
         </div>
       </div>
     );
@@ -30,12 +27,8 @@ export default function EcoImpactCard() {
       <div className="rounded-lg bg-warning/5 border border-warning/20 p-4">
         <div className="flex items-start gap-3">
           <div>
-            <p className="text-sm text-fg font-medium">
-              Usuario no autenticado
-            </p>
-            <p className="mt-1 text-xs text-warning">
-              Inicia sesión para ver tu impacto ecológico
-            </p>
+            <p className="text-sm text-fg font-medium">Usuario no autenticado</p>
+            <p className="mt-1 text-xs text-warning">Inicia sesión para ver tu impacto ecológico</p>
           </div>
         </div>
       </div>
@@ -52,7 +45,7 @@ export default function EcoImpactCard() {
           className={cn(
             'mt-3 px-4 py-2 text-sm font-medium',
             'rounded-md bg-error/10 text-error',
-            'hover:bg-error/20 transition-colors'
+            'hover:bg-error/20 transition-colors',
           )}
         >
           Reintentar
@@ -64,16 +57,13 @@ export default function EcoImpactCard() {
   // Seguridad extra
   if (!data) return null;
 
-  const isAboveAverage =
-    data.items_reused >= data.community_average_items;
+  const isAboveAverage = data.items_reused >= data.community_average_items;
 
   return (
     <article className="rounded-lg bg-gradient-to-br from-green-500/5 to-green-500/15 border border-green-500/20 p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">
-            Impacto Ecológico
-          </h3>
+          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">Impacto Ecológico</h3>
           <p className="mt-1 text-2xl font-bold text-green-600">
             {data.items_reused} items reutilizados
           </p>
@@ -94,9 +84,7 @@ export default function EcoImpactCard() {
             Estás por encima del promedio de la comunidad
           </span>
         ) : (
-          <span>
-            Sigue así, estás cerca del promedio de la comunidad
-          </span>
+          <span>Sigue así, estás cerca del promedio de la comunidad</span>
         )}
       </div>
     </article>

@@ -163,14 +163,30 @@ def build_challenge_catalog(now):
     for type_index, (challenge_type, _blueprint) in enumerate(type_items):
         for bucket in BUCKET_SPECS:
             for item_index in range(bucket["count"]):
-                goal = bucket["goal_base"] + bucket["goal_step"] * item_index + type_index
-                bonus_points = bucket["bonus_base"] + bucket["bonus_step"] * item_index + type_index * 2
-                start_date = now - bucket["start_offset"] - timedelta(hours=item_index * 2 + type_index)
+                goal = (
+                    bucket["goal_base"] + bucket["goal_step"] * item_index + type_index
+                )
+                bonus_points = (
+                    bucket["bonus_base"]
+                    + bucket["bonus_step"] * item_index
+                    + type_index * 2
+                )
+                start_date = (
+                    now
+                    - bucket["start_offset"]
+                    - timedelta(hours=item_index * 2 + type_index)
+                )
                 end_date = start_date + bucket["duration"]
-                action = CHALLENGE_ACTIONS[challenge_type][item_index % len(CHALLENGE_ACTIONS[challenge_type])]
+                action = CHALLENGE_ACTIONS[challenge_type][
+                    item_index % len(CHALLENGE_ACTIONS[challenge_type])
+                ]
                 object_name = CHALLENGE_OBJECTS[challenge_type]
-                impact = CHALLENGE_IMPACTS[challenge_type][item_index % len(CHALLENGE_IMPACTS[challenge_type])]
-                context = CHALLENGE_CONTEXTS[(item_index + type_index) % len(CHALLENGE_CONTEXTS)]
+                impact = CHALLENGE_IMPACTS[challenge_type][
+                    item_index % len(CHALLENGE_IMPACTS[challenge_type])
+                ]
+                context = CHALLENGE_CONTEXTS[
+                    (item_index + type_index) % len(CHALLENGE_CONTEXTS)
+                ]
                 time_label = TIME_LABELS[bucket["key"]]
 
                 title = f"{action} {goal} {object_name} {time_label}"
@@ -219,8 +235,12 @@ class Command(BaseCommand):
             challenge = Challenge.objects.create(
                 **payload,
             )
-            self.stdout.write(self.style.SUCCESS(f"Challenge created: {challenge.title}"))
+            self.stdout.write(
+                self.style.SUCCESS(f"Challenge created: {challenge.title}")
+            )
 
         self.stdout.write(
-            self.style.SUCCESS(f"Gamification seed completed with {len(catalog)} challenges.")
+            self.style.SUCCESS(
+                f"Gamification seed completed with {len(catalog)} challenges."
+            )
         )

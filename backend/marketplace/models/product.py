@@ -2,8 +2,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from .category import Category
 from social.models import Community
+
+from .category import Category
 
 
 class Products(models.Model):

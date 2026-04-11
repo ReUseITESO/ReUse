@@ -13,13 +13,13 @@ from gamification.views.challenges import (
     MyChallengesView,
 )
 from gamification.views.deduct_points import DeductPointsView
+from gamification.views.impact import UserImpactView
 from gamification.views.point_history import PointsHistoryView
 from gamification.views.points import (
     CurrentUserLevelProgressionView,
     CurrentUserPointsView,
     UserPointsView,
 )
-from gamification.views.impact import UserImpactView
 
 urlpatterns = [
     path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),

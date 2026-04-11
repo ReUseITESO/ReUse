@@ -102,8 +102,8 @@ export default function SignInPage() {
           <div className="mb-4 rounded-lg border border-warning/30 bg-warning/5 px-5 py-4">
             <p className="font-semibold text-fg mb-1">Cuenta desactivada</p>
             <p className="text-sm text-muted-fg mb-4">
-              Tu cuenta está desactivada. ¿Deseas reactivarla? Te enviaremos un correo con un
-              enlace para recuperar el acceso.
+              Tu cuenta está desactivada. ¿Deseas reactivarla? Te enviaremos un correo con un enlace
+              para recuperar el acceso.
             </p>
             <div className="flex gap-3">
               <button
