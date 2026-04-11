@@ -244,7 +244,9 @@ class PublishingCommunityItemTests(CommunityMarketplaceTestSetup):
             "community": None,  # No community
         }
 
-        response = self.client.post("/api/marketplace/products/", payload, format="json")
+        response = self.client.post(
+            "/api/marketplace/products/", payload, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNone(response.data["community"])
         self.assertEqual(response.data["title"], "New Public Item")
@@ -263,14 +265,18 @@ class PublishingCommunityItemTests(CommunityMarketplaceTestSetup):
             "community": self.community1.id,  # Alice is member
         }
 
-        response = self.client.post("/api/marketplace/products/", payload, format="json")
+        response = self.client.post(
+            "/api/marketplace/products/", payload, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["community"]["id"], self.community1.id)
         self.assertEqual(response.data["title"], "Community Item from Alice")
 
     def test_publish_in_community_where_user_is_not_member_fails(self):
         """Test publishing in a community where user is NOT a member (should fail with 403)"""
-        self._authenticate(self.charlie_token)  # Charlie is not a member of any community
+        self._authenticate(
+            self.charlie_token
+        )  # Charlie is not a member of any community
 
         payload = {
             "title": "Charlie's Attempt",
@@ -282,7 +288,9 @@ class PublishingCommunityItemTests(CommunityMarketplaceTestSetup):
             "community": self.community1.id,  # Charlie is NOT a member
         }
 
-        response = self.client.post("/api/marketplace/products/", payload, format="json")
+        response = self.client.post(
+            "/api/marketplace/products/", payload, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_publish_unauthenticated_returns_401(self):
@@ -299,7 +307,9 @@ class PublishingCommunityItemTests(CommunityMarketplaceTestSetup):
             "community": self.community1.id,
         }
 
-        response = self.client.post("/api/marketplace/products/", payload, format="json")
+        response = self.client.post(
+            "/api/marketplace/products/", payload, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -332,7 +342,7 @@ class ViewingCommunityItemsTests(CommunityMarketplaceTestSetup):
             # If not 403, should return empty list for non-members
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             # Non-member should NOT see community items
-            titles = [item["title"] for item in response.data["results"]]
+            _titles = [item["title"] for item in response.data["results"]]
             # If backend doesn't enforce permissions, items might show up
             # This is not ideal but some implementations may allow viewing
             # We'll just check that the endpoint doesn't crash
@@ -342,7 +352,9 @@ class ViewingCommunityItemsTests(CommunityMarketplaceTestSetup):
         """Test accessing a community item by direct URL as a non-member (should get 403)"""
         self._authenticate(self.charlie_token)
 
-        response = self.client.get(f"/api/marketplace/products/{self.community1_item.id}/")
+        response = self.client.get(
+            f"/api/marketplace/products/{self.community1_item.id}/"
+        )
         # Backend may return 404 (endpoint doesn't detail-level check) or 403 (enforced)
         # Or 200 if no detail-level enforcement
         self.assertIn(
@@ -355,7 +367,9 @@ class ViewingCommunityItemsTests(CommunityMarketplaceTestSetup):
         """Test accessing a community item by direct URL as a member (should succeed)"""
         self._authenticate(self.alice_token)  # Alice is member of community1
 
-        response = self.client.get(f"/api/marketplace/products/{self.community1_item.id}/")
+        response = self.client.get(
+            f"/api/marketplace/products/{self.community1_item.id}/"
+        )
         # Backend might not have detail endpoint, or it might return it
         if response.status_code == status.HTTP_404_NOT_FOUND:
             self.skipTest("Detail endpoint not implemented")
@@ -411,7 +425,7 @@ class BrowsingAndFilteringTests(CommunityMarketplaceTestSetup):
         """Test that default /products/ listing excludes community-scoped items"""
         # Need to authenticate to access the endpoint
         self._authenticate(self.charlie_token)
-        
+
         response = self.client.get("/api/marketplace/products/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         titles = [item["title"] for item in response.data["results"]]
@@ -438,7 +452,7 @@ class AdminControlsTests(CommunityMarketplaceTestSetup):
             response = self.client.delete(
                 f"/api/marketplace/products/{self.community1_item.id}/"
             )
-        
+
         # Should succeed (204) or return OK (200)
         self.assertIn(
             response.status_code,
@@ -447,14 +461,16 @@ class AdminControlsTests(CommunityMarketplaceTestSetup):
         )
 
         # Verify item is not accessible after deletion (might be soft-deleted or hard-deleted)
-        item_exists = Products.objects.filter(id=self.community1_item.id).exists()
+        _item_exists = Products.objects.filter(id=self.community1_item.id).exists()
         # If hard delete, should not exist; if soft delete, status might change
         # For this test, we just verify the delete request was accepted
         self.assertTrue(True)  # Placeholder to show test logic is valid
 
     def test_non_admin_cannot_remove_item(self):
         """Test non-admin member cannot remove items"""
-        self._authenticate(self.alice_token)  # Alice is member (not admin) of community1
+        self._authenticate(
+            self.alice_token
+        )  # Alice is member (not admin) of community1
 
         response = self.client.delete(
             f"/api/social/communities/{self.community1.id}/products/{self.community1_item.id}/"
@@ -548,7 +564,11 @@ class MemberOnlyFilteringTests(CommunityMarketplaceTestSetup):
         response = self.client.get("/api/social/communities/?scope=joined")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Handle both paginated and non-paginated responses
-        data = response.data if isinstance(response.data, list) else response.data.get("results", [])
+        data = (
+            response.data
+            if isinstance(response.data, list)
+            else response.data.get("results", [])
+        )
         community_ids = [c["id"] for c in data]
         self.assertIn(self.community1.id, community_ids)
         self.assertIn(self.community2.id, community_ids)
@@ -560,5 +580,9 @@ class MemberOnlyFilteringTests(CommunityMarketplaceTestSetup):
         response = self.client.get("/api/social/communities/?scope=joined")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Handle both paginated and non-paginated responses
-        data = response.data if isinstance(response.data, list) else response.data.get("results", [])
+        data = (
+            response.data
+            if isinstance(response.data, list)
+            else response.data.get("results", [])
+        )
         self.assertEqual(len(data), 0)

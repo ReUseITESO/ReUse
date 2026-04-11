@@ -34,9 +34,7 @@ export default function ProfilePage() {
       await signOut();
       router.replace('/auth/signin');
     } catch (err) {
-      setDeactivateError(
-        err instanceof Error ? err.message : 'Error al desactivar la cuenta.',
-      );
+      setDeactivateError(err instanceof Error ? err.message : 'Error al desactivar la cuenta.');
       setIsDeactivating(false);
     }
   }
@@ -177,7 +175,10 @@ export default function ProfilePage() {
               cualquier momento solicitando un correo de reactivación.
             </p>
             <button
-              onClick={() => { setDeactivateError(''); setShowDeactivateModal(true); }}
+              onClick={() => {
+                setDeactivateError('');
+                setShowDeactivateModal(true);
+              }}
               className="rounded-lg border border-error/40 px-4 py-2 text-sm font-medium
                          text-error transition-colors hover:bg-error/10"
             >

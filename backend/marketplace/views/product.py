@@ -154,7 +154,11 @@ class ProductViewSet(
     search_fields = ["title", "description", "category__name"]
     ordering_fields = ["created_at", "price", "title", "likes_count"]
     ordering = ["-created_at"]
-    permission_classes = [IsAuthenticatedOrReadOnly, CanPublishToCommunity, IsCommunityMember]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        CanPublishToCommunity,
+        IsCommunityMember,
+    ]
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -190,7 +194,7 @@ class ProductViewSet(
 
         seller_param = self.request.query_params.get("seller")
         is_my_products = seller_param == "me"
-        
+
         community_id = self.request.query_params.get("community")
         scope = self.request.query_params.get("scope")
         is_community_scope = scope == "communities"
@@ -203,12 +207,16 @@ class ProductViewSet(
                     return Products.objects.none()
             elif community_id:
                 # Filter by specific community (requires membership)
-                queryset = queryset.filter(community_id=community_id, status="disponible")
+                queryset = queryset.filter(
+                    community_id=community_id, status="disponible"
+                )
             elif is_community_scope:
                 # Show items from all user's communities
                 if self.request.user.is_authenticated:
-                    user_communities = self.request.user.community_memberships.values_list(
-                        "community_id", flat=True
+                    user_communities = (
+                        self.request.user.community_memberships.values_list(
+                            "community_id", flat=True
+                        )
                     )
                     queryset = queryset.filter(
                         community_id__in=user_communities, status="disponible"
@@ -217,7 +225,9 @@ class ProductViewSet(
                     return Products.objects.none()
             else:
                 # Default: show only public items (no community constraint) with active sellers
-                queryset = queryset.filter(community__isnull=True, status="disponible", seller__is_active=True)
+                queryset = queryset.filter(
+                    community__isnull=True, status="disponible", seller__is_active=True
+                )
 
         category_id = self.request.query_params.get("category")
         if category_id:
@@ -240,16 +250,14 @@ class ProductViewSet(
                 {"detail": "Authentication required to publish items."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         # Validate community membership if community_id provided
         community = serializer.validated_data.get("community")
         if community:
-            is_member = community.memberships.filter(
-                user=request.user
-            ).exists()
+            is_member = community.memberships.filter(user=request.user).exists()
             if not is_member:
                 return Response(
                     {
@@ -431,12 +439,14 @@ class CommunityMarketplaceViewSet(
             "community_id", flat=True
         )
 
-        queryset = Products.objects.filter(
-            community_id__in=user_communities,
-            status="disponible",
-        ).select_related(
-            "category", "seller", "community"
-        ).prefetch_related("images")
+        queryset = (
+            Products.objects.filter(
+                community_id__in=user_communities,
+                status="disponible",
+            )
+            .select_related("category", "seller", "community")
+            .prefetch_related("images")
+        )
 
         queryset = queryset.annotate(
             likes_count=Count("reactions", filter=Q(reactions__type="like")),
@@ -468,4 +478,3 @@ class CommunityMarketplaceViewSet(
             queryset = queryset.filter(transaction_type=transaction_type)
 
         return queryset
-

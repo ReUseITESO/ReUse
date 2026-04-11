@@ -17,22 +17,18 @@ class IsCommunityMember(BasePermission):
             return True
 
         # For community-scoped items, user must be a member
-        is_member = obj.community.memberships.filter(
-            user=request.user
-        ).exists()
+        is_member = obj.community.memberships.filter(user=request.user).exists()
 
         if request.method in SAFE_METHODS:
             return is_member
-        
+
         # For modifications, user must be member or admin/creator
         if is_member:
             # User is member, check if they're owner or community admin
-            membership = obj.community.memberships.filter(
-                user=request.user
-            ).first()
+            membership = obj.community.memberships.filter(user=request.user).first()
             is_admin = membership and membership.role in ["admin", "moderator"]
             return obj.seller == request.user or is_admin
-        
+
         return False
 
 
@@ -53,24 +49,22 @@ class CanPublishToCommunity(BasePermission):
 
         # Get community_id from request data
         community_id = request.data.get("community")
-        
+
         # If no community specified, it's a public item (allowed for authenticated users)
         if not community_id:
             return True
 
         # Community ID was specified, verify user is a member
         from social.models import Community
-        
+
         try:
             community = Community.objects.get(id=community_id)
             # Check if user is a member of the community
-            is_member = community.memberships.filter(
-                user=request.user
-            ).exists()
-            
+            is_member = community.memberships.filter(user=request.user).exists()
+
             if not is_member:
                 return False
-                
+
             return True
         except Community.DoesNotExist:
             # Community doesn't exist
@@ -93,8 +87,6 @@ class IsCommunityAdminForItem(BasePermission):
             return False
 
         # Check if user is admin/moderator of the community
-        membership = obj.community.memberships.filter(
-            user=request.user
-        ).first()
+        membership = obj.community.memberships.filter(user=request.user).first()
 
         return membership and membership.role in ["admin", "moderator"]

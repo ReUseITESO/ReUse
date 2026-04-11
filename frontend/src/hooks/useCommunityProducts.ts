@@ -25,7 +25,7 @@ export function useCommunityProducts(communityId?: number) {
         // Use /marketplace/products/ with scope=communities for all community items
         // or with community={id} to filter by specific community
         const params = new URLSearchParams();
-        
+
         if (communityId) {
           // Show items from specific community
           params.append('community', String(communityId));
@@ -34,7 +34,7 @@ export function useCommunityProducts(communityId?: number) {
           params.append('scope', 'communities');
         }
         params.append('page', String(page));
-        
+
         const url = `/marketplace/products/?${params.toString()}`;
         const data = await apiClient<CommunityProductsResponse>(url);
         setProducts(data.results || []);

@@ -271,7 +271,8 @@ export default function ProductMainFields<TFormValues extends ProductFormBaseVal
               Publicar para comunidad
             </label>
             <p className="mb-3 text-xs text-muted-fg">
-              Deja vacío para publicar en el marketplace público. Selecciona una comunidad para que solo sus miembros vean el artículo.
+              Deja vacío para publicar en el marketplace público. Selecciona una comunidad para que
+              solo sus miembros vean el artículo.
             </p>
             <Controller
               name={communityName}

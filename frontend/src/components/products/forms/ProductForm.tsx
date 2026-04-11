@@ -65,7 +65,8 @@ export default function ProductForm() {
       price: isSale ? Number(values.price) : null,
       image_url: hasImageList ? values.images[0] : values.image_url || undefined,
       images: hasImageList ? values.images : undefined,
-      community: values.community && values.community !== 'none' ? Number(values.community) : undefined,
+      community:
+        values.community && values.community !== 'none' ? Number(values.community) : undefined,
     });
 
     if (result) {

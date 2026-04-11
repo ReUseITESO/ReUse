@@ -11,7 +11,9 @@ from marketplace.views import (
 
 router = DefaultRouter()
 router.register("products", ProductViewSet, basename="products")
-router.register("community-products", CommunityMarketplaceViewSet, basename="community-products")
+router.register(
+    "community-products", CommunityMarketplaceViewSet, basename="community-products"
+)
 router.register("categories", CategoryViewSet, basename="categories")
 router.register("transactions", TransactionViewSet, basename="transactions")
 

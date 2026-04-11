@@ -1,10 +1,10 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
-from gamification.models.point_rule import PointRule, PointAction
 from gamification.models.environment_impact import EnvironmentImpact
-from gamification.services.point_service import award_points
+from gamification.models.point_rule import PointAction, PointRule
 from gamification.services.impact_service import get_user_impact
+from gamification.services.point_service import award_points
 
 User = get_user_model()
 
@@ -13,22 +13,28 @@ class EcoImpactTests(TestCase):
     def setUp(self):
         # Create test users
         self.user1 = User.objects.create_user(
-            email="user1@iteso.mx", 
+            email="user1@iteso.mx",
             password="testpassword",
             first_name="User",
-            last_name="One"
+            last_name="One",
         )
         self.user2 = User.objects.create_user(
-            email="user2@iteso.mx", 
+            email="user2@iteso.mx",
             password="testpassword",
             first_name="User",
-            last_name="Two"
+            last_name="Two",
         )
 
         # Create PointRules required for testing
-        PointRule.objects.create(action=PointAction.PUBLISH_ITEM, points=10, is_active=True)
-        PointRule.objects.create(action=PointAction.COMPLETE_SALE, points=15, is_active=True)
-        PointRule.objects.create(action=PointAction.COMPLETE_DONATION, points=25, is_active=True)
+        PointRule.objects.create(
+            action=PointAction.PUBLISH_ITEM, points=10, is_active=True
+        )
+        PointRule.objects.create(
+            action=PointAction.COMPLETE_SALE, points=15, is_active=True
+        )
+        PointRule.objects.create(
+            action=PointAction.COMPLETE_DONATION, points=25, is_active=True
+        )
 
     def test_non_impact_action(self):
         """Standard actions like publishing an item should NOT affect eco impact."""
@@ -77,6 +83,6 @@ class EcoImpactTests(TestCase):
 
         # Community averages (User 1 = 2 products, User 2 = 4 products. Average = 3)
         self.assertEqual(data["community_average_items"], 3.0)
-        
+
         # CO2 Averages (User 1 = 5.0, User 2 = 10.0. Average = 7.5)
         self.assertEqual(data["community_average_co2"], 7.5)

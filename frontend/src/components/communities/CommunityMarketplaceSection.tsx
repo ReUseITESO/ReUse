@@ -11,7 +11,7 @@ interface CommunityMarketplaceSectionProps {
   products: Product[];
   isLoading: boolean;
   error: string | null;
-  communityName: string;
+  communityName?: string;
   isAdmin?: boolean;
   communityId?: number;
   onProductRemoved?: () => void;
@@ -21,7 +21,6 @@ export default function CommunityMarketplaceSection({
   products,
   isLoading,
   error,
-  communityName,
   isAdmin = false,
   communityId,
   onProductRemoved,
@@ -31,11 +30,11 @@ export default function CommunityMarketplaceSection({
 
   const handleRemoveProduct = async (productId: number) => {
     if (!communityId) return;
-    
+
     if (!window.confirm('¿Estás seguro de que deseas eliminar este producto de la comunidad?')) {
       return;
     }
-    
+
     setDeletingId(productId);
     setDeleteError(null);
     try {
@@ -60,8 +59,11 @@ export default function CommunityMarketplaceSection({
   }
 
   if (error) {
-    const is403 = error.includes('403') || error.toLowerCase().includes('permission') || error.toLowerCase().includes('not a member');
-    
+    const is403 =
+      error.includes('403') ||
+      error.toLowerCase().includes('permission') ||
+      error.toLowerCase().includes('not a member');
+
     if (is403) {
       return (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-8 text-center">
@@ -70,12 +72,12 @@ export default function CommunityMarketplaceSection({
             Debes ser miembro de esta comunidad para ver el marketplace
           </p>
           <p className="mt-2 text-xs text-amber-700">
-            Haz clic en el botón "Unirse" arriba para acceder a los artículos exclusivos
+            Haz clic en el botón &quot;Unirse&quot; arriba para acceder a los artículos exclusivos
           </p>
         </div>
       );
     }
-    
+
     return (
       <div className="rounded-lg border border-error/20 bg-error/5 p-6">
         <p className="text-sm font-medium text-error">{error}</p>

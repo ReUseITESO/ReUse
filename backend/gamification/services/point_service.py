@@ -1,9 +1,9 @@
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
-from gamification.models.point_rule import PointRule, PointAction
-from gamification.models.point_transaction import PointTransaction
 from gamification.models.environment_impact import EnvironmentImpact
+from gamification.models.point_rule import PointAction, PointRule
+from gamification.models.point_transaction import PointTransaction
 
 CO2_PER_ITEM = 2.5
 
@@ -30,7 +30,7 @@ def award_points(user, action, reference_id=None):
             PointAction.COMPLETE_SALE,
             PointAction.COMPLETE_EXCHANGE,
         ]
-        
+
         if action in impact_actions:
             impact, _ = EnvironmentImpact.objects.get_or_create(user=user)
             impact.reused_products += 1
