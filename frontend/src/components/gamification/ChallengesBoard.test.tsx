@@ -61,7 +61,6 @@ describe('ChallengesBoard', () => {
       myChallenges: [],
       isLoading: false,
       error: null,
-      joinChallenge: vi.fn(),
       claimChallengeReward: vi.fn(),
       refetch: vi.fn(),
     });
@@ -101,7 +100,6 @@ describe('ChallengesBoard', () => {
       myChallenges: [],
       isLoading: true,
       error: null,
-      joinChallenge: vi.fn(),
       claimChallengeReward: vi.fn(),
       refetch: vi.fn(),
     });
@@ -144,7 +142,6 @@ describe('ChallengesBoard', () => {
       myChallenges: [buildUserChallenge({ progress: 2, is_completed: true, reward_claimed: true })],
       isLoading: false,
       error: null,
-      joinChallenge: vi.fn(),
       claimChallengeReward: claimMock,
       refetch: vi.fn(),
     });

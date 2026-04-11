@@ -264,20 +264,20 @@ def get_rotative_challenges(now=None):
 
     # Select 3 daily challenges deterministically
     if daily_challenges:
-        random.seed(daily_seed)
+        daily_rng = random.Random(daily_seed)
         daily_count = min(3, len(daily_challenges))
-        selected.extend(random.sample(daily_challenges, daily_count))
+        selected.extend(daily_rng.sample(daily_challenges, daily_count))
 
     # Select 3 weekly challenges deterministically
     if weekly_challenges:
-        random.seed(week_num)
+        weekly_rng = random.Random(week_num)
         weekly_count = min(3, len(weekly_challenges))
-        selected.extend(random.sample(weekly_challenges, weekly_count))
+        selected.extend(weekly_rng.sample(weekly_challenges, weekly_count))
 
     # Select 3 monthly challenges deterministically
     if monthly_challenges:
-        random.seed(month_num)
+        monthly_rng = random.Random(month_num)
         monthly_count = min(3, len(monthly_challenges))
-        selected.extend(random.sample(monthly_challenges, monthly_count))
+        selected.extend(monthly_rng.sample(monthly_challenges, monthly_count))
 
     return selected

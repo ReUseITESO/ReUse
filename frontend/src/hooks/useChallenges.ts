@@ -30,6 +30,13 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
       ]);
       setChallenges(active);
       setMyChallenges(mine);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('reuse:challenges-snapshot', {
+            detail: { challenges: active, myChallenges: mine },
+          }),
+        );
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'No se pudieron cargar los retos';
       setError(message);
@@ -39,16 +46,6 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
       setIsLoading(false);
     }
   }, [enabled]);
-
-  const joinChallenge = useCallback(
-    async (challengeId: number) => {
-      await apiClient<UserChallenge>(`/gamification/challenges/${challengeId}/join/`, {
-        method: 'POST',
-      });
-      await fetchChallenges();
-    },
-    [fetchChallenges],
-  );
 
   const claimChallengeReward = useCallback(
     async (challengeId: number) => {
@@ -80,7 +77,6 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
     myChallenges,
     isLoading,
     error,
-    joinChallenge,
     claimChallengeReward,
     refetch: fetchChallenges,
   };

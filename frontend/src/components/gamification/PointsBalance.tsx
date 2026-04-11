@@ -1,5 +1,7 @@
 'use client';
 
+import { AlertTriangle, Sparkles } from 'lucide-react';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { cn } from '@/lib/utils';
@@ -31,7 +33,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     return (
       <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">⚠️</span>
+          <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-700" />
           <div>
             <p className="text-sm font-medium text-yellow-900">Usuario no autenticado</p>
             <p className="mt-1 text-xs text-yellow-700">
@@ -76,12 +78,14 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
           <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">
             Puntos Acumulados
           </h3>
-          <p className="mt-2 text-4xl font-extrabold leading-none text-primary">{points || 0}</p>
+          <p className="mt-2 text-4xl font-extrabold leading-none text-primary">
+            {levelProgression.points || 0}
+          </p>
           <p className="mt-2 text-sm text-fg/80">Nivel de impacto en ReUse</p>
         </div>
 
         <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/70 ring-8 ring-primary/15">
-          <span className="text-2xl">⭐</span>
+          <Sparkles className="h-7 w-7 text-primary" />
         </div>
       </div>
 

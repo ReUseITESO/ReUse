@@ -29,7 +29,6 @@ function getChallengeTheme(type: ChallengeType) {
       accent: 'from-emerald-500 via-lime-400 to-teal-400',
       soft: 'bg-emerald-500/8',
       glow: 'shadow-emerald-500/15',
-      emoji: '🎁',
     };
   }
   if (type === 'exchange') {
@@ -38,7 +37,6 @@ function getChallengeTheme(type: ChallengeType) {
       accent: 'from-cyan-500 via-sky-400 to-emerald-400',
       soft: 'bg-cyan-500/8',
       glow: 'shadow-cyan-500/15',
-      emoji: '🔁',
     };
   }
   if (type === 'sale') {
@@ -47,7 +45,6 @@ function getChallengeTheme(type: ChallengeType) {
       accent: 'from-orange-500 via-amber-400 to-yellow-300',
       soft: 'bg-orange-500/8',
       glow: 'shadow-orange-500/15',
-      emoji: '💰',
     };
   }
   if (type === 'publish') {
@@ -56,7 +53,6 @@ function getChallengeTheme(type: ChallengeType) {
       accent: 'from-violet-500 via-fuchsia-400 to-pink-400',
       soft: 'bg-violet-500/8',
       glow: 'shadow-violet-500/15',
-      emoji: '📦',
     };
   }
   return {
@@ -64,7 +60,6 @@ function getChallengeTheme(type: ChallengeType) {
     accent: 'from-yellow-500 via-amber-400 to-orange-300',
     soft: 'bg-yellow-500/8',
     glow: 'shadow-yellow-500/15',
-    emoji: '⭐',
   };
 }
 
@@ -254,7 +249,6 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
 
       {visibleChallenges.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
-          <p className="text-4xl">🌍</p>
           <p className="mt-3 text-base font-semibold text-fg">
             No hay retos activos en esta categoría
           </p>

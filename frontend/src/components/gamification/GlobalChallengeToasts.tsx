@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
-import { apiClient } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { Challenge, UserChallenge } from '@/types/gamification';
 
@@ -13,6 +12,11 @@ interface ChallengeToast {
   id: number;
   text: string;
   type: ToastType;
+}
+
+interface ChallengesSnapshotEventDetail {
+  challenges: Challenge[];
+  myChallenges: UserChallenge[];
 }
 
 export default function GlobalChallengeToasts() {
@@ -33,93 +37,90 @@ export default function GlobalChallengeToasts() {
 
     let disposed = false;
 
-    const syncChallengeProgress = async () => {
-      try {
-        const [activeChallenges, myChallenges] = await Promise.all([
-          apiClient<Challenge[]>('/gamification/challenges/'),
-          apiClient<UserChallenge[]>('/gamification/challenges/me/'),
-        ]);
+    const processSnapshot = (activeChallenges: Challenge[], myChallenges: UserChallenge[]) => {
+      if (disposed) {
+        return;
+      }
 
-        if (disposed) {
+      // Only notify for challenges currently active/visible in the active catalog.
+      const activeIds = new Set(activeChallenges.map(item => item.id));
+      const activeMyChallenges = myChallenges.filter(item => activeIds.has(item.challenge_id));
+
+      const nextSnapshot: Record<number, { progress: number; is_completed: boolean }> = {};
+      activeMyChallenges.forEach(item => {
+        nextSnapshot[item.challenge_id] = {
+          progress: item.progress,
+          is_completed: item.is_completed,
+        };
+      });
+
+      if (!hydratedRef.current) {
+        previousProgressRef.current = nextSnapshot;
+        hydratedRef.current = true;
+        return;
+      }
+
+      const detectedToasts: ChallengeToast[] = [];
+
+      activeMyChallenges.forEach(item => {
+        const previous = previousProgressRef.current[item.challenge_id];
+        if (!previous) {
           return;
         }
 
-        // Only notify for challenges currently active/visible in the active catalog.
-        const activeIds = new Set(activeChallenges.map(item => item.id));
-        const activeMyChallenges = myChallenges.filter(item => activeIds.has(item.challenge_id));
+        const progressed = item.progress > previous.progress;
+        const justCompleted = item.is_completed && !previous.is_completed;
 
-        const nextSnapshot: Record<number, { progress: number; is_completed: boolean }> = {};
-        activeMyChallenges.forEach(item => {
-          nextSnapshot[item.challenge_id] = {
-            progress: item.progress,
-            is_completed: item.is_completed,
-          };
-        });
-
-        if (!hydratedRef.current) {
-          previousProgressRef.current = nextSnapshot;
-          hydratedRef.current = true;
+        if (!progressed && !justCompleted) {
           return;
         }
 
-        const detectedToasts: ChallengeToast[] = [];
-
-        activeMyChallenges.forEach(item => {
-          const previous = previousProgressRef.current[item.challenge_id];
-          if (!previous) {
-            return;
-          }
-
-          const progressed = item.progress > previous.progress;
-          const justCompleted = item.is_completed && !previous.is_completed;
-
-          if (!progressed && !justCompleted) {
-            return;
-          }
-
-          if (justCompleted) {
-            window.dispatchEvent(new CustomEvent('reuse:points-updated'));
-            detectedToasts.push({
-              id: Date.now() + item.challenge_id,
-              type: 'completed',
-              text: `Reto completado: ${item.title}`,
-            });
-            return;
-          }
-
+        if (justCompleted) {
+          window.dispatchEvent(new CustomEvent('reuse:points-updated'));
           detectedToasts.push({
             id: Date.now() + item.challenge_id,
-            type: 'progress',
-            text: `Avanzaste en: ${item.title} (${item.progress}/${item.goal})`,
+            type: 'completed',
+            text: `Reto completado: ${item.title}`,
           });
-        });
-
-        if (detectedToasts.length > 0) {
-          const limited = detectedToasts.slice(0, 2);
-          setToasts(previous => [...previous, ...limited]);
-
-          limited.forEach(toastItem => {
-            window.setTimeout(() => {
-              if (disposed) {
-                return;
-              }
-              setToasts(previous => previous.filter(current => current.id !== toastItem.id));
-            }, 4000);
-          });
+          return;
         }
 
-        previousProgressRef.current = nextSnapshot;
-      } catch {
-        // Silent fail: toasts are non-critical UI feedback.
+        detectedToasts.push({
+          id: Date.now() + item.challenge_id,
+          type: 'progress',
+          text: `Avanzaste en: ${item.title} (${item.progress}/${item.goal})`,
+        });
+      });
+
+      if (detectedToasts.length > 0) {
+        const limited = detectedToasts.slice(0, 2);
+        setToasts(previous => [...previous, ...limited]);
+
+        limited.forEach(toastItem => {
+          window.setTimeout(() => {
+            if (disposed) {
+              return;
+            }
+            setToasts(previous => previous.filter(current => current.id !== toastItem.id));
+          }, 4000);
+        });
       }
+
+      previousProgressRef.current = nextSnapshot;
     };
 
-    syncChallengeProgress();
-    const interval = window.setInterval(syncChallengeProgress, 8000);
+    const onSnapshot = (event: Event) => {
+      const customEvent = event as CustomEvent<ChallengesSnapshotEventDetail>;
+      if (!customEvent.detail) {
+        return;
+      }
+      processSnapshot(customEvent.detail.challenges, customEvent.detail.myChallenges);
+    };
+    window.addEventListener('reuse:challenges-snapshot', onSnapshot as EventListener);
 
     return () => {
       disposed = true;
-      window.clearInterval(interval);
+      window.removeEventListener('reuse:challenges-snapshot', onSnapshot as EventListener);
     };
   }, [isAuthenticated]);
 
