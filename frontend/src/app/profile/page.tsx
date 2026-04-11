@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import ChallengesBoard from '@/components/gamification/ChallengesBoard';
 import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
 import { deactivateAccount } from '@/lib/auth';
 import type { User } from '@/types/auth';
@@ -139,6 +140,10 @@ export default function ProfilePage() {
           <div>
             <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
             <PointsBalance />
+          </div>
+          <div>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Retos</h2>
+            <ChallengesBoard />
           </div>
         </section>
 

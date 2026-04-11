@@ -39,6 +39,7 @@ export default function TestPointsButtons({
         body: JSON.stringify({ action, user_id: user?.id }),
       });
       setMessage({ type: 'success', text: `Accion aplicada: ${action}` });
+      window.dispatchEvent(new CustomEvent('reuse:points-updated'));
       notifyPointsUpdate();
     } catch (err) {
       setMessage({
@@ -65,6 +66,7 @@ export default function TestPointsButtons({
         body: JSON.stringify({ points, user_id: user?.id }),
       });
       setMessage({ type: 'success', text: `Descuento aplicado: -${points} puntos` });
+      window.dispatchEvent(new CustomEvent('reuse:points-updated'));
       notifyPointsUpdate();
     } catch (err) {
       setMessage({

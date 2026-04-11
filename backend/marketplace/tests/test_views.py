@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core.models import User
+from gamification.models.point_rule import PointRule
 from marketplace.models import Category, Products
 
 
@@ -16,6 +17,7 @@ class ProductViewSetTests(APITestCase):
             phone="3312345678",
         )
         self.category = Category.objects.create(name="Libros")
+        PointRule.objects.create(action="publish_item", points=5, is_active=True)
 
     def _auth(self):
         """Authenticate as the seller for subsequent requests."""
@@ -50,6 +52,14 @@ class ProductViewSetTests(APITestCase):
         self._auth()
         response = self.client.post(self.PRODUCTS_URL, self._payload(), format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_sale_awards_publish_points_to_seller(self):
+        self._auth()
+        response = self.client.post(self.PRODUCTS_URL, self._payload(), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.seller.refresh_from_db()
+        self.assertEqual(self.seller.points, 5)
 
     def test_create_returns_product_id(self):
         self._auth()

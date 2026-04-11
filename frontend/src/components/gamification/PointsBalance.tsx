@@ -1,5 +1,7 @@
 'use client';
 
+import { AlertTriangle, Sparkles } from 'lucide-react';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { cn } from '@/lib/utils';
@@ -31,7 +33,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     return (
       <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">⚠️</span>
+          <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-700" />
           <div>
             <p className="text-sm font-medium text-yellow-900">Usuario no autenticado</p>
             <p className="mt-1 text-xs text-yellow-700">
@@ -67,47 +69,27 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
   }
 
   return (
-    <article className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-medium uppercase tracking-wide text-blue-900">
-            Puntos acumulados
+    <article className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-primary/5 to-emerald-400/10 p-6 shadow-sm">
+      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
+      <div className="pointer-events-none absolute -left-8 -bottom-10 h-28 w-28 rounded-full bg-emerald-400/15 blur-2xl" />
+
+      <div className="relative flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">
+            Puntos Acumulados
           </h3>
-          <div className="flex items-center gap-3">
-            <p className="text-4xl font-bold text-blue-600">{levelProgression.points}</p>
-            <span className="rounded-full bg-blue-200 px-3 py-1 text-xs font-semibold text-blue-900">
-              {levelProgression.current_level.name}
-            </span>
-          </div>
+          <p className="mt-2 text-4xl font-extrabold leading-none text-primary">
+            {levelProgression.points || 0}
+          </p>
+          <p className="mt-2 text-sm text-fg/80">Nivel de impacto en ReUse</p>
         </div>
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 bg-opacity-10">
-          <span className="text-2xl">⭐</span>
+
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/70 ring-8 ring-primary/15">
+          <Sparkles className="h-7 w-7 text-primary" />
         </div>
       </div>
 
-      <div className="mt-4">
-        <div className="mb-1 flex items-center justify-between text-xs text-blue-800">
-          <span>Progreso al siguiente nivel</span>
-          <span>{levelProgression.progress_percent}%</span>
-        </div>
-        <div className="h-2.5 w-full rounded-full bg-blue-200">
-          <div
-            className="h-2.5 rounded-full bg-blue-600 transition-all"
-            style={{ width: `${levelProgression.progress_percent}%` }}
-          />
-        </div>
-      </div>
-
-      {levelProgression.is_max_level ? (
-        <p className="mt-3 text-xs font-medium text-blue-800">Nivel maximo alcanzado.</p>
-      ) : (
-        <p className="mt-3 text-xs text-blue-700">
-          Te faltan <strong>{levelProgression.points_to_next_level}</strong> puntos para llegar a{' '}
-          <strong>{levelProgression.next_level?.name}</strong>.
-        </p>
-      )}
-
-      <p className="mt-3 text-xs text-blue-700">
+      <p className="relative mt-4 text-xs text-muted-fg">
         Gana puntos publicando, completando transacciones e interactuando con la comunidad.
       </p>
     </article>

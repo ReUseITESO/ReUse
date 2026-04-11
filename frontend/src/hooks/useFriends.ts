@@ -3,14 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
-import type { UserConnection, SocialUser } from '@/types/friends';
+import type { UserConnection, SocialUser, FriendRequest } from '@/types/friends';
 
 export type FriendUser = SocialUser;
-export type FriendRequest = {
-  id: number;
-  from_user: SocialUser;
-  created_at: string;
-};
 
 export function useFriends() {
   const { user } = useAuth();

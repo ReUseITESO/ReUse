@@ -83,6 +83,8 @@ export interface UserChallenge {
   progress: number;
   bonus_points: number;
   is_completed: boolean;
+  reward_claimed: boolean;
+  reward_claimed_at: string | null;
   joined_at: string;
   completed_at: string | null;
   start_date: string;
