@@ -24,7 +24,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     """Miembros de la comunidad ITESO que usan la plataforma"""
 
-    username = None
+    username = None  # type: ignore
     email = models.EmailField(
         unique=True,
         validators=[
@@ -43,10 +43,14 @@ class User(AbstractUser):
     is_email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(blank=True, null=True)
 
+    # HU-CORE-17: logical account deactivation (no physical delete)
+    is_deactivated = models.BooleanField(default=False)
+    deactivated_at = models.DateTimeField(blank=True, null=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
-    objects = CustomUserManager()
+    objects = CustomUserManager()  # type: ignore
 
     class Meta:
         db_table = "users"

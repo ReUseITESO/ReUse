@@ -292,7 +292,7 @@ Cada módulo es **dueño** de sus tablas. Solo el módulo dueño puede escribir 
 | Módulo | Tablas que posee |
 |--------|-----------------|
 | Core | `users`, `profiles`, `roles` |
-| Marketplace | `categories`, `products`, `product_images`, `transactions`, `messages` |
+| Marketplace | `categories`, `products`, `product_images`, `transactions`, `messages`, `comments` |
 | Gamificación | `point_transactions`, `badges`, `user_badges`, `challenges`, `user_challenges` |
 
 ### 3.2 Foreign Keys entre Módulos

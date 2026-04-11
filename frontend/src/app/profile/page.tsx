@@ -3,17 +3,42 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Pencil } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 import PointsBalance from '@/components/gamification/PointsBalance';
 import BadgesList from '@/components/gamification/BadgesList';
+import ChallengesBoard from '@/components/gamification/ChallengesBoard';
+import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
+import { deactivateAccount } from '@/lib/auth';
 import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const displayUser = localUser ?? user;
+
+  // HU-CORE-17: estado del modal de desactivación
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState('');
+
+  async function handleDeactivateConfirm() {
+    setIsDeactivating(true);
+    setDeactivateError('');
+    try {
+      await deactivateAccount();
+      await signOut();
+      router.replace('/auth/signin');
+    } catch (err) {
+      setDeactivateError(
+        err instanceof Error ? err.message : 'Error al desactivar la cuenta.',
+      );
+      setIsDeactivating(false);
+    }
+  }
 
   function handleSave(updated: User) {
     setLocalUser(updated);
@@ -116,6 +141,10 @@ export default function ProfilePage() {
             <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
             <PointsBalance />
           </div>
+          <div>
+            <h2 className="mb-4 text-h3 font-semibold text-fg">Retos</h2>
+            <ChallengesBoard />
+          </div>
         </section>
 
         <section>
@@ -124,7 +153,72 @@ export default function ProfilePage() {
             <BadgesList />
           </div>
         </section>
+
+        <section>
+          <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">
+              Historial de puntos
+            </h2>
+            <PointsHistoryCard />
+          </div>
+        </section>
+
+        {/* HU-CORE-17: Sección de desactivación de cuenta */}
+        <section className="mt-8">
+          <div className="rounded-lg border border-error/20 bg-error/5 p-6">
+            <h2 className="text-h3 font-semibold text-fg mb-1">Zona de peligro</h2>
+            <p className="text-sm text-muted-fg mb-4">
+              Al desactivar tu cuenta dejarás de aparecer en la plataforma. Podrás reactivarla en
+              cualquier momento solicitando un correo de reactivación.
+            </p>
+            <button
+              onClick={() => { setDeactivateError(''); setShowDeactivateModal(true); }}
+              className="rounded-lg border border-error/40 px-4 py-2 text-sm font-medium
+                         text-error transition-colors hover:bg-error/10"
+            >
+              Desactivar mi cuenta
+            </button>
+          </div>
+        </section>
       </div>
+
+      {/* HU-CORE-17: Modal de confirmación de desactivación */}
+      {showDeactivateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+            <h3 className="text-h3 font-bold text-fg mb-2">¿Desactivar tu cuenta?</h3>
+            <p className="text-sm text-muted-fg mb-4">
+              Tu cuenta quedará desactivada y cerraremos tu sesión. Para reactivarla, podrás
+              solicitar un correo con enlace de reactivación cuando quieras.
+            </p>
+
+            {deactivateError && (
+              <p className="mb-3 rounded-lg border border-error/20 bg-error/5 px-3 py-2 text-sm text-error">
+                {deactivateError}
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeactivateConfirm}
+                disabled={isDeactivating}
+                className="flex-1 rounded-lg bg-error px-4 py-2.5 text-sm font-medium
+                           text-white transition-colors hover:bg-error/80 disabled:opacity-50"
+              >
+                {isDeactivating ? 'Desactivando…' : 'Sí, desactivar'}
+              </button>
+              <button
+                onClick={() => setShowDeactivateModal(false)}
+                disabled={isDeactivating}
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm
+                           font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

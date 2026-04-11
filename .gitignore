@@ -65,6 +65,8 @@ db.sqlite3-journal
 **/migrations/core/
 **/migrations/marketplace/
 **/migrations/gamification/
+!backend/social/migrations/
+!backend/social/migrations/*.py
 
 # Flask stuff:
 instance/
@@ -218,4 +220,6 @@ out/
 
 # Django migrations in backend (do not commit generated migration files)
 backend/**/migrations/*.py
+!backend/social/migrations/
+!backend/social/migrations/*.py
 !backend/**/migrations/__init__.py

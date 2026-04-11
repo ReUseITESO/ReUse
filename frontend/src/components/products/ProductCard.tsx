@@ -3,14 +3,11 @@ import { Clock3, UserRound } from 'lucide-react';
 
 import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import Badge from '@/components/ui/Badge';
+import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import { getCategoryStyle, getPriceColor } from '@/lib/productStyles';
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
-import type { Product } from '@/types/product';
-
-interface ProductCardProps {
-  product: Product;
-}
+import type { ProductCardProps } from '@/types/product';
 
 export default function ProductCard({ product }: ProductCardProps) {
   const timeAgo = formatTimeAgo(product.created_at);
@@ -25,9 +22,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`}>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md cursor-pointer">
         <div className="flex h-44 items-center justify-center bg-muted">
-          {product.image_url ? (
+          {product.images?.[0]?.image_url ? (
             <img
-              src={product.image_url}
+              src={product.images[0].image_url}
               alt={product.title}
               className="h-full w-full object-cover"
             />
@@ -55,7 +52,18 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           <div className="mt-2 flex items-center gap-2 border-t border-border pt-3">
             <UserRound className="h-4 w-4 text-secondary" />
-            <span className="text-sm text-fg">{product.seller_name}</span>
+            <span className="flex-1 text-sm text-fg">{product.seller_name}</span>
+            <ProductReactionButtons
+              productId={product.id}
+              sellerId={product.seller_id}
+              compact
+              stopLinkNavigation
+              initialSummary={{
+                likes_count: product.likes_count,
+                dislikes_count: product.dislikes_count,
+                user_reaction: product.user_reaction,
+              }}
+            />
           </div>
         </div>
       </article>
