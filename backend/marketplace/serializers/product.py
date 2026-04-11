@@ -5,12 +5,14 @@ from marketplace.serializers.category import CategorySerializer
 from marketplace.serializers.images import ImageSerializer
 from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 from marketplace.services.transaction_service import has_active_transaction
+from social.serializers.community import CommunityListSerializer
 
 
 class ProductListSerializer(ReactionSerializerFieldsMixin, serializers.ModelSerializer):
     """Serializer for the product list (Object -> JSON)."""
 
     category = CategorySerializer(read_only=True)
+    community = CommunityListSerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
     images = ImageSerializer(many=True, read_only=True)
@@ -37,6 +39,7 @@ class ProductListSerializer(ReactionSerializerFieldsMixin, serializers.ModelSeri
             "price",
             "images",
             "category",
+            "community",
             "seller_name",
             "seller_id",
             "has_active_transaction",
@@ -61,6 +64,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             "transaction_type",
             "price",
             "category",
+            "community",
+            "images",
         ]
         read_only_fields = ["id"]
 
@@ -93,6 +98,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             "transaction_type",
             "price",
             "category",
+            "community",
         ]
 
     def validate(self, data):

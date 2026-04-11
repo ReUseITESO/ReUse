@@ -5,7 +5,7 @@ import {
   type PathValue,
   type UseFormReturn,
 } from 'react-hook-form';
-import { Info, Repeat2 } from 'lucide-react';
+import { Info, Repeat2, Users } from 'lucide-react';
 
 import AppSelect from '@/components/ui/AppSelect';
 import Spinner from '@/components/ui/Spinner';
@@ -16,6 +16,7 @@ import {
 } from '@/components/products/forms/formConstants';
 
 import type { Category, ProductCondition, TransactionType } from '@/types/product';
+import type { Community } from '@/types/community';
 
 interface ProductFormBaseValues extends FieldValues {
   title: string;
@@ -24,6 +25,7 @@ interface ProductFormBaseValues extends FieldValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
+  community?: string;
 }
 
 interface ProductMainFieldsProps<TFormValues extends ProductFormBaseValues> {
@@ -31,6 +33,7 @@ interface ProductMainFieldsProps<TFormValues extends ProductFormBaseValues> {
   categories: Category[];
   isLoadingCategories: boolean;
   categoriesError: string | null;
+  communities?: Community[];
   titlePlaceholder?: string;
   descriptionPlaceholder?: string;
 }
@@ -40,6 +43,7 @@ export default function ProductMainFields<TFormValues extends ProductFormBaseVal
   categories,
   isLoadingCategories,
   categoriesError,
+  communities = [],
   titlePlaceholder,
   descriptionPlaceholder,
 }: ProductMainFieldsProps<TFormValues>) {
@@ -60,6 +64,7 @@ export default function ProductMainFields<TFormValues extends ProductFormBaseVal
   const conditionName = 'condition' as Path<TFormValues>;
   const transactionTypeName = 'transaction_type' as Path<TFormValues>;
   const priceName = 'price' as Path<TFormValues>;
+  const communityName = 'community' as Path<TFormValues>;
 
   const titleError = errors.title?.message;
   const descriptionError = errors.description?.message;
@@ -129,13 +134,16 @@ export default function ProductMainFields<TFormValues extends ProductFormBaseVal
                 rules={{ required: 'Selecciona una categoría' }}
                 render={({ field }) => (
                   <AppSelect
-                    value={field.value ?? ''}
+                    value={String(field.value) || 'placeholder'}
                     onValueChange={field.onChange}
                     placeholder="Seleccionar categoría"
-                    options={categories.map(category => ({
-                      value: String(category.id),
-                      label: category.name,
-                    }))}
+                    options={[
+                      { value: 'placeholder', label: 'Seleccionar categoría', disabled: true },
+                      ...categories.map(category => ({
+                        value: String(category.id),
+                        label: category.name,
+                      })),
+                    ]}
                   />
                 )}
               />
@@ -250,6 +258,45 @@ export default function ProductMainFields<TFormValues extends ProductFormBaseVal
           </div>
         )}
       </section>
+
+      {communities && communities.length > 0 && (
+        <section className="space-y-5">
+          <h2 className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-fg">
+            <Users className="h-4 w-4" />
+            Comunidad (opcional)
+          </h2>
+
+          <div>
+            <label htmlFor="community" className="mb-1.5 block text-sm font-medium text-fg">
+              Publicar para comunidad
+            </label>
+            <p className="mb-3 text-xs text-muted-fg">
+              Deja vacío para publicar en el marketplace público. Selecciona una comunidad para que solo sus miembros vean el artículo.
+            </p>
+            <Controller
+              name={communityName}
+              control={control}
+              render={({ field }) => (
+                <AppSelect
+                  value={field.value ?? 'none'}
+                  onValueChange={value => {
+                    // Convert 'none' back to undefined for the form
+                    field.onChange(value === 'none' ? undefined : value);
+                  }}
+                  placeholder="Sin comunidad (público)"
+                  options={[
+                    { value: 'none', label: 'Sin comunidad (público)' },
+                    ...communities.map(community => ({
+                      value: String(community.id),
+                      label: community.name,
+                    })),
+                  ]}
+                />
+              )}
+            />
+          </div>
+        </section>
+      )}
     </>
   );
 }

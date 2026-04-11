@@ -7,6 +7,8 @@ import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
+import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
+import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -23,6 +25,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     joinCommunity,
     deleteCommunity,
   } = useCommunityDetail(params.id);
+
+  const { products, isLoading: productsLoading, error: productsError, refresh: refreshProducts } = useCommunityMarketplace(
+    params.id,
+  );
 
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
@@ -229,6 +235,19 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Marketplace Section */}
+        <div className="mt-8">
+          <CommunityMarketplaceSection
+            products={products}
+            isLoading={productsLoading}
+            error={productsError}
+            communityName={community?.name || ''}
+            isAdmin={isAdmin}
+            communityId={Number(params.id)}
+            onProductRemoved={refreshProducts}
+          />
         </div>
       </div>
     </main>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Users, Check, Mail } from 'lucide-react';
+import { Plus, Users, Check, Mail, ShoppingBag } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunities } from '@/hooks/useCommunities';
@@ -92,6 +92,18 @@ export default function CommunitiesPage() {
             Crear comunidad
           </button>
         </div>
+
+        {/* Marketplace Link */}
+        <Link
+          href="/communities/marketplace"
+          className="mb-6 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 transition-colors hover:bg-blue-100"
+        >
+          <ShoppingBag className="h-5 w-5 text-blue-600" />
+          <div>
+            <p className="text-sm font-medium text-blue-900">Marketplace de Comunidades</p>
+            <p className="text-xs text-blue-700">Explora artículos exclusivos de tus comunidades</p>
+          </div>
+        </Link>
 
         {/* Pending invitations */}
         {invitations.length > 0 && (

@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from .category import Category
+from social.models import Community
 
 
 class Products(models.Model):
@@ -41,6 +42,15 @@ class Products(models.Model):
         related_name="products",
         db_column="category_id",
     )
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.SET_NULL,
+        related_name="marketplace_items",
+        db_column="community_id",
+        null=True,
+        blank=True,
+        help_text="If set, this item is only visible to community members. If null, item is public.",
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES)
@@ -60,6 +70,8 @@ class Products(models.Model):
             models.Index(fields=["category"]),
             models.Index(fields=["status"]),
             models.Index(fields=["status", "category"], name="idx_products_available"),
+            models.Index(fields=["community"]),
+            models.Index(fields=["community", "status"], name="idx_comm_prod_avail"),
         ]
 
     def clean(self):
