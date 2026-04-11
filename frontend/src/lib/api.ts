@@ -2,6 +2,7 @@ import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
 import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
 
 import type { PaginatedResponse } from '@/types/api';
+import type { Comment } from '@/types/comment';
 import type {
   CreateTransactionPayload,
   Transaction,
@@ -115,6 +116,28 @@ export async function updateTransactionStatus(
   return apiClient<Transaction>(`/marketplace/transactions/${id}/status/`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
+  });
+}
+
+// ===== Marketplace Comments =====
+
+export async function listComments(productId: number, page = 1) {
+  const query = page > 1 ? `?page=${page}` : '';
+  return apiClient<PaginatedResponse<Comment>>(
+    `/marketplace/products/${productId}/comments/${query}`,
+  );
+}
+
+export async function createComment(productId: number, content: string) {
+  return apiClient<Comment>(`/marketplace/products/${productId}/comments/`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function deleteComment(productId: number, commentId: number) {
+  return apiClient<null>(`/marketplace/products/${productId}/comments/${commentId}/`, {
+    method: 'DELETE',
   });
 }
 

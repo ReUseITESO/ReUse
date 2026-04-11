@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import ProductDetailContent from '@/components/products/ProductDetailContent';
+import CommentsSection from '@/components/products/comments/CommentsSection';
 import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
 import { useAuth } from '@/hooks/useAuth';
@@ -134,6 +135,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         onBack={() => router.back()}
         onMainAction={handleMainAction}
       />
+
+      <div className="mx-auto mt-12 max-w-6xl border-t border-border pt-10">
+        <CommentsSection productId={product.id} productSellerId={product.seller_id} />
+      </div>
 
       <div className="mx-auto mt-4 flex max-w-6xl justify-end">
         <ProductReactionButtons

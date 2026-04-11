@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/hooks/useAuth';
+import GlobalChallengeToasts from '@/components/gamification/GlobalChallengeToasts';
 import Navbar from '@/components/layout/Navbar';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Plataforma compraventa de artículos de segunda mano para estudiantes del ITESO',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={cn('font-sans', inter.variable)} suppressHydrationWarning>
       <body className="bg-bg text-fg">
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange
         >
           <AuthProvider>
+            <GlobalChallengeToasts />
             <Navbar />
             <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
           </AuthProvider>

@@ -99,7 +99,7 @@ export default function ShareButton({ productId, productTitle }: ShareButtonProp
             </div>
 
             <p className="mb-4 text-sm text-muted-fg">
-              Selecciona amigos para compartir "{productTitle}"
+              Selecciona amigos para compartir &quot;{productTitle}&quot;
             </p>
 
             {error && (
