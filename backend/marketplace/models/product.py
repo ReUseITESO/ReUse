@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from social.models import Community
+
 from .category import Category
 
 
@@ -41,6 +43,15 @@ class Products(models.Model):
         related_name="products",
         db_column="category_id",
     )
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.SET_NULL,
+        related_name="marketplace_items",
+        db_column="community_id",
+        null=True,
+        blank=True,
+        help_text="If set, this item is only visible to community members. If null, item is public.",
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES)
@@ -49,7 +60,6 @@ class Products(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="disponible"
     )
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    image_url = models.CharField(max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(default=timezone.now)
 
@@ -61,6 +71,8 @@ class Products(models.Model):
             models.Index(fields=["category"]),
             models.Index(fields=["status"]),
             models.Index(fields=["status", "category"], name="idx_products_available"),
+            models.Index(fields=["community"]),
+            models.Index(fields=["community", "status"], name="idx_comm_prod_avail"),
         ]
 
     def clean(self):

@@ -2,10 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NAV_LINKS } from '@/components/layout/navLinks';
 import { Bell, User, LogOut, Menu, X, Plus, ArrowLeftRight, History } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { apiClient } from '@/lib/api';
+import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import NotificationBell from '@/components/notifications/NotificationBell';
+
+interface BadgeNotification {
+  id: number;
+  title: string;
+  body: string;
+  type: string;
+  is_read: boolean;
+}
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -13,6 +25,33 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [activeBadgeNotification, setActiveBadgeNotification] = useState<BadgeNotification | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const data = await apiClient<BadgeNotification[]>('/core/notifications/');
+        if (Array.isArray(data)) {
+          const unreadBadgeNotifications = data.filter(
+            n => !n.is_read && n.type === 'badge_earned',
+          );
+          if (unreadBadgeNotifications.length > 0 && !activeBadgeNotification) {
+            setActiveBadgeNotification(unreadBadgeNotifications[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications', error);
+      }
+    };
+
+    fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 15000);
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, activeBadgeNotification]);
 
   function handleSignOut() {
     signOut();
@@ -70,12 +109,8 @@ export default function Navbar() {
               >
                 <Plus className="h-4 w-4" /> Publicar
               </Link>
-              <button
-                className="relative rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
-                aria-label="Notificaciones"
-              >
-                <Bell className="h-5 w-5" />
-              </button>
+              <NotificationBell />
+              <ThemeToggle />
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
@@ -128,6 +163,7 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link
                 href="/auth/signin"
                 className="rounded-lg px-4 py-2 text-sm font-medium text-fg transition-colors hover:bg-muted"
@@ -144,17 +180,20 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => {
-            setMenuOpen(!menuOpen);
-            setProfileOpen(false);
-          }}
-          className="rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted md:hidden"
-          aria-label={menuOpen ? 'Cerrar menu' : 'Abrir menu'}
-        >
-          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile right */}
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <button
+            onClick={() => {
+              setMenuOpen(!menuOpen);
+              setProfileOpen(false);
+            }}
+            className="rounded-lg p-2 text-muted-fg transition-colors hover:bg-muted"
+            aria-label={menuOpen ? 'Cerrar menu' : 'Abrir menu'}
+          >
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -184,9 +223,13 @@ export default function Navbar() {
                 >
                   <Plus className="h-5 w-5" /> Publicar item
                 </Link>
-                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted">
+                <Link
+                  href="/notifications"
+                  onClick={closeMenu}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted"
+                >
                   <Bell className="h-5 w-5" /> Notificaciones
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -248,6 +291,13 @@ export default function Navbar() {
             </div>
           )}
         </div>
+      )}
+
+      {activeBadgeNotification && (
+        <CelebratoryNotification
+          notification={activeBadgeNotification}
+          onClose={() => setActiveBadgeNotification(null)}
+        />
       )}
     </nav>
   );

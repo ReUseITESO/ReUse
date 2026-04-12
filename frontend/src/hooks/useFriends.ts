@@ -1,74 +1,90 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-
 import { apiClient } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import type { UserConnection, SocialUser, FriendRequest } from '@/types/friends';
 
-import type { FriendUser, FriendRequest, FriendsListResponse } from '@/types/friends';
+export type FriendUser = SocialUser;
 
 export function useFriends() {
-  const [friends, setFriends] = useState<FriendUser[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
+  const { user } = useAuth();
+  const [connections, setConnections] = useState<UserConnection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFriends = useCallback(async () => {
-    try {
-      const data = await apiClient<FriendsListResponse>('/auth/friends/');
-      setFriends(data.results);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al cargar amigos';
-      setError(message);
-    }
-  }, []);
-
-  const fetchPendingRequests = useCallback(async () => {
-    try {
-      const data = await apiClient<{ results: FriendRequest[] }>('/auth/friends/requests/');
-      setPendingRequests(data.results);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al cargar solicitudes';
-      setError(message);
-    }
-  }, []);
-
-  const refresh = useCallback(async () => {
+  const fetchConnections = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    await Promise.all([fetchFriends(), fetchPendingRequests()]);
-    setIsLoading(false);
-  }, [fetchFriends, fetchPendingRequests]);
+    try {
+      const data = await apiClient<{ results: UserConnection[] } | UserConnection[]>(
+        '/social/connections/',
+      );
+      const results = Array.isArray(data) ? data : (data.results ?? []);
+      setConnections(results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al cargar conexiones');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    fetchConnections();
+  }, [fetchConnections]);
 
-  async function sendRequest(toUserId: number): Promise<string | null> {
+  const friends: FriendUser[] = user
+    ? connections
+        .filter(c => c.status === 'accepted')
+        .map(c => (c.requester.id === user.id ? c.addressee : c.requester))
+    : [];
+
+  const pendingRequests: FriendRequest[] = user
+    ? connections
+        .filter(c => c.status === 'pending' && c.addressee.id === user.id)
+        .map(c => ({ id: c.id, from_user: c.requester, created_at: c.created_at }))
+    : [];
+
+  // IDs of users we already sent a pending request to
+  const pendingSentIds: number[] = user
+    ? connections
+        .filter(c => c.status === 'pending' && c.requester.id === user.id)
+        .map(c => c.addressee.id)
+    : [];
+
+  async function sendRequest(addresseeId: number): Promise<string | null> {
     try {
-      await apiClient('/auth/friends/request/', {
+      await apiClient('/social/connections/', {
         method: 'POST',
-        body: JSON.stringify({ to_user_id: toUserId }),
+        body: JSON.stringify({ addressee_id: addresseeId }),
       });
+      await fetchConnections();
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al enviar solicitud';
     }
   }
 
-  async function acceptRequest(requestId: number): Promise<string | null> {
+  async function acceptRequest(connectionId: number): Promise<string | null> {
     try {
-      await apiClient(`/auth/friends/requests/${requestId}/accept/`, { method: 'POST' });
-      await refresh();
+      await apiClient(`/social/connections/${connectionId}/respond/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'accepted' }),
+      });
+      await fetchConnections();
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al aceptar';
     }
   }
 
-  async function rejectRequest(requestId: number): Promise<string | null> {
+  async function rejectRequest(connectionId: number): Promise<string | null> {
     try {
-      await apiClient(`/auth/friends/requests/${requestId}/reject/`, { method: 'POST' });
-      await refresh();
+      await apiClient(`/social/connections/${connectionId}/respond/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'rejected' }),
+      });
+      await fetchConnections();
       return null;
     } catch (err) {
       return err instanceof Error ? err.message : 'Error al rechazar';
@@ -76,19 +92,15 @@ export function useFriends() {
   }
 
   async function removeFriend(userId: number): Promise<string | null> {
-    try {
-      await apiClient(`/auth/friends/${userId}/`, { method: 'DELETE' });
-      await refresh();
-      return null;
-    } catch (err) {
-      return err instanceof Error ? err.message : 'Error al eliminar amigo';
-    }
+    void userId;
+    // Daniel's API doesn't support removing accepted connections
+    return 'No se puede eliminar una conexión aceptada desde la API actual.';
   }
 
   async function searchUsers(query: string): Promise<FriendUser[]> {
     if (query.length < 2) return [];
     try {
-      const data = await apiClient<{ results: FriendUser[] } | FriendUser[]>(
+      const data = await apiClient<{ results: SocialUser[] } | SocialUser[]>(
         `/auth/users/search/?q=${encodeURIComponent(query)}`,
       );
       if (Array.isArray(data)) return data;
@@ -101,9 +113,11 @@ export function useFriends() {
   return {
     friends,
     pendingRequests,
+    pendingSentIds,
+    connections,
     isLoading,
     error,
-    refresh,
+    refresh: fetchConnections,
     sendRequest,
     acceptRequest,
     rejectRequest,

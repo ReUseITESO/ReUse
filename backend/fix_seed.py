@@ -20,7 +20,7 @@ for obj in data:
     keys_to_change = [k for k in fields.keys() if k.endswith("_id")]
     for k in keys_to_change:
         new_key = k.replace("_id", "")
-        # Ajuste específico: Django suele usar nombres en singular para relaciones
+        # Ajuste espec├¡fico: Django suele usar nombres en singular para relaciones
         if new_key == "products":
             new_key = "product"
         fields[new_key] = fields.pop(k)
@@ -28,4 +28,4 @@ for obj in data:
 with open("seeds/seed_v1_fixed.json", "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2)
 
-print("¡Archivo JSON formateado y corregido con éxito!")
+print("┬íArchivo JSON formateado y corregido con ├⌐xito!")

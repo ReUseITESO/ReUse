@@ -2,24 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  Send,
-  Users,
-  LogOut,
-  Trash2,
-  UserMinus,
-  Crown,
-  UserPlus,
-  Search,
-} from 'lucide-react';
+import { ArrowLeft, Send, Users, LogOut, Trash2, Crown, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
-import { apiClient } from '@/lib/api';
-
-import type { CommunityMember } from '@/types/community';
+import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
+import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -32,25 +21,25 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     error,
     createPost,
     deletePost,
-    inviteUser,
     leaveCommunity,
-    expelMember,
+    joinCommunity,
     deleteCommunity,
   } = useCommunityDetail(params.id);
+
+  const {
+    products,
+    isLoading: productsLoading,
+    error: productsError,
+    refresh: refreshProducts,
+  } = useCommunityMarketplace(params.id);
 
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
 
-  const [showInvite, setShowInvite] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CommunityMember[]>([]);
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [invitedIds, setInvitedIds] = useState<Set<number>>(new Set());
-
-  const isAdmin = community?.user_role === 'admin';
-  const isMember = community?.is_member;
-  const memberIds = members.map(m => m.user.id);
+  const currentMembership = members.find(m => m.user.id === user?.id);
+  const isAdmin = currentMembership?.role === 'admin';
+  const isMember = !!currentMembership;
 
   async function handlePost() {
     if (!postContent.trim()) return;
@@ -60,6 +49,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     if (err) setPostError(err);
     else setPostContent('');
     setIsPosting(false);
+  }
+
+  async function handleJoin() {
+    await joinCommunity();
   }
 
   async function handleLeave() {
@@ -72,34 +65,11 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     if (!err) router.push('/communities');
   }
 
-  async function handleSearch() {
-    if (searchQuery.length < 2) return;
-    try {
-      const data = await apiClient<{ results: CommunityMember[] } | CommunityMember[]>(
-        `/auth/users/search/?q=${encodeURIComponent(searchQuery)}`,
-      );
-      const results = Array.isArray(data) ? data : (data.results ?? []);
-      setSearchResults(results);
-    } catch {
-      setSearchResults([]);
-    }
-  }
-
-  async function handleInvite(userId: number) {
-    setInviteError(null);
-    const err = await inviteUser(userId);
-    if (err) {
-      setInviteError(err);
-    } else {
-      setInvitedIds(prev => new Set(prev).add(userId));
-    }
-  }
-
   if (isLoading) {
     return (
       <main className="min-h-screen p-6">
         <div className="mx-auto max-w-3xl">
-          <div className="h-48 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-48 animate-pulse rounded-lg bg-muted" />
         </div>
       </main>
     );
@@ -109,8 +79,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     return (
       <main className="min-h-screen p-6">
         <div className="mx-auto max-w-3xl">
-          <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-            <p className="text-sm text-red-700">{error ?? 'Comunidad no encontrada'}</p>
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
+            <p className="text-sm text-destructive">{error ?? 'Comunidad no encontrada'}</p>
           </div>
         </div>
       </main>
@@ -122,31 +92,39 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
       <div className="mx-auto max-w-3xl">
         <Link
           href="/communities"
-          className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Volver a comunidades
         </Link>
 
         {/* Header */}
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{community.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{community.name}</h1>
               {community.description && (
-                <p className="mt-2 text-sm text-gray-600">{community.description}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{community.description}</p>
               )}
-              <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+              <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" /> {community.member_count} miembros
+                  <Users className="h-4 w-4" /> {community.members_count} miembros
                 </span>
-                <span>Creada por {community.created_by_name}</span>
+                <span>Creada por {community.creator.full_name}</span>
               </div>
             </div>
             <div className="flex gap-2">
+              {!isMember && (
+                <button
+                  onClick={handleJoin}
+                  className="flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  <UserPlus className="h-3.5 w-3.5" /> Unirse
+                </button>
+              )}
               {isMember && !isAdmin && (
                 <button
                   onClick={handleLeave}
-                  className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                  className="flex items-center gap-1 rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
                 >
                   <LogOut className="h-3.5 w-3.5" /> Salir
                 </button>
@@ -154,7 +132,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               {isAdmin && (
                 <button
                   onClick={handleDelete}
-                  className="flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                  className="flex items-center gap-1 rounded-lg border border-destructive/50 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Eliminar
                 </button>
@@ -166,24 +144,24 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Posts */}
           <div className="lg:col-span-2">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">Publicaciones</h2>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Publicaciones</h2>
 
             {isMember && (
-              <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                {postError && <p className="mb-2 text-sm text-red-600">{postError}</p>}
+              <div className="mb-4 rounded-lg border border-border bg-card p-4 shadow-sm">
+                {postError && <p className="mb-2 text-sm text-destructive">{postError}</p>}
                 <textarea
                   value={postContent}
                   onChange={e => setPostContent(e.target.value)}
                   placeholder="Escribe algo para la comunidad..."
                   rows={3}
                   maxLength={2000}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <div className="mt-2 flex justify-end">
                   <button
                     onClick={handlePost}
                     disabled={!postContent.trim() || isPosting}
-                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     <Send className="h-4 w-4" />
                     {isPosting ? 'Publicando...' : 'Publicar'}
@@ -193,24 +171,24 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             )}
 
             {posts.length === 0 ? (
-              <p className="py-8 text-center text-sm text-gray-500">No hay publicaciones todavia</p>
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No hay publicaciones todavia
+              </p>
             ) : (
               <div className="space-y-3">
                 {posts.map(post => (
                   <div
                     key={post.id}
-                    className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                    className="rounded-lg border border-border bg-card p-4 shadow-sm"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                          {post.author.first_name?.[0]?.toUpperCase()}
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                          {post.author_name?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {post.author.full_name}
-                          </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-sm font-medium text-foreground">{post.author_name}</p>
+                          <p className="text-xs text-muted-foreground">
                             {new Date(post.created_at).toLocaleDateString('es-MX', {
                               day: 'numeric',
                               month: 'short',
@@ -220,16 +198,18 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                           </p>
                         </div>
                       </div>
-                      {(post.author.id === user?.id || isAdmin) && (
+                      {(post.user === user?.id || isAdmin) && (
                         <button
                           onClick={() => deletePost(post.id)}
-                          className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                          className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}
                     </div>
-                    <p className="mt-3 whitespace-pre-wrap text-sm text-gray-700">{post.content}</p>
+                    <p className="mt-3 whitespace-pre-wrap text-sm text-foreground">
+                      {post.content}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -238,104 +218,39 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
           {/* Members sidebar */}
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Miembros</h2>
-              {isAdmin && (
-                <button
-                  onClick={() => setShowInvite(!showInvite)}
-                  className="flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
-                >
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Invitar
-                </button>
-              )}
-            </div>
-
-            {/* Invite search */}
-            {showInvite && (
-              <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                      placeholder="Buscar usuario..."
-                      className="w-full rounded-lg border border-gray-300 py-1.5 pl-8 pr-2 text-xs focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSearch}
-                    disabled={searchQuery.length < 2}
-                    className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    Buscar
-                  </button>
-                </div>
-                {inviteError && <p className="mt-2 text-xs text-red-600">{inviteError}</p>}
-                {searchResults.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {searchResults.map(u => {
-                      const alreadyMember = memberIds.includes(u.id);
-                      const alreadyInvited = invitedIds.has(u.id);
-                      return (
-                        <div
-                          key={u.id}
-                          className="flex items-center justify-between rounded bg-white p-2"
-                        >
-                          <p className="text-xs font-medium text-gray-900">{u.full_name}</p>
-                          {alreadyMember ? (
-                            <span className="text-xs text-gray-400">Miembro</span>
-                          ) : alreadyInvited ? (
-                            <span className="text-xs text-green-600">Invitado</span>
-                          ) : (
-                            <button
-                              onClick={() => handleInvite(u.id)}
-                              className="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
-                            >
-                              Invitar
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
             <div className="space-y-2">
               {members.map(m => (
                 <div
                   key={m.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                  className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-                      {m.user.first_name?.[0]?.toUpperCase()}
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {m.user.full_name}
-                      {m.role === 'admin' && (
-                        <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
-                      )}
-                    </p>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {m.user.first_name?.[0]?.toUpperCase()}
                   </div>
-                  {isAdmin && m.user.id !== user?.id && (
-                    <button
-                      onClick={() => expelMember(m.user.id)}
-                      className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                      title="Expulsar"
-                    >
-                      <UserMinus className="h-4 w-4" />
-                    </button>
-                  )}
+                  <p className="text-sm font-medium text-foreground">
+                    {m.user.full_name}
+                    {m.role === 'admin' && (
+                      <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                    )}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Marketplace Section */}
+        <div className="mt-8">
+          <CommunityMarketplaceSection
+            products={products}
+            isLoading={productsLoading}
+            error={productsError}
+            communityName={community?.name || ''}
+            isAdmin={isAdmin}
+            communityId={Number(params.id)}
+            onProductRemoved={refreshProducts}
+          />
         </div>
       </div>
     </main>

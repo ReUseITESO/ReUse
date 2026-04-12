@@ -1,6 +1,8 @@
 import { getStoredTokens, refreshAndStore, clearTokens } from '@/lib/auth';
-
+import type { Notification, NotificationCount, PaginatedNotifications } from '@/types/notification';
+import type { ProductReactionSummary, ProductReactionType } from '@/types/product';
 import type { PaginatedResponse } from '@/types/api';
+import type { Comment } from '@/types/comment';
 import type {
   CreateTransactionPayload,
   Transaction,
@@ -12,8 +14,9 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
 export async function apiClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const tokens = getStoredTokens();
+  const isFormData = options?.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(!isFormData && { 'Content-Type': 'application/json' }),
     ...(options?.headers as Record<string, string>),
   };
 
@@ -121,6 +124,28 @@ export async function updateTransactionStatus(
   });
 }
 
+// ===== Marketplace Comments =====
+
+export async function listComments(productId: number, page = 1) {
+  const query = page > 1 ? `?page=${page}` : '';
+  return apiClient<PaginatedResponse<Comment>>(
+    `/marketplace/products/${productId}/comments/${query}`,
+  );
+}
+
+export async function createComment(productId: number, content: string) {
+  return apiClient<Comment>(`/marketplace/products/${productId}/comments/`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function deleteComment(productId: number, commentId: number) {
+  return apiClient<null>(`/marketplace/products/${productId}/comments/${commentId}/`, {
+    method: 'DELETE',
+  });
+}
+
 // ===== Transactions =====
 
 export async function getTransactionHistory(params?: {
@@ -146,4 +171,39 @@ export async function submitTransactionReview(
     method: 'POST',
     body: JSON.stringify(payload),
   }) as Promise<TransactionReview>;
+}
+
+export async function postProductReaction(
+  id: string | number,
+  type: ProductReactionType,
+): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'POST',
+    body: JSON.stringify({ type }),
+  });
+}
+
+export async function deleteProductReaction(id: string | number): Promise<ProductReactionSummary> {
+  return apiClient<ProductReactionSummary>(`/marketplace/products/${id}/reactions/`, {
+    method: 'DELETE',
+  });
+}
+
+// ===== Notifications =====
+
+export async function getNotifications(page = 1): Promise<PaginatedNotifications> {
+  const query = page > 1 ? `?page=${page}` : '';
+  return apiClient<PaginatedNotifications>(`/core/notifications/${query}`);
+}
+
+export async function getNotificationCount(): Promise<NotificationCount> {
+  return apiClient<NotificationCount>('/core/notifications/count/');
+}
+
+export async function markNotificationRead(id: number): Promise<Notification> {
+  return apiClient<Notification>(`/core/notifications/${id}/read/`, { method: 'PATCH' });
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  return apiClient<void>('/core/notifications/read-all/', { method: 'POST' });
 }

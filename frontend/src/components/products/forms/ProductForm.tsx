@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateProduct } from '@/hooks/useCreateProduct';
+import { useCommunities } from '@/hooks/useCommunities';
 
 import CreateProductImagesSection from '@/components/products/forms/CreateProductImagesSection';
 import ProductFormActions from '@/components/products/forms/ProductFormActions';
@@ -18,24 +20,41 @@ export default function ProductForm() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
+  const { communities } = useCommunities({ onlyJoined: true });
   const { createProduct, isLoading: submitting, error: submitError } = useCreateProduct();
 
   const form = useForm<FormValues>({
     defaultValues: {
       title: '',
       description: '',
-      category: '',
+      category: 'placeholder',
       condition: 'buen_estado',
       transaction_type: 'sale',
       price: '',
       image_url: '',
       images: [],
+      community: 'none',
     },
   });
+
+  // Initialize category with first available category when loaded
+  useEffect(() => {
+    if (categories.length > 0) {
+      const currentValue = form.getValues('category');
+      if (!currentValue || currentValue === 'placeholder') {
+        form.setValue('category', String(categories[0].id));
+      }
+    }
+  }, [categories, form]);
 
   async function handleCreateProduct(values: FormValues) {
     const isSale = values.transaction_type === 'sale';
     const hasImageList = values.images.length > 0;
+
+    // Validate category selection (not placeholder)
+    if (!values.category || values.category === 'placeholder') {
+      return;
+    }
 
     const result = await createProduct({
       title: values.title,
@@ -46,6 +65,8 @@ export default function ProductForm() {
       price: isSale ? Number(values.price) : null,
       image_url: hasImageList ? values.images[0] : values.image_url || undefined,
       images: hasImageList ? values.images : undefined,
+      community:
+        values.community && values.community !== 'none' ? Number(values.community) : undefined,
     });
 
     if (result) {
@@ -71,6 +92,7 @@ export default function ProductForm() {
           categories={categories}
           isLoadingCategories={categoriesLoading}
           categoriesError={categoriesError}
+          communities={communities}
           titlePlaceholder="Ej: Libro de Cálculo Diferencial"
           descriptionPlaceholder="Describe el artículo que deseas publicar..."
         />

@@ -138,6 +138,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",
         "auth": "5/minute",
         "email_verification": "3/minute",
+        "reactivation": "3/hour",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
@@ -243,8 +244,8 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "x-mock-user-id",  # For mock authentication in development
 ]
-
 # LOGGING CONFIGURATION
 LOGGING = {
     "version": 1,
@@ -273,6 +274,11 @@ LOGGING = {
 logger = logging.getLogger(__name__)
 logger.info("Application started")
 
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
+
 FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3001")
 
 MICROSOFT_CLIENT_ID = os.environ.get("MICROSOFT_CLIENT_ID", "")
@@ -285,12 +291,18 @@ EMAIL_VERIFICATION_EXPIRES_MINUTES = int(
     os.environ.get("EMAIL_VERIFICATION_EXPIRES_MINUTES", "30")
 )
 
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.sendgrid.net")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "apikey")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@reuse.com")
+
+# Si no hay API key de SendGrid configurada, usar consola (los emails se imprimen en el log).
+# Para usar SMTP real, establecer EMAIL_HOST_PASSWORD en el entorno.
+_default_email_backend = (
+    "django.core.mail.backends.console.EmailBackend"
+    if not EMAIL_HOST_PASSWORD
+    else "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", _default_email_backend)

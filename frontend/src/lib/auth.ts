@@ -1,6 +1,27 @@
 import type { AuthResponse, SignInRequest, SignUpRequest, User, AuthTokens } from '@/types/auth';
 
+type SignUpResponse = Record<string, unknown>;
+type SignUpErrorResponse = {
+  error?: {
+    message?: string;
+    details?: Record<string, string[]>;
+  };
+};
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
+
+/**
+ * HU-CORE-17: Error con código de API para distinguir tipos de fallo.
+ * Extiende Error para mantener compatibilidad con código existente.
+ */
+export class ApiError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+  }
+}
 
 const ACCESS_KEY = 'reuse_access_token';
 const REFRESH_KEY = 'reuse_refresh_token';
@@ -109,8 +130,10 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
 
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const message = body?.error?.message ?? 'Correo o contraseña incorrectos.';
-    throw new Error(message);
+    const code: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'Correo o contraseña incorrectos.';
+    // Lanzar ApiError para que el llamador pueda distinguir por código
+    throw new ApiError(message, code);
   }
 
   const data: AuthResponse = await response.json();
@@ -118,14 +141,51 @@ export async function signIn(credentials: SignInRequest): Promise<AuthResponse> 
   return data;
 }
 
-export async function signUp(payload: SignUpRequest): Promise<unknown> {
+export async function deactivateAccount(): Promise<void> {
+  const tokens = getStoredTokens();
+  await authFetch('/auth/account/deactivate/', {
+    method: 'POST',
+    body: JSON.stringify({ refresh: tokens?.refresh ?? null }),
+  });
+  clearTokens();
+}
+
+export async function requestReactivationEmail(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/account/reactivate/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Error al enviar el correo de reactivación.');
+  }
+}
+
+export async function confirmReactivation(
+  token: string,
+): Promise<{ message: string; email: string }> {
+  const response = await fetch(
+    `${API_BASE}/auth/account/reactivate/confirm/?token=${encodeURIComponent(token)}`,
+    { method: 'GET', headers: { Accept: 'application/json' } },
+  );
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    const code: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'No se pudo reactivar la cuenta.';
+    throw new ApiError(message, code);
+  }
+  return body;
+}
+
+export async function signUp(payload: SignUpRequest): Promise<SignUpResponse> {
   const response = await fetch(`${API_BASE}/auth/signup/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
   });
 
-  const body = await response.json().catch(() => ({}));
+  const body = (await response.json().catch(() => ({}))) as SignUpResponse & SignUpErrorResponse;
 
   if (response.status === 429) {
     throw new Error(
@@ -143,7 +203,7 @@ export async function signUp(payload: SignUpRequest): Promise<unknown> {
     throw new Error(body?.error?.message ?? 'Error al crear la cuenta.');
   }
 
-  return body;
+  return body as Record<string, unknown>;
 }
 
 export async function signOut(): Promise<void> {

@@ -5,7 +5,6 @@ from gamification.models.point_rule import PointAction, PointRule
 
 
 class AwardPointsAPITest(APITestCase):
-
     def setUp(self):
 
         self.user = User.objects.create(
