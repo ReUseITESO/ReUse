@@ -63,25 +63,6 @@ function getBucketFromDates(startDate: string, endDate: string): ChallengeBucket
   return 'monthly';
 }
 
-function getDaysRemaining(bucket: ChallengeBucket, nowMs: number) {
-  const now = new Date(nowMs);
-
-  if (bucket === 'daily') {
-    return 1;
-  }
-
-  if (bucket === 'weekly') {
-    const day = now.getDay();
-    const dayFromMonday = day === 0 ? 6 : day - 1;
-    return Math.max(1, 7 - dayFromMonday);
-  }
-
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  return Math.max(1, daysInMonth - now.getDate() + 1);
-}
-
 function getProgressTone(progress: number, completed: boolean) {
   if (completed || progress >= 100) {
     return 'from-emerald-500 to-lime-400';
