@@ -8,6 +8,7 @@ import ShareButton from '@/components/products/ShareButton';
 import { formatTimeAgo } from '@/lib/utils';
 
 import type { ProductDetail } from '@/types/product';
+import type { ReactNode } from 'react';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
@@ -16,6 +17,7 @@ interface ProductDetailContentProps {
   transactionNotice: string | null;
   onBack: () => void;
   onMainAction: () => void;
+  reactionsNode?: ReactNode;
 }
 
 export default function ProductDetailContent({
@@ -25,6 +27,7 @@ export default function ProductDetailContent({
   transactionNotice,
   onBack,
   onMainAction,
+  reactionsNode,
 }: ProductDetailContentProps) {
   const timeAgo = formatTimeAgo(product.created_at);
 
@@ -55,6 +58,7 @@ export default function ProductDetailContent({
             description={product.description}
             categoryName={product.category.name}
             condition={product.condition}
+            actions={reactionsNode}
           />
 
           <div className="rounded-lg border border-border bg-muted p-4">

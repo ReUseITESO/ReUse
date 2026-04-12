@@ -8,6 +8,7 @@ export type ProductReactionType = 'like' | 'dislike';
 
 // Import Community type from community.ts to avoid duplication
 import type { Community } from './community';
+import type { ReactNode } from 'react';
 export type { Community };
 
 export interface ProductReactionSummary {
@@ -58,6 +59,7 @@ export interface ProductBasicDetailsProps {
   transactionType?: TransactionType;
   price?: string | null;
   showTransactionBadge?: boolean;
+  actions?: ReactNode;
 }
 
 export interface ProductDetail extends Product {

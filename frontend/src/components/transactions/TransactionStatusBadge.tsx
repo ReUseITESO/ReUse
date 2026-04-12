@@ -11,7 +11,8 @@ const STATUS_CONFIG: Record<
   { label: string; variant: 'green' | 'blue' | 'gray' | 'red' | 'yellow' }
 > = {
   pendiente: { label: 'Pendiente', variant: 'yellow' },
-  confirmada: { label: 'Confirmada', variant: 'blue' },
+  // Treat confirmed as pending in the UI (unified view)
+  confirmada: { label: 'Pendiente', variant: 'yellow' },
   completada: { label: 'Completada', variant: 'green' },
   cancelada: { label: 'Cancelada', variant: 'red' },
 };

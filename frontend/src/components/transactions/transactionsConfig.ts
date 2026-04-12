@@ -9,7 +9,6 @@ export type TransactionRole = 'buyer' | 'seller';
 export const STATUS_FILTERS: Array<{ label: string; value?: TransactionStatus }> = [
   { label: 'Todas' },
   { label: 'Pendientes', value: 'pendiente' },
-  { label: 'Confirmadas', value: 'confirmada' },
   { label: 'Completadas', value: 'completada' },
   { label: 'Canceladas', value: 'cancelada' },
 ];

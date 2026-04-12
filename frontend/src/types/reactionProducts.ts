@@ -6,6 +6,7 @@ export interface ProductReactionButtonsProps {
   sellerId: number;
   initialSummary: ProductReactionSummary;
   compact?: boolean;
+  inline?: boolean;
   stopLinkNavigation?: boolean;
   className?: string;
   onChange?: (summary: ProductReactionSummary) => void;

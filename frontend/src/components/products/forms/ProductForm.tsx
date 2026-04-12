@@ -64,7 +64,8 @@ export default function ProductForm() {
       transaction_type: values.transaction_type,
       price: isSale ? Number(values.price) : null,
       image_url: hasImageList ? values.images[0] : values.image_url || undefined,
-      images: hasImageList ? values.images : undefined,
+      // Backend expects an `images` array field; always send an array (may be empty)
+      images: hasImageList ? values.images : [],
       community:
         values.community && values.community !== 'none' ? Number(values.community) : undefined,
     });

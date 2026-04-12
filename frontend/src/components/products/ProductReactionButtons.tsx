@@ -16,6 +16,7 @@ export default function ProductReactionButtons({
   sellerId,
   initialSummary,
   compact = false,
+  inline = false,
   stopLinkNavigation = false,
   className,
   onChange,
@@ -48,8 +49,10 @@ export default function ProductReactionButtons({
   const buttonSize = compact ? 'h-8 min-w-14 px-2' : 'h-10 min-w-20 px-3';
   const iconSize = compact ? 14 : 16;
 
+  const containerClass = inline ? 'flex items-center gap-2' : 'flex flex-col items-end gap-1';
+
   return (
-    <div className={cn('flex flex-col items-end gap-1', className)}>
+    <div className={cn(containerClass, className)}>
       <div className="flex items-center gap-2">
         <ReactionButton
           label="Me gusta"

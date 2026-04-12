@@ -8,6 +8,8 @@ import type { TransactionStatus } from '@/types/transaction';
 interface TransactionsFiltersProps {
   role: 'buyer' | 'seller';
   status?: TransactionStatus;
+  buyerCount?: number;
+  sellerCount?: number;
   onRoleChange: (role: 'buyer' | 'seller') => void;
   onStatusChange: (status?: TransactionStatus) => void;
 }
@@ -51,6 +53,8 @@ const STATUS_STYLES: Record<TransactionStatus | 'all', { active: string; inactiv
 export default function TransactionsFilters({
   role,
   status,
+  buyerCount,
+  sellerCount,
   onRoleChange,
   onStatusChange,
 }: TransactionsFiltersProps) {
@@ -64,7 +68,7 @@ export default function TransactionsFilters({
             onClick={() => onRoleChange('buyer')}
             className={`${COMPACT_BUTTON} ${role === 'buyer' ? ROLE_STYLES.buyer.active : ROLE_STYLES.buyer.inactive}`}
           >
-            <ArrowRightLeft className="mr-1 inline h-3.5 w-3.5" /> Tus compras
+            <ArrowRightLeft className="mr-1 inline h-3.5 w-3.5" /> Tus compras {buyerCount ? `(${buyerCount})` : ''}
           </Button>
           <Button
             variant="template"
@@ -72,7 +76,7 @@ export default function TransactionsFilters({
             className={`${COMPACT_BUTTON} ${role === 'seller' ? ROLE_STYLES.seller.active : ROLE_STYLES.seller.inactive}`}
           >
             <ArrowRightLeft className="mr-1 inline h-3.5 w-3.5" />
-            Tus Entregas
+            Tus Entregas {sellerCount ? `(${sellerCount})` : ''}
           </Button>
         </div>
       </div>

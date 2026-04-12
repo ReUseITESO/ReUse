@@ -81,7 +81,8 @@ export async function getProductById(id: string | number, options: GetProductByI
 
 interface ListTransactionsParams {
   role?: 'buyer' | 'seller';
-  status?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+  // status can be a single value or an array to request multiple statuses
+  status?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | Array<'pendiente' | 'confirmada' | 'completada' | 'cancelada'>;
   page?: number;
 }
 
@@ -96,7 +97,14 @@ export async function listTransactions(params: ListTransactionsParams = {}) {
   const query = new URLSearchParams();
 
   if (params.role) query.set('role', params.role);
-  if (params.status) query.set('status', params.status);
+  if (params.status) {
+    if (Array.isArray(params.status)) {
+      // append multiple status params: ?status=pendiente&status=confirmada
+      params.status.forEach(s => query.append('status', s));
+    } else {
+      query.set('status', params.status);
+    }
+  }
   if (params.page && params.page > 1) query.set('page', String(params.page));
 
   const endpoint = query.toString()
