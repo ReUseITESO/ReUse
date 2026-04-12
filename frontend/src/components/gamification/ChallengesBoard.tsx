@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { Award, Box, HandHeart, RefreshCw, Repeat2, Star } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Award, Box, CheckCircle2, HandHeart, Repeat2, Star } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useChallenges } from '@/hooks/useChallenges';
@@ -25,41 +25,31 @@ function getChallengeIcon(type: ChallengeType) {
 function getChallengeTheme(type: ChallengeType) {
   if (type === 'donation') {
     return {
-      badge: 'bg-emerald-500/15 text-emerald-800 ring-emerald-500/25 dark:text-emerald-200',
-      accent: 'from-emerald-500 via-lime-400 to-teal-400',
-      soft: 'bg-emerald-500/8',
-      glow: 'shadow-emerald-500/15',
+      accent: 'from-emerald-500 to-teal-500',
+      row: 'border-emerald-300/70 bg-emerald-50/70',
     };
   }
   if (type === 'exchange') {
     return {
-      badge: 'bg-cyan-500/15 text-cyan-800 ring-cyan-500/25 dark:text-cyan-200',
-      accent: 'from-cyan-500 via-sky-400 to-emerald-400',
-      soft: 'bg-cyan-500/8',
-      glow: 'shadow-cyan-500/15',
+      accent: 'from-cyan-500 to-sky-500',
+      row: 'border-cyan-300/70 bg-cyan-50/60',
     };
   }
   if (type === 'sale') {
     return {
-      badge: 'bg-orange-500/15 text-orange-800 ring-orange-500/25 dark:text-orange-200',
-      accent: 'from-orange-500 via-amber-400 to-yellow-300',
-      soft: 'bg-orange-500/8',
-      glow: 'shadow-orange-500/15',
+      accent: 'from-orange-500 to-amber-500',
+      row: 'border-orange-300/70 bg-orange-50/60',
     };
   }
   if (type === 'publish') {
     return {
-      badge: 'bg-violet-500/15 text-violet-800 ring-violet-500/25 dark:text-violet-200',
-      accent: 'from-violet-500 via-fuchsia-400 to-pink-400',
-      soft: 'bg-violet-500/8',
-      glow: 'shadow-violet-500/15',
+      accent: 'from-violet-500 to-fuchsia-500',
+      row: 'border-violet-300/70 bg-violet-50/60',
     };
   }
   return {
-    badge: 'bg-yellow-500/15 text-yellow-900 ring-yellow-500/25 dark:text-yellow-200',
-    accent: 'from-yellow-500 via-amber-400 to-orange-300',
-    soft: 'bg-yellow-500/8',
-    glow: 'shadow-yellow-500/15',
+    accent: 'from-yellow-500 to-orange-500',
+    row: 'border-yellow-300/70 bg-yellow-50/60',
   };
 }
 
@@ -71,6 +61,25 @@ function getBucketFromDates(startDate: string, endDate: string): ChallengeBucket
   if (durationDays <= 2) return 'daily';
   if (durationDays <= 10) return 'weekly';
   return 'monthly';
+}
+
+function getDaysRemaining(bucket: ChallengeBucket, nowMs: number) {
+  const now = new Date(nowMs);
+
+  if (bucket === 'daily') {
+    return 1;
+  }
+
+  if (bucket === 'weekly') {
+    const day = now.getDay();
+    const dayFromMonday = day === 0 ? 6 : day - 1;
+    return Math.max(1, 7 - dayFromMonday);
+  }
+
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  return Math.max(1, daysInMonth - now.getDate() + 1);
 }
 
 function getProgressTone(progress: number, completed: boolean) {
@@ -89,13 +98,13 @@ interface ChallengesBoardProps {
 
 export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardProps) {
   const { isAuthenticated } = useAuth();
-  const { challenges, myChallenges, isLoading, error, claimChallengeReward, refetch } =
-    useChallenges(isAuthenticated, refreshTrigger);
+  const { challenges, myChallenges, isLoading, error, claimChallengeReward } = useChallenges(
+    isAuthenticated,
+    refreshTrigger,
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [claimingId, setClaimingId] = useState<number | null>(null);
-  const [clockTick, setClockTick] = useState(Date.now());
   const [activeBucket, setActiveBucket] = useState<ChallengeBucket>('daily');
 
   const challengesByBucket = useMemo(() => {
@@ -114,14 +123,6 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
 
   const visibleChallenges = challengesByBucket[activeBucket];
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setClockTick(Date.now());
-    }, 60_000);
-
-    return () => window.clearInterval(interval);
-  }, []);
-
   const handleClaimReward = async (challengeId: number) => {
     if (claimingId === challengeId) {
       return;
@@ -139,22 +140,6 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
       setMessage(err instanceof Error ? err.message : 'No se pudo reclamar la recompensa.');
     } finally {
       setClaimingId(null);
-    }
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    setMessage(null);
-    setIsErrorMessage(false);
-
-    try {
-      await refetch();
-      setMessage('Progreso actualizado correctamente.');
-    } catch (err) {
-      setIsErrorMessage(true);
-      setMessage(err instanceof Error ? err.message : 'No se pudo actualizar el progreso.');
-    } finally {
-      setIsRefreshing(false);
     }
   };
 
@@ -186,53 +171,48 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
     <section className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-fg">Retos de ahora</h3>
-          <p className="text-sm text-muted-fg">Cambia entre diarios, semanales y mensuales.</p>
+          <h3 className="text-base font-semibold text-fg">Retos</h3>
         </div>
-        <button
-          type="button"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-fg transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <RefreshCw className={cn('h-4 w-4', isRefreshing && 'animate-spin')} />
-          {isRefreshing ? 'Actualizando...' : 'Actualizar retos'}
-        </button>
-      </div>
-
-      <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-muted p-1.5">
-        <button
-          type="button"
-          onClick={() => setActiveBucket('daily')}
-          className={cn(
-            'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-            activeBucket === 'daily' ? 'bg-card text-fg shadow-sm' : 'text-muted-fg hover:text-fg',
-          )}
-        >
-          Diarios ({challengesByBucket.daily.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveBucket('weekly')}
-          className={cn(
-            'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-            activeBucket === 'weekly' ? 'bg-card text-fg shadow-sm' : 'text-muted-fg hover:text-fg',
-          )}
-        >
-          Semanales ({challengesByBucket.weekly.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveBucket('monthly')}
-          className={cn(
-            'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-            activeBucket === 'monthly'
-              ? 'bg-card text-fg shadow-sm'
-              : 'text-muted-fg hover:text-fg',
-          )}
-        >
-          Mensuales ({challengesByBucket.monthly.length})
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="grid grid-cols-3 gap-1 rounded-2xl bg-muted p-1">
+            <button
+              type="button"
+              onClick={() => setActiveBucket('daily')}
+              className={cn(
+                'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                activeBucket === 'daily'
+                  ? 'bg-card text-fg shadow-sm'
+                  : 'text-muted-fg hover:text-fg',
+              )}
+            >
+              Diarios
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveBucket('weekly')}
+              className={cn(
+                'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                activeBucket === 'weekly'
+                  ? 'bg-card text-fg shadow-sm'
+                  : 'text-muted-fg hover:text-fg',
+              )}
+            >
+              Semanales
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveBucket('monthly')}
+              className={cn(
+                'rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                activeBucket === 'monthly'
+                  ? 'bg-card text-fg shadow-sm'
+                  : 'text-muted-fg hover:text-fg',
+              )}
+            >
+              Mensuales
+            </button>
+          </div>
+        </div>
       </div>
 
       {message ? (
@@ -267,36 +247,33 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
             const isClaimed = progress?.reward_claimed ?? false;
             const theme = getChallengeTheme(challenge.challenge_type);
             const ChallengeIcon = getChallengeIcon(challenge.challenge_type);
-            const daysRemaining = Math.ceil(
-              (new Date(challenge.end_date).getTime() - clockTick) / (1000 * 60 * 60 * 24),
-            );
+            const isClaimAction = isCompleted && !isClaimed;
+            const statusLabel = isClaimed ? 'Reclamado' : isCompleted ? 'Reclamar' : 'En curso';
 
             return (
               <article
                 key={challenge.id}
                 className={cn(
-                  'group flex items-start gap-4 rounded-2xl border border-border bg-white p-4 shadow-sm transition-all hover:shadow-md',
-                  isCompleted && 'border-emerald-200 bg-emerald-50/30',
+                  'group flex items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-sm transition-all hover:shadow-md',
+                  isCompleted && theme.row,
                 )}
               >
                 <div
-                  className={cn('rounded-2xl p-2.5 text-white flex-shrink-0 h-fit', theme.accent)}
+                  className={cn(
+                    'h-fit flex-shrink-0 rounded-2xl bg-gradient-to-br p-2.5 text-white shadow-sm',
+                    theme.accent,
+                  )}
                 >
                   <ChallengeIcon className="h-5 w-5" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-fg line-clamp-1">{challenge.title}</h4>
-                      <p className="text-xs text-muted-fg mt-0.5">{daysRemaining} días restantes</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-bold text-base text-fg">{normalizedProgress}%</p>
-                    </div>
+                  <div className="mb-2 flex items-center gap-2">
+                    <h4 className="line-clamp-1 font-semibold text-fg">{challenge.title}</h4>
+                    {isCompleted ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : null}
                   </div>
 
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <div
                       className={cn(
                         'h-2 rounded-full bg-gradient-to-r transition-all duration-500',
@@ -309,36 +286,32 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                   <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-fg">
                     <span>
                       {Math.min(currentValue, challenge.goal)} / {challenge.goal}
+                      completado
                     </span>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (isCompleted && !isClaimed) {
-                          await handleClaimReward(challenge.id);
-                          return;
-                        }
-                      }}
-                      disabled={isClaimed || !isCompleted || claimingId === challenge.id}
-                      className={cn(
-                        'px-3 py-1 rounded-lg text-xs font-semibold transition-all',
-                        isClaimed
-                          ? 'bg-muted text-muted-fg'
-                          : isCompleted
-                            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                            : 'bg-muted text-muted-fg',
-                        claimingId === challenge.id && 'opacity-70',
-                      )}
-                    >
-                      {isClaimed
-                        ? '✓ Reclamado'
-                        : claimingId === challenge.id
-                          ? 'Reclamando...'
-                          : isCompleted
-                            ? 'Reclamar'
-                            : 'En progreso'}
-                    </button>
+                    <span className="font-semibold text-primary">+{challenge.bonus_points} pts</span>
                   </div>
                 </div>
+
+                {isClaimAction ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleClaimReward(challenge.id);
+                    }}
+                    disabled={claimingId === challenge.id}
+                    className={cn(
+                      'flex-shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition',
+                      'bg-primary text-white hover:bg-primary-hover',
+                      claimingId === challenge.id && 'opacity-70',
+                    )}
+                  >
+                    {claimingId === challenge.id ? 'Reclamando...' : statusLabel}
+                  </button>
+                ) : (
+                  <span className="flex-shrink-0 rounded-full bg-muted px-4 py-2 text-xs font-semibold text-muted-fg">
+                    {statusLabel}
+                  </span>
+                )}
               </article>
             );
           })}

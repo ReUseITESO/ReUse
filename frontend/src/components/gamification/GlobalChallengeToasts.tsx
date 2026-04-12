@@ -76,7 +76,6 @@ export default function GlobalChallengeToasts() {
         }
 
         if (justCompleted) {
-          window.dispatchEvent(new CustomEvent('reuse:points-updated'));
           detectedToasts.push({
             id: Date.now() + item.challenge_id,
             type: 'completed',

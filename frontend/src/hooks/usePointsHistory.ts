@@ -20,6 +20,7 @@ export function usePointsHistory(enabled: boolean = true) {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<PointsHistoryFilters>(DEFAULT_FILTERS);
   const activeFiltersRef = useRef<PointsHistoryFilters>(DEFAULT_FILTERS);
+  const activePageRef = useRef(1);
 
   const fetchHistory = useCallback(
     async (nextFilters: PointsHistoryFilters = activeFiltersRef.current, nextPage: number = 1) => {
@@ -29,6 +30,7 @@ export function usePointsHistory(enabled: boolean = true) {
         setHasNextPage(false);
         setHasPrevPage(false);
         setPage(1);
+        activePageRef.current = 1;
         setError(null);
         setIsLoading(false);
         return;
@@ -65,6 +67,7 @@ export function usePointsHistory(enabled: boolean = true) {
           `/gamification/points/history/${query}`,
         );
         activeFiltersRef.current = nextFilters;
+        activePageRef.current = nextPage;
         setEntries(response.results);
         setCount(response.count);
         setHasNextPage(Boolean(response.next));
@@ -87,6 +90,22 @@ export function usePointsHistory(enabled: boolean = true) {
   useEffect(() => {
     fetchHistory(DEFAULT_FILTERS, 1);
   }, [fetchHistory]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onPointsUpdated = () => {
+      fetchHistory(activeFiltersRef.current, activePageRef.current);
+    };
+
+    window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+    };
+  }, [enabled, fetchHistory]);
 
   return {
     entries,
