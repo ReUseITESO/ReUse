@@ -19,13 +19,10 @@ class Avatar(models.Model):
     border_name=models.CharField(max_length=100, null=True, blank=True)  # For design templates
     
     
-# class DesignTemplate(models.Model):
-#     name = models.CharField(max_length=100, unique=True)
-#     # The actual border image (PNG with transparency)
-#     border_overlay = models.ImageField(upload_to='borders/')
-#     # Optional: Categorization
-#     category = models.CharField(max_length=50, default="General")
-#     is_active = models.BooleanField(default=True)
+class DesignTemplate(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    price = models.IntegerField(default=0)
+    bought = models.BooleanField(default=False)
 
-#     def __str__(self):
-#         return self.name
+    def __str__(self):
+        return self.name
