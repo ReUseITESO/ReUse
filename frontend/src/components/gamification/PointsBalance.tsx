@@ -114,7 +114,8 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   function getEntryIcon(entry: PointHistoryEntry) {
     if (entry.action === 'complete_donation') return HandHeart;
-    if (entry.action === 'complete_sale' || entry.action === 'complete_exchange') return ReceiptText;
+    if (entry.action === 'complete_sale' || entry.action === 'complete_exchange')
+      return ReceiptText;
     if (entry.action === 'challenge_completion') return Gift;
     if (entry.action === 'publish_item') return Tag;
     return TrendingUp;
@@ -148,7 +149,9 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
       </div>
 
       <div className="mt-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-fg">Actividad reciente</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-fg">
+          Actividad reciente
+        </p>
 
         <div className="mt-3 space-y-2.5">
           {historyLoading && recentEntries.length === 0 ? (

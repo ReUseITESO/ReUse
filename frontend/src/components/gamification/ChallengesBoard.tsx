@@ -269,7 +269,9 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
                       {Math.min(currentValue, challenge.goal)} / {challenge.goal}
                       completado
                     </span>
-                    <span className="font-semibold text-primary">+{challenge.bonus_points} pts</span>
+                    <span className="font-semibold text-primary">
+                      +{challenge.bonus_points} pts
+                    </span>
                   </div>
                 </div>
 

@@ -25,8 +25,7 @@ export function useBadgesStatus(enabled: boolean = true) {
       const data = await apiClient<BadgeWithStatus[]>('/gamification/badges/status/');
       setBadges(data);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'No se pudieron cargar las medallas';
+      const message = err instanceof Error ? err.message : 'No se pudieron cargar las medallas';
       setError(message);
       setBadges([]);
     } finally {

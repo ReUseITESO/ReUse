@@ -149,7 +149,9 @@ export default function BadgesList() {
           <h3
             className={cn(
               'mb-2 text-[15px] font-bold leading-tight',
-              !isLocked ? `bg-gradient-to-r bg-clip-text text-transparent ${gradient}` : 'text-muted-fg',
+              !isLocked
+                ? `bg-gradient-to-r bg-clip-text text-transparent ${gradient}`
+                : 'text-muted-fg',
             )}
           >
             {badge.name}
