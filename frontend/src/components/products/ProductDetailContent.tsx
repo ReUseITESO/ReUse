@@ -64,10 +64,10 @@ export default function ProductDetailContent({
             description={product.description}
             categoryName={product.category.name}
             condition={product.condition}
+            actions={reactionsNode}
             transactionType={product.transaction_type}
             price={product.price}
             showTransactionBadge={true}
-            actions={reactionsNode}
           />
 
           <div className="rounded-lg border border-border bg-muted p-4">

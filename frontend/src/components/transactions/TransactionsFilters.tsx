@@ -19,7 +19,7 @@ const COMPACT_BUTTON = 'px-2.5 py-1 text-xs';
 const ROLE_STYLES: Record<'buyer' | 'seller', { active: string; inactive: string }> = {
   buyer: {
     active: 'border border-secondary/60 bg-secondary/15 text-fg',
-    inactive: 'border border-secondary/40 bg-transparent text-fg hover:bg-secondary/10',
+      inactive: 'border border-secondary/40 bg-transparent text-fg hover:bg-secondary/10',
   },
   seller: {
     active: 'border border-primary/60 bg-primary/15 text-fg',
