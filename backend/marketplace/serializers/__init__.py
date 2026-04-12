@@ -12,6 +12,7 @@ from .product_reaction import (
     ProductReactionRequestSerializer,
     ProductReactionSummarySerializer,
 )
+from .report import ReportCreateSerializer
 from .transaction import (
     TransactionCreateSerializer,
     TransactionHistorySerializer,
@@ -27,6 +28,7 @@ __all__ = [
     "CategorySerializer",
     "CommentSerializer",
     "CommentCreateSerializer",
+    "ReportCreateSerializer",
     "ProductCreateSerializer",
     "ProductListSerializer",
     "ProductDetailSerializer",
