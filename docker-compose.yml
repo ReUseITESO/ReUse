@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15-alpine
@@ -44,19 +46,10 @@ services:
       EMAIL_HOST_PASSWORD: "${SENDGRID_API_KEY:-}"
       DEFAULT_FROM_EMAIL: reuseiteso@outlook.com
       EMAIL_VERIFICATION_EXPIRES_MINUTES: "30"
-      MICROSOFT_CLIENT_ID: "${MICROSOFT_CLIENT_ID:-}"
-      MICROSOFT_CLIENT_SECRET: "${MICROSOFT_CLIENT_SECRET:-}"
-      MICROSOFT_TENANT_ID: "${MICROSOFT_TENANT_ID:-common}"
-      MICROSOFT_REDIRECT_URI: "http://localhost:3000/auth/microsoft/callback"
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - /app/.venv        # This "hides" the container's version from your host's version
-      - /app/__pycache__  # Prevents cache conflicts
-      - ./backend/media:/app/media  # Maps local media directly to container root /media
-    working_dir: /app
-    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       db:
         condition: service_healthy
@@ -70,7 +63,6 @@ services:
       dockerfile: Dockerfile
     container_name: reuse_iteso_frontend
     environment:
-      WATCHPACK_POLLING: true
       NEXT_PUBLIC_API_URL: "http://localhost:8000/api"
     ports:
       - "3000:3000"
@@ -78,7 +70,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    command: npm run dev  # This triggers nodemon/next dev
     depends_on:
       - backend
     networks:
@@ -101,8 +92,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  media_volume:
     driver: local
 
 networks:
