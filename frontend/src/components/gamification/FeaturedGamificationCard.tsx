@@ -6,7 +6,7 @@ import {
   Crown,
   Leaf,
   Medal,
-  Seedling,
+  Sprout,
   Sparkles,
   Star,
   Trophy,
@@ -49,7 +49,7 @@ function getLevelIcon(iconName: string, levelName: string) {
   const normalizedName = levelName.toLowerCase();
 
   if (normalizedIcon.includes('seed') || normalizedName.includes('beginner')) {
-    return Seedling;
+    return Sprout;
   }
 
   if (normalizedIcon.includes('leaf') || normalizedName.includes('active')) {
@@ -133,7 +133,8 @@ export default function FeaturedGamificationCard({
   const normalizedProgress = Math.max(0, Math.min(100, levelProgression.progress_percent || 0));
   const currentPoints = levelProgression.points || 0;
   const nextLevelTarget =
-    levelProgression.next_level?.min_points ?? currentPoints + levelProgression.points_to_next_level;
+    levelProgression.next_level?.min_points ??
+    currentPoints + levelProgression.points_to_next_level;
   const CurrentLevelIcon = getLevelIcon(
     levelProgression.current_level.icon,
     levelProgression.current_level.name,
@@ -183,7 +184,10 @@ export default function FeaturedGamificationCard({
 
         {!levelProgression.is_max_level && (
           <p className="mt-2 text-center text-xs text-muted-fg">
-            Te faltan <span className="font-semibold text-primary">{levelProgression.points_to_next_level}</span>{' '}
+            Te faltan{' '}
+            <span className="font-semibold text-primary">
+              {levelProgression.points_to_next_level}
+            </span>{' '}
             puntos para subir de nivel
           </p>
         )}
