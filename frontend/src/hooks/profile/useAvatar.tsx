@@ -8,8 +8,8 @@ import { AvatarData } from '@/types/gamification';
 const defaultAvatarData = {
   image: '/../media/avatars/default.png',
   border_thickness: 10,
-  border_color: "#000A9A",
-  shadow_color: "#4e0072",
+  border_color: '#000A9A',
+  shadow_color: '#4e0072',
   shadow_thickness: 20,
   zoom_level: 1,
   offset_x: 0.0,
@@ -23,12 +23,14 @@ interface AvatarContextValue {
   setAvatarData: React.Dispatch<React.SetStateAction<AvatarData>>;
   isLoading: boolean;
   error: string | null;
-  updateAvatar: (newData: AvatarData) => Promise<{ success: boolean; error?: undefined } | { success: boolean; error: unknown }>;
+  updateAvatar: (
+    newData: AvatarData,
+  ) => Promise<{ success: boolean; error?: undefined } | { success: boolean; error: unknown }>;
 }
 
 const AvatarContext = createContext<AvatarContextValue | undefined>(undefined);
 
-export function AvatarProvider({ children } : { children: React.ReactNode }) {
+export function AvatarProvider({ children }: { children: React.ReactNode }) {
   const [avatarData, setAvatarData] = useState<AvatarData>(defaultAvatarData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +41,8 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
     try {
       // apiClient handles http://localhost:8000 and credentials/CSRF
       const data = await apiClient<Partial<AvatarData>>('/gamification/avatar/data');
-      console.log('Fetched avatar data:', data);
       const image = data.image || getBackendUrl(defaultAvatarData.image);
-      setAvatarData({...defaultAvatarData, ...data, image}); // Merge with defaults
+      setAvatarData({ ...defaultAvatarData, ...data, image }); // Merge with defaults
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading avatar');
     } finally {
@@ -55,7 +56,6 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
         method: 'POST',
         body: JSON.stringify(newData),
       });
-      console.log('new data:', newData);
       setAvatarData(newData);
       return { success: true };
     } catch (err) {
@@ -77,12 +77,8 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
     }),
     [avatarData, isLoading, error, updateAvatar],
   );
-  
-  return (
-    <AvatarContext.Provider value={value}>
-      {children}
-    </AvatarContext.Provider>
-  );
+
+  return <AvatarContext.Provider value={value}>{children}</AvatarContext.Provider>;
 }
 
 export function useAvatar(): AvatarContextValue {

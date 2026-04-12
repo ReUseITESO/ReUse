@@ -7,9 +7,9 @@ const nextConfig = {
         hostname: 'localhost',
         port: '8000',
       },
-	  {
+      {
         protocol: 'http',
-        hostname: 'backend',   // For the Docker internal server fetch
+        hostname: 'backend', // For the Docker internal server fetch
         port: '8000',
       },
     ],

@@ -13,7 +13,7 @@ export function Slider({ value, min, max, onChange }: SliderProps) {
         min={min}
         max={max}
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={e => onChange(Number(e.target.value))}
         className="
           w-full h-1.5 rounded-lg appearance-none cursor-pointer 
           bg-border             /* Changed from bg-muted for visibility */

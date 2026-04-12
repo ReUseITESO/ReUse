@@ -67,7 +67,7 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
 }
 
 export function getBackendUrl(path: string) {
-  return path?`${API_BASE}${path}`:'';
+  return path ? `${API_BASE}${path}` : '';
 }
 
 // ===== Marketplace Products =====

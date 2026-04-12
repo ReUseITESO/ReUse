@@ -13,7 +13,7 @@ import PointsHistoryCard from '@/components/gamification/PointsHistoryCard';
 import EcoImpactCard from '@/components/gamification/EcoImpact';
 import { deactivateAccount } from '@/lib/auth';
 import type { User } from '@/types/auth';
-import Avatar from '../../components/gamification/profile/Avatar'
+import Avatar from '../../components/gamification/profile/Avatar';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -91,7 +91,7 @@ export default function ProfilePage() {
                 ) : (
                   displayUser.first_name?.charAt(0).toUpperCase()
                 )} */}
-                <Avatar/>
+                <Avatar />
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">
@@ -106,11 +106,17 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                    >
                       <Pencil className="h-4 w-4" /> Editar Perfil
                     </button>
-                    <Link href="/profile/customization" className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted">
-                      <Palette  className="h-4 w-4" /> Customizar Perfil
+                    <Link
+                      href="/profile/customization"
+                      className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                    >
+                      <Palette className="h-4 w-4" /> Customizar Perfil
                     </Link>
                   </div>
                 </div>

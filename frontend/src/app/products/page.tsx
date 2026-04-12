@@ -36,7 +36,7 @@ export default function ProductsPage() {
           )}
         </div>
       </div>
-      <ProductList/>
+      <ProductList />
     </main>
   );
 }

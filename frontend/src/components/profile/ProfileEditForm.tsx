@@ -27,8 +27,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
   const [picturePreview, setPicturePreview] = useState<string | null>(user.profile_picture);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const {avatarData, setAvatarData, updateAvatar} = useAvatar();
-
+  const { avatarData, setAvatarData, updateAvatar } = useAvatar();
 
   const {
     register,
