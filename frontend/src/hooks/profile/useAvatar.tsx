@@ -12,8 +12,8 @@ const defaultAvatarData = {
   shadow_color: "#4e0072",
   shadow_thickness: 20,
   zoom_level: 1,
-  offset_x: -120,
-  offset_y: 0,
+  offset_x: 0.0,
+  offset_y: 0.0,
   border_type: 'custom',
   border_name: null,
 };
@@ -38,7 +38,7 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
 
     try {
       // apiClient handles http://localhost:8000 and credentials/CSRF
-      const data = await apiClient<Partial<AvatarData>>('/gamification/avatar/');
+      const data = await apiClient<Partial<AvatarData>>('/gamification/avatar/data');
       console.log('Fetched avatar data:', data);
       const image = data.image || getBackendUrl(defaultAvatarData.image);
       setAvatarData({...defaultAvatarData, ...data, image}); // Merge with defaults
@@ -51,11 +51,11 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
 
   const updateAvatar = useCallback(async (newData: AvatarData) => {
     try {
-      await apiClient('/gamification/avatar/', {
+      await apiClient('/gamification/avatar/data', {
         method: 'POST',
         body: JSON.stringify(newData),
       });
-      console.log('new data:', await newData);
+      console.log('new data:', newData);
       setAvatarData(newData);
       return { success: true };
     } catch (err) {

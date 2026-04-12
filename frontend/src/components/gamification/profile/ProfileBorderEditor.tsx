@@ -1,8 +1,7 @@
 
-import Slider from '../../../components/ui/Slider'
+import { Slider }  from '../../../components/ui/Slider'
 import { useAvatar } from '@/hooks/profile/useAvatar';
 
-import { AvatarData } from '../../../types/gamification';
 import { useState } from 'react';
 
 import Image from 'next/image';
@@ -12,28 +11,79 @@ function CustomTab() {
 	const { avatarData, setAvatarData } = useAvatar();
 
 	return (
-		<div className="flex flex-col flex-center gap-4 text-black">
-			<label className="font-bold text-lg">Borde</label>
-			<span>Color</span>
-			<input type="color" 
-				value={avatarData.border_color} 
-				onChange={(e) => setAvatarData((prev : AvatarData) => ({...prev, border_color: e.target.value}))}/>
-			<span>Grosor</span>
-			<Slider 
-				value={avatarData.border_thickness} 
-				onChange={(value: number) => setAvatarData((prev : AvatarData) => ({...prev, border_thickness: value}))} 
-				min={0} max={50}/>
-			<label className="font-bold text-lg">Sombra</label>
-			<span>Color</span>
-			<input type="color" 
-				value={avatarData.shadow_color} 
-				onChange={(e) => setAvatarData((prev : AvatarData) => ({...prev, shadow_color: e.target.value}))}/>
-			<span>Grosor</span>
-			<Slider 
-				value={avatarData.shadow_thickness} 
-				onChange={(value: number) => setAvatarData( (prev : AvatarData) => ({...prev, shadow_thickness: value}))} 
-				min={0} max={150}/>
-		</div>)
+    <div className="flex flex-col items-center w-full max-w-md mx-auto p-6 space-y-8 bg-card text-card-fg rounded-lg border border-border shadow-sm">
+      
+      {/* --- Section: Borde --- */}
+      <section className="w-full space-y-4">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
+          <div className="w-1 h-6 bg-primary rounded-full" />
+          <h2 className="text-h3 font-bold text-fg">Borde</h2>
+        </div>
+
+        {/* Color Picker */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-muted-fg">Color del borde</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono opacity-50 uppercase">{avatarData.border_color}</span>
+            <input 
+              type="color" 
+              className="w-10 h-10 rounded border border-border bg-transparent cursor-pointer hover:scale-105 transition-transform"
+              value={avatarData.border_color} 
+              onChange={(e) => setAvatarData({ ...avatarData, border_color: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Thickness Slider */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-fg">Grosor</span>
+            <span className="text-xs font-bold text-primary">{avatarData.border_thickness}px</span>
+          </div>
+          <Slider 
+            value={avatarData.border_thickness} 
+            onChange={(val) => setAvatarData({ ...avatarData, border_thickness: val })} 
+            min={0} max={50} 
+          />
+        </div>
+      </section>
+
+      {/* --- Section: Sombra --- */}
+      <section className="w-full space-y-4">
+        <div className="flex items-center gap-2 border-b border-border pb-2">
+          <div className="w-1 h-6 bg-secondary rounded-full" />
+          <h2 className="text-h3 font-bold text-fg">Sombra</h2>
+        </div>
+
+        {/* Color Picker */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-muted-fg">Color de sombra</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono opacity-50 uppercase">{avatarData.shadow_color}</span>
+            <input 
+              type="color" 
+              className="w-10 h-10 rounded border border-border bg-transparent cursor-pointer hover:scale-105 transition-transform"
+              value={avatarData.shadow_color} 
+              onChange={(e) => setAvatarData({ ...avatarData, shadow_color: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Shadow Thickness Slider */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-fg">Difuminado</span>
+            <span className="text-xs font-bold text-secondary">{avatarData.shadow_thickness}px</span>
+          </div>
+          <Slider 
+            value={avatarData.shadow_thickness} 
+            onChange={(val) => setAvatarData({ ...avatarData, shadow_thickness: val })} 
+            min={0} max={150} 
+          />
+        </div>
+      </section>
+    </div>
+  );		
 }
 
 interface Border {

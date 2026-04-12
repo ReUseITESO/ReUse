@@ -743,3 +743,16 @@ class ShareItemView(APIView):
             {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
             status=status.HTTP_201_CREATED,
         )
+        
+def update_avatar_template(request):
+    user = request.user
+    template_id = request.data.get('template_id')
+
+    # 1. Access the existing dictionary
+    # 2. Add the new key
+    current_data = user.avatarData or {}
+    current_data['template_id'] = template_id
+
+    # 3. Re-assign and save
+    user.avatarData = current_data
+    user.save()

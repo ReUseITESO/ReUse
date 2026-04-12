@@ -20,7 +20,12 @@ from gamification.views.points import (
     CurrentUserPointsView,
     UserPointsView,
 )
-from gamification.views.avatar import AvatarView
+from gamification.views.avatar import (
+    AvatarDataView,
+    # DesignTemplateListCreate,
+    # DesignTemplateDetail
+)
+
 
 urlpatterns = [
     path("badges/status/", UserBadgesStatusView.as_view(), name="user-badges-status"),
@@ -47,5 +52,6 @@ urlpatterns = [
         name="claim-challenge-reward",
     ),
     path("impact/", UserImpactView.as_view(), name="user-impact"),
-    path("avatar/", AvatarView.as_view(), name="user-avatar"),
+    path("avatar/data", AvatarDataView.as_view(), name="user-avatar-data"),
+    # path("avatar/template/borders", DesignTemplateView.as_view(), name="avatar-design-borders"),
 ]

@@ -56,13 +56,13 @@ export default function Avatar({movable = false}: MovableAvatarProps) {
 		const deltaY = e.movementY / dpr;
 
 		//console.log("offset X: ", Math.min(Math.max(avatarData.offset_x + deltaXPercent, 0), 100))
-		setAvatarData(prev => {
+		setAvatarData((prev) => {
 			
 			const newX = prev.offset_x + deltaX;
 			const newY = prev.offset_y + deltaY;
 
-			const limitX = (zoom >= 1) ? ((zoom - 1) * rect.width) : ((1 - zoom) * rect.width / zoom);
-			const limitY = (zoom >= 1) ? ((zoom - 1) * rect.height): ((1 - zoom) * rect.width / zoom);
+			const limitX = (zoom >= 1) ? zoom * rect.width/2 : rect.width/2;
+			const limitY = (zoom >= 1) ? zoom * rect.height/2 :  rect.height/2;
 
 			return {
 				...prev,
