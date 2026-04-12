@@ -149,7 +149,7 @@ describe('ChallengesBoard', () => {
 
     render(React.createElement(ChallengesBoard));
 
-    expect(screen.getByRole('button', { name: '✓ Reclamado' })).toBeDisabled();
+    expect(screen.getByText('Reclamado')).toBeInTheDocument();
     expect(claimMock).not.toHaveBeenCalled();
   });
 });

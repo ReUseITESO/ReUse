@@ -38,6 +38,22 @@ export function useLevelProgression(enabled: boolean = true, refreshTrigger: num
     fetchLevelProgression();
   }, [fetchLevelProgression, refreshTrigger]);
 
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onPointsUpdated = () => {
+      fetchLevelProgression();
+    };
+
+    window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+    };
+  }, [enabled, fetchLevelProgression]);
+
   return {
     levelProgression: data,
     isLoading,

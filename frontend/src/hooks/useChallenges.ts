@@ -65,11 +65,15 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
       return;
     }
 
-    const interval = window.setInterval(() => {
+    const onPointsUpdated = () => {
       fetchChallenges();
-    }, 20_000);
+    };
 
-    return () => window.clearInterval(interval);
+    window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+    };
   }, [enabled, fetchChallenges]);
 
   return {
