@@ -7,6 +7,7 @@ import { apiClient } from '@/lib/api';
 import { getStoredTokens } from '@/lib/auth';
 import type { User } from '@/types/auth';
 import { useAvatar } from '@/hooks/profile/useAvatar';
+import Image from 'next/image';
 
 interface ProfileFormValues {
   first_name: string;
@@ -109,7 +110,11 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
           onClick={() => fileInputRef.current?.click()}
         >
           {picturePreview ? (
-            <img src={avatarData.image} alt="Preview" className="h-full w-full object-cover" />
+            <Image 
+              fill
+              src={avatarData.image || "/images/default-avatar.png"}
+              alt="Preview" 
+              className="h-full w-full object-cover" />
           ) : (
             <span className="text-2xl font-bold text-primary">
               {user.first_name?.charAt(0).toUpperCase()}
