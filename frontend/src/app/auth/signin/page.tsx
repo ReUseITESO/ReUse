@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -47,8 +47,13 @@ export default function SignInPage() {
     }
   }
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/products');
+    }
+  }, [isAuthenticated, router]);
+
   if (isAuthenticated) {
-    router.replace('/products');
     return null;
   }
 

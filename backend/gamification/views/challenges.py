@@ -74,9 +74,9 @@ class MyChallengesView(APIView):
         description="List current user joined challenges with refreshed progress.",
     )
     def get(self, request):
-        ensure_user_active_challenges(user=request.user, now=timezone.now())
-        user_challenges = list(
-            UserChallenge.objects.select_related("challenge").filter(user=request.user)
+        user_challenges = ensure_user_active_challenges(
+            user=request.user,
+            now=timezone.now(),
         )
         refreshed = [refresh_user_challenge_progress(item) for item in user_challenges]
         serializer = UserChallengeSerializer(refreshed, many=True)

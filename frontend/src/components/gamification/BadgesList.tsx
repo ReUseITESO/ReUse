@@ -6,7 +6,10 @@ import { BadgeWithStatus } from '@/types/gamification';
 import Spinner from '@/components/ui/Spinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { apiClient } from '@/lib/api';
+import { cn } from '@/lib/utils';
 import {
+  ChevronLeft,
+  ChevronRight,
   Trophy,
   Star,
   Sprout,
@@ -21,9 +24,14 @@ import {
 } from 'lucide-react';
 
 export default function BadgesList() {
+  const ITEMS_PER_PAGE = 4;
   const [badges, setBadges] = useState<BadgeWithStatus[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [unlockedPage, setUnlockedPage] = useState(1);
+  const [lockedPage, setLockedPage] = useState(1);
+  const [unlockedDirection, setUnlockedDirection] = useState<'left' | 'right'>('right');
+  const [lockedDirection, setLockedDirection] = useState<'left' | 'right'>('right');
 
   useEffect(() => {
     const fetchBadges = async () => {
@@ -81,86 +89,207 @@ export default function BadgesList() {
   if (loading) return <Spinner />;
   if (error) return <ErrorMessage message={error} />;
 
-  return (
-    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-      {badges.map(badge => {
-        const isLocked = !badge.earned_at;
-        const gradient = getGradientForBadge(badge.name);
+  const unlockedBadges = badges
+    .filter(badge => Boolean(badge.earned_at))
+    .sort((first, second) => {
+      const firstDate = first.earned_at ? new Date(first.earned_at).getTime() : 0;
+      const secondDate = second.earned_at ? new Date(second.earned_at).getTime() : 0;
+      return secondDate - firstDate;
+    });
+  const lockedBadges = badges.filter(badge => !badge.earned_at);
 
-        return (
-          <div
-            key={badge.id}
-            className={`
-              relative group flex flex-col items-center p-5 text-center
-              rounded-2xl border transition-all duration-500 ease-out h-full
-              ${
-                isLocked
-                  ? 'border-border/60 bg-muted/20 opacity-60 hover:opacity-100 grayscale hover:grayscale-0'
-                  : 'border-primary/20 bg-card hover:border-primary/50 hover:shadow-xl hover:-translate-y-2'
-              }
-            `}
+  const unlockedTotalPages = Math.max(1, Math.ceil(unlockedBadges.length / ITEMS_PER_PAGE));
+  const lockedTotalPages = Math.max(1, Math.ceil(lockedBadges.length / ITEMS_PER_PAGE));
+
+  const currentUnlockedPage = Math.min(unlockedPage, unlockedTotalPages);
+  const currentLockedPage = Math.min(lockedPage, lockedTotalPages);
+
+  const unlockedStart = (currentUnlockedPage - 1) * ITEMS_PER_PAGE;
+  const lockedStart = (currentLockedPage - 1) * ITEMS_PER_PAGE;
+
+  const visibleUnlocked = unlockedBadges.slice(unlockedStart, unlockedStart + ITEMS_PER_PAGE);
+  const visibleLocked = lockedBadges.slice(lockedStart, lockedStart + ITEMS_PER_PAGE);
+
+  function renderBadgeCard(badge: BadgeWithStatus, isLocked: boolean) {
+    const gradient = getGradientForBadge(badge.name);
+
+    return (
+      <div
+        key={badge.id}
+        className={cn(
+          'relative group flex h-full flex-col items-center rounded-2xl border p-5 text-center transition-all duration-500 ease-out',
+          isLocked
+            ? 'border-border/60 bg-muted/20 opacity-80 grayscale'
+            : 'border-primary/20 bg-card hover:border-primary/50 hover:shadow-xl hover:-translate-y-1',
+        )}
+      >
+        {!isLocked && (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+            <div className="pointer-events-none absolute -inset-1 z-0 rounded-full bg-gradient-to-tr from-primary to-accent opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-20" />
+          </div>
+        )}
+
+        <div
+          className={cn(
+            'relative mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br shadow-lg transition-transform duration-500 group-hover:scale-105',
+            isLocked ? 'from-slate-300 to-slate-400' : gradient,
+          )}
+        >
+          <div className="absolute inset-0 z-0 rounded-3xl bg-white/20 backdrop-blur-sm" />
+          {getIconForBadge(badge.name)}
+
+          {isLocked && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center rounded-3xl bg-background/50 backdrop-blur-[1px]">
+              <Medal className="h-8 w-8 text-muted-fg/80" />
+            </div>
+          )}
+        </div>
+
+        <div className="relative z-10 mt-2 flex w-full flex-1 flex-col">
+          <h3
+            className={cn(
+              'mb-2 text-[15px] font-bold leading-tight',
+              !isLocked
+                ? `bg-gradient-to-r bg-clip-text text-transparent ${gradient}`
+                : 'text-muted-fg',
+            )}
           >
-            {/* Sparkle effects for unlocked */}
-            {!isLocked && (
-              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-                <div className="absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-700 blur-2xl rounded-full bg-gradient-to-tr from-primary to-accent pointer-events-none z-0" />
+            {badge.name}
+          </h3>
+          <p className="mb-4 line-clamp-3 flex-1 text-[13px] leading-relaxed text-muted-fg">
+            {badge.description}
+          </p>
+
+          <div className="mt-auto w-full border-t border-border/50 pt-3">
+            {!isLocked ? (
+              <div className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-success/10 px-2 py-1.5">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-success/90">
+                  {new Date(badge.earned_at as string).toLocaleDateString('es-MX', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex w-full items-center justify-center rounded-lg bg-muted/50 py-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-fg">
+                  Bloqueado
+                </span>
               </div>
             )}
-
-            {/* Icon Container */}
-            <div
-              className={`
-              relative flex items-center justify-center w-20 h-20 mb-4 rounded-3xl 
-              transition-transform duration-500 group-hover:scale-110 shadow-lg
-              bg-gradient-to-br ${isLocked ? 'from-slate-300 to-slate-400' : gradient}
-            `}
-            >
-              <div className="absolute inset-0 bg-white/20 rounded-3xl backdrop-blur-sm z-0" />
-              {getIconForBadge(badge.name)}
-
-              {/* Locked overlay */}
-              {isLocked && (
-                <div className="absolute inset-0 bg-background/50 rounded-3xl z-20 flex items-center justify-center backdrop-blur-[1px]">
-                  <Medal className="w-8 h-8 text-muted-fg/80" />
-                </div>
-              )}
-            </div>
-
-            {/* Text Content */}
-            <div className="relative z-10 flex flex-col flex-1 w-full mt-2">
-              <h3
-                className={`font-bold text-[15px] mb-2 leading-tight ${!isLocked ? 'bg-clip-text text-transparent bg-gradient-to-r ' + gradient : 'text-muted-fg'}`}
-              >
-                {badge.name}
-              </h3>
-              <p className="text-[13px] text-muted-fg mb-4 flex-1 line-clamp-3 leading-relaxed">
-                {badge.description}
-              </p>
-
-              <div className="mt-auto w-full pt-3 border-t border-border/50">
-                {!isLocked ? (
-                  <div className="inline-flex items-center justify-center gap-1.5 w-full bg-success/10 py-1.5 px-2 rounded-lg">
-                    <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                    <span className="text-[11px] font-bold text-success/90 uppercase tracking-widest">
-                      {new Date(badge.earned_at as string).toLocaleDateString('es-MX', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center justify-center w-full py-1.5 bg-muted/50 rounded-lg">
-                    <span className="text-[11px] font-semibold text-muted-fg uppercase tracking-widest">
-                      Bloqueado
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
-        );
-      })}
+        </div>
+      </div>
+    );
+  }
+
+  function renderCarouselSection(
+    title: string,
+    sectionBadges: BadgeWithStatus[],
+    page: number,
+    totalPages: number,
+    direction: 'left' | 'right',
+    onPrev: () => void,
+    onNext: () => void,
+    isLocked: boolean,
+  ) {
+    return (
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-fg">{title}</h3>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onPrev}
+              disabled={page <= 1}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-fg transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label={`Pagina anterior de ${title.toLowerCase()}`}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="min-w-14 text-center text-xs text-muted-fg">
+              {page} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={page >= totalPages}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-fg transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label={`Pagina siguiente de ${title.toLowerCase()}`}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {sectionBadges.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-fg">
+            {isLocked
+              ? 'No hay medallas bloqueadas pendientes.'
+              : 'Todavia no tienes medallas desbloqueadas.'}
+          </div>
+        ) : (
+          <div
+            key={`${title}-${page}-${direction}`}
+            className={cn(
+              'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4',
+              'animate-in fade-in-0 duration-500',
+              direction === 'right' ? 'slide-in-from-right-10' : 'slide-in-from-left-10',
+            )}
+          >
+            {sectionBadges.map(badge => renderBadgeCard(badge, isLocked))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  function changeUnlockedPage(delta: -1 | 1) {
+    const next = Math.min(unlockedTotalPages, Math.max(1, currentUnlockedPage + delta));
+    if (next === currentUnlockedPage) {
+      return;
+    }
+
+    setUnlockedDirection(delta > 0 ? 'right' : 'left');
+    setUnlockedPage(next);
+  }
+
+  function changeLockedPage(delta: -1 | 1) {
+    const next = Math.min(lockedTotalPages, Math.max(1, currentLockedPage + delta));
+    if (next === currentLockedPage) {
+      return;
+    }
+
+    setLockedDirection(delta > 0 ? 'right' : 'left');
+    setLockedPage(next);
+  }
+
+  return (
+    <div className="space-y-8">
+      {renderCarouselSection(
+        'Desbloqueados',
+        visibleUnlocked,
+        currentUnlockedPage,
+        unlockedTotalPages,
+        unlockedDirection,
+        () => changeUnlockedPage(-1),
+        () => changeUnlockedPage(1),
+        false,
+      )}
+
+      {renderCarouselSection(
+        'Bloqueados',
+        visibleLocked,
+        currentLockedPage,
+        lockedTotalPages,
+        lockedDirection,
+        () => changeLockedPage(-1),
+        () => changeLockedPage(1),
+        true,
+      )}
     </div>
   );
 }

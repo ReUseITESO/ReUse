@@ -1,5 +1,7 @@
 'use client';
 
+import { Leaf, Recycle, Users, Wind } from 'lucide-react';
+
 import { useUserImpact } from '@/hooks/useUserImpact';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
@@ -57,45 +59,62 @@ export default function EcoImpactCard() {
   // Seguridad extra
   if (!data) return null;
 
-  const isAboveAverage = data.items_reused >= data.community_average_items;
+  const reusedLabel = data.items_reused === 1 ? 'item reutilizado' : 'items reutilizados';
 
   return (
-    <article className="rounded-lg bg-gradient-to-br from-green-500/5 to-green-500/15 border border-green-500/20 p-6 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-fg uppercase tracking-wide">Impacto Ecológico</h3>
-          <p className="mt-1 text-2xl font-bold text-green-600">
-            {data.items_reused} items reutilizados
-          </p>
+    <article className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-700">
+          <Leaf className="h-4 w-4" />
+        </div>
+        <h3 className="text-base font-semibold text-fg">Impacto Ecologico</h3>
+      </div>
+
+      <div className="mt-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 p-4 text-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20">
+            <Recycle className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-white/90">Total contribuido</p>
+            <p className="text-4xl font-extrabold leading-none">
+              {data.items_reused} {reusedLabel}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Métricas */}
-      <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Metric title="Reutilizados" value={data.items_reused} />
-        <Metric title="CO₂ evitado" value={`${data.co2_avoided} kg`} />
-        <Metric title="Promedio comunidad" value={data.community_average_items} />
-      </div>
+      <div className="mt-6 flex-1 space-y-2.5">
+        <div className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-muted-fg">
+              <Recycle className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-semibold text-fg">Items reutilizados</span>
+          </div>
+          <span className="text-xl font-semibold text-fg">{data.items_reused}</span>
+        </div>
 
-      {/* Comparativa */}
-      <div className="mt-4 text-xs text-muted-fg">
-        {isAboveAverage ? (
-          <span className="text-green-600 font-medium">
-            Estás por encima del promedio de la comunidad
-          </span>
-        ) : (
-          <span>Sigue así, estás cerca del promedio de la comunidad</span>
-        )}
+        <div className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-muted-fg">
+              <Wind className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-semibold text-fg">CO2 evitado</span>
+          </div>
+          <span className="text-xl font-semibold text-fg">{data.co2_avoided} kg</span>
+        </div>
+
+        <div className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-muted-fg">
+              <Users className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-semibold text-fg">Promedio comunidad</span>
+          </div>
+          <span className="text-xl font-semibold text-fg">{data.community_average_items}</span>
+        </div>
       </div>
     </article>
-  );
-}
-
-function Metric({ title, value }: { title: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-border bg-muted/20 p-3 text-center">
-      <p className="text-xs text-muted-fg">{title}</p>
-      <p className="mt-1 text-lg font-semibold text-fg">{value}</p>
-    </div>
   );
 }
