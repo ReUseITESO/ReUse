@@ -567,10 +567,8 @@ class MicrosoftCallbackView(APIView):
                 {
                     "error": {
                         "code": "ACCOUNT_DEACTIVATED",
-                        "message": (
-                            "Tu cuenta está desactivada. "
-                            "Solicita un enlace de reactivación en la pantalla de inicio de sesión."
-                        ),
+                        "email": email,
+                        "message": "Tu cuenta está desactivada.",
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,
@@ -657,6 +655,9 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
         notification.read_at = timezone.now()
         notification.save(update_fields=["is_read", "read_at"])
         return Response({"status": "notification marked as read"})
+
+
+# ── Share Item with Friends (HU-CORE-12) ─────────────────
 
 
 class ShareItemView(APIView):
