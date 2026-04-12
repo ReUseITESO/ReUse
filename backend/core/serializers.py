@@ -70,7 +70,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         print("hello world")
         return value
 
-
     def validate_first_name(self, value: str) -> str:
         value = sanitize_string(value)
         if not re.match(r"^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$", value):

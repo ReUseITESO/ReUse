@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 
 # from gamification.models.avatar import DesignTemplate
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         # media_path = 'initial_designs/'

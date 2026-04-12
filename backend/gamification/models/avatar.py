@@ -4,14 +4,14 @@ from django.db import models
 
 class AvatarData(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='avatar_data')
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="avatar_data"
+    )
     # This stores the entire dictionary (colors, zoom, template_id, etc.)
     data = models.JSONField(default=dict)
 
     def __str__(self):
         return f"Avatar for {self.user.username}"
+
 
 # class AvatarData(models.Model):
 #     user = models.OneToOneField(

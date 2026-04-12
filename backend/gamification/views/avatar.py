@@ -20,7 +20,6 @@ DEFAULT_AVATAR_DATA = {
 }
 
 
-
 class AvatarDataView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -40,14 +39,9 @@ class AvatarDataView(APIView):
         current_data = avatar.data if isinstance(avatar.data, dict) else {}
 
         # Three-way merge: Defaults <- Current Data <- New Request Data
-        updated_data = {
-            **DEFAULT_AVATAR_DATA,
-            **current_data,
-            **request.data
-        }
+        updated_data = {**DEFAULT_AVATAR_DATA, **current_data, **request.data}
 
         avatar.data = updated_data
         avatar.save()
 
         return Response(avatar.data)
-
