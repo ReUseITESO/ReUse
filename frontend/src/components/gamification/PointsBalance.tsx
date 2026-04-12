@@ -1,10 +1,21 @@
 'use client';
 
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import {
+  AlertTriangle,
+  Gift,
+  HandHeart,
+  ReceiptText,
+  Sparkles,
+  Tag,
+  TrendingUp,
+} from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useLevelProgression } from '@/hooks/useLevelProgression';
+import { usePointsHistory } from '@/hooks/usePointsHistory';
 import { cn } from '@/lib/utils';
+import type { PointHistoryEntry } from '@/types/gamification';
 
 interface PointsBalanceProps {
   refreshTrigger?: number;
@@ -16,6 +27,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     isAuthenticated,
     refreshTrigger,
   );
+  const { entries, isLoading: historyLoading } = usePointsHistory(isAuthenticated);
 
   const isInitialLoading = authLoading || (isLoading && !levelProgression && !error);
 
@@ -68,30 +80,121 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     return null;
   }
 
+  const recentEntries = entries.slice(0, 3);
+
+  function formatRelativeDay(value: string) {
+    const entryDate = new Date(value);
+    const now = new Date();
+    const currentDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const targetDay = new Date(
+      entryDate.getFullYear(),
+      entryDate.getMonth(),
+      entryDate.getDate(),
+    ).getTime();
+    const dayDiff = Math.floor((currentDay - targetDay) / (1000 * 60 * 60 * 24));
+
+    if (dayDiff <= 0) return 'Hoy';
+    if (dayDiff === 1) return 'Ayer';
+    return `Hace ${dayDiff} dias`;
+  }
+
+  function normalizeActionLabel(entry: PointHistoryEntry) {
+    if (entry.action_display) {
+      return entry.action_display;
+    }
+
+    if (entry.action === 'publish_item') return 'Articulo publicado';
+    if (entry.action === 'complete_donation') return 'Articulo donado';
+    if (entry.action === 'complete_sale') return 'Venta completada';
+    if (entry.action === 'complete_exchange') return 'Intercambio completado';
+    if (entry.action === 'receive_positive_review') return 'Resena positiva';
+    if (entry.action === 'challenge_completion') return 'Reto completado';
+    return 'Actividad';
+  }
+
+  function getEntryIcon(entry: PointHistoryEntry) {
+    if (entry.action === 'complete_donation') return HandHeart;
+    if (entry.action === 'complete_sale' || entry.action === 'complete_exchange') return ReceiptText;
+    if (entry.action === 'challenge_completion') return Gift;
+    if (entry.action === 'publish_item') return Tag;
+    return TrendingUp;
+  }
+
+  function pointsLabel(points: number) {
+    return points >= 0 ? `+${points}` : `${points}`;
+  }
+
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-primary/5 to-emerald-400/10 p-6 shadow-sm">
-      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
-      <div className="pointer-events-none absolute -left-8 -bottom-10 h-28 w-28 rounded-full bg-emerald-400/15 blur-2xl" />
-
-      <div className="relative flex items-center justify-between">
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">
-            Puntos Acumulados
-          </h3>
-          <p className="mt-2 text-4xl font-extrabold leading-none text-primary">
-            {levelProgression.points || 0}
-          </p>
-          <p className="mt-2 text-sm text-fg/80">Nivel de impacto en ReUse</p>
+    <article className="h-full rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Sparkles className="h-4 w-4" />
         </div>
+        <h3 className="text-base font-semibold text-fg">Puntos Acumulados</h3>
+      </div>
 
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/70 ring-8 ring-primary/15">
-          <Sparkles className="h-7 w-7 text-primary" />
+      <div className="mt-5 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 p-4 text-white">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-white/90">Total de puntos</p>
+            <p className="text-5xl font-extrabold leading-none">
+              {(levelProgression.points || 0).toLocaleString('es-MX')}
+            </p>
+          </div>
         </div>
       </div>
 
-      <p className="relative mt-4 text-xs text-muted-fg">
-        Gana puntos publicando, completando transacciones e interactuando con la comunidad.
-      </p>
+      <div className="mt-6">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-fg">Actividad reciente</p>
+
+        <div className="mt-3 space-y-2.5">
+          {historyLoading && recentEntries.length === 0 ? (
+            <div className="h-14 animate-pulse rounded-2xl bg-muted" />
+          ) : null}
+
+          {!historyLoading && recentEntries.length === 0 ? (
+            <div className="rounded-2xl bg-muted/60 px-4 py-3 text-sm text-muted-fg">
+              Aun no tienes movimientos recientes.
+            </div>
+          ) : null}
+
+          {recentEntries.map(entry => {
+            const EntryIcon = getEntryIcon(entry);
+            return (
+              <div
+                key={entry.id}
+                className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-muted-fg">
+                    <EntryIcon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold leading-tight text-fg">
+                      {normalizeActionLabel(entry)}
+                    </p>
+                    <p className="text-xs text-muted-fg">{formatRelativeDay(entry.created_at)}</p>
+                  </div>
+                </div>
+                <p className="text-xl font-semibold text-primary">{pointsLabel(entry.points)}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-5 text-center">
+        <Link
+          href="/profile/points-history"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary-hover"
+        >
+          Ver todo el historial
+          <span aria-hidden="true">›</span>
+        </Link>
+      </div>
     </article>
   );
 }
