@@ -17,8 +17,8 @@
 #         model = DesignTemplate
 #         # Explicitly list fields to control what the frontend sees
 #         fields = ['id', 'name', 'price', 'bought', 'config_data']
-        
-#         # 'bought' should likely be read-only so users can't 
+
+#         # 'bought' should likely be read-only so users can't
 #         # just 'POST' a true value to get it for free.
 #         read_only_fields = ['bought']
 

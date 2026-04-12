@@ -39,7 +39,7 @@ class User(AbstractUser):
     points = models.IntegerField(default=0)
     profile_picture = models.CharField(max_length=500, blank=True, null=True)
     avatarData = models.JSONField(default=dict)
-    
+
     # HU-CORE-09: email verification state
     is_email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(blank=True, null=True)

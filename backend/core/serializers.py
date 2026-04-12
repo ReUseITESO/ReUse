@@ -69,7 +69,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         #     )
         print("hello world")
         return value
-    
+
 
     def validate_first_name(self, value: str) -> str:
         value = sanitize_string(value)
