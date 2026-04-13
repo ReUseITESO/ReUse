@@ -22,10 +22,11 @@ export default function ProductBasicDetails({
   price,
   showTransactionBadge = false,
   actions,
+  disableShowMore = false,
 }: ProductBasicDetailsProps) {
   const [showMore, setShowMore] = useState(false);
   const TRUNCATE_LIMIT = 220;
-  const isTruncatable = !!description && description.length > TRUNCATE_LIMIT;
+  const isTruncatable = !disableShowMore && !!description && description.length > TRUNCATE_LIMIT;
   const displayedDescription = isTruncatable && !showMore ? `${description.slice(0, TRUNCATE_LIMIT).trimEnd()}...` : description;
   const categoryClass = getCategoryStyle(categoryName);
   const conditionClass = condition

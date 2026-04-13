@@ -60,6 +60,7 @@ export interface ProductBasicDetailsProps {
   price?: string | null;
   showTransactionBadge?: boolean;
   actions?: ReactNode;
+  disableShowMore?: boolean;
 }
 
 export interface ProductDetail extends Product {

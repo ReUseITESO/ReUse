@@ -28,20 +28,11 @@ export function useTransactions(filters: UseTransactionsFilters = {}) {
       setError(null);
 
       try {
-        let data;
-        if (filters.status === 'pendiente') {
-          data = await listTransactions({
-            role: filters.role,
-            status: ['pendiente', 'confirmada'],
-            page,
-          });
-        } else {
-          data = await listTransactions({
-            role: filters.role,
-            status: filters.status,
-            page,
-          });
-        }
+        const data = await listTransactions({
+          role: filters.role,
+          status: filters.status,
+          page,
+        });
 
         if (requestId !== requestSequenceRef.current) {
           return;

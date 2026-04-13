@@ -43,13 +43,13 @@ export default function TransactionProductSection({ product }: TransactionProduc
     <div className="space-y-3">
       <h2 className="text-h2 font-semibold text-fg">Producto de la transacción</h2>
       <div className="rounded-lg border border-border bg-muted/40 p-4">
-        <div className="grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
-          <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <div className="grid items-start gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
+          <div className="overflow-hidden rounded-lg border border-border bg-card h-40">
             {product.image_url ? (
               <img
                 src={product.image_url}
                 alt={product.title}
-                className="h-40 w-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex h-40 flex-col items-center justify-center gap-2 bg-muted text-muted-fg">
@@ -71,6 +71,7 @@ export default function TransactionProductSection({ product }: TransactionProduc
               transactionType={product.transaction_type}
               price={product.price}
               showTransactionBadge
+              disableShowMore
             />
 
             {hasLongDescription && (
