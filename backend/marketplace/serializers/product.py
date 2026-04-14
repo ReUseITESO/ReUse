@@ -1,25 +1,25 @@
 from rest_framework import serializers
 
-from marketplace.models import Images, Products
+from marketplace.models import Products
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.images import ImageSerializer
+from marketplace.serializers.reaction_fields import ReactionSerializerFieldsMixin
 from marketplace.services.transaction_service import has_active_transaction
+from social.serializers.community import CommunityListSerializer
 
 
-class ImageSerializer(serializers.ModelSerializer):
-    """Serializer for product images."""
-
-    class Meta:
-        model = Images
-        fields = ["id", "image_url", "order_number"]
-
-
-class ProductListSerializer(serializers.ModelSerializer):
+class ProductListSerializer(ReactionSerializerFieldsMixin, serializers.ModelSerializer):
     """Serializer for the product list (Object -> JSON)."""
 
     category = CategorySerializer(read_only=True)
+    community = CommunityListSerializer(read_only=True)
     seller_name = serializers.SerializerMethodField()
     seller_id = serializers.IntegerField(source="seller.id", read_only=True)
+    images = ImageSerializer(many=True, read_only=True)
     has_active_transaction = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+    user_reaction = serializers.SerializerMethodField()
 
     def get_seller_name(self, obj):
         return obj.seller.get_full_name()
@@ -37,11 +37,15 @@ class ProductListSerializer(serializers.ModelSerializer):
             "transaction_type",
             "status",
             "price",
-            "image_url",
+            "images",
             "category",
+            "community",
             "seller_name",
             "seller_id",
             "has_active_transaction",
+            "likes_count",
+            "dislikes_count",
+            "user_reaction",
             "created_at",
             "updated_at",
         ]
@@ -49,13 +53,6 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     """Serializador para crear productos (JSON -> Obj)."""
-
-    images = serializers.ListField(
-        child=serializers.URLField(),
-        required=False,
-        allow_empty=True,
-        help_text="Array de URLs de imágenes para el producto",
-    )
 
     class Meta:
         model = Products
@@ -66,8 +63,8 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             "condition",
             "transaction_type",
             "price",
-            "image_url",
             "category",
+            "community",
             "images",
         ]
         read_only_fields = ["id"]
@@ -88,18 +85,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create(self, validated_data):
-        images_data = validated_data.pop("images", [])
-        product = Products.objects.create(**validated_data)
-
-        # Create Images objects for each URL
-        for index, image_url in enumerate(images_data):
-            Images.objects.create(
-                product=product, image_url=image_url, order_number=index
-            )
-
-        return product
-
 
 class ProductUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating products (PATCH)."""
@@ -112,8 +97,8 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
             "condition",
             "transaction_type",
             "price",
-            "image_url",
             "category",
+            "community",
         ]
 
     def validate(self, data):

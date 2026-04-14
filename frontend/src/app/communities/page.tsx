@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Users, Check, X, Mail } from 'lucide-react';
+import { Plus, Users, Check, Mail, ShoppingBag } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunities } from '@/hooks/useCommunities';
@@ -23,12 +23,8 @@ export default function CommunitiesPage() {
   const [loadingInviteId, setLoadingInviteId] = useState<number | null>(null);
 
   const fetchInvitations = useCallback(async () => {
-    try {
-      const data = await apiClient<{ results: CommunityInvitation[] }>('/communities/invitations/');
-      setInvitations(data.results);
-    } catch {
-      setInvitations([]);
-    }
+    // Daniel's API doesn't have an invitations endpoint
+    setInvitations([]);
   }, []);
 
   useEffect(() => {
@@ -38,7 +34,7 @@ export default function CommunitiesPage() {
   async function handleAcceptInvite(communityId: number, inviteId: number) {
     setLoadingInviteId(inviteId);
     try {
-      await apiClient(`/communities/${communityId}/join/`, { method: 'POST' });
+      await apiClient(`/social/communities/${communityId}/join/`, { method: 'POST' });
       await Promise.all([fetchInvitations(), refresh()]);
     } catch {
       /* ignore */
@@ -65,7 +61,7 @@ export default function CommunitiesPage() {
     return (
       <main className="min-h-screen p-6">
         <div className="mx-auto max-w-3xl">
-          <div className="h-32 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-32 animate-pulse rounded-lg bg-muted" />
         </div>
       </main>
     );
@@ -75,8 +71,8 @@ export default function CommunitiesPage() {
     return (
       <main className="min-h-screen p-6">
         <div className="mx-auto max-w-3xl">
-          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 text-center">
-            <p className="font-medium text-yellow-900">Inicia sesion para ver comunidades</p>
+          <div className="rounded-lg border border-warning/30 bg-warning/10 p-6 text-center">
+            <p className="font-medium text-fg">Inicia sesion para ver comunidades</p>
           </div>
         </div>
       </main>
@@ -87,37 +83,49 @@ export default function CommunitiesPage() {
     <main className="min-h-screen p-6">
       <div className="mx-auto max-w-3xl">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Comunidades</h1>
+          <h1 className="text-3xl font-bold text-fg">Comunidades</h1>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="flex items-center gap-1.5 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4" />
             Crear comunidad
           </button>
         </div>
 
+        {/* Marketplace Link */}
+        <Link
+          href="/communities/marketplace"
+          className="mb-6 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 transition-colors hover:bg-blue-100"
+        >
+          <ShoppingBag className="h-5 w-5 text-blue-600" />
+          <div>
+            <p className="text-sm font-medium text-blue-900">Marketplace de Comunidades</p>
+            <p className="text-xs text-blue-700">Explora artículos exclusivos de tus comunidades</p>
+          </div>
+        </Link>
+
         {/* Pending invitations */}
         {invitations.length > 0 && (
           <div className="mb-6">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900">
-              <Mail className="h-4 w-4 text-blue-600" />
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg">
+              <Mail className="h-4 w-4 text-info" />
               Invitaciones pendientes ({invitations.length})
             </h2>
             <div className="space-y-2">
               {invitations.map(inv => (
                 <div
                   key={inv.id}
-                  className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3"
+                  className="flex items-center justify-between rounded-lg border border-info/30 bg-info/10 p-3"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{inv.community_name}</p>
-                    <p className="text-xs text-gray-500">Invitado por {inv.invited_by.full_name}</p>
+                    <p className="text-sm font-medium text-fg">{inv.community_name}</p>
+                    <p className="text-xs text-muted-fg">Invitado por {inv.invited_by.full_name}</p>
                   </div>
                   <button
                     onClick={() => handleAcceptInvite(inv.community, inv.id)}
                     disabled={loadingInviteId === inv.id}
-                    className="flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                    className="flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-accent-fg hover:bg-accent/80 disabled:opacity-50"
                   >
                     <Check className="h-3.5 w-3.5" />
                     {loadingInviteId === inv.id ? 'Uniendo...' : 'Aceptar'}
@@ -129,34 +137,34 @@ export default function CommunitiesPage() {
         )}
 
         {showForm && (
-          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-gray-900">Nueva comunidad</h2>
-            {formError && <p className="mb-3 text-sm text-red-600">{formError}</p>}
+          <div className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm">
+            <h2 className="mb-3 text-lg font-semibold text-fg">Nueva comunidad</h2>
+            {formError && <p className="mb-3 text-sm text-error">{formError}</p>}
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Nombre de la comunidad"
-              className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="mb-3 w-full rounded-lg border border-input bg-bg px-3 py-2 text-sm text-fg focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Descripcion (opcional)"
               rows={3}
-              className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="mb-3 w-full rounded-lg border border-input bg-bg px-3 py-2 text-sm text-fg focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowForm(false)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-muted-fg hover:bg-muted"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleCreate}
                 disabled={name.trim().length < 3 || isSubmitting}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg hover:bg-primary-hover disabled:opacity-50"
               >
                 {isSubmitting ? 'Creando...' : 'Crear'}
               </button>
@@ -165,7 +173,7 @@ export default function CommunitiesPage() {
         )}
 
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">
             {error}
           </div>
         )}
@@ -173,14 +181,14 @@ export default function CommunitiesPage() {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-24 animate-pulse rounded-lg bg-gray-200" />
+              <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
             ))}
           </div>
         ) : communities.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-            <Users className="mx-auto mb-3 h-10 w-10 text-gray-400" />
-            <p className="text-sm text-gray-500">No perteneces a ninguna comunidad</p>
-            <p className="mt-1 text-xs text-gray-400">Crea una o espera una invitacion</p>
+          <div className="rounded-lg border border-dashed border-border bg-muted p-8 text-center">
+            <Users className="mx-auto mb-3 h-10 w-10 text-muted-fg" />
+            <p className="text-sm text-muted-fg">No perteneces a ninguna comunidad</p>
+            <p className="mt-1 text-xs text-muted-fg">Crea una o espera una invitacion</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -188,21 +196,21 @@ export default function CommunitiesPage() {
               <Link
                 key={c.id}
                 href={`/communities/${c.id}`}
-                className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className="block rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900">{c.name}</h3>
+                    <h3 className="text-base font-semibold text-fg">{c.name}</h3>
                     {c.description && (
-                      <p className="mt-1 line-clamp-1 text-sm text-gray-500">{c.description}</p>
+                      <p className="mt-1 line-clamp-1 text-sm text-muted-fg">{c.description}</p>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <div className="flex items-center gap-1 text-xs text-muted-fg">
                     <Users className="h-4 w-4" />
-                    {c.member_count}
+                    {c.members_count}
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-gray-400">Creada por {c.created_by_name}</p>
+                <p className="mt-2 text-xs text-muted-fg">Creada por {c.creator.full_name}</p>
               </Link>
             ))}
           </div>

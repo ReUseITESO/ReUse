@@ -18,6 +18,7 @@ from marketplace.models import Category, Products, Transaction
 class ChallengeAPITest(APITestCase):
     CHALLENGES_URL = "/api/gamification/challenges/"
     MY_CHALLENGES_URL = "/api/gamification/challenges/me/"
+    CLAIM_CHALLENGE_URL_TEMPLATE = "/api/gamification/challenges/{challenge_id}/claim/"
 
     def setUp(self):
         self.user = User.objects.create(
@@ -91,7 +92,7 @@ class ChallengeAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], self.active_challenge.id)
-        self.assertFalse(response.data[0]["joined"])
+        self.assertTrue(response.data[0]["joined"])
 
     def test_join_challenge_creates_user_challenge(self):
         self._auth()
@@ -108,23 +109,28 @@ class ChallengeAPITest(APITestCase):
             ).exists()
         )
 
-    def test_join_challenge_twice_returns_400(self):
+    def test_join_challenge_twice_is_idempotent(self):
         self._auth()
-        self.client.post(
+        first_response = self.client.post(
             f"/api/gamification/challenges/{self.active_challenge.id}/join/"
         )
 
-        response = self.client.post(
+        second_response = self.client.post(
             f"/api/gamification/challenges/{self.active_challenge.id}/join/"
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(second_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            UserChallenge.objects.filter(
+                user=self.user,
+                challenge=self.active_challenge,
+            ).count(),
+            1,
+        )
 
     def test_my_challenges_refreshes_progress_and_awards_bonus_once(self):
         self._auth()
-        self.client.post(
-            f"/api/gamification/challenges/{self.active_challenge.id}/join/"
-        )
 
         self._create_transaction(transaction_type="donation")
         self._create_transaction(transaction_type="donation")
@@ -135,6 +141,23 @@ class ChallengeAPITest(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["progress"], 2)
         self.assertTrue(response.data[0]["is_completed"])
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 0)
+        self.assertEqual(
+            PointTransaction.objects.filter(
+                user=self.user,
+                action="challenge_completion",
+                reference_id=self.active_challenge.id,
+            ).count(),
+            0,
+        )
+
+        claim_url = self.CLAIM_CHALLENGE_URL_TEMPLATE.format(
+            challenge_id=self.active_challenge.id
+        )
+        claim_response = self.client.post(claim_url)
+        self.assertEqual(claim_response.status_code, status.HTTP_200_OK)
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.points, 20)
@@ -163,9 +186,6 @@ class ChallengeAPITest(APITestCase):
 
     def test_my_challenges_uses_point_transactions_for_progress(self):
         self._auth()
-        self.client.post(
-            f"/api/gamification/challenges/{self.active_challenge.id}/join/"
-        )
 
         PointTransaction.objects.create(
             user=self.user,
@@ -178,3 +198,45 @@ class ChallengeAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["progress"], 1)
         self.assertFalse(response.data[0]["is_completed"])
+
+    def test_claim_reward_only_once(self):
+        self._auth()
+
+        self._create_transaction(transaction_type="donation")
+        self._create_transaction(transaction_type="donation")
+
+        my_response = self.client.get(self.MY_CHALLENGES_URL)
+        self.assertEqual(my_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(my_response.data[0]["is_completed"])
+        self.assertFalse(my_response.data[0]["reward_claimed"])
+
+        claim_url = self.CLAIM_CHALLENGE_URL_TEMPLATE.format(
+            challenge_id=self.active_challenge.id
+        )
+        first_claim = self.client.post(claim_url)
+        second_claim = self.client.post(claim_url)
+
+        self.assertEqual(first_claim.status_code, status.HTTP_200_OK)
+        self.assertTrue(first_claim.data["reward_claimed"])
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 20)
+        self.assertEqual(
+            PointTransaction.objects.filter(
+                user=self.user,
+                action="challenge_completion",
+                reference_id=self.active_challenge.id,
+            ).count(),
+            1,
+        )
+        self.assertEqual(second_claim.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_claim_reward_requires_completed_challenge(self):
+        self._auth()
+
+        self.client.get(self.MY_CHALLENGES_URL)
+        claim_url = self.CLAIM_CHALLENGE_URL_TEMPLATE.format(
+            challenge_id=self.active_challenge.id
+        )
+        response = self.client.post(claim_url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

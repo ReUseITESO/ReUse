@@ -12,9 +12,11 @@ class CommunityPostViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # HU-CORE-17: excluir posts de usuarios desactivados
         return (
             CommunityPost.objects.select_related("community", "user")
             .filter(community__memberships__user=self.request.user)
+            .exclude(user__is_deactivated=True)
             .distinct()
         )
 

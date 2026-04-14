@@ -30,6 +30,13 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
       ]);
       setChallenges(active);
       setMyChallenges(mine);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('reuse:challenges-snapshot', {
+            detail: { challenges: active, myChallenges: mine },
+          }),
+        );
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'No se pudieron cargar los retos';
       setError(message);
@@ -40,26 +47,41 @@ export function useChallenges(enabled: boolean = true, refreshTrigger: number = 
     }
   }, [enabled]);
 
-  const joinChallenge = useCallback(
+  const claimChallengeReward = useCallback(
     async (challengeId: number) => {
-      await apiClient<UserChallenge>(`/gamification/challenges/${challengeId}/join/`, {
+      await apiClient<UserChallenge>(`/gamification/challenges/${challengeId}/claim/`, {
         method: 'POST',
       });
       await fetchChallenges();
     },
     [fetchChallenges],
   );
-
   useEffect(() => {
     fetchChallenges();
   }, [fetchChallenges, refreshTrigger]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onPointsUpdated = () => {
+      fetchChallenges();
+    };
+
+    window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
+    };
+  }, [enabled, fetchChallenges]);
 
   return {
     challenges,
     myChallenges,
     isLoading,
     error,
-    joinChallenge,
+    claimChallengeReward,
     refetch: fetchChallenges,
   };
 }

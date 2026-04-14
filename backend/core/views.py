@@ -1,22 +1,39 @@
 import hashlib
+import os
 import secrets
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
+from rest_framework import serializers as drf_serializers
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.models.notification import Notification
 from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
+from marketplace.models import Products
+from marketplace.serializers.product import ProductListSerializer
+from social.models import UserConnection
+
 from .models.email_verification import EmailVerificationToken
-from .serializers import SignInSerializer, SignUpSerializer, UserProfileSerializer
+from .serializers import (
+    NotificationSerializer,
+    SignInSerializer,
+    SignUpSerializer,
+    UserProfileSerializer,
+)
 
 User = get_user_model()
 
@@ -25,7 +42,7 @@ def _hash_token(raw: str) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def create_email_verification_token(user, minutes: int = None) -> str:
+def create_email_verification_token(user, minutes: int | None = None) -> str:
     """
     Crea token de verificación (one-time) y guarda el hash en DB.
     Devuelve el token plano para mandarlo por email.
@@ -124,11 +141,14 @@ class SignUpView(generics.CreateAPIView):
         user.email_verified_at = None
         user.save(update_fields=["is_active", "is_email_verified", "email_verified_at"])
 
-        # Genera token y manda correo
-        raw_token = create_email_verification_token(user)
+        # Genera token y manda correo — atómico para evitar token huérfano si falla el envío
+        from django.db import transaction as db_transaction
+
         frontend_base = getattr(settings, "FRONTEND_BASE_URL", "http://localhost:3001")
-        verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
-        send_verification_email(user.email, verify_url)
+        with db_transaction.atomic():
+            raw_token = create_email_verification_token(user)
+            verify_url = f"{frontend_base}/auth/verify?token={raw_token}"
+            send_verification_email(user.email, verify_url)
 
         return Response(
             {
@@ -184,6 +204,21 @@ class SignInView(APIView):
                     "error": {
                         "code": "ACCOUNT_DISABLED",
                         "message": "Esta cuenta ha sido desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # HU-CORE-17: bloquear login si la cuenta fue desactivada lógicamente
+        if getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "message": (
+                            "Tu cuenta está desactivada. "
+                            "Revisa tu correo o solicita un enlace de reactivación en /api/auth/account/reactivate/send/"
+                        ),
                     }
                 },
                 status=status.HTTP_403_FORBIDDEN,
@@ -348,10 +383,52 @@ class EmailVerificationConfirmView(APIView):
         )
 
 
-# ── Dashboard (HU-CORE-04) ───────────────────────────────
+# ── User Search ──────────────────────────────────────────
 
-from marketplace.models import Products
-from marketplace.serializers.product import ProductListSerializer
+
+class UserSearchView(generics.ListAPIView):
+    """GET /api/auth/users/search/?q=query — search users by name or email."""
+
+    permission_classes = [IsAuthenticated]
+
+    class UserSearchSerializer(drf_serializers.ModelSerializer):
+        full_name = drf_serializers.SerializerMethodField()
+
+        class Meta:
+            model = User
+            fields = [
+                "id",
+                "email",
+                "first_name",
+                "last_name",
+                "full_name",
+                "profile_picture",
+            ]
+            read_only_fields = fields
+
+        def get_full_name(self, obj):
+            return obj.get_full_name()
+
+    serializer_class = UserSearchSerializer
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "").strip()
+        if len(query) < 2:
+            return User.objects.none()
+        return (
+            User.objects.filter(
+                Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(email__icontains=query),
+                is_active=True,
+                is_deactivated=False,
+            )
+            .exclude(id=self.request.user.id)
+            .order_by("first_name")[:20]
+        )
+
+
+# ── Dashboard (HU-CORE-04) ───────────────────────────────
 
 
 class DashboardView(APIView):
@@ -380,9 +457,19 @@ class DashboardView(APIView):
             user_products = user_qs[:3]
             user_points = getattr(request.user, "points", 0)
 
+        serializer_context = {"request": request}
+
         data = {
-            "recent_products": ProductListSerializer(recent_products, many=True).data,
-            "user_products": ProductListSerializer(user_products, many=True).data,
+            "recent_products": ProductListSerializer(
+                recent_products,
+                many=True,
+                context=serializer_context,
+            ).data,
+            "user_products": ProductListSerializer(
+                user_products,
+                many=True,
+                context=serializer_context,
+            ).data,
             "user_products_count": user_products_count,
             "active_transactions_count": 0,
             "gamification": {
@@ -395,10 +482,6 @@ class DashboardView(APIView):
 
 
 # ── Profile Picture Upload (HU-CORE-10) ─────────────────
-
-from rest_framework.parsers import MultiPartParser
-import os
-import uuid
 
 
 class MicrosoftAuthURLView(APIView):
@@ -479,6 +562,17 @@ class MicrosoftCallbackView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        elif getattr(user, "is_deactivated", False):
+            return Response(
+                {
+                    "error": {
+                        "code": "ACCOUNT_DEACTIVATED",
+                        "email": email,
+                        "message": "Tu cuenta está desactivada.",
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         refresh = RefreshToken.for_user(user)
         return Response(
@@ -507,12 +601,22 @@ class ProfilePictureUploadView(APIView):
         file = request.FILES.get("file")
         if not file:
             return Response(
-                {"error": {"code": "NO_FILE", "message": "No se envio ningun archivo."}},
+                {
+                    "error": {
+                        "code": "NO_FILE",
+                        "message": "No se envio ningun archivo.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.content_type not in self.ALLOWED_TYPES:
             return Response(
-                {"error": {"code": "INVALID_TYPE", "message": "Solo imagenes (JPEG, PNG, WebP, GIF)."}},
+                {
+                    "error": {
+                        "code": "INVALID_TYPE",
+                        "message": "Solo imagenes (JPEG, PNG, WebP, GIF).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if file.size > self.MAX_SIZE:
@@ -525,8 +629,6 @@ class ProfilePictureUploadView(APIView):
         filename = f"profile_{uuid.uuid4().hex}{ext}"
         filepath = os.path.join("profile_pictures", filename)
 
-        from django.core.files.storage import default_storage
-
         saved_path = default_storage.save(filepath, file)
         file_url = request.build_absolute_uri(f"/media/{saved_path}")
 
@@ -535,3 +637,108 @@ class ProfilePictureUploadView(APIView):
         user.save(update_fields=["profile_picture"])
 
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
+
+
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by(
+            "-created_at"
+        )
+
+    @action(detail=True, methods=["patch"])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save(update_fields=["is_read", "read_at"])
+        return Response({"status": "notification marked as read"})
+
+
+# ── Share Item with Friends (HU-CORE-12) ─────────────────
+
+
+class ShareItemView(APIView):
+    """POST /api/auth/shares/ — share a product with friends via notifications."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        product_id = request.data.get("product_id")
+        friend_ids = request.data.get("friend_ids", [])
+
+        if not product_id:
+            return Response(
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "product_id es requerido.",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not friend_ids or not isinstance(friend_ids, list):
+            return Response(
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "friend_ids es requerido (lista de IDs).",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            product = Products.objects.get(pk=product_id, status="disponible")
+        except Products.DoesNotExist:
+            return Response(
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Producto no encontrado o no disponible.",
+                    }
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        user = request.user
+        accepted_connections = UserConnection.objects.filter(
+            Q(requester=user, status="accepted") | Q(addressee=user, status="accepted")
+        )
+        connected_ids = set()
+        for conn in accepted_connections:
+            connected_ids.add(
+                conn.requester_id if conn.addressee_id == user.id else conn.addressee_id
+            )
+
+        invalid_ids = [fid for fid in friend_ids if fid not in connected_ids]
+        if invalid_ids:
+            return Response(
+                {
+                    "error": {
+                        "code": "NOT_FRIENDS",
+                        "message": f"No eres amigo de los usuarios: {invalid_ids}",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        notifications = []
+        for fid in friend_ids:
+            notifications.append(
+                Notification(
+                    user_id=fid,
+                    type="shared_item",
+                    title=f"{user.get_full_name()} te compartio un producto",
+                    body=product.title,
+                    reference_id=product.id,
+                )
+            )
+        Notification.objects.bulk_create(notifications)
+
+        return Response(
+            {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
+            status=status.HTTP_201_CREATED,
+        )

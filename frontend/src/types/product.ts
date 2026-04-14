@@ -4,6 +4,18 @@ export type ProductCondition = 'nuevo' | 'como_nuevo' | 'buen_estado' | 'usado';
 
 export type TransactionType = 'donation' | 'sale' | 'swap';
 
+export type ProductReactionType = 'like' | 'dislike';
+
+// Import Community type from community.ts to avoid duplication
+import type { Community } from './community';
+export type { Community };
+
+export interface ProductReactionSummary {
+  likes_count: number;
+  dislikes_count: number;
+  user_reaction: ProductReactionType | null;
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -24,11 +36,15 @@ export interface Product {
   transaction_type: TransactionType;
   status: ProductStatus;
   price: string | null;
-  image_url: string;
+  images: ProductImage[];
   category: Category;
+  community?: Community | null;
   seller_id: number;
   seller_name: string;
   has_active_transaction: boolean;
+  likes_count: number;
+  dislikes_count: number;
+  user_reaction: ProductReactionType | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +63,7 @@ export interface ProductBasicDetailsProps {
 export interface ProductDetail extends Product {
   seller_email: string;
   images: ProductImage[];
+  has_reported: boolean;
 }
 
 export interface ProductCreatePayload {
@@ -58,6 +75,7 @@ export interface ProductCreatePayload {
   image_url?: string;
   category: number;
   images?: string[];
+  community?: number;
 }
 
 export interface ProductUpdatePayload {
@@ -66,8 +84,8 @@ export interface ProductUpdatePayload {
   condition?: ProductCondition;
   transaction_type?: TransactionType;
   price?: number | null;
-  image_url?: string;
   category?: number;
+  image_url?: string;
 }
 
 export interface EditFormValues {
@@ -77,7 +95,7 @@ export interface EditFormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
+  image_url?: string;
 }
 
 export interface ProductEditFormProps {
@@ -93,9 +111,15 @@ export interface FormValues {
   price: string;
   image_url: string;
   images: string[];
+  community?: string;
 }
 
 export interface ChangeStatusResult {
   product: Product | null;
   error: string | null;
+}
+
+export interface ProductCardProps {
+  product: Product;
+  showCommunityBadge?: boolean;
 }

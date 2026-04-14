@@ -11,6 +11,9 @@ from gamification.serializers.challenges import (
     UserChallengeSerializer,
 )
 from gamification.services.challenge_service import (
+    claim_challenge_reward,
+    ensure_user_active_challenges,
+    get_rotative_challenges,
     join_challenge,
     refresh_user_challenge_progress,
 )
@@ -21,20 +24,18 @@ class ChallengeListView(APIView):
 
     @extend_schema(
         responses={200: ChallengeSerializer(many=True)},
-        description="List all active challenges available in the current time window.",
+        description="List rotative active challenges that change daily/weekly/monthly.",
     )
     def get(self, request):
         now = timezone.now()
-        challenges = Challenge.objects.filter(
-            is_active=True,
-            start_date__lte=now,
-            end_date__gte=now,
-        ).order_by("end_date", "id")
+        ensure_user_active_challenges(user=request.user, now=now)
+        # Get rotative challenges (3 daily, 3 weekly, 3 monthly)
+        challenges = get_rotative_challenges(now)
 
         joined_ids = set(
             UserChallenge.objects.filter(
                 user=request.user,
-                challenge_id__in=challenges.values_list("id", flat=True),
+                challenge_id__in=[c.id for c in challenges],
             ).values_list("challenge_id", flat=True)
         )
         serializer = ChallengeSerializer(
@@ -73,9 +74,30 @@ class MyChallengesView(APIView):
         description="List current user joined challenges with refreshed progress.",
     )
     def get(self, request):
-        user_challenges = list(
-            UserChallenge.objects.select_related("challenge").filter(user=request.user)
+        user_challenges = ensure_user_active_challenges(
+            user=request.user,
+            now=timezone.now(),
         )
         refreshed = [refresh_user_challenge_progress(item) for item in user_challenges]
         serializer = UserChallengeSerializer(refreshed, many=True)
         return Response(serializer.data)
+
+
+class ClaimChallengeRewardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        responses={200: UserChallengeSerializer},
+        description="Claim reward for a completed challenge once.",
+    )
+    def post(self, request, challenge_id):
+        challenge = Challenge.objects.filter(id=challenge_id).first()
+        if challenge is None:
+            return Response(
+                {"detail": "Challenge not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        claimed = claim_challenge_reward(user=request.user, challenge=challenge)
+        serializer = UserChallengeSerializer(claimed)
+        return Response(serializer.data, status=status.HTTP_200_OK)

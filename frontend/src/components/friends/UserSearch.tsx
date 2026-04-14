@@ -3,15 +3,23 @@
 import { useState } from 'react';
 import { Search, UserPlus, Check } from 'lucide-react';
 
-import type { FriendUser } from '@/types/friends';
+import type { SocialUser } from '@/types/friends';
+
+type FriendUser = SocialUser;
 
 interface UserSearchProps {
   onSearch: (query: string) => Promise<FriendUser[]>;
   onSendRequest: (userId: number) => Promise<string | null>;
   friendIds: number[];
+  pendingSentIds?: number[];
 }
 
-export default function UserSearch({ onSearch, onSendRequest, friendIds }: UserSearchProps) {
+export default function UserSearch({
+  onSearch,
+  onSendRequest,
+  friendIds,
+  pendingSentIds = [],
+}: UserSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<FriendUser[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -38,7 +46,12 @@ export default function UserSearch({ onSearch, onSendRequest, friendIds }: UserS
     setError(null);
     const err = await onSendRequest(userId);
     if (err) {
-      setError(err);
+      // If connection already exists, treat as "already sent"
+      if (err.toLowerCase().includes('already exists') || err.toLowerCase().includes('ya existe')) {
+        setSentIds(prev => new Set(prev).add(userId));
+      } else {
+        setError(err);
+      }
     } else {
       setSentIds(prev => new Set(prev).add(userId));
     }
@@ -73,7 +86,7 @@ export default function UserSearch({ onSearch, onSendRequest, friendIds }: UserS
         <div className="space-y-2">
           {results.map(user => {
             const isFriend = friendIds.includes(user.id);
-            const isSent = sentIds.has(user.id);
+            const isSent = sentIds.has(user.id) || pendingSentIds.includes(user.id);
             return (
               <div
                 key={user.id}

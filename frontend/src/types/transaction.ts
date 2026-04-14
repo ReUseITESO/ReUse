@@ -1,7 +1,9 @@
 import type { Category, ProductCondition, ProductStatus, TransactionType } from '@/types/product';
 
+export type { TransactionType } from '@/types/product';
 export type TransactionStatus = 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
 export type UpdatableTransactionStatus = 'confirmada' | 'completada' | 'cancelada';
+export type TransactionRole = 'seller' | 'buyer';
 
 export interface TransactionUserSummary {
   id: number;
@@ -22,6 +24,14 @@ export interface TransactionProductSummary {
   category: Category;
 }
 
+export interface TransactionReview {
+  id: number;
+  rating: number;
+  comment: string;
+  reviewer_name: string;
+  created_at: string;
+}
+
 export interface Transaction {
   id: number;
   product: TransactionProductSummary;
@@ -38,6 +48,9 @@ export interface Transaction {
   created_at: string;
   expires_at: string;
   is_expired: boolean;
+  // Present only from the /history/ endpoint
+  can_review?: boolean;
+  my_review?: TransactionReview | null;
 }
 
 export interface CreateTransactionPayload {
@@ -85,4 +98,15 @@ export interface TransactionsPaginationProps {
   hasPrevPage: boolean;
   onNext: () => void;
   onPrevious: () => void;
+}
+
+export interface TransactionFilters {
+  transaction_type?: TransactionType;
+  date_from?: string;
+  date_to?: string;
+}
+
+export interface SubmitReviewPayload {
+  rating: number;
+  comment?: string;
 }

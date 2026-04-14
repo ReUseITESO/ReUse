@@ -3,17 +3,40 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Pencil } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
+import FeaturedGamificationCard from '@/components/gamification/FeaturedGamificationCard';
 import PointsBalance from '@/components/gamification/PointsBalance';
+import ChallengesBoard from '@/components/gamification/ChallengesBoard';
 import BadgesList from '@/components/gamification/BadgesList';
+import EcoImpactCard from '@/components/gamification/EcoImpact';
+import { deactivateAccount } from '@/lib/auth';
 import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const displayUser = localUser ?? user;
+
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState('');
+
+  async function handleDeactivateConfirm() {
+    setIsDeactivating(true);
+    setDeactivateError('');
+    try {
+      await deactivateAccount();
+      await signOut();
+      router.replace('/auth/signin');
+    } catch (err) {
+      setDeactivateError(err instanceof Error ? err.message : 'Error al desactivar la cuenta.');
+      setIsDeactivating(false);
+    }
+  }
 
   function handleSave(updated: User) {
     setLocalUser(updated);
@@ -23,7 +46,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <main className="min-h-screen p-6">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <div className="h-32 animate-pulse rounded-lg border border-border bg-muted" />
         </div>
       </main>
@@ -33,7 +56,7 @@ export default function ProfilePage() {
   if (!isAuthenticated || !displayUser) {
     return (
       <main className="min-h-screen p-6">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <div className="rounded-lg border border-warning/20 bg-warning/5 p-6 text-center">
             <p className="font-medium text-fg">Inicia sesion para ver tu perfil</p>
           </div>
@@ -44,87 +67,154 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen p-6">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-6xl">
         <h1 className="mb-8 text-h1 font-bold text-fg">Mi Perfil</h1>
 
-        <section className="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
-          {isEditing ? (
-            <ProfileEditForm
-              user={displayUser}
-              onSave={handleSave}
-              onCancel={() => setIsEditing(false)}
-            />
-          ) : (
-            <div className="flex items-start gap-6">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {displayUser.profile_picture ? (
-                  <img
-                    src={displayUser.profile_picture}
-                    alt={displayUser.first_name}
-                    className="h-20 w-20 rounded-full object-cover"
-                  />
-                ) : (
-                  displayUser.first_name?.charAt(0).toUpperCase()
-                )}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-h3 font-semibold text-fg">
-                      {displayUser.full_name ||
-                        `${displayUser.first_name} ${displayUser.last_name}`.trim()}
-                    </h2>
-                    <p className="mt-1 text-sm text-muted-fg">{displayUser.email}</p>
-                    {displayUser.phone && (
-                      <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch">
+          <div className="space-y-6">
+            <section className="rounded-lg border border-border bg-card p-7 shadow-sm lg:flex lg:min-h-44 lg:items-center">
+              {isEditing ? (
+                <ProfileEditForm
+                  user={displayUser}
+                  onSave={handleSave}
+                  onCancel={() => setIsEditing(false)}
+                />
+              ) : (
+                <div className="flex w-full items-center gap-6">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                    {displayUser.profile_picture ? (
+                      <img
+                        src={displayUser.profile_picture}
+                        alt={displayUser.first_name}
+                        className="h-20 w-20 rounded-full object-cover"
+                      />
+                    ) : (
+                      displayUser.first_name?.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
-                  >
-                    <Pencil className="h-4 w-4" /> Editar perfil
-                  </button>
+                  <div className="w-full flex-1">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <h2 className="text-h3 font-semibold text-fg">
+                          {displayUser.full_name ||
+                            `${displayUser.first_name} ${displayUser.last_name}`.trim()}
+                        </h2>
+                        <p className="mt-1 text-sm text-muted-fg">{displayUser.email}</p>
+                        {displayUser.phone && (
+                          <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                      >
+                        <Pencil className="h-4 w-4" /> Editar perfil
+                      </button>
+                    </div>
+                    <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
+              )}
+            </section>
 
-        <section className="mb-6 rounded-lg border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-h3 font-semibold text-fg">Mis Articulos</h2>
-              <p className="mt-1 text-sm text-muted-fg">
-                Administra los productos que has publicado
-              </p>
-            </div>
-            <Link
-              href="/products/my"
-              className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
-            >
-              Ver mis articulos
-            </Link>
+            <section className="rounded-lg border bg-card p-7 shadow-sm lg:flex lg:min-h-36 lg:items-center">
+              <div className="flex w-full items-center justify-between">
+                <div>
+                  <h2 className="text-h3 font-semibold text-fg">Mis Articulos</h2>
+                  <p className="mt-1 text-sm text-muted-fg">
+                    Administra los productos que has publicado
+                  </p>
+                </div>
+                <Link
+                  href="/products/my"
+                  className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-fg transition-colors hover:bg-primary-hover"
+                >
+                  Ver mis articulos
+                </Link>
+              </div>
+            </section>
+          </div>
+
+          <div className="h-full animate-in fade-in-0 slide-in-from-right-6 duration-500">
+            <FeaturedGamificationCard />
           </div>
         </section>
 
-        <section className="space-y-6">
-          <div>
-            <h2 className="mb-4 text-h3 font-semibold text-fg">Gamificacion</h2>
+        <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch">
+          <div className="h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
             <PointsBalance />
           </div>
+
+          <div className="h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+            <EcoImpactCard />
+          </div>
         </section>
 
-        <section>
-          <div className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">Logros y Medallas</h2>
-            <BadgesList />
+        <section className="mt-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+          <ChallengesBoard />
+        </section>
+
+        <section className="mt-6 rounded-lg border border-border bg-card p-6 shadow-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+          <h2 className="mb-4 border-b pb-2 text-h3 font-semibold text-fg">Logros y Medallas</h2>
+          <BadgesList />
+        </section>
+
+        <section className="mt-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+          <div className="rounded-lg border border-error/20 bg-error/5 p-6">
+            <h2 className="mb-1 text-h3 font-semibold text-fg">Zona de peligro</h2>
+            <p className="mb-4 text-sm text-muted-fg">
+              Al desactivar tu cuenta dejarás de aparecer en la plataforma. Podrás reactivarla en
+              cualquier momento solicitando un correo de reactivación.
+            </p>
+            <button
+              onClick={() => {
+                setDeactivateError('');
+                setShowDeactivateModal(true);
+              }}
+              className="rounded-lg border border-error/40 px-4 py-2 text-sm font-medium text-error transition-colors hover:bg-error/10"
+            >
+              Desactivar mi cuenta
+            </button>
           </div>
         </section>
       </div>
+
+      {showDeactivateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+            <h3 className="mb-2 text-h3 font-bold text-fg">¿Desactivar tu cuenta?</h3>
+            <p className="mb-4 text-sm text-muted-fg">
+              Tu cuenta quedará desactivada y cerraremos tu sesión. Para reactivarla, podrás
+              solicitar un correo con enlace de reactivación cuando quieras.
+            </p>
+
+            {deactivateError && (
+              <p className="mb-3 rounded-lg border border-error/20 bg-error/5 px-3 py-2 text-sm text-error">
+                {deactivateError}
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeactivateConfirm}
+                disabled={isDeactivating}
+                className="flex-1 rounded-lg bg-error px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-error/80 disabled:opacity-50"
+              >
+                {isDeactivating ? 'Desactivando...' : 'Sí, desactivar'}
+              </button>
+              <button
+                onClick={() => setShowDeactivateModal(false)}
+                disabled={isDeactivating}
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
