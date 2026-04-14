@@ -59,14 +59,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-# Ignore Django migrations
-**/migrations/
-!**/migrations/__init__.py
-**/migrations/core/
-**/migrations/marketplace/
-**/migrations/gamification/
-!backend/social/migrations/
-!backend/social/migrations/*.py
+# Django migrations — los archivos .py SÍ se versionan, solo ignorar caché
+**/migrations/__pycache__/
 
 # Flask stuff:
 instance/
@@ -218,8 +212,3 @@ node_modules/
 .next/
 out/
 
-# Django migrations in backend (do not commit generated migration files)
-backend/**/migrations/*.py
-!backend/social/migrations/
-!backend/social/migrations/*.py
-!backend/**/migrations/__init__.py
