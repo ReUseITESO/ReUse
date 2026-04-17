@@ -42,7 +42,7 @@ export default function SignInPage() {
     setIsSendingVerification(true);
     try {
       await resendVerificationEmail(unverifiedEmail);
-      router.push('/auth/check-email');
+      router.push(`/auth/check-email?resend=true&email=${encodeURIComponent(unverifiedEmail)}`);
     } catch {
       setError('No se pudo reenviar el correo de verificación. Intenta de nuevo.');
       setUnverifiedEmail(null);
