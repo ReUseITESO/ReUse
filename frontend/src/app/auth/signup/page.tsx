@@ -182,8 +182,8 @@ export default function SignUpPage() {
           <div className="mb-4 rounded-lg border border-info/30 bg-info/5 px-5 py-4">
             <p className="font-semibold text-fg mb-1">Este correo ya está registrado</p>
             <p className="text-sm text-muted-fg mb-3">
-              Si nunca te llegó el correo de verificación, puedes solicitarlo de nuevo desde inicio
-              de sesión.
+              Si nunca te llegó el correo de verificación, inicia sesión con tu correo y contraseña
+              y te aparecerá la opción para reenviarlo.
             </p>
             <Link
               href="/auth/signin"
