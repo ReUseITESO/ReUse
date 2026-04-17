@@ -8,7 +8,6 @@ import Badge from '@/components/ui/Badge';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useDeleteProduct } from '@/hooks/useDeleteProduct';
-import { useChangeProductStatus } from '@/hooks/useChangeProductStatus';
 import {
   getCategoryStyle,
   getConditionLabel,
@@ -18,42 +17,18 @@ import {
 
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
-import type { Product, ProductStatus } from '@/types/product';
+import type { Product } from '@/types/product';
 
 interface MyProductCardProps {
   product: Product;
   onProductChanged: () => void;
 }
 
-const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
-  disponible: [
-    { label: 'Pausar', value: 'pausado' },
-    { label: 'Marcar en proceso', value: 'en_proceso' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  pausado: [
-    { label: 'Reactivar', value: 'disponible' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  en_proceso: [
-    { label: 'Marcar disponible', value: 'disponible' },
-    { label: 'Marcar completado', value: 'completado' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  completado: [],
-  cancelado: [],
-};
-
 export default function MyProductCard({ product, onProductChanged }: MyProductCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isPauseOpen, setIsPauseOpen] = useState(false);
-  const [statusFeedback, setStatusFeedback] = useState<string | null>(null);
-  const [statusFeedbackKind, setStatusFeedbackKind] = useState<'success' | 'error'>('success');
   const { deleteProduct, isLoading: isDeleting } = useDeleteProduct();
-  const { changeStatus, isLoading: isChangingStatus } = useChangeProductStatus();
 
   const isDisponible = product.status === 'disponible';
-  const transitions = STATUS_TRANSITIONS[product.status];
   const categoryClass = getCategoryStyle(product.category.name);
   const priceColorClass = getPriceColor(product.transaction_type);
 
@@ -69,32 +44,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
       setIsDeleteOpen(false);
       onProductChanged();
     }
-  }
-
-  async function handleStatusChange(newStatus: ProductStatus) {
-    const result = await changeStatus(product.id, newStatus);
-    if (result.product) {
-      const message =
-        newStatus === 'pausado'
-          ? 'Publicacion pausada exitosamente.'
-          : newStatus === 'disponible' && product.status === 'pausado'
-            ? 'Publicacion reactivada exitosamente.'
-            : 'Estado actualizado exitosamente.';
-      setStatusFeedbackKind('success');
-      setStatusFeedback(message);
-      onProductChanged();
-      return;
-    }
-
-    if (result.error) {
-      setStatusFeedbackKind('error');
-      setStatusFeedback(result.error);
-    }
-  }
-
-  async function confirmPause() {
-    setIsPauseOpen(false);
-    await handleStatusChange('pausado');
   }
 
   return (
@@ -133,46 +82,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           </div>
 
           <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
-            {transitions.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {transitions.map(t => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    disabled={
-                      isChangingStatus ||
-                      (t.value === 'pausado' && Boolean(product.has_active_transaction))
-                    }
-                    title={
-                      t.value === 'pausado' && product.has_active_transaction
-                        ? 'No puedes pausar este articulo porque tiene una transaccion activa.'
-                        : undefined
-                    }
-                    onClick={() => {
-                      if (t.value === 'pausado') {
-                        setIsPauseOpen(true);
-                        return;
-                      }
-                      handleStatusChange(t.value);
-                    }}
-                    className="rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {statusFeedback && (
-              <p
-                className={`text-xs ${
-                  statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
-                }`}
-              >
-                {statusFeedback}
-              </p>
-            )}
-
             <div className="flex items-center gap-2">
               {isDisponible && (
                 <Link
@@ -210,17 +119,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
         isLoading={isDeleting}
         onConfirm={handleDelete}
         onCancel={() => setIsDeleteOpen(false)}
-      />
-
-      <ConfirmDialog
-        isOpen={isPauseOpen}
-        title="Pausar publicacion"
-        message="¿Estas seguro de que quieres pausar esta publicacion? No sera visible en el marketplace."
-        confirmLabel="Pausar"
-        variant="primary"
-        isLoading={isChangingStatus}
-        onConfirm={confirmPause}
-        onCancel={() => setIsPauseOpen(false)}
       />
     </>
   );

@@ -82,7 +82,12 @@ export async function getProductById(id: string | number, options: GetProductByI
 interface ListTransactionsParams {
   role?: 'buyer' | 'seller';
   // status can be a single value or an array to request multiple statuses
-  status?: 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | Array<'pendiente' | 'confirmada' | 'completada' | 'cancelada'>;
+  status?:
+    | 'pendiente'
+    | 'confirmada'
+    | 'completada'
+    | 'cancelada'
+    | Array<'pendiente' | 'confirmada' | 'completada' | 'cancelada'>;
   page?: number;
 }
 

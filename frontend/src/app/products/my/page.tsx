@@ -28,7 +28,7 @@ export default function MyProductsPage() {
               <h1 className="text-h1 font-bold text-fg">Mis artículos</h1>
             </div>
             <p className="text-sm text-muted-fg">
-              Gestiona disponibilidad, edición y estado de tus publicaciones.
+              Consulta el estado de tus publicaciones y edita las disponibles.
             </p>
           </div>
 
