@@ -152,6 +152,18 @@ export async function deactivateAccount(): Promise<void> {
   clearTokens();
 }
 
+export async function resendVerificationEmail(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/email-verification/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Error al reenviar el correo de verificación.');
+  }
+}
+
 export async function requestReactivationEmail(email: string): Promise<void> {
   const response = await fetch(`${API_BASE}/auth/account/reactivate/send/`, {
     method: 'POST',
