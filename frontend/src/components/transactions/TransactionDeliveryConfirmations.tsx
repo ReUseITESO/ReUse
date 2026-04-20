@@ -3,11 +3,15 @@ import { CheckCircle2, CircleDotDashed } from 'lucide-react';
 interface TransactionDeliveryConfirmationsProps {
   sellerConfirmation: boolean;
   buyerConfirmation: boolean;
+  sellerName: string;
+  buyerName: string;
 }
 
 export default function TransactionDeliveryConfirmations({
   sellerConfirmation,
   buyerConfirmation,
+  sellerName,
+  buyerName,
 }: TransactionDeliveryConfirmationsProps) {
   const sellerStatusClass = sellerConfirmation ? 'text-success' : 'text-error';
   const buyerStatusClass = buyerConfirmation ? 'text-success' : 'text-error';
@@ -22,7 +26,7 @@ export default function TransactionDeliveryConfirmations({
           ) : (
             <CircleDotDashed className="h-4 w-4 text-error" />
           )}
-          <span className="text-muted-fg">Vendedor:</span>
+          <span className="text-muted-fg">{sellerName}:</span>
           <span className={`font-medium ${sellerStatusClass}`}>
             {sellerConfirmation ? 'Confirmado' : 'Pendiente'}
           </span>
@@ -33,7 +37,7 @@ export default function TransactionDeliveryConfirmations({
           ) : (
             <CircleDotDashed className="h-4 w-4 text-error" />
           )}
-          <span className="text-muted-fg">Comprador:</span>
+          <span className="text-muted-fg">{buyerName}:</span>
           <span className={`font-medium ${buyerStatusClass}`}>
             {buyerConfirmation ? 'Confirmado' : 'Pendiente'}
           </span>

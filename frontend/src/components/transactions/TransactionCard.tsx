@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { CalendarClock, MapPin, RefreshCcw, User, UserRoundCheck } from 'lucide-react';
+import { CalendarClock, MapPin, User, UserRoundCheck } from 'lucide-react';
 
+import SwapProductsSnapshot from '@/components/transactions/swap/SwapProductsSnapshot';
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
 import {
@@ -48,7 +49,12 @@ export default function TransactionCard({
     <Card className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-h3 font-semibold text-fg">{transaction.product.title}</h3>
+          <Link
+            href={`/products/${transaction.product.id}`}
+            className="text-h3 font-semibold text-fg hover:text-primary"
+          >
+            {transaction.product.title}
+          </Link>
           <p className="text-sm text-muted-fg">
             {transaction.transaction_type === 'sale'
               ? formatPrice(transaction.product.price)
@@ -66,11 +72,11 @@ export default function TransactionCard({
       <div className="grid gap-2 text-sm text-muted-fg sm:grid-cols-2">
         <p className="flex items-center gap-2">
           <User className="h-4 w-4 text-secondary" />
-          Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
+          {transaction.buyer.first_name} {transaction.buyer.last_name}
         </p>
         <p className="flex items-center gap-2">
           <UserRoundCheck className="h-4 w-4 text-accent" />
-          Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
+          {transaction.seller.first_name} {transaction.seller.last_name}
         </p>
         <p className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-info" />
@@ -87,10 +93,7 @@ export default function TransactionCard({
       </div>
 
       {transaction.transaction_type === 'swap' && (
-        <p className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-fg">
-          <RefreshCcw className="mr-2 inline h-3 w-3" />
-          TODO: flujo completo de intercambio pendiente (issue #34).
-        </p>
+        <SwapProductsSnapshot transaction={transaction} />
       )}
 
       <div className="flex flex-wrap items-center gap-2">
@@ -100,7 +103,7 @@ export default function TransactionCard({
             disabled={isUpdatingStatus}
             onClick={() => onStatusChange(transaction.id, 'confirmada')}
           >
-            Aceptar solicitud
+            Confirmar solicitud
           </Button>
         )}
         {canConfirmDelivery && (

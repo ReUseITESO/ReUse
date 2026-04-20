@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertCircle, ClipboardCheck, Mail, RefreshCcw, UserRound } from 'lucide-react';
+import { AlertCircle, ClipboardCheck, Mail, UserRound } from 'lucide-react';
 
 import MeetingLocationFields from '@/components/transactions/MeetingLocationFields';
 import Button from '@/components/ui/Button';
@@ -19,7 +19,7 @@ export default function CreateTransactionDialog({
   productTitle,
   sellerName,
   sellerEmail,
-  transactionType,
+  transactionType: _transactionType, // eslint-disable-line @typescript-eslint/no-unused-vars
   isLoading,
   error,
   onCancel,
@@ -45,14 +45,22 @@ export default function CreateTransactionDialog({
     setRoomNumber('');
   }, [buildingCode]);
 
-  if (!isOpen) return null;
-
-  async function handleSubmit() {
-    if (transactionType === 'swap') {
-      setValidationError('Intercambio pendiente de implementación completa en la issue #34.');
+  useEffect(() => {
+    if (!isOpen) {
       return;
     }
 
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  async function handleSubmit() {
     if (!buildingCode || !roomNumber || !meetingDateTime) {
       setValidationError('Completa edificio, salon y fecha/hora para continuar.');
       return;
@@ -99,7 +107,7 @@ export default function CreateTransactionDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 !m-0 bg-black/50 p-3 sm:p-4">
       <div className="mx-auto flex h-full w-full max-w-2xl items-end sm:items-center">
         <div
           role="dialog"
@@ -144,18 +152,6 @@ export default function CreateTransactionDialog({
               />
             </div>
 
-            {transactionType === 'swap' && (
-              <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-fg">
-                <p className="font-medium">Flujo de intercambio parcial</p>
-                <p className="mt-1">
-                  La selección del artículo a intercambiar se implementará en la issue #34.
-                </p>
-                <Button variant="secondary" className="mt-2" disabled>
-                  <RefreshCcw className="mr-2 inline h-4 w-4" /> TODO issue #34
-                </Button>
-              </div>
-            )}
-
             {(validationError || error) && (
               <p className="mt-3 inline-flex items-center gap-2 text-sm text-error">
                 <AlertCircle className="h-4 w-4" />
@@ -167,11 +163,21 @@ export default function CreateTransactionDialog({
               Notificación pendiente: integración con CORE.
             </p>
 
-            <div className="mt-6 flex items-center justify-end gap-3">
-              <Button variant="danger-outline" onClick={onCancel} disabled={isLoading}>
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
+              <Button
+                variant="danger-outline"
+                onClick={onCancel}
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
                 Cancelar
               </Button>
-              <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
                 {isLoading ? 'Enviando...' : 'Enviar solicitud'}
               </Button>
             </div>

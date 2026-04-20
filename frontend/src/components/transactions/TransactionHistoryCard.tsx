@@ -64,11 +64,11 @@ export default function TransactionHistoryCard({ transaction }: { transaction: T
       <div className="grid gap-2 text-sm text-muted-fg sm:grid-cols-2">
         <p className="flex items-center gap-2">
           <User className="h-4 w-4 text-secondary" />
-          Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
+          {transaction.buyer.first_name} {transaction.buyer.last_name}
         </p>
         <p className="flex items-center gap-2">
           <UserRoundCheck className="h-4 w-4 text-accent" />
-          Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
+          {transaction.seller.first_name} {transaction.seller.last_name}
         </p>
         {transaction.delivery_location && (
           <p className="flex items-center gap-2">

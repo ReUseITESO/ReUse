@@ -22,10 +22,13 @@ export default function ProductBasicDetails({
   price,
   showTransactionBadge = false,
   actions,
+  disableShowMore = false,
 }: ProductBasicDetailsProps) {
   const [showMore, setShowMore] = useState(false);
   const TRUNCATE_LIMIT = 220;
-  const isTruncatable = !!description && description.length > TRUNCATE_LIMIT;
+  const shouldUseInternalTruncation = !disableShowMore;
+  const isTruncatable =
+    shouldUseInternalTruncation && !!description && description.length > TRUNCATE_LIMIT;
   const displayedDescription =
     isTruncatable && !showMore
       ? `${description.slice(0, TRUNCATE_LIMIT).trimEnd()}...`
@@ -68,8 +71,9 @@ export default function ProductBasicDetails({
       <div>
         <p className="text-sm text-muted-fg">{displayedDescription}</p>
 
-        {isTruncatable && (
+        {isTruncatable && !disableShowMore && (
           <button
+            type="button"
             onClick={() => setShowMore(s => !s)}
             className="mx-auto mt-3 flex w-full items-center justify-center gap-3 text-sm text-primary"
             aria-expanded={showMore}

@@ -34,6 +34,9 @@ export function shouldAllowStatusChange(
   }
 
   if (targetStatus === 'confirmada') {
+    if (transaction.transaction_type === 'swap' && transaction.swap_stage) {
+      return false;
+    }
     return transaction.status === 'pendiente' && actorRole === 'seller';
   }
 
@@ -62,21 +65,22 @@ export function hasActorConfirmed(transaction: Transaction, actorRole: Transacti
 
 export function getDeliveryConfirmationLabel(actorRole: TransactionRole): string {
   if (actorRole === 'seller') {
-    return 'Confirmar entrega';
+    return 'Confirmar producto entregado';
   }
 
-  return 'Confirmar que lo recibi';
+  return 'Confirmar producto recibido';
 }
 
-export function getPendingCounterpartLabel(
-  transaction: Transaction,
-): 'vendedor' | 'comprador' | null {
+export function getPendingCounterpartLabel(transaction: Transaction): string | null {
+  const sellerName = `${transaction.seller.first_name} ${transaction.seller.last_name}`.trim();
+  const buyerName = `${transaction.buyer.first_name} ${transaction.buyer.last_name}`.trim();
+
   if (transaction.seller_confirmation && !transaction.buyer_confirmation) {
-    return 'comprador';
+    return buyerName;
   }
 
   if (!transaction.seller_confirmation && transaction.buyer_confirmation) {
-    return 'vendedor';
+    return sellerName;
   }
 
   return null;

@@ -31,7 +31,7 @@ export default function TransactionStatusActions({
           disabled={isUpdating}
           onClick={() => onChangeStatus('confirmada')}
         >
-          Aceptar solicitud
+          Confirmar solicitud
         </Button>
       )}
 

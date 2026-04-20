@@ -6,6 +6,14 @@ interface TransactionLocationHighlightProps {
   showPrefix?: boolean;
 }
 
+function normalizeFallbackLocation(location: string): string {
+  const [firstChunk, secondChunk] = location.split(',').map(part => part.trim());
+  if (secondChunk && /l[ií]mite/i.test(secondChunk)) {
+    return firstChunk;
+  }
+  return location;
+}
+
 function extractLocationParts(location: string) {
   const buildingMatch = location.match(/Edificio\s+([A-Za-z0-9]+)/i);
   const roomMatch = location.match(/Sal[oó]n\s+([A-Za-z0-9-]+)/i);
@@ -33,9 +41,10 @@ export default function TransactionLocationHighlight({
       : null;
 
   const meetingLabel = meetingFromDeliveryDate ?? meeting;
+  const fallbackLocation = normalizeFallbackLocation(location);
 
   if (!buildingCode && !roomNumber && !gateNumber) {
-    return <span>{showPrefix ? `Entrega: ${location}` : location}</span>;
+    return <span>{showPrefix ? `Entrega: ${fallbackLocation}` : fallbackLocation}</span>;
   }
 
   return (
