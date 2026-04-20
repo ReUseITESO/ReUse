@@ -1,5 +1,4 @@
-from django.db import IntegrityError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import CharField, Count, OuterRef, Q, Subquery, Value
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
@@ -8,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from marketplace.models import ProductReaction, Products
+from marketplace.models import ProductReaction, Products, Transaction
 from marketplace.permissions import CanPublishToCommunity, IsCommunityMember
 from marketplace.serializers import (
     ProductCreateSerializer,
@@ -29,6 +28,7 @@ from marketplace.services import (
     update_product,
     upsert_product_reaction,
 )
+from marketplace.services.transaction_swap_meta import extract_proposed_product_id
 
 
 @extend_schema_view(
@@ -173,6 +173,37 @@ class ProductViewSet(
             return ProductStatusSerializer
         return ProductListSerializer
 
+    def _get_swap_proposed_product_ids_for_user(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return set()
+
+        swap_transactions = (
+            Transaction.objects.filter(transaction_type="swap")
+            .filter(Q(seller=user) | Q(buyer=user))
+            .only("delivery_location")
+        )
+
+        proposed_ids = set()
+        for tx in swap_transactions:
+            proposed_id = extract_proposed_product_id(tx.delivery_location)
+            if proposed_id:
+                proposed_ids.add(proposed_id)
+
+        return proposed_ids
+
+    def _build_private_retrieve_filter(self):
+        user = self.request.user
+        private_filter = (
+            Q(seller=user) | Q(transaction__seller=user) | Q(transaction__buyer=user)
+        )
+
+        proposed_ids = self._get_swap_proposed_product_ids_for_user()
+        if proposed_ids:
+            private_filter |= Q(pk__in=proposed_ids)
+
+        return private_filter
+
     def get_queryset(self):
         queryset = Products.objects.select_related(
             "category", "seller", "transaction", "community"
@@ -227,9 +258,17 @@ class ProductViewSet(
                     return Products.objects.none()
             else:
                 # Default: show only public items (no community constraint) with active sellers
-                queryset = queryset.filter(
-                    community__isnull=True, status="disponible", seller__is_active=True
+                public_filter = Q(
+                    community__isnull=True,
+                    status="disponible",
+                    seller__is_active=True,
                 )
+                if self.action == "retrieve" and self.request.user.is_authenticated:
+                    queryset = queryset.filter(
+                        public_filter | self._build_private_retrieve_filter()
+                    )
+                else:
+                    queryset = queryset.filter(public_filter)
 
         category_id = self.request.query_params.get("category")
         if category_id:
@@ -238,6 +277,11 @@ class ProductViewSet(
         condition = self.request.query_params.get("condition")
         if condition:
             queryset = queryset.filter(condition=condition)
+
+        status_param = self.request.query_params.get("status")
+        valid_statuses = {choice for choice, _ in Products.STATUS_CHOICES}
+        if status_param and status_param in valid_statuses:
+            queryset = queryset.filter(status=status_param)
 
         transaction_type = self.request.query_params.get("transaction_type")
         if transaction_type:

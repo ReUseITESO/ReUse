@@ -18,10 +18,22 @@ from marketplace.serializers.transaction_review import (
     TransactionReviewCreateSerializer,
     TransactionReviewSerializer,
 )
+from marketplace.serializers.transaction_swap import (
+    SwapAgendaDecisionSerializer,
+    SwapAgendaProposalSerializer,
+    SwapProposalDecisionSerializer,
+    SwapProposalSerializer,
+)
 from marketplace.services.transaction_service import (
     create_transaction_request,
     list_transactions_for_user,
     update_transaction_status,
+)
+from marketplace.services.transaction_swap_flow import (
+    decide_swap_agenda,
+    decide_swap_proposal,
+    propose_swap_agenda,
+    set_swap_proposal,
 )
 
 
@@ -69,14 +81,24 @@ class TransactionViewSet(
 
     def get_queryset(self):
         role = self.request.query_params.get("role")
-        status_filter = self.request.query_params.get("status")
+        status_filters = self.request.query_params.getlist("status")
 
         if role and role not in ["buyer", "seller"]:
             return Transaction.objects.none()
 
         valid_statuses = [choice for choice, _ in Transaction.STATUS_CHOICES]
-        if status_filter and status_filter not in valid_statuses:
-            return Transaction.objects.none()
+        if status_filters:
+            invalid_statuses = [
+                value for value in status_filters if value not in valid_statuses
+            ]
+            if invalid_statuses:
+                return Transaction.objects.none()
+
+        status_filter = None
+        if len(status_filters) == 1:
+            status_filter = status_filters[0]
+        elif len(status_filters) > 1:
+            status_filter = status_filters
 
         return list_transactions_for_user(
             user=self.request.user,
@@ -89,6 +111,14 @@ class TransactionViewSet(
             return TransactionCreateSerializer
         if self.action == "change_status":
             return TransactionStatusSerializer
+        if self.action == "swap_proposal":
+            return SwapProposalSerializer
+        if self.action == "swap_proposal_decision":
+            return SwapProposalDecisionSerializer
+        if self.action == "swap_agenda":
+            return SwapAgendaProposalSerializer
+        if self.action == "swap_agenda_decision":
+            return SwapAgendaDecisionSerializer
         return TransactionSerializer
 
     def create(self, request, *args, **kwargs):
@@ -98,8 +128,9 @@ class TransactionViewSet(
         transaction = create_transaction_request(
             product_id=serializer.validated_data["product_id"],
             buyer=request.user,
-            delivery_location=serializer.validated_data["delivery_location"],
-            delivery_date=serializer.validated_data["delivery_date"],
+            delivery_location=serializer.validated_data.get("delivery_location"),
+            delivery_date=serializer.validated_data.get("delivery_date"),
+            proposed_product_id=serializer.validated_data.get("proposed_product_id"),
         )
 
         response_serializer = TransactionSerializer(
@@ -138,6 +169,83 @@ class TransactionViewSet(
             context=self.get_serializer_context(),
         )
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["patch"], url_path="swap/proposal")
+    def swap_proposal(self, request, pk=None):
+        transaction = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        updated_transaction = set_swap_proposal(
+            transaction_id=transaction.pk,
+            actor=request.user,
+            proposed_product_id=serializer.validated_data["proposed_product_id"],
+        )
+        return Response(
+            TransactionSerializer(
+                updated_transaction,
+                context=self.get_serializer_context(),
+            ).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["patch"], url_path="swap/proposal-decision")
+    def swap_proposal_decision(self, request, pk=None):
+        transaction = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        updated_transaction = decide_swap_proposal(
+            transaction_id=transaction.pk,
+            actor=request.user,
+            accepted=serializer.validated_data["accepted"],
+        )
+        return Response(
+            TransactionSerializer(
+                updated_transaction,
+                context=self.get_serializer_context(),
+            ).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["patch"], url_path="swap/agenda")
+    def swap_agenda(self, request, pk=None):
+        transaction = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        updated_transaction = propose_swap_agenda(
+            transaction_id=transaction.pk,
+            actor=request.user,
+            delivery_location=serializer.validated_data["delivery_location"],
+            delivery_date=serializer.validated_data["delivery_date"],
+        )
+        return Response(
+            TransactionSerializer(
+                updated_transaction,
+                context=self.get_serializer_context(),
+            ).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["patch"], url_path="swap/agenda-decision")
+    def swap_agenda_decision(self, request, pk=None):
+        transaction = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        updated_transaction = decide_swap_agenda(
+            transaction_id=transaction.pk,
+            actor=request.user,
+            accepted=serializer.validated_data["accepted"],
+        )
+        return Response(
+            TransactionSerializer(
+                updated_transaction,
+                context=self.get_serializer_context(),
+            ).data,
+            status=status.HTTP_200_OK,
+        )
 
     @extend_schema(
         summary="Transaction history",
