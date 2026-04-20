@@ -19,6 +19,12 @@ from marketplace.services.transaction_expiration import (
     is_transaction_expired,
     list_transactions_for_user,
 )
+from marketplace.services.transaction_swap_flow import set_swap_proposed_status
+from marketplace.services.transaction_swap_meta import (
+    SWAP_STAGE_PROPOSAL_PENDING,
+    build_swap_meta,
+    extract_swap_stage,
+)
 
 __all__ = [
     "ACTIVE_TRANSACTION_STATUSES",
@@ -76,7 +82,13 @@ def _reuse_cancelled_transaction(
     return transaction
 
 
-def create_transaction_request(product_id, buyer, delivery_location, delivery_date):
+def create_transaction_request(
+    product_id,
+    buyer,
+    delivery_location,
+    delivery_date,
+    proposed_product_id=None,
+):
     with db_transaction.atomic():
         try:
             product = (
@@ -92,6 +104,37 @@ def create_transaction_request(product_id, buyer, delivery_location, delivery_da
 
         if product.status != "disponible":
             raise StateConflictError("Solo se pueden solicitar productos disponibles.")
+
+        proposed_product = None
+        if product.transaction_type == "swap":
+            if proposed_product_id is None:
+                raise StateConflictError(
+                    "Debes seleccionar un artículo propio para intercambio."
+                )
+
+            try:
+                proposed_product = Products.objects.select_for_update().get(
+                    pk=proposed_product_id
+                )
+            except Products.DoesNotExist as err:
+                raise StateConflictError("El artículo propuesto no existe.") from err
+
+            if proposed_product.seller_id != buyer.pk:
+                raise PermissionDenied("Solo puedes proponer artículos propios.")
+
+            if proposed_product.status != "disponible":
+                raise StateConflictError("Solo puedes proponer artículos disponibles.")
+
+            if has_active_transaction(proposed_product):
+                raise StateConflictError(
+                    "El artículo propuesto ya tiene una transacción activa."
+                )
+
+            delivery_location = build_swap_meta(
+                proposed_product_id=proposed_product.pk,
+                stage=SWAP_STAGE_PROPOSAL_PENDING,
+            )
+            delivery_date = None
 
         try:
             existing_transaction = product.transaction
@@ -116,6 +159,8 @@ def create_transaction_request(product_id, buyer, delivery_location, delivery_da
                 delivery_date=delivery_date,
             )
             _set_product_in_progress(product)
+            if proposed_product:
+                _set_product_in_progress(proposed_product)
 
             # TODO: Integrar creación de notificaciones cuando el módulo CORE lo exponga.
             return transaction
@@ -131,6 +176,8 @@ def create_transaction_request(product_id, buyer, delivery_location, delivery_da
         )
 
         _set_product_in_progress(product)
+        if proposed_product:
+            _set_product_in_progress(proposed_product)
 
         # TODO: Integrar creación de notificaciones cuando el módulo CORE lo exponga.
         return transaction
@@ -158,6 +205,13 @@ def update_transaction_status(transaction_id, new_status, actor):
         validate_transition(transaction.status, new_status)
 
         if new_status == "confirmada":
+            if transaction.transaction_type == "swap" and extract_swap_stage(
+                transaction.delivery_location
+            ):
+                raise StateConflictError(
+                    "Para intercambio usa el flujo de propuesta y agenda."
+                )
+
             if actor_role != "seller":
                 raise PermissionDenied("Solo el vendedor puede aceptar la solicitud.")
 
@@ -175,6 +229,9 @@ def update_transaction_status(transaction_id, new_status, actor):
             if product.status != "disponible":
                 product.status = "disponible"
                 product.save(update_fields=["status", "updated_at"])
+
+            if transaction.transaction_type == "swap":
+                set_swap_proposed_status(transaction, "disponible")
 
             # TODO: Integrar notificación de cancelación cuando CORE esté listo.
             return transaction
@@ -205,6 +262,9 @@ def update_transaction_status(transaction_id, new_status, actor):
             if product.status != "completado":
                 product.status = "completado"
                 product.save(update_fields=["status", "updated_at"])
+
+            if transaction.transaction_type == "swap":
+                set_swap_proposed_status(transaction, "completado")
 
             award_completion_points(transaction)
 

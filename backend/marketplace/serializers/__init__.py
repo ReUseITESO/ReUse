@@ -1,5 +1,4 @@
 from .category import CategorySerializer
-from .report import ReportCreateSerializer
 from .comment import CommentCreateSerializer, CommentSerializer
 from .product import (
     ImageSerializer,

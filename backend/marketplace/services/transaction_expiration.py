@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from marketplace.models import Transaction
 from marketplace.services.transaction_common import ACTIVE_TRANSACTION_STATUSES
+from marketplace.services.transaction_swap_flow import set_swap_proposed_status
 
 EXPIRATION_HOURS = 24
 
@@ -32,6 +33,9 @@ def expire_transaction_if_needed(transaction):
     if product.status != "disponible":
         product.status = "disponible"
         product.save(update_fields=["status", "updated_at"])
+
+    if transaction.transaction_type == "swap":
+        set_swap_proposed_status(transaction, "disponible")
 
     return True
 
@@ -63,6 +67,9 @@ def list_transactions_for_user(user, role=None, status_filter=None):
         queryset = queryset.filter(buyer=user)
 
     if status_filter:
-        queryset = queryset.filter(status=status_filter)
+        if isinstance(status_filter, (list, tuple, set)):
+            queryset = queryset.filter(status__in=status_filter)
+        else:
+            queryset = queryset.filter(status=status_filter)
 
     return queryset.order_by("-created_at")

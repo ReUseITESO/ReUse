@@ -12,6 +12,11 @@ from marketplace.services.transaction_service import (
     get_expiration_datetime,
     is_transaction_expired,
 )
+from marketplace.services.transaction_swap_meta import (
+    extract_agenda_location,
+    extract_proposed_product_id,
+    extract_swap_stage,
+)
 
 
 class TransactionUserSerializer(serializers.ModelSerializer):
@@ -46,14 +51,51 @@ class TransactionSerializer(serializers.ModelSerializer):
     product = TransactionProductSerializer(read_only=True)
     seller = TransactionUserSerializer(read_only=True)
     buyer = TransactionUserSerializer(read_only=True)
+    delivery_location = serializers.SerializerMethodField()
     expires_at = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField()
+    swap_stage = serializers.SerializerMethodField()
+    proposed_product = serializers.SerializerMethodField()
+
+    def get_delivery_location(self, obj):
+        if obj.transaction_type != "swap":
+            return obj.delivery_location
+        agenda_location = extract_agenda_location(obj.delivery_location)
+        if agenda_location:
+            return agenda_location
+        if not extract_swap_stage(obj.delivery_location):
+            return obj.delivery_location
+        return "Por definir"
 
     def get_expires_at(self, obj):
         return get_expiration_datetime(obj)
 
     def get_is_expired(self, obj):
         return is_transaction_expired(obj)
+
+    def get_swap_stage(self, obj):
+        if obj.transaction_type != "swap":
+            return None
+        return extract_swap_stage(obj.delivery_location)
+
+    def get_proposed_product(self, obj):
+        if obj.transaction_type != "swap":
+            return None
+
+        proposed_product_id = extract_proposed_product_id(obj.delivery_location)
+        if not proposed_product_id:
+            return None
+
+        proposed_product = (
+            Products.objects.filter(pk=proposed_product_id)
+            .select_related("category")
+            .prefetch_related("images")
+            .first()
+        )
+        if not proposed_product:
+            return None
+
+        return TransactionProductSerializer(proposed_product).data
 
     class Meta:
         model = Transaction
@@ -73,13 +115,25 @@ class TransactionSerializer(serializers.ModelSerializer):
             "created_at",
             "expires_at",
             "is_expired",
+            "swap_stage",
+            "proposed_product",
         ]
 
 
 class TransactionCreateSerializer(serializers.Serializer):
     product_id = serializers.IntegerField(min_value=1)
-    delivery_location = serializers.CharField(max_length=255, trim_whitespace=True)
-    delivery_date = serializers.DateTimeField()
+    delivery_location = serializers.CharField(
+        max_length=255,
+        trim_whitespace=True,
+        required=False,
+        allow_null=True,
+    )
+    delivery_date = serializers.DateTimeField(required=False, allow_null=True)
+    proposed_product_id = serializers.IntegerField(
+        min_value=1,
+        required=False,
+        allow_null=True,
+    )
 
     def validate_product_id(self, value):
         if not Products.objects.filter(pk=value).exists():
@@ -87,6 +141,9 @@ class TransactionCreateSerializer(serializers.Serializer):
         return value
 
     def validate_delivery_location(self, value):
+        if value is None:
+            return value
+
         # Keep only place data in DB (building/room or gate), strip any
         # legacy meeting text that might be sent by older frontend versions.
         location_without_meeting = re.sub(
@@ -102,9 +159,38 @@ class TransactionCreateSerializer(serializers.Serializer):
         return location_without_meeting
 
     def validate_delivery_date(self, value):
+        if value is None:
+            return value
         if value <= timezone.now():
             raise serializers.ValidationError("La fecha de entrega debe ser futura.")
         return value
+
+    def validate(self, attrs):
+        product = (
+            Products.objects.filter(pk=attrs["product_id"])
+            .only("transaction_type")
+            .first()
+        )
+        if not product:
+            return attrs
+
+        if product.transaction_type == "swap":
+            if attrs.get("proposed_product_id") is None:
+                raise serializers.ValidationError(
+                    {"proposed_product_id": "Selecciona un artículo para intercambio."}
+                )
+            return attrs
+
+        if not attrs.get("delivery_location"):
+            raise serializers.ValidationError(
+                {"delivery_location": "La ubicación de entrega es obligatoria."}
+            )
+        if attrs.get("delivery_date") is None:
+            raise serializers.ValidationError(
+                {"delivery_date": "La fecha de entrega es obligatoria."}
+            )
+
+        return attrs
 
 
 class TransactionStatusSerializer(serializers.Serializer):
