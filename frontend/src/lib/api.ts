@@ -5,6 +5,9 @@ import type { PaginatedResponse } from '@/types/api';
 import type { Comment } from '@/types/comment';
 import type {
   CreateTransactionPayload,
+  SwapAgendaPayload,
+  SwapDecisionPayload,
+  SwapProposalPayload,
   Transaction,
   TransactionReview,
   UpdateTransactionStatusPayload,
@@ -128,6 +131,34 @@ export async function updateTransactionStatus(
   payload: UpdateTransactionStatusPayload,
 ) {
   return apiClient<Transaction>(`/marketplace/transactions/${id}/status/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateSwapProposal(id: number | string, payload: SwapProposalPayload) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap/proposal/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function decideSwapProposal(id: number | string, payload: SwapDecisionPayload) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap/proposal-decision/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function proposeSwapAgenda(id: number | string, payload: SwapAgendaPayload) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap/agenda/`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function decideSwapAgenda(id: number | string, payload: SwapDecisionPayload) {
+  return apiClient<Transaction>(`/marketplace/transactions/${id}/swap/agenda-decision/`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });

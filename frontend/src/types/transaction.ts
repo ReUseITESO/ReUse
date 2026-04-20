@@ -4,6 +4,13 @@ export type { TransactionType } from '@/types/product';
 export type TransactionStatus = 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
 export type UpdatableTransactionStatus = 'confirmada' | 'completada' | 'cancelada';
 export type TransactionRole = 'seller' | 'buyer';
+export type SwapStage =
+  | 'proposal_pending'
+  | 'proposal_rejected'
+  | 'proposal_accepted'
+  | 'agenda_pending'
+  | 'agenda_rejected'
+  | 'agenda_accepted';
 
 export interface TransactionUserSummary {
   id: number;
@@ -48,6 +55,8 @@ export interface Transaction {
   created_at: string;
   expires_at: string;
   is_expired: boolean;
+  swap_stage?: SwapStage | null;
+  proposed_product?: TransactionProductSummary | null;
   // Present only from the /history/ endpoint
   can_review?: boolean;
   my_review?: TransactionReview | null;
@@ -55,12 +64,26 @@ export interface Transaction {
 
 export interface CreateTransactionPayload {
   product_id: number;
-  delivery_location: string;
-  delivery_date: string;
+  delivery_location?: string;
+  delivery_date?: string;
+  proposed_product_id?: number;
 }
 
 export interface UpdateTransactionStatusPayload {
   status: UpdatableTransactionStatus;
+}
+
+export interface SwapProposalPayload {
+  proposed_product_id: number;
+}
+
+export interface SwapDecisionPayload {
+  accepted: boolean;
+}
+
+export interface SwapAgendaPayload {
+  delivery_location: string;
+  delivery_date: string;
 }
 
 // CreateTransactionDialog

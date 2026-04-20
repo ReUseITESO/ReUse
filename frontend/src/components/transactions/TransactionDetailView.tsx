@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CalendarClock, MapPin, Package, UserRound } from 'lucide-react';
 
+import SwapAgendaModal from '@/components/transactions/swap/SwapAgendaModal';
+import SwapProductProposalModal from '@/components/transactions/swap/SwapProductProposalModal';
+import SwapStagePanel from '@/components/transactions/swap/SwapStagePanel';
 import TransactionDeliveryConfirmations from '@/components/transactions/TransactionDeliveryConfirmations';
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
 import TransactionProductSection from '@/components/transactions/TransactionProductSection';
@@ -19,6 +23,7 @@ import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransactionDetail } from '@/hooks/useTransactionDetail';
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
+import { useSwapTransactionFlow } from '@/hooks/useSwapTransactionFlow';
 import type { UpdatableTransactionStatus } from '@/types/transaction';
 
 interface TransactionDetailViewProps {
@@ -27,8 +32,18 @@ interface TransactionDetailViewProps {
 
 export default function TransactionDetailView({ transactionId }: TransactionDetailViewProps) {
   const { user } = useAuth();
+  const [isReproposalModalOpen, setIsReproposalModalOpen] = useState(false);
+  const [isAgendaModalOpen, setIsAgendaModalOpen] = useState(false);
   const { transaction, isLoading, error, refetch } = useTransactionDetail(transactionId);
   const { changeStatus, isLoading: isUpdating, error: updateError } = useTransactionStatus();
+  const {
+    isLoading: isUpdatingSwap,
+    error: swapError,
+    decideAgenda,
+    decideProposal,
+    updateAgenda,
+    updateProposal,
+  } = useSwapTransactionFlow();
 
   if (isLoading) {
     return <Spinner />;
@@ -44,7 +59,12 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   }
 
   const actorRole = transaction.seller.id === user?.id ? 'seller' : 'buyer';
-  const canAccept = shouldAllowStatusChange(transaction, actorRole, 'confirmada');
+  const isSwapPendingFlow =
+    transaction.transaction_type === 'swap' &&
+    transaction.status === 'pendiente' &&
+    Boolean(transaction.swap_stage);
+  const canAccept =
+    shouldAllowStatusChange(transaction, actorRole, 'confirmada') && !isSwapPendingFlow;
   const canCancel = shouldAllowStatusChange(transaction, actorRole, 'cancelada');
   const canConfirmDelivery = shouldAllowStatusChange(transaction, actorRole, 'completada');
   const confirmDeliveryLabel = getDeliveryConfirmationLabel(actorRole);
@@ -53,9 +73,41 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   const showWaitingConfirmation =
     transaction.status === 'confirmada' && actorAlreadyConfirmed && pendingCounterpart;
   const transactionIdValue = transaction.id;
+  const sellerName = `${transaction.seller.first_name} ${transaction.seller.last_name}`.trim();
+  const buyerName = `${transaction.buyer.first_name} ${transaction.buyer.last_name}`.trim();
 
   async function handleChangeStatus(status: UpdatableTransactionStatus) {
     const updated = await changeStatus(transactionIdValue, status);
+    if (updated) {
+      refetch();
+    }
+  }
+
+  async function handleReproposal(proposedProductId: number) {
+    const updated = await updateProposal(transactionIdValue, proposedProductId);
+    if (updated) {
+      setIsReproposalModalOpen(false);
+      refetch();
+    }
+  }
+
+  async function handleProposalDecision(accepted: boolean) {
+    const updated = await decideProposal(transactionIdValue, accepted);
+    if (updated) {
+      refetch();
+    }
+  }
+
+  async function handleAgendaProposal(deliveryLocation: string, deliveryDate: Date) {
+    const updated = await updateAgenda(transactionIdValue, deliveryLocation, deliveryDate);
+    if (updated) {
+      setIsAgendaModalOpen(false);
+      refetch();
+    }
+  }
+
+  async function handleAgendaDecision(accepted: boolean) {
+    const updated = await decideAgenda(transactionIdValue, accepted);
     if (updated) {
       refetch();
     }
@@ -94,6 +146,7 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
                 deliveryDate={transaction.delivery_date}
               />
             </p>
+            <p></p>
             <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
               <CalendarClock className="h-4 w-4 text-warning" />
               Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
@@ -104,13 +157,13 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             <div className="rounded-lg border border-border bg-card p-2.5">
               <p className="inline-flex items-center gap-2 text-muted-fg">
                 <UserRound className="h-4 w-4 text-accent" />
-                Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
+                Vendedor: {sellerName}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-card p-2.5">
               <p className="inline-flex items-center gap-2 text-muted-fg">
                 <UserRound className="h-4 w-4 text-secondary" />
-                Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
+                Comprador: {buyerName}
               </p>
             </div>
           </div>
@@ -119,6 +172,8 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
         <TransactionDeliveryConfirmations
           sellerConfirmation={transaction.seller_confirmation}
           buyerConfirmation={transaction.buyer_confirmation}
+          sellerName={sellerName}
+          buyerName={buyerName}
         />
 
         <TransactionStatusActions
@@ -132,12 +187,56 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           onChangeStatus={handleChangeStatus}
         />
 
-        <TransactionProductSection product={transaction.product} />
+        {isSwapPendingFlow && (
+          <SwapStagePanel
+            transaction={transaction}
+            actorRole={actorRole}
+            isUpdating={isUpdatingSwap}
+            onRepropose={() => setIsReproposalModalOpen(true)}
+            onOpenAgenda={() => setIsAgendaModalOpen(true)}
+            onDecideProposal={handleProposalDecision}
+            onDecideAgenda={handleAgendaDecision}
+          />
+        )}
+
+        <TransactionProductSection
+          product={transaction.product}
+          title={
+            transaction.transaction_type === 'swap'
+              ? `Producto publicado por ${sellerName}`
+              : 'Producto de la transacción'
+          }
+        />
+
+        {transaction.transaction_type === 'swap' && transaction.proposed_product && (
+          <TransactionProductSection
+            product={transaction.proposed_product}
+            title={`Producto propuesto por ${buyerName}`}
+          />
+        )}
 
         <p className="text-xs text-muted-fg">Notificación pendiente: integración con CORE.</p>
 
-        {updateError && <p className="text-sm text-error">{updateError}</p>}
+        {(updateError || swapError) && (
+          <p className="text-sm text-error">{updateError || swapError}</p>
+        )}
       </div>
+
+      <SwapProductProposalModal
+        isOpen={isReproposalModalOpen}
+        isSubmitting={isUpdatingSwap}
+        submitError={swapError}
+        onClose={() => setIsReproposalModalOpen(false)}
+        onSubmit={handleReproposal}
+      />
+
+      <SwapAgendaModal
+        isOpen={isAgendaModalOpen}
+        isLoading={isUpdatingSwap}
+        error={swapError}
+        onCancel={() => setIsAgendaModalOpen(false)}
+        onSubmit={handleAgendaProposal}
+      />
     </section>
   );
 }

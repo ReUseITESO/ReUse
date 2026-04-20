@@ -8,6 +8,7 @@ import CommentsSection from '@/components/products/comments/CommentsSection';
 import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import ReportProductDialog from '@/components/products/ReportProductDialog';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
+import SwapProductProposalModal from '@/components/transactions/swap/SwapProductProposalModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateTransaction } from '@/hooks/useCreateTransaction';
 import { useProductDetail } from '@/hooks/useProductDetail';
@@ -29,6 +30,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   } = useCreateTransaction();
   const { product, setProduct, isLoading, error } = useProductDetail(productId);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
+  const [isSwapProposalModalOpen, setIsSwapProposalModalOpen] = useState(false);
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [hasReported, setHasReported] = useState(false);
@@ -112,6 +114,33 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     );
   }
 
+  async function handleCreateSwapTransaction(proposedProductId: number) {
+    if (!product) {
+      return;
+    }
+
+    const transaction = await create({
+      product_id: product.id,
+      proposed_product_id: proposedProductId,
+    });
+
+    if (!transaction) {
+      return;
+    }
+
+    setIsSwapProposalModalOpen(false);
+    setTransactionNotice('Propuesta enviada. Espera la decisión del dueño del artículo.');
+    setProduct(previous =>
+      previous
+        ? {
+            ...previous,
+            has_active_transaction: true,
+            status: 'en_proceso',
+          }
+        : previous,
+    );
+  }
+
   async function handleReport(reason: string, description: string) {
     if (!product) return;
     const success = await reportProduct(product.id, {
@@ -131,6 +160,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     }
 
     if (!canCreateTransaction) {
+      return;
+    }
+
+    if (!product) {
+      return;
+    }
+
+    if (product.transaction_type === 'swap') {
+      setIsSwapProposalModalOpen(true);
       return;
     }
 
@@ -198,6 +236,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         error={createTransactionError}
         onCancel={() => setIsTransactionDialogOpen(false)}
         onSubmit={handleCreateTransaction}
+      />
+
+      <SwapProductProposalModal
+        isOpen={isSwapProposalModalOpen}
+        isSubmitting={isCreatingTransaction}
+        submitError={createTransactionError}
+        onClose={() => setIsSwapProposalModalOpen(false)}
+        onSubmit={handleCreateSwapTransaction}
       />
     </>
   );
