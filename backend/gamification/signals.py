@@ -110,5 +110,9 @@ def user_post_save(sender, instance, created, **kwargs):
         evaluate_milestones(instance)
     else:
         update_fields = kwargs.get("update_fields")
-        if not update_fields or "phone" in update_fields or "profile_picture" in update_fields:
+        if (
+            not update_fields
+            or "phone" in update_fields
+            or "profile_picture" in update_fields
+        ):
             evaluate_milestones(instance)
