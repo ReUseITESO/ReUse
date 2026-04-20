@@ -215,6 +215,8 @@ export default function CommunitiesPage() {
             ))}
           </div>
         )}
+        
+      
       </div>
     </main>
   );

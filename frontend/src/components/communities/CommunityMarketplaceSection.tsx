@@ -135,6 +135,7 @@ export default function CommunityMarketplaceSection({
           </div>
         ))}
       </div>
+
     </div>
   );
 }

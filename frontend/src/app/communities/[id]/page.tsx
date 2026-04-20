@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Send, Users, LogOut, Trash2, Crown, UserPlus } from 'lucide-react';
+import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
 import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
+import LeaderBoard from '@/components/gamification/Leaderboard';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -138,6 +139,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 </button>
               )}
             </div>
+            
           </div>
         </div>
 
@@ -216,7 +218,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             )}
           </div>
 
-          {/* Members sidebar */}
+        {/* Members sidebar 
           <div>
             <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
             <div className="space-y-2">
@@ -237,8 +239,13 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 </div>
               ))}
             </div>
-          </div>
+          </div>*/}
+          <LeaderBoard members={members} posts={posts}/>
+
         </div>
+
+        
+          <h2 className="mb-4 text-lg font-semibold text-fg">Leaderboard</h2>
 
         {/* Marketplace Section */}
         <div className="mt-8">
