@@ -43,7 +43,11 @@ function rankLabel(index: number): { icon: ReactNode; className: string } {
     };
   }
   return {
-    icon: <span className="w-5 text-center text-xs font-semibold text-muted-foreground">{index + 1}</span>,
+    icon: (
+      <span className="w-5 text-center text-xs font-semibold text-muted-foreground">
+        {index + 1}
+      </span>
+    ),
     className: 'border-border',
   };
 }
@@ -110,7 +114,9 @@ export default function LeaderBoard({ members, posts }: LeaderBoardProps) {
   if (!isAuthenticated) {
     return (
       <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-center">
-        <p className="text-sm font-medium text-foreground">Inicia sesion para ver tu puntuacion e insignias</p>
+        <p className="text-sm font-medium text-foreground">
+          Inicia sesion para ver tu puntuacion e insignias
+        </p>
       </div>
     );
   }
@@ -121,11 +127,11 @@ export default function LeaderBoard({ members, posts }: LeaderBoardProps) {
 
       {/* Tu resumen: puntos + insignias */}
       <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">Tu resumen</p>
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Tu resumen
+        </p>
 
-        {pointsError && (
-          <p className="mb-2 text-xs text-destructive">{pointsError}</p>
-        )}
+        {pointsError && <p className="mb-2 text-xs text-destructive">{pointsError}</p>}
 
         <div className="mb-4 flex items-center justify-between gap-2">
           <div>
@@ -209,7 +215,9 @@ export default function LeaderBoard({ members, posts }: LeaderBoardProps) {
                       {isYou && <span className="ml-1 text-xs text-primary">(tu)</span>}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{n} pub.</span>
+                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                    {n} pub.
+                  </span>
                 </li>
               );
             })}

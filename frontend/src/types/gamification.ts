@@ -112,13 +112,13 @@ export interface PointsHistoryFilters {
 
 export interface AvatarData {
   image: string | null;
-	border_thickness: number;
-	border_color: string;
-	shadow_color: string;
-	shadow_thickness: number;
+  border_thickness: number;
+  border_color: string;
+  shadow_color: string;
+  shadow_thickness: number;
   zoom_level: number;
   offset_x: number;
   offset_y: number;
   border_type: string | null;
   border_name: string | null;
-};
+}

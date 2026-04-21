@@ -7,6 +7,7 @@ import { apiClient } from '@/lib/api';
 import { getStoredTokens } from '@/lib/auth';
 import type { User } from '@/types/auth';
 import { useAvatar } from '@/hooks/profile/useAvatar';
+import Avatar from '../gamification/profile/Avatar';
 
 interface ProfileFormValues {
   first_name: string;
@@ -24,11 +25,10 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [picturePreview, setPicturePreview] = useState<string | null>(user.profile_picture);
+  const [setPicturePreview] = useState<string | null>(user.profile_picture);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const {avatarData, setAvatarData, updateAvatar} = useAvatar();
-
+  const { avatarData, setAvatarData, updateAvatar } = useAvatar();
 
   const {
     register,
@@ -109,13 +109,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
           className="relative flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary/10"
           onClick={() => fileInputRef.current?.click()}
         >
-          {picturePreview ? (
-            <img src={avatarData.image} alt="Preview" className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-2xl font-bold text-primary">
-              {user.first_name?.charAt(0).toUpperCase()}
-            </span>
-          )}
+          <Avatar />
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
             <Camera className="h-6 w-6 text-white" />
           </div>

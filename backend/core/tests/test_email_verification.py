@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
-from django.contrib.auth import get_user_model
+
 from core.views import send_verification_email
+
 
 class EmailVerificationTests(TestCase):
     def test_send_verification_email_puts_message_in_outbox(self):

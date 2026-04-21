@@ -139,7 +139,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 </button>
               )}
             </div>
-            
           </div>
         </div>
 
@@ -218,7 +217,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             )}
           </div>
 
-        {/* Members sidebar 
+          {/* Members sidebar 
           <div>
             <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
             <div className="space-y-2">
@@ -240,8 +239,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               ))}
             </div>
           </div>*/}
-          <LeaderBoard members={members} posts={posts}/>
-
+          <LeaderBoard members={members} posts={posts} />
         </div>
 
         {/* Marketplace Section */}

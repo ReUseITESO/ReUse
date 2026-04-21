@@ -14,7 +14,6 @@ def _comment_detail_url(product_id, comment_id):
 
 
 class CommentListCreateTests(APITestCase):
-
     def setUp(self):
         self.seller = User.objects.create(
             email="seller@iteso.mx",
@@ -153,7 +152,6 @@ class CommentListCreateTests(APITestCase):
 
 
 class CommentDeleteTests(APITestCase):
-
     def setUp(self):
         self.seller = User.objects.create(
             email="seller2@iteso.mx",

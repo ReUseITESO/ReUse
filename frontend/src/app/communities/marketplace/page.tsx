@@ -67,7 +67,6 @@ export default function CommunitiesMarketplacePage() {
             </div>
           )}
 
-
           {/* Products Grid */}
           {isLoading ? (
             <div className="flex justify-center py-16">
