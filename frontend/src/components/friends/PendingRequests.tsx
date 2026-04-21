@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check, X } from 'lucide-react';
 
 import type { FriendRequest } from '@/types/friends';
+import Image from 'next/image';
 
 interface PendingRequestsProps {
   requests: FriendRequest[];
@@ -42,10 +43,12 @@ export default function PendingRequests({ requests, onAccept, onReject }: Pendin
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
               {req.from_user.profile_picture ? (
-                <img
+                <Image
+                  height={40}
+                  width={40}
                   src={req.from_user.profile_picture}
                   alt={req.from_user.first_name}
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="rounded-full object-cover"
                 />
               ) : (
                 req.from_user.first_name?.[0]?.toUpperCase()

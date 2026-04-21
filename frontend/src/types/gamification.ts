@@ -110,20 +110,6 @@ export interface PointsHistoryFilters {
   ordering?: string;
 }
 
-export type ChallengeType = 'donation' | 'exchange' | 'sale' | 'publish' | 'review';
-
-export interface Challenge {
-  id: number;
-  title: string;
-  description: string;
-  challenge_type: ChallengeType;
-  goal: number;
-  bonus_points: number;
-  start_date: string;
-  end_date: string;
-  joined: boolean;
-}
-
 export interface UserChallenge {
   id: number;
   challenge_id: number;

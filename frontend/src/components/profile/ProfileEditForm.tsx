@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Camera } from 'lucide-react';
 import { apiClient } from '@/lib/api';
@@ -25,7 +25,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [setPicturePreview] = useState<string | null>(user.profile_picture);
+  const [picturePreview, setPicturePreview] = useState<string | null>(user.profile_picture);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { avatarData, setAvatarData, updateAvatar } = useAvatar();
@@ -37,6 +37,15 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
   } = useForm<ProfileFormValues>({
     defaultValues: { first_name: user.first_name, last_name: user.last_name, phone: user.phone },
   });
+
+  useEffect(() => {
+    // Cleanup function to free memory
+    return () => {
+      if (picturePreview) {
+        URL.revokeObjectURL(picturePreview);
+      }
+    };
+  }, [picturePreview]);
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -51,7 +60,8 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
     }
     setPictureFile(file);
     setAvatarData(prev => ({ ...prev, image: URL.createObjectURL(file) })); // Update avatar context for immediate preview
-    setPicturePreview(URL.createObjectURL(file));
+    const objectUrl = URL.createObjectURL(file);
+    setPicturePreview(objectUrl);
     setError(null);
   }
 

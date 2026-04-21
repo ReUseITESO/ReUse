@@ -11,6 +11,7 @@ import { CelebratoryNotification } from '@/components/gamification/CelebratoryNo
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import Avatar from '../gamification/profile/Avatar';
+import Image from 'next/image';
 
 interface BadgeNotification {
   id: number;
@@ -73,10 +74,12 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 text-h3 font-bold text-primary">
-          <img
+          <Image
+            height={32}
+            width={32}
             src="/ReUseITESOLogo.png"
             alt="ReUseITESO logo"
-            className="h-12 w-12 object-contain"
+            className="object-contain"
           />
           <span className="hidden sm:inline">ReUseITESO</span>
         </Link>
