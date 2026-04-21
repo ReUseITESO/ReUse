@@ -73,8 +73,8 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME", "reuse_iteso_dev"),
         "USER": os.environ.get("DB_USER", "reuse_dev"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "local_dev_password"),
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DB_PORT", "5433"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }
 
@@ -105,7 +105,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

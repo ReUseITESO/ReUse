@@ -101,7 +101,6 @@ def verify_email_token(raw_token: str):
 
 
 def send_verification_email(to_email: str, verify_url: str):
-    print("this is the url", verify_url)
     subject = "Verifica tu correo - ReUseITESO"
     message = (
         "Gracias por registrarte.\n\n"
@@ -637,7 +636,6 @@ class ProfilePictureUploadView(APIView):
         user.profile_picture = file_url
         user.save(update_fields=["profile_picture"])
 
-        print("Profile picture updated for user", user.id, "URL:", file_url)
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
@@ -744,7 +742,6 @@ class ShareItemView(APIView):
             {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
             status=status.HTTP_201_CREATED,
         )
-
 
 def update_avatar_template(request):
     user = request.user

@@ -63,11 +63,10 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Solo se permiten correos del dominio @iteso.mx"
             )
-        # if User.objects.filter(email=value).exists():
-        #     raise serializers.ValidationError(
-        #         "Ya existe una cuenta registrada con este correo."
-        #     )
-        print("hello world")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                "Ya existe una cuenta registrada con este correo."
+            )
         return value
 
     def validate_first_name(self, value: str) -> str:
