@@ -743,6 +743,7 @@ class ShareItemView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
+
 def update_avatar_template(request):
     user = request.user
     template_id = request.data.get("template_id")
