@@ -29,6 +29,7 @@ __all__ = [
     "ReportCreateSerializer",
     "CommentSerializer",
     "CommentCreateSerializer",
+    "ReportCreateSerializer",
     "ProductCreateSerializer",
     "ProductListSerializer",
     "ProductDetailSerializer",

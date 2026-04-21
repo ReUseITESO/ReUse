@@ -226,6 +226,15 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
       {/* Reactions moved inline into ProductBasicDetails */}
 
+      <ReportProductDialog
+        isOpen={isReportDialogOpen}
+        productTitle={product.title}
+        isLoading={isReporting}
+        error={reportError}
+        onCancel={() => setIsReportDialogOpen(false)}
+        onSubmit={handleReport}
+      />
+
       <CreateTransactionDialog
         isOpen={isTransactionDialogOpen}
         productTitle={product.title}
