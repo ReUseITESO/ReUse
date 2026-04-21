@@ -109,8 +109,6 @@ export interface PointsHistoryFilters {
   ordering?: string;
 }
 
-export type ChallengeType = 'donation' | 'exchange' | 'sale' | 'publish' | 'review';
-
 export interface Challenge {
   id: number;
   title: string;
