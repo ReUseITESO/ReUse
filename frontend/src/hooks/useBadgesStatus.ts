@@ -3,18 +3,18 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api';
-import type { LevelProgression } from '@/types/gamification';
+import type { BadgeWithStatus } from '@/types/gamification';
 
-export function useLevelProgression(enabled: boolean = true, refreshTrigger: number = 0) {
-  const [data, setData] = useState<LevelProgression | null>(null);
+export function useBadgesStatus(enabled: boolean = true) {
+  const [badges, setBadges] = useState<BadgeWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLevelProgression = useCallback(async () => {
+  const fetchBadges = useCallback(async () => {
     if (!enabled) {
-      setIsLoading(false);
+      setBadges([]);
       setError(null);
-      setData(null);
+      setIsLoading(false);
       return;
     }
 
@@ -22,21 +22,20 @@ export function useLevelProgression(enabled: boolean = true, refreshTrigger: num
     setError(null);
 
     try {
-      const response = await apiClient<LevelProgression>('/gamification/level-progression/');
-      setData(response);
+      const data = await apiClient<BadgeWithStatus[]>('/gamification/badges/status/');
+      setBadges(data);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'No se pudo cargar la progresion de nivel';
+      const message = err instanceof Error ? err.message : 'No se pudieron cargar las medallas';
       setError(message);
-      setData(null);
+      setBadges([]);
     } finally {
       setIsLoading(false);
     }
   }, [enabled]);
 
   useEffect(() => {
-    fetchLevelProgression();
-  }, [fetchLevelProgression, refreshTrigger]);
+    fetchBadges();
+  }, [fetchBadges]);
 
   useEffect(() => {
     if (!enabled) {
@@ -44,7 +43,7 @@ export function useLevelProgression(enabled: boolean = true, refreshTrigger: num
     }
 
     const onPointsUpdated = () => {
-      fetchLevelProgression();
+      fetchBadges();
     };
 
     window.addEventListener('reuse:points-updated', onPointsUpdated as EventListener);
@@ -52,12 +51,12 @@ export function useLevelProgression(enabled: boolean = true, refreshTrigger: num
     return () => {
       window.removeEventListener('reuse:points-updated', onPointsUpdated as EventListener);
     };
-  }, [enabled, fetchLevelProgression]);
+  }, [enabled, fetchBadges]);
 
   return {
-    levelProgression: data,
+    badges,
     isLoading,
     error,
-    refetch: fetchLevelProgression,
+    refetch: fetchBadges,
   };
 }

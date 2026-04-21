@@ -143,6 +143,23 @@ class ChallengeAPITest(APITestCase):
         self.assertTrue(response.data[0]["is_completed"])
 
         self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 0)
+        self.assertEqual(
+            PointTransaction.objects.filter(
+                user=self.user,
+                action="challenge_completion",
+                reference_id=self.active_challenge.id,
+            ).count(),
+            0,
+        )
+
+        claim_url = self.CLAIM_CHALLENGE_URL_TEMPLATE.format(
+            challenge_id=self.active_challenge.id
+        )
+        claim_response = self.client.post(claim_url)
+        self.assertEqual(claim_response.status_code, status.HTTP_200_OK)
+
+        self.user.refresh_from_db()
         self.assertEqual(self.user.points, 20)
         self.assertEqual(
             PointTransaction.objects.filter(
@@ -201,6 +218,16 @@ class ChallengeAPITest(APITestCase):
 
         self.assertEqual(first_claim.status_code, status.HTTP_200_OK)
         self.assertTrue(first_claim.data["reward_claimed"])
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.points, 20)
+        self.assertEqual(
+            PointTransaction.objects.filter(
+                user=self.user,
+                action="challenge_completion",
+                reference_id=self.active_challenge.id,
+            ).count(),
+            1,
+        )
         self.assertEqual(second_claim.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_claim_reward_requires_completed_challenge(self):
