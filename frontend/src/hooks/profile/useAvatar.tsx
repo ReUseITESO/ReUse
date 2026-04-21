@@ -4,6 +4,7 @@
 import { useState, useCallback, useEffect, createContext, useMemo, useContext } from 'react';
 import { apiClient, getBackendUrl } from '@/lib/api';
 import { AvatarData } from '@/types/gamification';
+import { useAuth } from '../useAuth';
 
 const defaultAvatarData = {
   image: '/../media/avatars/default.png',
@@ -32,6 +33,7 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
   const [avatarData, setAvatarData] = useState<AvatarData>(defaultAvatarData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const fetchAvatar = useCallback(async () => {
     setIsLoading(true);
@@ -39,7 +41,6 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
     try {
       // apiClient handles http://localhost:8000 and credentials/CSRF
       const data = await apiClient<Partial<AvatarData>>('/gamification/avatar/data');
-      console.log('Fetched avatar data:', data);
       const image = data.image || getBackendUrl(defaultAvatarData.image);
       setAvatarData({...defaultAvatarData, ...data, image}); // Merge with defaults
     } catch (err) {
@@ -55,7 +56,7 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
         method: 'POST',
         body: JSON.stringify(newData),
       });
-      console.log('new data:', newData);
+
       setAvatarData(newData);
       return { success: true };
     } catch (err) {
@@ -65,7 +66,7 @@ export function AvatarProvider({ children } : { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchAvatar();
-  }, [fetchAvatar]);
+  }, [isAuthenticated, isAuthLoading, fetchAvatar]);
 
   const value = useMemo<AvatarContextValue>(
     () => ({

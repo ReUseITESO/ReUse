@@ -2,34 +2,34 @@ interface SliderProps {
   value: number;
   min: number;
   max: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }
 
-export function Slider({ value, min, max, onChange }: SliderProps) {
+export function Slider({ value, min, max, onChange, disabled }: SliderProps) {
+
   return (
-    <div className="w-full py-2">
+    <div className="w-full py-4">
       <input
         type="range"
+        disabled={disabled}
         min={min}
         max={max}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="
-          w-full h-1.5 rounded-lg appearance-none cursor-pointer 
-          bg-border             /* Changed from bg-muted for visibility */
-          accent-primary        /* Colors the 'thumb' */
-          hover:accent-secondary 
-          transition-all
-          [&::-webkit-slider-runnable-track]:bg-transparent
-          [&::-webkit-slider-thumb]:appearance-none
-          [&::-webkit-slider-thumb]:h-4
-          [&::-webkit-slider-thumb]:w-4
-          [&::-webkit-slider-thumb]:rounded-full
-          [&::-webkit-slider-thumb]:bg-primary
-          [&::-webkit-slider-thumb]:border-2
-          [&::-webkit-slider-thumb]:border-bg
-          [&::-webkit-slider-thumb]:shadow-sm
-        "
+        className={`w-full h-3 rounded-full appearance-none transition-all
+          ${disabled 
+            ? 'bg-gray-300 cursor-not-allowed accent-gray-400' 
+            : 'bg-primary/20 cursor-pointer accent-secondary hover:accent-primary'}
+          
+          [&::-webkit-slider-thumb]:appearance-none 
+          [&::-webkit-slider-thumb]:h-5 
+          [&::-webkit-slider-thumb]:w-5 
+          [&::-webkit-slider-thumb]:rounded-full 
+          ${disabled 
+            ? '[&::-webkit-slider-thumb]:bg-gray-400 [&::-webkit-slider-thumb]:border-gray-200' 
+            : '[&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-primary'}
+        `}
       />
     </div>
   );

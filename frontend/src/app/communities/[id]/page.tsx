@@ -244,9 +244,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
         </div>
 
-        
-          <h2 className="mb-4 text-lg font-semibold text-fg">Leaderboard</h2>
-
         {/* Marketplace Section */}
         <div className="mt-8">
           <CommunityMarketplaceSection
