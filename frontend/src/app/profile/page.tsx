@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Pencil } from 'lucide-react';
+import { Pencil, Palette } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
@@ -82,7 +82,7 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="flex w-full items-center gap-6">
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
                     <Avatar />
                   </div>
                   <div className="w-full flex-1">
@@ -97,12 +97,20 @@ export default function ProfilePage() {
                           <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
                         )}
                       </div>
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
-                      >
-                        <Pencil className="h-4 w-4" /> Editar perfil
-                      </button>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                        >
+                          <Pencil className="h-4 w-4" /> Editar perfil
+                        </button>
+                        <Link
+                          href="/profile/customization"
+                          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
+                        >
+                          <Palette className="h-4 w-4" /> Customizar Avatar
+                        </Link>
+                      </div>
                     </div>
                     <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
                       <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo

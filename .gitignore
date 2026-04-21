@@ -224,5 +224,5 @@ backend/**/migrations/*.py
 !backend/social/migrations/*.py
 !backend/**/migrations/__init__.py
 
-# Not import to git the avatar images 
+# Don't import to git the avatar images 
 backend/media/profile_pictures/*
