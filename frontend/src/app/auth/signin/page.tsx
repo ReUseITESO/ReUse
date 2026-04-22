@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { getMicrosoftAuthUrl, requestReactivationEmail, resendVerificationEmail, ApiError } from '@/lib/auth';
+import {
+  getMicrosoftAuthUrl,
+  requestReactivationEmail,
+  resendVerificationEmail,
+  ApiError,
+} from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -95,7 +100,7 @@ export default function SignInPage() {
       // HU-CORE-17: detectar cuenta desactivada por código de error
       if (err instanceof ApiError && err.code === 'ACCOUNT_DEACTIVATED') {
         setDeactivatedEmail(email.trim().toLowerCase());
-      // HU-CORE-09: detectar correo no verificado
+        // HU-CORE-09: detectar correo no verificado
       } else if (err instanceof ApiError && err.code === 'EMAIL_NOT_VERIFIED') {
         setUnverifiedEmail(email.trim().toLowerCase());
       } else {
