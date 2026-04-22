@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { getMicrosoftAuthUrl, requestReactivationEmail, resendVerificationEmail, ApiError } from "@/lib/auth";
+import {
+  getMicrosoftAuthUrl,
+  requestReactivationEmail,
+  resendVerificationEmail,
+  ApiError,
+} from '@/lib/auth';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -35,18 +40,18 @@ export default function SignInPage() {
   }
 
   async function handleResendVerification() {
-     if (!unverifiedEmail) return;
-     setIsSendingVerification(true);
-     try {
-       await resendVerificationEmail(unverifiedEmail);
-       router.push(`/auth/check-email?resend=true&email=${encodeURIComponent(unverifiedEmail)}`);
-     } catch {
-       setError("No se pudo reenviar el correo de verificacion. Intenta de nuevo.");
-       setUnverifiedEmail(null);
-     } finally {
-       setIsSendingVerification(false);
-     }
-   }
+    if (!unverifiedEmail) return;
+    setIsSendingVerification(true);
+    try {
+      await resendVerificationEmail(unverifiedEmail);
+      router.push(`/auth/check-email?resend=true&email=${encodeURIComponent(unverifiedEmail)}`);
+    } catch {
+      setError('No se pudo reenviar el correo de verificacion. Intenta de nuevo.');
+      setUnverifiedEmail(null);
+    } finally {
+      setIsSendingVerification(false);
+    }
+  }
 
   // HU-CORE-17: solicitar email de reactivación y redirigir
   async function handleRequestReactivation() {
@@ -92,9 +97,8 @@ export default function SignInPage() {
       // HU-CORE-17: detectar cuenta desactivada por código de error
       if (err instanceof ApiError && err.code === 'ACCOUNT_DEACTIVATED') {
         setDeactivatedEmail(email.trim().toLowerCase());
-      } else if (err instanceof ApiError && err.code === "EMAIL_NOT_VERIFIED") {
+      } else if (err instanceof ApiError && err.code === 'EMAIL_NOT_VERIFIED') {
         setUnverifiedEmail(email.trim().toLowerCase());
-
       } else {
         setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
       }

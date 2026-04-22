@@ -108,4 +108,3 @@ export interface PointsHistoryFilters {
   action?: string;
   ordering?: string;
 }
-
