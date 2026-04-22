@@ -16,10 +16,9 @@ import type { User } from '@/types/auth';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, signOut } = useAuth();
+  const { user, isAuthenticated, isLoading, signOut, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [localUser, setLocalUser] = useState<User | null>(null);
-  const displayUser = localUser ?? user;
+  const displayUser = user;
 
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
@@ -39,7 +38,7 @@ export default function ProfilePage() {
   }
 
   function handleSave(updated: User) {
-    setLocalUser(updated);
+    updateUser(updated);
     setIsEditing(false);
   }
 

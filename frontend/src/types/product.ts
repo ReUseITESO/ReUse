@@ -66,18 +66,6 @@ export interface ProductDetail extends Product {
   has_reported: boolean;
 }
 
-export interface ProductCreatePayload {
-  title: string;
-  description: string;
-  condition: ProductCondition;
-  transaction_type: TransactionType;
-  price?: number | null;
-  image_url?: string;
-  category: number;
-  images?: string[];
-  community?: number;
-}
-
 export interface ProductUpdatePayload {
   title?: string;
   description?: string;
@@ -85,7 +73,6 @@ export interface ProductUpdatePayload {
   transaction_type?: TransactionType;
   price?: number | null;
   category?: number;
-  image_url?: string;
 }
 
 export interface EditFormValues {
@@ -95,7 +82,7 @@ export interface EditFormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url?: string;
+  imageFiles: File[];
 }
 
 export interface ProductEditFormProps {
@@ -109,8 +96,7 @@ export interface FormValues {
   condition: ProductCondition;
   transaction_type: TransactionType;
   price: string;
-  image_url: string;
-  images: string[];
+  imageFiles: File[];
   community?: string;
 }
 
