@@ -1,5 +1,9 @@
-from django.contrib.auth import get_user_model  # type: ignore[reportMissingModuleSource]
-from django.contrib.auth.backends import ModelBackend  # type: ignore[reportMissingModuleSource]
+from django.contrib.auth import (
+    get_user_model,  # type: ignore[reportMissingModuleSource]
+)
+from django.contrib.auth.backends import (  # type: ignore[reportMissingModuleSource]
+    ModelBackend,
+)
 
 User = get_user_model()
 

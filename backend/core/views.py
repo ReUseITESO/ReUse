@@ -1,12 +1,9 @@
 import hashlib
-import os
 import secrets
-import uuid
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.utils import timezone
