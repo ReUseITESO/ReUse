@@ -223,4 +223,3 @@ backend/**/migrations/*.py
 !backend/social/migrations/
 !backend/social/migrations/*.py
 !backend/**/migrations/__init__.py
-BUGS.md
