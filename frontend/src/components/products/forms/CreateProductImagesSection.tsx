@@ -1,34 +1,44 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import { ImagePlus, X } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 
-import Button from '@/components/ui/Button';
-import { INPUT_CLASS } from '@/components/products/forms/formConstants';
-
 import type { FormValues } from '@/types/product';
 
-interface CreateProductImagesSectionProps {
+const MAX_IMAGES = 5;
+const ACCEPTED = 'image/jpeg,image/png,image/webp';
+
+interface Props {
   form: UseFormReturn<FormValues>;
 }
 
-export default function CreateProductImagesSection({ form }: CreateProductImagesSectionProps) {
-  const { register, setValue, watch } = form;
+export default function CreateProductImagesSection({ form }: Props) {
+  const { setValue, watch } = form;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const files = watch('imageFiles');
+  const [previews, setPreviews] = useState<string[]>([]);
 
-  const imageUrl = watch('image_url');
-  const images = watch('images');
+  useEffect(() => {
+    const urls = files.map(f => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach(u => URL.revokeObjectURL(u));
+  }, [files]);
 
-  function handleAddImage() {
-    if (imageUrl && !images.includes(imageUrl)) {
-      setValue('images', [...images, imageUrl]);
-      setValue('image_url', '');
-    }
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files ?? []);
+    setValue('imageFiles', [...files, ...selected].slice(0, MAX_IMAGES));
+    if (inputRef.current) inputRef.current.value = '';
   }
 
-  function handleRemoveImage(index: number) {
+  function handleRemove(index: number) {
     setValue(
-      'images',
-      images.filter((_, imageIndex) => imageIndex !== index),
+      'imageFiles',
+      files.filter((_, i) => i !== index),
     );
   }
+
+  const remaining = MAX_IMAGES - files.length;
 
   return (
     <section className="space-y-5">
@@ -37,68 +47,58 @@ export default function CreateProductImagesSection({ form }: CreateProductImages
         Imágenes
       </h2>
 
-      <div>
-        <label htmlFor="image_url" className="mb-1.5 block text-sm font-medium text-fg">
-          URL de imagen
-        </label>
-        <div className="flex min-w-0 gap-2">
-          <input
-            id="image_url"
-            type="url"
-            {...register('image_url')}
-            className={`${INPUT_CLASS} min-w-0 flex-1`}
-            placeholder="https://ejemplo.com/imagen.jpg"
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                handleAddImage();
-              }
-            }}
-          />
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleAddImage}
-            disabled={!imageUrl}
-            className="inline-flex flex-shrink-0 items-center gap-2"
-          >
-            <ImagePlus className="h-4 w-4" />
-            Agregar
-          </Button>
-        </div>
-        <p className="mt-1.5 text-xs text-muted-fg">
-          Agrega URLs de imágenes del artículo. Se mostrarán en orden.
-        </p>
-      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED}
+        multiple
+        className="hidden"
+        onChange={handleFileChange}
+        disabled={remaining === 0}
+      />
 
-      {images.length > 0 && (
+      {files.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium text-fg">Imágenes agregadas ({images.length})</p>
-          <div className="space-y-2">
-            {images.map((url, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 rounded-lg border border-border bg-muted p-3"
-              >
-                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {index + 1}
-                </span>
-                <span className="flex-1 break-all overflow-wrap-anywhere text-sm text-muted-fg">
-                  {url}
-                </span>
+          <p className="text-sm font-medium text-fg">
+            Imágenes seleccionadas ({files.length}/{MAX_IMAGES})
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {previews.map((url, index) => (
+              <div key={index} className="group relative aspect-square">
+                <img
+                  src={url}
+                  alt={`Imagen ${index + 1}`}
+                  className="h-full w-full rounded-lg object-cover"
+                />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="flex-shrink-0 rounded-md p-1 text-error transition-opacity hover:opacity-80"
-                  title="Eliminar imagen"
+                  onClick={() => handleRemove(index)}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                  title="Eliminar"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-3 w-3" />
                 </button>
+                <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1 text-xs text-white">
+                  {index + 1}
+                </span>
               </div>
             ))}
           </div>
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={remaining === 0}
+        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border py-8 text-sm text-muted-fg transition-colors hover:border-primary/50 hover:text-fg disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <ImagePlus className="h-5 w-5" />
+        {files.length === 0 ? 'Seleccionar imágenes' : `Agregar más (${remaining} disponibles)`}
+      </button>
+      <p className="text-xs text-muted-fg">
+        Máximo {MAX_IMAGES} imágenes · JPEG, PNG o WebP · Se mostrarán en orden.
+      </p>
     </section>
   );
 }

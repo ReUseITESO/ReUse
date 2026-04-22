@@ -24,6 +24,8 @@ export default function SignInPage() {
   // HU-CORE-17: estado para mostrar el panel de cuenta desactivada
   const [deactivatedEmail, setDeactivatedEmail] = useState<string | null>(null);
   const [isSendingReactivation, setIsSendingReactivation] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
 
   // HU-CORE-09: estado para mostrar el panel de correo no verificado
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);

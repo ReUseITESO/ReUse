@@ -17,7 +17,7 @@ import Spinner from '@/components/ui/Spinner';
 
 import { apiClient } from '@/lib/api';
 
-import type { EditFormValues, Product, ProductEditFormProps } from '@/types/product';
+import type { EditFormValues, Product, ProductEditFormProps, ProductImage } from '@/types/product';
 
 export default function ProductEditForm({ productId }: ProductEditFormProps) {
   const router = useRouter();
@@ -27,8 +27,9 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
 
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
 
-  const form = useForm<EditFormValues>();
+  const form = useForm<EditFormValues>({ defaultValues: { imageFiles: [] } });
 
   useEffect(() => {
     async function fetchProduct() {
@@ -38,6 +39,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
       try {
         const product = await apiClient<Product>(`/marketplace/products/${productId}/`);
 
+        setExistingImages(product.images ?? []);
         form.reset({
           title: product.title,
           description: product.description,
@@ -45,7 +47,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           condition: product.condition,
           transaction_type: product.transaction_type,
           price: product.price ?? '',
-          image_url: product.images?.[0]?.image_url ?? '',
+          imageFiles: [],
         });
       } catch (err) {
         setLoadError(err instanceof Error ? err.message : 'Error al cargar el producto');
@@ -60,19 +62,17 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
   async function handleUpdateProduct(values: EditFormValues) {
     const isSale = values.transaction_type === 'sale';
 
-    const result = await updateProduct(productId, {
-      title: values.title,
-      description: values.description,
-      category: Number(values.category),
-      condition: values.condition,
-      transaction_type: values.transaction_type,
-      price: isSale ? Number(values.price) : null,
-      image_url: values.image_url || undefined,
-    });
+    const formData = new FormData();
+    formData.append('title', values.title);
+    formData.append('description', values.description);
+    formData.append('category', String(Number(values.category)));
+    formData.append('condition', values.condition);
+    formData.append('transaction_type', values.transaction_type);
+    if (isSale) formData.append('price', String(Number(values.price)));
+    values.imageFiles.forEach(file => formData.append('images', file));
 
-    if (result) {
-      router.push('/products/my');
-    }
+    const result = await updateProduct(productId, formData);
+    if (result) router.push('/products/my');
   }
 
   if (!isAuthenticated) {
@@ -103,7 +103,7 @@ export default function ProductEditForm({ productId }: ProductEditFormProps) {
           categoriesError={categoriesError}
         />
 
-        <EditProductImageSection form={form} />
+        <EditProductImageSection form={form} existingImages={existingImages} />
 
         <ProductFormActions
           isSubmitting={submitting}
