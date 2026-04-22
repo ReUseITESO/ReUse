@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { getMicrosoftAuthUrl, requestReactivationEmail, ApiError } from '@/lib/auth';
+import { getMicrosoftAuthUrl, requestReactivationEmail, resendVerificationEmail, ApiError } from "@/lib/auth";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -19,6 +19,8 @@ export default function SignInPage() {
   // HU-CORE-17: estado para mostrar el panel de cuenta desactivada
   const [deactivatedEmail, setDeactivatedEmail] = useState<string | null>(null);
   const [isSendingReactivation, setIsSendingReactivation] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
 
   async function handleMicrosoftSignIn() {
     setError('');
@@ -31,6 +33,20 @@ export default function SignInPage() {
       setIsMicrosoftLoading(false);
     }
   }
+
+  async function handleResendVerification() {
+     if (!unverifiedEmail) return;
+     setIsSendingVerification(true);
+     try {
+       await resendVerificationEmail(unverifiedEmail);
+       router.push(`/auth/check-email?resend=true&email=${encodeURIComponent(unverifiedEmail)}`);
+     } catch {
+       setError("No se pudo reenviar el correo de verificacion. Intenta de nuevo.");
+       setUnverifiedEmail(null);
+     } finally {
+       setIsSendingVerification(false);
+     }
+   }
 
   // HU-CORE-17: solicitar email de reactivación y redirigir
   async function handleRequestReactivation() {
@@ -61,6 +77,7 @@ export default function SignInPage() {
     e.preventDefault();
     setError('');
     setDeactivatedEmail(null);
+    setUnverifiedEmail(null);
 
     if (!email.trim() || !password) {
       setError('Todos los campos son obligatorios.');
@@ -75,6 +92,9 @@ export default function SignInPage() {
       // HU-CORE-17: detectar cuenta desactivada por código de error
       if (err instanceof ApiError && err.code === 'ACCOUNT_DEACTIVATED') {
         setDeactivatedEmail(email.trim().toLowerCase());
+      } else if (err instanceof ApiError && err.code === "EMAIL_NOT_VERIFIED") {
+        setUnverifiedEmail(email.trim().toLowerCase());
+
       } else {
         setError(err instanceof Error ? err.message : 'Error al iniciar sesión.');
       }
@@ -124,6 +144,36 @@ export default function SignInPage() {
                 type="button"
                 onClick={() => setDeactivatedEmail(null)}
                 disabled={isSendingReactivation}
+                className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium
+                           text-fg transition-colors hover:bg-muted disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {unverifiedEmail && (
+          <div className="mb-4 rounded-lg border border-info/30 bg-info/5 px-5 py-4">
+            <p className="font-semibold text-fg mb-1">Correo no verificado</p>
+            <p className="text-sm text-muted-fg mb-4">
+              Tu cuenta aún no está verificada. Te reenviaremos el correo a{' '}
+              <span className="font-medium text-fg">{unverifiedEmail}</span>.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={isSendingVerification}
+                className="flex-1 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium
+                           text-btn-primary-fg transition-colors hover:bg-primary-hover disabled:opacity-50"
+              >
+                {isSendingVerification ? 'Enviando…' : 'Reenviar correo'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUnverifiedEmail(null)}
+                disabled={isSendingVerification}
                 className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium
                            text-fg transition-colors hover:bg-muted disabled:opacity-50"
               >

@@ -25,6 +25,7 @@ from core.services.microsoft_oauth import exchange_code, get_authorization_url
 from core.throttles import AuthRateThrottle, EmailVerificationRateThrottle
 from marketplace.models import Products
 from marketplace.serializers.product import ProductListSerializer
+from marketplace.services.s3_service import upload_profile_picture
 from social.models import UserConnection
 
 from .models.email_verification import EmailVerificationToken
@@ -625,14 +626,8 @@ class ProfilePictureUploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        ext = os.path.splitext(file.name)[1].lower()
-        filename = f"profile_{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join("profile_pictures", filename)
-
-        saved_path = default_storage.save(filepath, file)
-        file_url = request.build_absolute_uri(f"/media/{saved_path}")
-
         user = request.user
+        file_url = upload_profile_picture(user.id, file)
         user.profile_picture = file_url
         user.save(update_fields=["profile_picture"])
 
