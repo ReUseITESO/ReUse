@@ -159,7 +159,7 @@ export async function resendVerificationEmail(email: string): Promise<void> {
   });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    throw new Error(body?.error?.message ?? 'Error al reenviar el correo de verificacion.');
+    throw new Error(body?.error?.message ?? 'Error al reenviar el correo de verificación.');
   }
 }
 
