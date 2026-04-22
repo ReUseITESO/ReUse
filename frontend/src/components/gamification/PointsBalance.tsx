@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
-import { useLevelProgression } from '@/hooks/useLevelProgression';
 import { usePointsHistory } from '@/hooks/usePointsHistory';
+import { useUserPoints } from '@/hooks/useUserPoints';
 import { cn } from '@/lib/utils';
 import type { PointHistoryEntry } from '@/types/gamification';
 
@@ -23,13 +23,10 @@ interface PointsBalanceProps {
 
 export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { levelProgression, isLoading, error, refetch } = useLevelProgression(
-    isAuthenticated,
-    refreshTrigger,
-  );
+  const { points, isLoading, error, refetch } = useUserPoints(isAuthenticated, refreshTrigger);
   const { entries, isLoading: historyLoading } = usePointsHistory(isAuthenticated);
 
-  const isInitialLoading = authLoading || (isLoading && !levelProgression && !error);
+  const isInitialLoading = authLoading || (isLoading && points === null && !error);
 
   if (isInitialLoading) {
     return (
@@ -83,7 +80,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
     );
   }
 
-  if (!levelProgression) {
+  if (points === null) {
     return null;
   }
 
@@ -152,7 +149,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
           <div>
             <p className="text-sm font-medium text-white/90">Total de puntos</p>
             <p data-testid="points-balance-total" className="text-5xl font-extrabold leading-none">
-              {(levelProgression.points || 0).toLocaleString('es-MX')}
+              {(points ?? 0).toLocaleString('es-MX')}
             </p>
           </div>
         </div>

@@ -23,37 +23,25 @@ test.describe('HU-GAM-01: View Points', () => {
       await expect(total).toHaveText(/^\d[\d,]*$/);
     });
 
-    test('2. UI points equal API response (BUG: PointsBalance uses /level-progression/ instead of /points/)', async ({
+    test('2. UI points equal API /points/ response (Bug #1 fixed: PointsBalance now consumes /points/)', async ({
       page,
     }) => {
-      // Bug observed: HU-GAM-01 specifies GET /api/gamification/points/ as the source,
-      // but PointsBalance reads `levelProgression.points` from /level-progression/.
-      // The dedicated /points/ endpoint is never consumed. See BUGS.md.
-      let pointsCalled = false;
-      let levelPoints: number | null = null;
-      page.on('request', (req) => {
-        if (req.url().endsWith('/api/gamification/points/')) pointsCalled = true;
-      });
-      page.on('response', async (res) => {
-        if (res.url().includes('/api/gamification/level-progression/') && res.ok()) {
-          levelPoints = (await res.json()).points;
-        }
-      });
-      await page.goto('/profile', { waitUntil: 'networkidle' });
-      await expect(page.getByTestId('points-balance-total')).toBeVisible();
+      // Previously PointsBalance read points from /level-progression/ while
+      // the dedicated /points/ endpoint was never consumed. Fixed by switching
+      // the component to useUserPoints. This test asserts that /points/ is
+      // now called and that the UI matches its response.
+      const pointsResponsePromise = page.waitForResponse(
+        (res) => /\/api\/gamification\/points\/(\?|$)/.test(res.url()) && res.ok(),
+      );
+      await page.goto('/profile');
+      const pointsResponse = await pointsResponsePromise;
+      const apiPoints = (await pointsResponse.json()).points;
 
-      expect(levelPoints).not.toBeNull();
+      await expect(page.getByTestId('points-balance-total')).toBeVisible();
       const uiText = (await page.getByTestId('points-balance-total').innerText()).trim();
       const uiNumber = parseInt(uiText.replace(/,/g, ''), 10);
-      expect(uiNumber).toBe(levelPoints);
+      expect(uiNumber).toBe(apiPoints);
       expect(uiNumber).toBeGreaterThanOrEqual(0);
-
-      // Document the bug as a soft expectation (not failing the suite).
-      // Once fixed (PointsBalance uses useUserPoints), flip this to toBe(true).
-      test.info().annotations.push({
-        type: 'bug',
-        description: `HU-GAM-01 endpoint /api/gamification/points/ is${pointsCalled ? '' : ' NOT'} consumed by PointsBalance`,
-      });
     });
 
     test('3. Dashboard also shows PointsBalance', async ({ page }) => {
@@ -87,9 +75,6 @@ test.describe('HU-GAM-01: View Points', () => {
       await page.route('**/api/gamification/points/', (r) =>
         r.fulfill({ status: 500, body: '{}' }),
       );
-      await page.route('**/api/gamification/level-progression/', (r) =>
-        r.fulfill({ status: 500, body: '{}' }),
-      );
       await page.goto('/profile');
       await expect(page.getByTestId('points-balance-error')).toBeVisible();
       const retry = page.getByTestId('points-balance-retry');
@@ -98,18 +83,11 @@ test.describe('HU-GAM-01: View Points', () => {
     });
 
     test('6. es-MX localized number (thousands separator for >= 1000)', async ({ page }) => {
-      await page.route('**/api/gamification/level-progression/', (r) =>
+      await page.route('**/api/gamification/points/', (r) =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({
-            points: 1500,
-            current_level: { name: 'Sustainability Leader', min_points: 500, icon: 'crown' },
-            next_level: null,
-            progress_percent: 100,
-            points_to_next_level: 0,
-            is_max_level: true,
-          }),
+          body: JSON.stringify({ points: 1500 }),
         }),
       );
       await page.goto('/profile');
