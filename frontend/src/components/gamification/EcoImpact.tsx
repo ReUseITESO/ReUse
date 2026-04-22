@@ -26,7 +26,10 @@ export default function EcoImpactCard() {
   // No autenticado
   if (!isAuthenticated) {
     return (
-      <div className="rounded-lg bg-warning/5 border border-warning/20 p-4">
+      <div
+        data-testid="eco-impact-unauth"
+        className="rounded-lg bg-warning/5 border border-warning/20 p-4"
+      >
         <div className="flex items-start gap-3">
           <div>
             <p className="text-sm text-fg font-medium">Usuario no autenticado</p>
@@ -40,9 +43,13 @@ export default function EcoImpactCard() {
   // Error
   if (error) {
     return (
-      <div className="rounded-lg bg-error/5 border border-error/20 p-4">
+      <div
+        data-testid="eco-impact-error"
+        className="rounded-lg bg-error/5 border border-error/20 p-4"
+      >
         <p className="text-sm text-error font-medium">{error}</p>
         <button
+          data-testid="eco-impact-retry"
           onClick={refetch}
           className={cn(
             'mt-3 px-4 py-2 text-sm font-medium',
@@ -62,7 +69,10 @@ export default function EcoImpactCard() {
   const reusedLabel = data.items_reused === 1 ? 'item reutilizado' : 'items reutilizados';
 
   return (
-    <article className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm">
+    <article
+      data-testid="eco-impact-card"
+      className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm"
+    >
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-700">
           <Leaf className="h-4 w-4" />
@@ -77,7 +87,10 @@ export default function EcoImpactCard() {
           </div>
           <div>
             <p className="text-sm font-medium text-white/90">Total contribuido</p>
-            <p className="text-4xl font-extrabold leading-none">
+            <p
+              data-testid="eco-impact-hero-label"
+              className="text-4xl font-extrabold leading-none"
+            >
               {data.items_reused} {reusedLabel}
             </p>
           </div>
@@ -92,7 +105,9 @@ export default function EcoImpactCard() {
             </div>
             <span className="text-sm font-semibold text-fg">Items reutilizados</span>
           </div>
-          <span className="text-xl font-semibold text-fg">{data.items_reused}</span>
+          <span data-testid="eco-impact-items" className="text-xl font-semibold text-fg">
+            {data.items_reused}
+          </span>
         </div>
 
         <div className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3">
@@ -102,7 +117,9 @@ export default function EcoImpactCard() {
             </div>
             <span className="text-sm font-semibold text-fg">CO2 evitado</span>
           </div>
-          <span className="text-xl font-semibold text-fg">{data.co2_avoided} kg</span>
+          <span data-testid="eco-impact-co2" className="text-xl font-semibold text-fg">
+            {data.co2_avoided} kg
+          </span>
         </div>
 
         <div className="flex items-center justify-between rounded-2xl bg-muted/60 px-4 py-3">
@@ -112,7 +129,9 @@ export default function EcoImpactCard() {
             </div>
             <span className="text-sm font-semibold text-fg">Promedio comunidad</span>
           </div>
-          <span className="text-xl font-semibold text-fg">{data.community_average_items}</span>
+          <span data-testid="eco-impact-community-avg" className="text-xl font-semibold text-fg">
+            {data.community_average_items}
+          </span>
         </div>
       </div>
     </article>

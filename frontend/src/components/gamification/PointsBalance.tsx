@@ -43,7 +43,10 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+      <div
+        data-testid="points-balance-unauth"
+        className="rounded-lg border border-yellow-200 bg-yellow-50 p-4"
+      >
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-700" />
           <div>
@@ -59,9 +62,13 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+      <div
+        data-testid="points-balance-error"
+        className="rounded-lg border border-red-200 bg-red-50 p-4"
+      >
         <p className="text-sm font-medium text-red-700">{error}</p>
         <button
+          data-testid="points-balance-retry"
           onClick={refetch}
           className={cn(
             'mt-3 rounded-md px-4 py-2 text-sm font-medium',
@@ -126,7 +133,10 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
   }
 
   return (
-    <article className="h-full rounded-3xl border border-border bg-card p-6 shadow-sm">
+    <article
+      data-testid="points-balance-card"
+      className="h-full rounded-3xl border border-border bg-card p-6 shadow-sm"
+    >
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Sparkles className="h-4 w-4" />
@@ -141,7 +151,7 @@ export default function PointsBalance({ refreshTrigger = 0 }: PointsBalanceProps
           </div>
           <div>
             <p className="text-sm font-medium text-white/90">Total de puntos</p>
-            <p className="text-5xl font-extrabold leading-none">
+            <p data-testid="points-balance-total" className="text-5xl font-extrabold leading-none">
               {(levelProgression.points || 0).toLocaleString('es-MX')}
             </p>
           </div>
