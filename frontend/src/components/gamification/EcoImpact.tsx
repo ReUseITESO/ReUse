@@ -87,10 +87,7 @@ export default function EcoImpactCard() {
           </div>
           <div>
             <p className="text-sm font-medium text-white/90">Total contribuido</p>
-            <p
-              data-testid="eco-impact-hero-label"
-              className="text-4xl font-extrabold leading-none"
-            >
+            <p data-testid="eco-impact-hero-label" className="text-4xl font-extrabold leading-none">
               {data.items_reused} {reusedLabel}
             </p>
           </div>
