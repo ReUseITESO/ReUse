@@ -266,8 +266,7 @@ export default function ChallengesBoard({ refreshTrigger = 0 }: ChallengesBoardP
 
                   <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-fg">
                     <span>
-                      {Math.min(currentValue, challenge.goal)} / {challenge.goal}
-                      completado
+                      {Math.min(currentValue, challenge.goal)} / {challenge.goal} completado
                     </span>
                     <span className="font-semibold text-primary">
                       +{challenge.bonus_points} pts
