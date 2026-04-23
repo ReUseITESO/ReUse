@@ -141,7 +141,12 @@ class PasswordResetConfirmView(APIView):
 
         if token_obj.used_at is not None:
             return Response(
-                {"error": {"code": "TOKEN_USED", "message": "Este enlace ya fue usado."}},
+                {
+                    "error": {
+                        "code": "TOKEN_USED",
+                        "message": "Este enlace ya fue usado.",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -180,6 +185,8 @@ class PasswordResetConfirmView(APIView):
             user.save(update_fields=["password"])
 
         return Response(
-            {"message": "Contraseña restablecida correctamente. Ya puedes iniciar sesión."},
+            {
+                "message": "Contraseña restablecida correctamente. Ya puedes iniciar sesión."
+            },
             status=status.HTTP_200_OK,
         )
