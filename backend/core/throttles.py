@@ -37,6 +37,18 @@ class ReactivationRateThrottle(SimpleRateThrottle):
         return self.cache_format % {"scope": self.scope, "ident": ident}
 
 
+class PasswordResetRateThrottle(SimpleRateThrottle):
+    """HU-CORE-19: limitar solicitudes de restablecimiento de contraseña para evitar spam."""
+
+    scope = "password_reset"
+
+    def get_cache_key(self, request, view):
+        ident = request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[
+            0
+        ].strip() or request.META.get("REMOTE_ADDR", "")
+        return self.cache_format % {"scope": self.scope, "ident": ident}
+
+
 class StandardAnonThrottle(AnonRateThrottle):
     scope = "anon"
 
