@@ -5,9 +5,9 @@ from .images import Images
 from .product import Products
 from .product_reaction import ProductReaction
 from .report import Report
+from .swap_transaction import SwapTransaction
 from .transaction import Transaction
 from .transaction_review import TransactionReview
-from .swap_transaction import SwapTransaction
 
 __all__ = [
     "Category",
