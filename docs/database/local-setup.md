@@ -2,19 +2,21 @@
 # Local Database Setup - ReUseITESO
 
 **DBA:** Daniel
-**Date:** 11 March 2026
-**Version:** 1.3
+**Date:** 22 April 2026
+**Version:** 1.5
 
 ---
 
 ## Changelog
 
-| Version | Date        | Change                                                       |
-| ------- | ----------- | ------------------------------------------------------------ |
-| 1.0     | 15 Feb 2026 | Initial setup guide                                          |
-| 1.1     | 24 Feb 2026 | Added Docker Compose instructions and .env.example reference |
-| 1.2     | 5 Mar 2026  | Updated seed filename to seed_dev_fixed.json                 |
-| 1.3     | 11 Mar 2026 | Added social app setup instructions                          |
+| Version | Date        | Change                                                                                      |
+| ------- | ----------- | ------------------------------------------------------------------------------------------- |
+| 1.0     | 15 Feb 2026 | Initial setup guide                                                                         |
+| 1.1     | 24 Feb 2026 | Added Docker Compose instructions and .env.example reference                                |
+| 1.2     | 5 Mar 2026  | Updated seed filename to seed_dev_fixed.json                                                |
+| 1.3     | 11 Mar 2026 | Added social app setup instructions                                                         |
+| 1.4     | 19 Mar 2026 | Updated expected migration output: added social 0002, marketplace 0004/0005/0006, core 0003 |
+| 1.5     | 22 Apr 2026 | Updated expected migration output: added marketplace 0003/0004 (SwapTransaction)            |
 
 ---
 
@@ -24,7 +26,7 @@
 * Python 3.11+
 * Git
 
-If you cannot use Docker, see [Fallback: Local PostgreSQL](https://claude.ai/chat/a2cb6fe3-f50e-424e-893b-d9d1996fdf4d#fallback-local-postgresql) at the bottom.
+If you cannot use Docker, see [Fallback: Local PostgreSQL](https://claude.ai/chat/e0ddd24d-9151-4755-91d5-2799b12630c9#fallback-local-postgresql) at the bottom.
 
 ---
 
@@ -93,18 +95,20 @@ Expected output — all migrations should show `[X]`:
 ```
 core
   [X] 0001_initial
-  [X] 0002_user_email_verified_at_user_is_email_verified_and_more
+  [X] 0002_alter_user_managers_user_deactivated_at_and_more
 marketplace
   [X] 0001_initial
-  [X] 0002_forumquestion_images_transaction_and_more
-  [X] 0003_fix_updated_at_products
+  [X] 0002_comment_forumquestion_images_productreaction_report_and_more
+  [X] 0003_add_updated_at_transaction
+  [X] 0004_add_swap_transaction
 gamification
   [X] 0001_initial
 social
   [X] 0001_initial
+  [X] 0002_add_community_post_and_forum_post_link
 ```
 
-If you see `DuplicateTable` errors, a teammate pushed models without including the migration. See [Troubleshooting](https://claude.ai/chat/a2cb6fe3-f50e-424e-893b-d9d1996fdf4d#troubleshooting).
+If you see `DuplicateTable` errors, a teammate pushed models without including the migration. See [Troubleshooting](https://claude.ai/chat/e0ddd24d-9151-4755-91d5-2799b12630c9#troubleshooting).
 
 ---
 
@@ -120,11 +124,13 @@ This loads:
 * 5 categories
 * 10 products (mix of sale / donation / swap)
 * 3 transactions (pending / confirmed / completed)
-* 5 forum questions
+* 5 forum questions + 3 forum questions linked to community posts
 * 3 badges + 3 user_badges
 * 6 environment_impact records
+* 3 user_connections + 2 frequent_contacts
+* 2 communities + 5 community_members + 3 community_posts
 
-> **Note:** The social module (UserConnection, FrequentContact, Community, CommunityMember) does not have seed data yet. Populate manually via the admin panel or Django shell.
+> **Note:** ProductReaction, Report, Notification, and SwapTransaction do not have seed data. These tables are populated through normal app usage.
 
 ---
 
@@ -246,5 +252,5 @@ ports:
 
 ---
 
-**Last updated:** 11 March 2026
+**Last updated:** 22 April 2026
 **Responsible:** Daniel (DBA)
