@@ -136,19 +136,17 @@ test.describe('HU-GAM-05A – Retos en el Perfil', () => {
       await expect(page.getByText(/puntos/i).first()).toBeVisible();
 
       // Los retos aparecen antes que "Logros y Medallas" en el DOM
-      const challengesHandle = await challengesBoardInProfile(page).elementHandle();
-      const badgesHeading = page.getByText('Logros y Medallas');
-      const badgesHandle = await badgesHeading.elementHandle();
-
-      if (challengesHandle && badgesHandle) {
-        // compareDocumentPosition: bit 4 = el segundo elemento viene después del primero
-        const position: number = await page.evaluate(
-          ([a, b]) => a.compareDocumentPosition(b),
-          [challengesHandle, badgesHandle] as [Element, Element],
+      // Usamos evaluate con selectores para evitar problemas de tipos con ElementHandle
+      const challengesBeforeBadges = await page.evaluate(() => {
+        const challenges = document.querySelector('h3')?.closest('section');
+        const badges = Array.from(document.querySelectorAll('h2')).find(h =>
+          h.textContent?.includes('Logros y Medallas'),
         );
-        // Node.DOCUMENT_POSITION_FOLLOWING = 4: badges está después de challenges en el DOM
-        expect(position & 4).toBe(4);
-      }
+        if (!challenges || !badges) return true;
+        // DOCUMENT_POSITION_FOLLOWING = 4: badges está después de challenges
+        return !!(challenges.compareDocumentPosition(badges) & 4);
+      });
+      expect(challengesBeforeBadges).toBe(true);
     });
   });
 
