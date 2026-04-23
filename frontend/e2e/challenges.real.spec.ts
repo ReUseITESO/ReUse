@@ -14,7 +14,7 @@
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 
 const BASE_API = 'http://localhost:8000/api';
-const TEST_EMAIL = 'jose.chavez@iteso.mx';
+const TEST_EMAIL = 'sofia.torres@iteso.mx';
 const TEST_PASSWORD = 'ReUse2026!';
 
 // ─── Auth helper: login vía API real y devuelve tokens ───────────────────────
@@ -37,6 +37,9 @@ async function injectRealTokens(page: Page, tokens: { access: string; refresh: s
 
 // ─── Setup compartido ────────────────────────────────────────────────────────
 test.describe('Retos de Sustentabilidad – Sistema Real', () => {
+  // Serial para evitar rate-limiting: el beforeAll comparte tokens en un solo worker
+  test.describe.configure({ mode: 'serial' });
+
   let tokens: { access: string; refresh: string };
 
   test.beforeAll(async ({ request }) => {
