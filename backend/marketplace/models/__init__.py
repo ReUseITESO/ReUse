@@ -19,5 +19,5 @@ __all__ = [
     "ForumQuestion",
     "ProductReaction",
     "Report",
-    "SwapTransaction"
+    "SwapTransaction",
 ]

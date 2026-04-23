@@ -7,12 +7,12 @@ class SwapTransaction(models.Model):
     """Extended state machine for swap-type transactions."""
 
     class Stage(models.TextChoices):
-        PROPOSAL_PENDING  = "proposal_pending",  "Proposal Pending"
+        PROPOSAL_PENDING = "proposal_pending", "Proposal Pending"
         PROPOSAL_REJECTED = "proposal_rejected", "Proposal Rejected"
         PROPOSAL_ACCEPTED = "proposal_accepted", "Proposal Accepted"
-        AGENDA_PENDING    = "agenda_pending",    "Agenda Pending"
-        AGENDA_REJECTED   = "agenda_rejected",   "Agenda Rejected"
-        AGENDA_ACCEPTED   = "agenda_accepted",   "Agenda Accepted"
+        AGENDA_PENDING = "agenda_pending", "Agenda Pending"
+        AGENDA_REJECTED = "agenda_rejected", "Agenda Rejected"
+        AGENDA_ACCEPTED = "agenda_accepted", "Agenda Accepted"
 
     transaction = models.OneToOneField(
         "marketplace.Transaction",
