@@ -37,26 +37,22 @@ class SwapTransaction(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=["transaction"]),
-            models.Index(fields=["proposed_product"]),
-            models.Index(fields=["stage"]),
-            models.Index(fields=["stage", "created_at"]),
+            models.Index(fields=["stage"], name="idx_swaptx_stage"),
+            models.Index(fields=["stage", "created_at"], name="idx_swaptx_stage_created"),
         ]
 
     def save(self, *args, **kwargs):
-        if not self._state.adding:
-            self.updated_at = timezone.now()
-        super().save(*args, **kwargs)
-
-    def clean(self):
         if (
             self.proposed_product_id
             and self.transaction_id
-            and self.proposed_product_id == self.transaction.products_id
+            and self.proposed_product_id == self.transaction.product_id  # product_id, no products_id
         ):
             raise ValidationError(
                 "proposed_product cannot be the same product as the transaction product."
             )
+        if not self._state.adding:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"SwapTransaction #{self.pk} — {self.stage}"
