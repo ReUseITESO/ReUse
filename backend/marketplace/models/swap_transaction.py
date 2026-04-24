@@ -38,14 +38,17 @@ class SwapTransaction(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["stage"], name="idx_swaptx_stage"),
-            models.Index(fields=["stage", "created_at"], name="idx_swaptx_stage_created"),
+            models.Index(
+                fields=["stage", "created_at"], name="idx_swaptx_stage_created"
+            ),
         ]
 
     def save(self, *args, **kwargs):
         if (
             self.proposed_product_id
             and self.transaction_id
-            and self.proposed_product_id == self.transaction.product_id  # product_id, no products_id
+            and self.proposed_product_id
+            == self.transaction.product_id  # product_id, no products_id
         ):
             raise ValidationError(
                 "proposed_product cannot be the same product as the transaction product."
