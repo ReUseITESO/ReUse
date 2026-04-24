@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCreateTransaction } from '@/hooks/useCreateTransaction';
 import { useProductDetail } from '@/hooks/useProductDetail';
 import { useReportProduct } from '@/hooks/useReportProduct';
+import { useSwapTransaction } from '@/hooks/useSwapTransaction';
 
 import type { ProductReactionSummary } from '@/types/product';
 
@@ -27,6 +28,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     isLoading: isCreatingTransaction,
     error: createTransactionError,
   } = useCreateTransaction();
+  const { proposeSwap, isLoading: isProposingSwap, error: proposeSwapError } = useSwapTransaction();
   const { product, setProduct, isLoading, error } = useProductDetail(productId);
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [transactionNotice, setTransactionNotice] = useState<string | null>(null);
@@ -84,7 +86,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     !product.has_active_transaction &&
     product.status === 'disponible';
 
-  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date) {
+  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date, swapProductId?: number) {
     if (!product) {
       return;
     }
@@ -97,6 +99,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
     if (!transaction) {
       return;
+    }
+
+    if (product.transaction_type === 'swap' && swapProductId) {
+      const swapResult = await proposeSwap(transaction.id, swapProductId);
+      if (!swapResult) {
+        return; // Error is handled by the hook and displayed in dialog via proposeSwapError (passed as error below)
+      }
     }
 
     setIsTransactionDialogOpen(false);
@@ -192,8 +201,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         sellerName={product.seller_name}
         sellerEmail={product.seller_email}
         transactionType={product.transaction_type}
-        isLoading={isCreatingTransaction}
-        error={createTransactionError}
+        isLoading={isCreatingTransaction || isProposingSwap}
+        error={createTransactionError || proposeSwapError}
         onCancel={() => setIsTransactionDialogOpen(false)}
         onSubmit={handleCreateTransaction}
       />

@@ -5,6 +5,7 @@ import type { PaginatedResponse } from '@/types/api';
 import type { Comment } from '@/types/comment';
 import type {
   CreateTransactionPayload,
+  SwapTransactionData,
   Transaction,
   TransactionReview,
   UpdateTransactionStatusPayload,
@@ -118,6 +119,48 @@ export async function updateTransactionStatus(
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+}
+
+export async function createSwapProposal(
+  transactionId: number | string,
+  proposedProductId: number,
+) {
+  return apiClient<SwapTransactionData>(`/marketplace/transactions/${transactionId}/swap/propose/`, {
+    method: 'POST',
+    body: JSON.stringify({ proposed_product_id: proposedProductId }),
+  });
+}
+
+export async function respondSwapProposal(transactionId: number | string, accept: boolean) {
+  return apiClient<SwapTransactionData>(
+    `/marketplace/transactions/${transactionId}/swap/respond-proposal/`,
+    { method: 'PATCH', body: JSON.stringify({ accept }) },
+  );
+}
+
+export async function proposeSwapAgenda(
+  transactionId: number | string,
+  agendaLocation: string,
+  deliveryDate: string,
+) {
+  return apiClient<SwapTransactionData>(
+    `/marketplace/transactions/${transactionId}/swap/propose-agenda/`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ agenda_location: agendaLocation, delivery_date: deliveryDate }),
+    },
+  );
+}
+
+export async function respondSwapAgenda(transactionId: number | string, accept: boolean) {
+  return apiClient<SwapTransactionData>(
+    `/marketplace/transactions/${transactionId}/swap/respond-agenda/`,
+    { method: 'PATCH', body: JSON.stringify({ accept }) },
+  );
+}
+
+export async function getSwapState(transactionId: number | string) {
+  return apiClient<SwapTransactionData>(`/marketplace/transactions/${transactionId}/swap/`);
 }
 
 // ===== Marketplace Comments =====
