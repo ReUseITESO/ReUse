@@ -31,8 +31,7 @@ export default function ProductForm() {
       condition: 'buen_estado',
       transaction_type: 'sale',
       price: '',
-      image_url: '',
-      images: [],
+      imageFiles: [],
       community: 'none',
     },
   });
@@ -49,29 +48,23 @@ export default function ProductForm() {
 
   async function handleCreateProduct(values: FormValues) {
     const isSale = values.transaction_type === 'sale';
-    const hasImageList = values.images.length > 0;
 
-    // Validate category selection (not placeholder)
-    if (!values.category || values.category === 'placeholder') {
-      return;
+    if (!values.category || values.category === 'placeholder') return;
+
+    const formData = new FormData();
+    formData.append('title', values.title);
+    formData.append('description', values.description);
+    formData.append('category', String(Number(values.category)));
+    formData.append('condition', values.condition);
+    formData.append('transaction_type', values.transaction_type);
+    if (isSale) formData.append('price', String(Number(values.price)));
+    if (values.community && values.community !== 'none') {
+      formData.append('community', String(Number(values.community)));
     }
+    values.imageFiles.forEach(file => formData.append('images', file));
 
-    const result = await createProduct({
-      title: values.title,
-      description: values.description,
-      category: Number(values.category),
-      condition: values.condition,
-      transaction_type: values.transaction_type,
-      price: isSale ? Number(values.price) : null,
-      image_url: hasImageList ? values.images[0] : values.image_url || undefined,
-      images: hasImageList ? values.images : undefined,
-      community:
-        values.community && values.community !== 'none' ? Number(values.community) : undefined,
-    });
-
-    if (result) {
-      router.push('/products');
-    }
+    const result = await createProduct(formData);
+    if (result) router.push('/products');
   }
 
   if (!isAuthenticated) {

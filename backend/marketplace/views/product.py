@@ -285,9 +285,14 @@ class ProductViewSet(
         serializer = self.get_serializer(product, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        updated_product = update_product(
-            product, serializer.validated_data, request.user
-        )
+        with transaction.atomic():
+            updated_product = update_product(
+                product, serializer.validated_data, request.user
+            )
+            images = request.FILES.getlist("images")
+            if images:
+                updated_product.images.all().delete()
+                attach_images_to_product(updated_product, images)
 
         response_serializer = ProductListSerializer(
             updated_product,
