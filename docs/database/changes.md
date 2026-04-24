@@ -1,8 +1,205 @@
-
 # Database Changes Log - ReUseITESO
 
 **DBA:** Daniel
-**Last updated:** 12 March 2026
+**Last updated:** 22 April 2026
+
+---
+
+## [2026-04-22] HU-DBA-03 — SwapTransaction + Transaction.updated_at
+
+**Author:** Daniel (DBA)
+**Type:** Moderate (new table + new column on existing table)
+**DBA approved:** Yes — self-approved (DBA)
+
+### Context
+
+Prerequisite for HU-MKT-12 (#34). Adds dedicated state machine for swap negotiation flow: product proposal → agenda proposal → delivery confirmation. Without this table, HU-MKT-12 would be coupled to temporary solutions with high technical debt.
+
+### Schema changes
+
+**Table: `marketplace_swaptransaction`** — New table
+
+| Column              | Type         | Constraints                                                           |
+| ------------------- | ------------ | --------------------------------------------------------------------- |
+| id                  | BIGSERIAL    | PK                                                                    |
+| transaction_id      | BIGINT       | FK to marketplace_transaction(id) ON DELETE CASCADE, NOT NULL, UNIQUE |
+| proposed_product_id | BIGINT       | FK to marketplace_products(id) ON DELETE RESTRICT, NOT NULL           |
+| stage               | VARCHAR(30)  | NOT NULL DEFAULT 'proposal_pending', CHECK 6 valid values             |
+| agenda_location     | VARCHAR(255) | NULLABLE                                                              |
+| proposal_decided_at | TIMESTAMP    | NULLABLE                                                              |
+| agenda_decided_at   | TIMESTAMP    | NULLABLE                                                              |
+| created_at          | TIMESTAMP    | NOT NULL DEFAULT NOW()                                                |
+| updated_at          | TIMESTAMP    | NOT NULL DEFAULT NOW()                                                |
+
+Indexes:
+
+* `idx_swaptx_transaction` on `(transaction_id)` — UNIQUE
+* `idx_swaptx_proposed_product` on `(proposed_product_id)`
+* `idx_swaptx_stage` on `(stage)`
+* `idx_swaptx_stage_created` on `(stage, created_at)` — pending inbox queries
+
+**Table: `marketplace_transaction`** — Column added
+
+| Change      | Detail                                                                                                                 |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Field added | `updated_at TIMESTAMP NOT NULL DEFAULT NOW()`                                                                        |
+| Fix applied | `auto_now_add=True`on `created_at`replaced by `default=timezone.now`+`save()`override (loaddata compatibility) |
+
+### Migrations
+
+* `marketplace/migrations/0003_add_updated_at_transaction.py`
+* `marketplace/migrations/0004_add_swap_transaction.py`
+
+### Design notes
+
+* Cross-table constraint (`proposed_product_id != transaction.products_id`) enforced at Django layer via `clean()` — PostgreSQL does not support cross-row CHECK constraints.
+* `ON DELETE RESTRICT` on `proposed_product_id` — a product involved in an active swap proposal cannot be deleted.
+* On `stage = agenda_accepted`, service layer must sync `agenda_location` → `Transaction.delivery_location` before proceeding to delivery confirmation flow.
+
+---
+
+## [2026-03-19] HU-DB-01 — ProductReaction + Report + Notification
+
+**Author:** Daniel (DBA)
+**Type:** Moderate (three new tables — two in marketplace, one in core)
+**DBA approved:** Yes — self-approved (DBA)
+
+### Context
+
+Three new tables approved to support HU-MKT-17 (reactions), HU-MKT-18 (reports), and HU-CORE-14 (notifications). All proposals reviewed against the existing schema before approval.
+
+Two design changes applied during review:
+
+* **Rejected `likes_count`, `dislikes_count` on Products (HU-DB-01):** Denormalized counters were proposed with Django signals to keep them updated. Rejected — signals do not fire on bulk operations, causing silent drift. Counts are obtained via `COUNT()` query with composite index `(product_id, type)`.
+* **Rejected `report_count` on Products (Report proposal):** Same reasoning. Count via `COUNT()` with index on `product_id`.
+* **Rejected UUID as PK on Report:** Inconsistent with the rest of the project which uses BIGSERIAL throughout. No technical justification for UUID at this scope.
+
+### Schema changes
+
+**Table: `marketplace_productreaction`** — New table
+
+| Column     | Type        | Constraints                                                |
+| ---------- | ----------- | ---------------------------------------------------------- |
+| id         | BIGSERIAL   | PK                                                         |
+| product_id | BIGINT      | FK to marketplace_products(id) ON DELETE CASCADE, NOT NULL |
+| user_id    | BIGINT      | FK to core_user(id) ON DELETE CASCADE, NOT NULL            |
+| type       | VARCHAR(10) | NOT NULL CHECK IN ('like', 'dislike')                      |
+| created_at | TIMESTAMP   | NOT NULL DEFAULT NOW()                                     |
+| UNIQUE     |             | (product_id, user_id)                                      |
+
+Indexes:
+
+* `idx_pr_product_type` on `(product_id, type)` — count queries
+* `idx_pr_user` on `(user_id)` — reactions by user
+
+**Table: `marketplace_report`** — New table
+
+| Column      | Type         | Constraints                                                                                                    |
+| ----------- | ------------ | -------------------------------------------------------------------------------------------------------------- |
+| id          | BIGSERIAL    | PK                                                                                                             |
+| product_id  | BIGINT       | FK to marketplace_products(id) ON DELETE CASCADE, NOT NULL                                                     |
+| reporter_id | BIGINT       | FK to core_user(id) ON DELETE CASCADE, NOT NULL                                                                |
+| reason      | VARCHAR(30)  | NOT NULL CHECK IN ('prohibited_item', 'misleading_description', 'offensive_content', 'possible_scam', 'other') |
+| description | VARCHAR(300) | NULLABLE                                                                                                       |
+| created_at  | TIMESTAMP    | NOT NULL DEFAULT NOW()                                                                                         |
+| UNIQUE      |              | (product_id, reporter_id)                                                                                      |
+
+Indexes:
+
+* `idx_marketplace_report_product` on `(product_id)`
+* `idx_report_reporter` on `(reporter_id)`
+
+**Table: `core_notification`** — New table
+
+| Column       | Type         | Constraints                                     |
+| ------------ | ------------ | ----------------------------------------------- |
+| id           | BIGSERIAL    | PK                                              |
+| user_id      | BIGINT       | FK to core_user(id) ON DELETE CASCADE, NOT NULL |
+| type         | VARCHAR(50)  | NOT NULL                                        |
+| title        | VARCHAR(255) | NOT NULL                                        |
+| body         | TEXT         | NULLABLE                                        |
+| reference_id | INTEGER      | NULLABLE (no FK — generic reference)           |
+| is_read      | BOOLEAN      | NOT NULL DEFAULT FALSE                          |
+| read_at      | TIMESTAMP    | NULLABLE                                        |
+| created_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                          |
+
+Indexes:
+
+* `idx_notif_user_unread` on `(user_id, is_read)` WHERE `is_read = FALSE` — partial index for unread notifications
+
+### Tables with no changes
+
+| Table                    | Proposed change        | Decision                  |
+| ------------------------ | ---------------------- | ------------------------- |
+| `marketplace_products` | Add `likes_count`    | ❌ Rejected — drift risk |
+| `marketplace_products` | Add `dislikes_count` | ❌ Rejected — drift risk |
+| `marketplace_products` | Add `report_count`   | ❌ Rejected — drift risk |
+
+### Migrations
+
+* `marketplace/migrations/0005_add_product_reaction.py`
+* `marketplace/migrations/0006_add_report.py`
+* `core/migrations/0003_add_notification.py`
+
+### Pending
+
+* [ ] Update `erd_v1.md` to v1.4 — done
+* [ ] Backend team implements models for the three new tables
+* [ ] Backend team generates and commits migrations with models in the same commit
+* [ ] PRs tagged to DBA before merge
+
+---
+
+## [2026-03-12] Social — CommunityPost + ForumQuestion post_id
+
+**Author:** Daniel (DBA)
+**Type:** Moderate (new table + FK added to existing table)
+**DBA approved:** Yes — self-approved (DBA)
+
+### Context
+
+New `CommunityPost` table added to the `social` app. Posts are published inside communities by their members. Supports pinned posts for announcements.
+
+`ForumQuestion` extended to support threaded discussion on community posts. `products_id` made nullable. New `post_id` FK added. Exactly one of the two must be non-null — enforced by CHECK constraint at the DB level and by `clean()` in Django.
+
+### Schema changes
+
+**Table: `social_communitypost`** — New table
+
+| Column       | Type         | Constraints                                            |
+| ------------ | ------------ | ------------------------------------------------------ |
+| id           | BIGSERIAL    | PK                                                     |
+| community_id | BIGINT       | FK to social_community(id) ON DELETE CASCADE, NOT NULL |
+| user_id      | BIGINT       | FK to core_user(id) ON DELETE CASCADE, NOT NULL        |
+| title        | VARCHAR(255) | NOT NULL                                               |
+| content      | TEXT         | NOT NULL                                               |
+| image_url    | VARCHAR(500) | NULLABLE                                               |
+| is_pinned    | BOOLEAN      | NOT NULL DEFAULT FALSE                                 |
+| created_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
+| updated_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
+
+**Table: `marketplace_forumquestion`** — Fields modified
+
+| Change        | Before                          | After                                                                                              |
+| ------------- | ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Field changed | `products_id BIGINT NOT NULL` | `products_id BIGINT NULL`                                                                        |
+| Field added   | —                              | `post_id BIGINT NULL REFERENCES social_communitypost(id) ON DELETE CASCADE`                      |
+| CHECK added   | —                              | `(products_id IS NOT NULL AND post_id IS NULL) OR (products_id IS NULL AND post_id IS NOT NULL)` |
+| Index added   | —                              | `idx_marketplace_forumquestion_post ON (post_id)`                                                |
+
+### Migrations
+
+* `social/migrations/0002_add_community_post_and_forum_post_link.py`
+* `marketplace/migrations/0004_add_community_post_and_forum_post_link.py`
+
+### Seed data updated
+
+`seeds/seed_dev_fixed.json` updated. Added:
+
+* 3 `social.communitypost` records (pks 1-3)
+* 3 `marketplace.forumquestion` records linked to posts (pks 6-8)
+
+Total objects: 62 (previously 44, then 56 after social module seed).
 
 ---
 
@@ -297,59 +494,6 @@ New `social` app to support social connections between users: friend requests, f
 
 ---
 
-## [2026-03-12] Social — CommunityPost + ForumQuestion post_id
-
-**Author:** Daniel (DBA)
-**Type:** Moderate (new table + FK added to existing table)
-**DBA approved:** Yes — self-approved (DBA)
-
-### Context
-
-New `CommunityPost` table added to the `social` app. Posts are published inside communities by their members. Supports pinned posts for announcements.
-
-`ForumQuestion` extended to support threaded discussion on community posts. `products_id` made nullable. New `post_id` FK added. Exactly one of the two must be non-null — enforced by CHECK constraint at the DB level and by `clean()` in Django.
-
-### Schema changes
-
-**Table: `social_communitypost`** — New table
-
-| Column       | Type         | Constraints                                            |
-| ------------ | ------------ | ------------------------------------------------------ |
-| id           | BIGSERIAL    | PK                                                     |
-| community_id | BIGINT       | FK to social_community(id) ON DELETE CASCADE, NOT NULL |
-| user_id      | BIGINT       | FK to core_user(id) ON DELETE CASCADE, NOT NULL        |
-| title        | VARCHAR(255) | NOT NULL                                               |
-| content      | TEXT         | NOT NULL                                               |
-| image_url    | VARCHAR(500) | NULLABLE                                               |
-| is_pinned    | BOOLEAN      | NOT NULL DEFAULT FALSE                                 |
-| created_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
-| updated_at   | TIMESTAMP    | NOT NULL DEFAULT NOW()                                 |
-
-**Table: `marketplace_forumquestion`** — Fields modified
-
-| Change        | Before                          | After                                                                                              |
-| ------------- | ------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Field changed | `products_id BIGINT NOT NULL` | `products_id BIGINT NULL`                                                                        |
-| Field added   | —                              | `post_id BIGINT NULL REFERENCES social_communitypost(id) ON DELETE CASCADE`                      |
-| CHECK added   | —                              | `(products_id IS NOT NULL AND post_id IS NULL) OR (products_id IS NULL AND post_id IS NOT NULL)` |
-| Index added   | —                              | `idx_marketplace_forumquestion_post ON (post_id)`                                                |
-
-### Migrations
-
-* `social/migrations/0002_add_community_post_and_forum_post_link.py`
-* `marketplace/migrations/0004_add_community_post_and_forum_post_link.py`
-
-### Seed data updated
-
-`seeds/seed_dev_fixed.json` updated. Added:
-
-* 3 `social.communitypost` records (pks 1-3)
-* 3 `marketplace.forumquestion` records linked to posts (pks 6-8)
-
-Total objects: 62 (previously 44, then 56 after social module seed).
-
----
-
 ## Documentation pending
 
 | Item                                                                         | Status                                          |
@@ -358,3 +502,5 @@ Total objects: 62 (previously 44, then 56 after social module seed).
 | Post-facto RFC for PointTransaction                                          | Documented in erd_v1.md v1.1 Known Design Notes |
 | Notify team: schema changes must tag DBA in PRs                              | Pending                                         |
 | Update `erd_v1.md`with CommunityPost and ForumQuestion dual-target         | Done — v1.3                                    |
+| Update `erd_v1.md`with ProductReaction, Report, Notification               | Done — v1.4                                    |
+| Update `erd_v1.md`with SwapTransaction and Transaction.updated_at          | Done — v1.5                                    |
