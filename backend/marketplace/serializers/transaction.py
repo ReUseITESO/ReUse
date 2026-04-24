@@ -60,10 +60,9 @@ class TransactionSerializer(serializers.ModelSerializer):
     def get_swap_data(self, obj):
         if obj.transaction_type != "swap":
             return None
-        try:
+        if hasattr(obj, "swap_data"):
             return SwapTransactionSerializer(obj.swap_data).data
-        except obj.swap_data.RelatedObjectDoesNotExist:
-            return None
+        return None
 
     class Meta:
         model = Transaction
