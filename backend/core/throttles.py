@@ -14,14 +14,20 @@ class AuthRateThrottle(SimpleRateThrottle):
     scope = "auth"
 
     def get_cache_key(self, request, view):
-        return self.cache_format % {"scope": self.scope, "ident": _get_client_ip(request)}
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": _get_client_ip(request),
+        }
 
 
 class EmailVerificationRateThrottle(SimpleRateThrottle):
     scope = "email_verification"
 
     def get_cache_key(self, request, view):
-        return self.cache_format % {"scope": self.scope, "ident": _get_client_ip(request)}
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": _get_client_ip(request),
+        }
 
 
 class ReactivationRateThrottle(SimpleRateThrottle):
@@ -30,7 +36,10 @@ class ReactivationRateThrottle(SimpleRateThrottle):
     scope = "reactivation"
 
     def get_cache_key(self, request, view):
-        return self.cache_format % {"scope": self.scope, "ident": _get_client_ip(request)}
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": _get_client_ip(request),
+        }
 
 
 class PasswordResetRateThrottle(SimpleRateThrottle):
@@ -39,7 +48,10 @@ class PasswordResetRateThrottle(SimpleRateThrottle):
     scope = "password_reset"
 
     def get_cache_key(self, request, view):
-        return self.cache_format % {"scope": self.scope, "ident": _get_client_ip(request)}
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": _get_client_ip(request),
+        }
 
 
 class StandardAnonThrottle(AnonRateThrottle):
