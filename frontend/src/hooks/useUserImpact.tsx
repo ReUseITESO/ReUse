@@ -5,7 +5,6 @@ import { apiClient } from '@/lib/api';
 
 type UserImpact = {
   items_reused: number;
-  items_saved_from_waste: number;
   co2_avoided: number;
   community_average_items: number;
   community_average_co2: number;
