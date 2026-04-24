@@ -12,6 +12,7 @@ from marketplace.services.transaction_service import (
     get_expiration_datetime,
     is_transaction_expired,
 )
+from marketplace.serializers.transaction_flow import SwapTransactionSerializer
 
 
 class TransactionUserSerializer(serializers.ModelSerializer):
@@ -48,12 +49,21 @@ class TransactionSerializer(serializers.ModelSerializer):
     buyer = TransactionUserSerializer(read_only=True)
     expires_at = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField()
+    swap_data = serializers.SerializerMethodField()
 
     def get_expires_at(self, obj):
         return get_expiration_datetime(obj)
 
     def get_is_expired(self, obj):
         return is_transaction_expired(obj)
+
+    def get_swap_data(self, obj):
+        if obj.transaction_type != "swap":
+            return None
+        try:
+            return SwapTransactionSerializer(obj.swap_data).data
+        except obj.swap_data.RelatedObjectDoesNotExist:
+            return None
 
     class Meta:
         model = Transaction
@@ -73,6 +83,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             "created_at",
             "expires_at",
             "is_expired",
+            "swap_data",
         ]
 
 
