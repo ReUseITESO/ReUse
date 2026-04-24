@@ -8,6 +8,7 @@ import TransactionLocationHighlight from '@/components/transactions/TransactionL
 import TransactionProductSection from '@/components/transactions/TransactionProductSection';
 import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
+import SwapProposalStatus from '@/components/transactions/swap-transactions/SwapProposalStatus';
 import {
   getDeliveryConfirmationLabel,
   getPendingCounterpartLabel,
@@ -19,6 +20,7 @@ import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransactionDetail } from '@/hooks/useTransactionDetail';
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
+import { useSwapTransaction } from '@/hooks/useSwapTransaction';
 import type { UpdatableTransactionStatus } from '@/types/transaction';
 
 interface TransactionDetailViewProps {
@@ -29,6 +31,13 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   const { user } = useAuth();
   const { transaction, isLoading, error, refetch } = useTransactionDetail(transactionId);
   const { changeStatus, isLoading: isUpdating, error: updateError } = useTransactionStatus();
+  const {
+    respondProposal,
+    proposeAgenda,
+    respondAgenda,
+    isLoading: isSwapLoading,
+    error: swapError,
+  } = useSwapTransaction();
 
   if (isLoading) {
     return <Spinner />;
@@ -59,6 +68,21 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
     if (updated) {
       refetch();
     }
+  }
+
+  async function handleRespondProposal(accept: boolean) {
+    const updated = await respondProposal(transactionIdValue, accept);
+    if (updated) refetch();
+  }
+
+  async function handleProposeAgenda(location: string, date: Date) {
+    const updated = await proposeAgenda(transactionIdValue, location, date.toISOString());
+    if (updated) refetch();
+  }
+
+  async function handleRespondAgenda(accept: boolean) {
+    const updated = await respondAgenda(transactionIdValue, accept);
+    if (updated) refetch();
   }
 
   return (
@@ -115,6 +139,18 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             </div>
           </div>
         </div>
+
+        {transaction.swap_data && (
+          <SwapProposalStatus
+            swapData={transaction.swap_data}
+            actorRole={actorRole}
+            isLoading={isSwapLoading}
+            error={swapError}
+            onRespondProposal={handleRespondProposal}
+            onProposeAgenda={handleProposeAgenda}
+            onRespondAgenda={handleRespondAgenda}
+          />
+        )}
 
         <TransactionDeliveryConfirmations
           sellerConfirmation={transaction.seller_confirmation}
