@@ -74,20 +74,21 @@ export default function ProfilePage() {
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch">
           <div className="space-y-6">
             <section className="rounded-lg border border-border bg-card p-7 shadow-sm lg:flex lg:min-h-44 lg:items-center">
-              {isEditing ? (
-                <ProfileEditForm
+              {isEditing  ? (//w-full aspect-square flex items-center justify-center rounded-full overflow-hidden
+                <ProfileEditForm //relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary
                   user={displayUser}
                   onSave={handleSave}
                   onCancel={() => setIsEditing(false)}
                 />
               ) : (
                 <div className="flex w-full items-center gap-6">
-                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                  
+                  <div className="w-full aspect-square flex items-center justify-center rounded-full overflow-hidden">
                     <Avatar />
                   </div>
-                  <div className="w-full flex-1">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
+                  <div className="flex items-center justify-between gap-8">
+                    <div className="flex flex-col items-center gap-3 w-full">
+                      <div className="flex flex-col items-center">
                         <h2 className="text-h3 font-semibold text-fg">
                           {displayUser.full_name ||
                             `${displayUser.first_name} ${displayUser.last_name}`.trim()}
@@ -97,23 +98,26 @@ export default function ProfilePage() {
                           <p className="mt-0.5 text-sm text-muted-fg">{displayUser.phone}</p>
                         )}
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={() => setIsEditing(true)}
-                          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
-                        >
-                          <Pencil className="h-4 w-4" /> Editar perfil
-                        </button>
-                        <Link
-                          href="/profile/customization"
-                          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-muted"
-                        >
-                          <Palette className="h-4 w-4" /> Customizar Avatar
-                        </Link>
+                      <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
+                        <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo
                       </div>
                     </div>
-                    <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success/20">
-                      <span className="h-1.5 w-1.5 rounded-full bg-success" /> Usuario activo
+                    <div className="flex flex-col items-center gap-3 w-full">
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="flex items-center justify-center gap-2 w-full max-w-[220px] rounded-xl bg-primary text-white px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:bg-primary-hover hover:scale-105 active:scale-95 shadow-md shadow-primary/20"
+                      >
+                        <Pencil className="h-5 w-5 shrink-0" />
+                        <span>Editar Perfil</span>
+                      </button>
+
+                      <Link
+                        href="/profile/customization"
+                        className="flex items-center justify-center gap-2 w-full max-w-[220px] rounded-xl bg-secondary text-white px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:bg-secondary-hover hover:scale-105 active:scale-95 shadow-md shadow-secondary/20"
+                      >
+                        <Palette className="h-5 w-5 shrink-0" />
+                        <span className='text-center'>Personalizar Avatar</span>
+                      </Link>
                     </div>
                   </div>
                 </div>

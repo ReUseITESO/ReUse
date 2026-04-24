@@ -19,21 +19,22 @@ export default function DesignTab() {
   const [loading] = useState(false);
 
   const handleSelect = (borderPath: string) => {
-    if (borderPath === avatarData.border_name || avatarData.border_type === 'design') {
+    if (borderPath !== avatarData.border_name) {
+      // select current over the previously selected design
+      setAvatarData(prev => ({
+        ...prev,
+        border_type: 'design',
+        border_name: borderPath,
+      }));
+    } else
+    {
       // Deselect if already selected
       setAvatarData(prev => ({
         ...prev,
         border_type: 'custom',
         border_name: null,
       }));
-      return;
-    } else if (avatarData.border_name !== borderPath) {
-      setAvatarData(prev => ({
-        ...prev,
-        border_type: 'design',
-        border_name: borderPath,
-      }));
-    }
+    } 
   };
 
   if (loading) return <div className="text-center p-4">Cargando diseños...</div>;

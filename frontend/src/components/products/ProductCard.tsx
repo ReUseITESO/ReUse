@@ -22,16 +22,14 @@ export default function ProductCard({ product, showCommunityBadge }: ProductCard
   return (
     <Link href={`/products/${product.id}`}>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md cursor-pointer">
-        <div className="flex h-44 items-center justify-center bg-muted">
-          {product.images?.[0]?.image_url ? (
-            <div className="relative w-full aspect-video">  
-              <Image
-                fill
-                src={product.images[0].image_url}
-                alt={product.title}
-                className="object-cover"
-              /> 
-            </div>
+        <div className="relative flex h-44 items-center justify-center bg-muted">
+          {product.images?.[0]?.image_url ? (  
+            <Image
+              fill
+              src={product.images[0].image_url}
+              alt={product.title}
+              className="object-cover"
+            /> 
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-fg">
               <CategoryPlaceholderIcon categoryName={product.category.name} />

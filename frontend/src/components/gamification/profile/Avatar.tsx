@@ -25,7 +25,7 @@ function getProfilePictureStyle(avatarData: AvatarData) {
 }
 
 interface MovableAvatarProps {
-  movable?: boolean | null;
+  movable?: boolean | null; 
 }
 
 export default function Avatar({ movable = false }: MovableAvatarProps) {
@@ -153,9 +153,9 @@ export default function Avatar({ movable = false }: MovableAvatarProps) {
         <div
           id="profile-border"
           className="absolute aspect-square 
-				rounded-full flex inset-[10%]
-				items-center justify-center
-				pointer-events-none"
+            rounded-full flex inset-[10%]
+            items-center justify-center
+            pointer-events-none"
           style={{ ...profileBorderStyle }}
         ></div>
       )}
@@ -163,15 +163,15 @@ export default function Avatar({ movable = false }: MovableAvatarProps) {
       {/* 3. The Design Border Overlay Layer */}
       {avatarData.border_type === 'design' && avatarData.border_name && (
         <div
-          className="absolute aspect-square top-0 left-0 w-full
-							flex items-center justify-center pointer-events-none"
+          className="absolute aspect-square w-full
+							flex items-center justify-center 
+              pointer-events-none"
         >
           <div className="absolute inset-0 rounded-full">
             <Image
               src={getImageUrl(`/media/avatars/borders/${avatarData.border_name}.png`)}
               alt={avatarData.border_name || 'preset border'}
               fill
-              className="object-contain p-1"
               unoptimized
             />
           </div>
