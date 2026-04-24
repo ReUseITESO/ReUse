@@ -63,10 +63,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}"
     container_name: reuse_iteso_frontend
     environment:
       NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}"
-    command: npm run dev
     ports:
       - "3000:3000"
     volumes:
