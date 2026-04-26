@@ -26,20 +26,9 @@ interface MyProductCardProps {
 }
 
 const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
-  disponible: [
-    { label: 'Pausar', value: 'pausado' },
-    { label: 'Marcar en proceso', value: 'en_proceso' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  pausado: [
-    { label: 'Reactivar', value: 'disponible' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  en_proceso: [
-    { label: 'Marcar disponible', value: 'disponible' },
-    { label: 'Marcar completado', value: 'completado' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
+  disponible: [],
+  pausado: [],
+  en_proceso: [],
   completado: [],
   cancelado: [],
 };
