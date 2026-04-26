@@ -10,7 +10,7 @@ export default function ProfilePictureDraft() {
 
   const handleSave = async (): Promise<void> => {
     const result = await updateAvatar(avatarData);
-    if (result.success) alert('Saved!');
+    if (result.success) alert('¡Avatar Actualizado!');
   };
 
   return (

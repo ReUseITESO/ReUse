@@ -2,10 +2,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from gamification.models.avatar import AvatarData
-
 DEFAULT_AVATAR_DATA = {
-    "image": "'/../media/avatars/default.png",
+    "image": "./media/avatars/default.png",
     "border_color": "#00264C",
     "border_thickness": 10,
     "zoom_level": 1.0,
@@ -20,28 +18,24 @@ DEFAULT_AVATAR_DATA = {
 
 
 class AvatarDataView(APIView):
-    # This automatically handles the "is_authenticated" check for you
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # 1. Find the avatar row for this user
-        avatar, _ = AvatarData.objects.get_or_create(user=request.user)
-
-        # 2. Return the JSON object stored in the database
-        # This returns everything: image, colors, and your new template_id
-        response_data = {**DEFAULT_AVATAR_DATA, **(avatar.data or {})}
+        """Get avatar data from user's avatar_data JSONField"""
+        user = request.user
+        current_data = user.avatar_data if isinstance(user.avatar_data, dict) else {}
+        response_data = {**DEFAULT_AVATAR_DATA, **current_data}
         return Response(response_data)
 
     def post(self, request):
-        # 1. Find the avatar row
-        avatar, _ = AvatarData.objects.get_or_create(user=request.user)
-
-        current_data = avatar.data if isinstance(avatar.data, dict) else {}
+        """Update avatar data in user's avatar_data JSONField"""
+        user = request.user
+        current_data = user.avatar_data if isinstance(user.avatar_data, dict) else {}
 
         # Three-way merge: Defaults <- Current Data <- New Request Data
         updated_data = {**DEFAULT_AVATAR_DATA, **current_data, **request.data}
 
-        avatar.data = updated_data
-        avatar.save()
+        user.avatar_data = updated_data
+        user.save()
 
-        return Response(avatar.data)
+        return Response(user.avatar_data)

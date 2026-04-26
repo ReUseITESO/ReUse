@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus } from 'lucide-react';
+import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus, Crown } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -216,8 +216,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               </div>
             )}
           </div>
-
-          {/* Members sidebar 
+          {/* Members sidebar */}
           <div>
             <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
             <div className="space-y-2">
@@ -238,7 +237,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 </div>
               ))}
             </div>
-          </div>*/}
+          </div>
           <LeaderBoard members={members} posts={posts} />
         </div>
 

@@ -66,11 +66,11 @@ export function formatTimeAgo(isoDate: string): string {
 }
 
 export function getImageUrl(imagePath: string | null | undefined): string {
-  const BACKEND_URL = 'http://localhost:8000';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   // Handle empty state or null
   if (!imagePath || imagePath === '') {
-    return `${BACKEND_URL}/media/avatars/default.png`;
+    return `${API_URL}/media/avatars/default.png`;
   }
 
   // Handle absolute URLs
@@ -80,8 +80,8 @@ export function getImageUrl(imagePath: string | null | undefined): string {
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
 
   if (cleanPath.startsWith('/media/')) {
-    return `${BACKEND_URL}${cleanPath}`;
+    return `${API_URL}${cleanPath}`;
   }
 
-  return `${BACKEND_URL}/media${cleanPath}`;
+  return `${API_URL}/media${cleanPath}`;
 }
