@@ -163,6 +163,36 @@ export async function resendVerificationEmail(email: string): Promise<void> {
   }
 }
 
+export async function requestPasswordReset(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/password-reset/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error?.message ?? 'Error al enviar el correo de restablecimiento.');
+  }
+}
+
+export async function confirmPasswordReset(
+  token: string,
+  newPassword: string,
+  confirmPassword: string,
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/password-reset/confirm/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, new_password: newPassword, confirm_password: confirmPassword }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const code: string = body?.error?.code ?? 'UNKNOWN';
+    const message: string = body?.error?.message ?? 'No se pudo restablecer la contraseña.';
+    throw new ApiError(message, code);
+  }
+}
+
 export async function requestReactivationEmail(email: string): Promise<void> {
   const response = await fetch(`${API_BASE}/auth/account/reactivate/send/`, {
     method: 'POST',

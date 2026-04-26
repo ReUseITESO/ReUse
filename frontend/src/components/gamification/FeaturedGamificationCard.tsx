@@ -149,7 +149,10 @@ export default function FeaturedGamificationCard({
     .slice(0, 3);
 
   return (
-    <article className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <article
+      data-testid="level-card"
+      className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
       <div className="flex flex-col items-center text-center">
         <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary text-white shadow-lg">
           <CurrentLevelIcon className="h-9 w-9" />
@@ -160,12 +163,14 @@ export default function FeaturedGamificationCard({
           </span>
         </div>
 
-        <p className="mt-3 text-3xl font-bold text-fg">{levelProgression.current_level.name}</p>
+        <p data-testid="level-current-name" className="mt-3 text-3xl font-bold text-fg">
+          {levelProgression.current_level.name}
+        </p>
       </div>
 
       <div className="mt-7">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-fg">
+          <span data-testid="level-progress-label" className="text-muted-fg">
             {levelProgression.is_max_level
               ? 'Nivel máximo alcanzado'
               : `Progreso al ${levelProgression.next_level?.name || 'siguiente nivel'}`}
@@ -177,6 +182,8 @@ export default function FeaturedGamificationCard({
 
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-primary/10">
           <div
+            data-testid="level-progress-bar"
+            data-progress={normalizedProgress}
             className="h-full rounded-full bg-primary transition-all duration-300"
             style={{ width: `${normalizedProgress}%` }}
           />
@@ -185,7 +192,7 @@ export default function FeaturedGamificationCard({
         {!levelProgression.is_max_level && (
           <p className="mt-2 text-center text-xs text-muted-fg">
             Te faltan{' '}
-            <span className="font-semibold text-primary">
+            <span data-testid="level-points-to-next" className="font-semibold text-primary">
               {levelProgression.points_to_next_level}
             </span>{' '}
             puntos para subir de nivel

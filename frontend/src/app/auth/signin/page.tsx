@@ -231,6 +231,16 @@ export default function SignInPage() {
             />
           </div>
 
+          {/* HU-CORE-19: link a recuperar contraseña */}
+          <div className="text-center">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-primary hover:text-primary-hover hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={isSubmitting}
