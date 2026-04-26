@@ -158,23 +158,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         onBack={() => router.back()}
         onMainAction={handleMainAction}
         onReport={() => setIsReportDialogOpen(true)}
+        onReactionChange={handleReactionChange}
       />
 
       <div className="mx-auto mt-12 max-w-6xl border-t border-border pt-10">
         <CommentsSection productId={product.id} productSellerId={product.seller_id} />
-      </div>
-
-      <div className="mx-auto mt-4 flex max-w-6xl justify-end">
-        <ProductReactionButtons
-          productId={product.id}
-          sellerId={product.seller_id}
-          initialSummary={{
-            likes_count: product.likes_count,
-            dislikes_count: product.dislikes_count,
-            user_reaction: product.user_reaction,
-          }}
-          onChange={handleReactionChange}
-        />
       </div>
 
       <ReportProductDialog
