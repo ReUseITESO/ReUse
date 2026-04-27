@@ -126,6 +126,8 @@ export interface SwapProposedProduct {
   id: number;
   title: string;
   description: string;
+  condition?: ProductCondition | null;
+  transaction_type: TransactionType;
   status: ProductStatus;
   image_url: string | null;
   category: Category;
