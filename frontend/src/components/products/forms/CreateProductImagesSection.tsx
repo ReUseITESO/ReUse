@@ -5,6 +5,7 @@ import { ImagePlus, X } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
 
 import type { FormValues } from '@/types/product';
+import Image from 'next/image';
 
 const MAX_IMAGES = 5;
 const ACCEPTED = 'image/jpeg,image/png,image/webp';
@@ -65,10 +66,11 @@ export default function CreateProductImagesSection({ form }: Props) {
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {previews.map((url, index) => (
               <div key={index} className="group relative aspect-square">
-                <img
+                <Image
                   src={url}
                   alt={`Imagen ${index + 1}`}
-                  className="h-full w-full rounded-lg object-cover"
+                  className="rounded-lg object-cover"
+                  fill
                 />
                 <button
                   type="button"
