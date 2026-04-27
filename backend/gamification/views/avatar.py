@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 DEFAULT_AVATAR_DATA = {
-    "image": "./media/avatars/default.png",
+    "image": "/avatars/default.png",
     "border_color": "#00264C",
     "border_thickness": 10,
     "zoom_level": 1.0,

@@ -94,7 +94,7 @@ export default function CustomTab() {
             value={avatarData.shadow_thickness}
             onChange={val => setAvatarData({ ...avatarData, shadow_thickness: val })}
             min={0}
-            max={20}
+            max={10}
             disabled={isLocked}
           />
         </div>

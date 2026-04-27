@@ -1,16 +1,21 @@
-import ZoomSlider from '../../../components/ui/ZoomSlider';
+
+import { useState } from 'react';
 
 import { useAvatar } from '@/hooks/profile/useAvatar';
+
 import Avatar from '../../../components/gamification/profile/Avatar';
+import ZoomSlider from '../../../components/ui/ZoomSlider';
+import SuccessModal from '@/components/gamification/profile/SuccessModal';
 
 export default function ProfilePictureDraft() {
   const { avatarData, setAvatarData, isLoading: isLoadingAvatar, updateAvatar } = useAvatar();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   if (isLoadingAvatar) return <p>Cargando...</p>;
 
   const handleSave = async (): Promise<void> => {
     const result = await updateAvatar(avatarData);
-    if (result.success) alert('¡Avatar Actualizado!');
+    if (result.success) setShowSuccess(true);
   };
 
   return (
@@ -41,6 +46,11 @@ export default function ProfilePictureDraft() {
           </button>
         </div>
       </div>
+      <SuccessModal 
+        isOpen={showSuccess} 
+        onClose={() => setShowSuccess(false)} 
+        message="Tu avatar ha sido actualizado correctamente en ReUseITESO." 
+      />
     </article>
   );
 }
