@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { RefreshCcw, Search, ChevronLeft, ChevronRight, SlidersHorizontal, Plus } from 'lucide-react';
-import Link from 'next/link';
+import { RefreshCcw, Search, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 
 import Button from '@/components/ui/Button';
 import ErrorMessage from '@/components/ui/ErrorMessage';

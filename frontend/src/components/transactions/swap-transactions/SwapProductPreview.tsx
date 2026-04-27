@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Eye, Package } from 'lucide-react';
+import { Eye } from 'lucide-react';
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import { cn } from '@/lib/utils';
 import { getCategoryStyle, getConditionStyle, getConditionLabel, getTransactionTypeStyle } from '@/lib/productStyles';
 import { getTransactionTypeLabel } from '@/components/transactions/transactionsConfig';
@@ -32,8 +33,8 @@ export default function SwapProductPreview({ product, label, className }: SwapPr
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-muted-fg">
-                <Package className="h-5 w-5" />
+              <div className="flex h-full w-full items-center justify-center">
+                <CategoryPlaceholderIcon categoryName={product.category.name} className="h-6 w-6" />
               </div>
             )}
           </div>

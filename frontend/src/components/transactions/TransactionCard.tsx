@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { CalendarClock, MapPin, RefreshCcw, User, UserRoundCheck, Package } from 'lucide-react';
+import { CalendarClock, MapPin, User, UserRoundCheck } from 'lucide-react';
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
@@ -108,7 +109,10 @@ export default function TransactionCard({
               />
             ) : (
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted">
-                <Package className="h-5 w-5 text-muted-fg" />
+                <CategoryPlaceholderIcon
+                  categoryName={transaction.product.category.name}
+                  className="h-5 w-5"
+                />
               </div>
             )}
             <div className="min-w-0 flex-1">
