@@ -84,6 +84,10 @@ def create_swap_proposal(transaction_id, proposed_product_id, buyer):
             stage=SwapTransaction.Stage.PROPOSAL_PENDING,
         )
 
+        # Set proposed product in progress
+        proposed_product.status = "en_proceso"
+        proposed_product.save(update_fields=["status", "updated_at"])
+
         # TODO(core-team): Notificar al vendedor que el comprador propuso un artículo de intercambio.
         return swap
 
@@ -120,6 +124,12 @@ def respond_to_proposal(transaction_id, accept, actor):
         swap.stage = next_stage
         swap.proposal_decided_at = timezone.now()
         swap.save(update_fields=["stage", "proposal_decided_at", "updated_at"])
+
+        # If rejected, set proposed product back to available
+        if not accept:
+            proposed_product = swap.proposed_product
+            proposed_product.status = "disponible"
+            proposed_product.save(update_fields=["status", "updated_at"])
 
         # TODO(core-team): Notificar al comprador el resultado de la propuesta de intercambio.
         return swap

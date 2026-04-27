@@ -226,9 +226,18 @@ class ProductViewSet(
                     return Products.objects.none()
             else:
                 # Default: show only public items (no community constraint) with active sellers
-                queryset = queryset.filter(
-                    community__isnull=True, status="disponible", seller__is_active=True
-                )
+                # For retrieve, allow involved users to see en_proceso products
+                if self.action == "retrieve" and self.request.user.is_authenticated:
+                    queryset = queryset.filter(
+                        Q(community__isnull=True, status="disponible", seller__is_active=True)
+                        | Q(seller=self.request.user)
+                        | Q(transaction__buyer=self.request.user)
+                        | Q(swap_proposals__transaction__seller=self.request.user)
+                    ).distinct()
+                else:
+                    queryset = queryset.filter(
+                        community__isnull=True, status="disponible", seller__is_active=True
+                    )
 
         category_id = self.request.query_params.get("category")
         if category_id:
