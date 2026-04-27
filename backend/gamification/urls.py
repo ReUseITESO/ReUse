@@ -17,8 +17,8 @@ from gamification.views.deduct_points import DeductPointsView
 from gamification.views.impact import UserImpactView
 from gamification.views.point_history import PointsHistoryView
 from gamification.views.points import (
-    CurrentUserPointsView,
     CurrentUserLevelProgressionView,
+    CurrentUserPointsView,
     UserPointsView,
 )
 
