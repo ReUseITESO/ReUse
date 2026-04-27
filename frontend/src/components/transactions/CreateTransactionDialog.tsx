@@ -32,8 +32,6 @@ export default function CreateTransactionDialog({
   const [timeValidationError, setTimeValidationError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const [showSwapPicker, setShowSwapPicker] = useState(false);
-
   useEffect(() => {
     if (!isOpen) {
       setBuildingCode('');
@@ -41,7 +39,6 @@ export default function CreateTransactionDialog({
       setMeetingDateTime(null);
       setTimeValidationError(null);
       setValidationError(null);
-      setShowSwapPicker(false);
     }
   }, [isOpen]);
 
