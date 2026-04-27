@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import { cn } from '@/lib/utils';
-import { getCategoryStyle, getConditionStyle, getConditionLabel, getTransactionTypeStyle } from '@/lib/productStyles';
+import {
+  getCategoryStyle,
+  getConditionStyle,
+  getConditionLabel,
+  getTransactionTypeStyle,
+} from '@/lib/productStyles';
 import { getTransactionTypeLabel } from '@/components/transactions/transactionsConfig';
 import ProductBadge from '@/components/ui/ProductBadge';
 import type { TransactionProductSummary, SwapProposedProduct } from '@/types/transaction';
@@ -21,7 +26,12 @@ export default function SwapProductPreview({ product, label, className }: SwapPr
   const typeStyle = getTransactionTypeStyle(product.transaction_type);
 
   return (
-    <div className={cn('flex-1 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-border/80', className)}>
+    <div
+      className={cn(
+        'flex-1 rounded-lg border border-border bg-card p-3 shadow-sm transition-all hover:border-border/80',
+        className,
+      )}
+    >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex gap-3 min-w-0 flex-1">
           {/* Product Thumbnail */}
@@ -65,15 +75,9 @@ export default function SwapProductPreview({ product, label, className }: SwapPr
           label={getTransactionTypeLabel(product.transaction_type)}
           className={typeStyle}
         />
-        <ProductBadge
-          label={product.category.name}
-          className={catStyle}
-        />
+        <ProductBadge label={product.category.name} className={catStyle} />
         {product.condition && (
-          <ProductBadge
-            label={getConditionLabel(product.condition)}
-            className={condStyle}
-          />
+          <ProductBadge label={getConditionLabel(product.condition)} className={condStyle} />
         )}
       </div>
     </div>

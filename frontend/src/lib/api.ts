@@ -129,10 +129,13 @@ export async function createSwapProposal(
   transactionId: number | string,
   proposedProductId: number,
 ) {
-  return apiClient<SwapTransactionData>(`/marketplace/transactions/${transactionId}/swap/propose/`, {
-    method: 'POST',
-    body: JSON.stringify({ proposed_product_id: proposedProductId }),
-  });
+  return apiClient<SwapTransactionData>(
+    `/marketplace/transactions/${transactionId}/swap/propose/`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ proposed_product_id: proposedProductId }),
+    },
+  );
 }
 
 export async function respondSwapProposal(transactionId: number | string, accept: boolean) {

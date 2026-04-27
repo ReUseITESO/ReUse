@@ -2,7 +2,12 @@
 
 import { Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getCategoryStyle, getConditionStyle, getConditionLabel, getTransactionTypeStyle } from '@/lib/productStyles';
+import {
+  getCategoryStyle,
+  getConditionStyle,
+  getConditionLabel,
+  getTransactionTypeStyle,
+} from '@/lib/productStyles';
 import type { Product } from '@/types/product';
 import { getTransactionTypeLabel } from '../transactionsConfig';
 

@@ -47,7 +47,9 @@ export default function SwapProductPickerModal({
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -58,7 +60,10 @@ export default function SwapProductPickerModal({
     }
   }, [isOpen]);
 
-  const availableProducts = useMemo(() => products.filter(p => p.status === 'disponible'), [products]);
+  const availableProducts = useMemo(
+    () => products.filter(p => p.status === 'disponible'),
+    [products],
+  );
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return availableProducts;
     return availableProducts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -105,7 +110,8 @@ export default function SwapProductPickerModal({
               </h2>
             </div>
             <p className="mb-4 text-sm text-muted-fg">
-              Elige uno de tus artículos disponibles. Si lo aceptan, después podrás proponer fecha y lugar.
+              Elige uno de tus artículos disponibles. Si lo aceptan, después podrás proponer fecha y
+              lugar.
             </p>
 
             <div className="relative mb-4">
@@ -123,7 +129,8 @@ export default function SwapProductPickerModal({
               <div className="flex items-center gap-2 text-xs font-medium text-muted-fg">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 <span>
-                  Mostrando {filteredProducts.length > 0 ? startCount : 0}-{endCount} de {filteredProducts.length} artículos
+                  Mostrando {filteredProducts.length > 0 ? startCount : 0}-{endCount} de{' '}
+                  {filteredProducts.length} artículos
                 </span>
               </div>
 
@@ -158,16 +165,15 @@ export default function SwapProductPickerModal({
               {error && <ErrorMessage message={error} />}
 
               {!isLoading && !error && availableProducts.length === 0 && (
-                <EmptyState
-                  message="No tienes artículos disponibles. Publica algo primero para poder intercambiar."
-                />
+                <EmptyState message="No tienes artículos disponibles. Publica algo primero para poder intercambiar." />
               )}
 
-              {!isLoading && !error && availableProducts.length > 0 && filteredProducts.length === 0 && (
-                <EmptyState
-                  message="No se encontraron resultados. Intenta con otro término de búsqueda."
-                />
-              )}
+              {!isLoading &&
+                !error &&
+                availableProducts.length > 0 &&
+                filteredProducts.length === 0 && (
+                  <EmptyState message="No se encontraron resultados. Intenta con otro término de búsqueda." />
+                )}
 
               {!isLoading && filteredProducts.length > 0 && (
                 <div className="grid grid-cols-1 gap-3 pb-2 sm:grid-cols-2">
@@ -207,4 +213,3 @@ export default function SwapProductPickerModal({
     </div>
   );
 }
-

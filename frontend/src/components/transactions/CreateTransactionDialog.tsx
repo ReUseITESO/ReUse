@@ -55,7 +55,7 @@ export default function CreateTransactionDialog({
         isOpen={isOpen}
         isSubmitting={isLoading}
         onCancel={onCancel}
-        onConfirm={async (productId) => {
+        onConfirm={async productId => {
           // onSubmit signature: (deliveryLocation, deliveryDate) — for swap we pass placeholders;
           // the real location/date is negotiated in the agenda stage.
           await onSubmit('pendiente', new Date(Date.now() + 24 * 60 * 60 * 1000), productId);
