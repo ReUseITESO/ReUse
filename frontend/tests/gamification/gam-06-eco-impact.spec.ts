@@ -32,7 +32,7 @@ test.describe('HU-GAM-06: Eco Impact', () => {
 
     test('2. UI numbers equal API response exactly', async ({ page }) => {
       let api: any = null;
-      page.on('response', async (res) => {
+      page.on('response', async res => {
         if (res.url().includes('/api/gamification/impact/') && res.ok()) {
           api = await res.json();
         }
@@ -65,7 +65,7 @@ test.describe('HU-GAM-06: Eco Impact', () => {
 
     test('5. Singular vs plural label for items_reused (1 vs N)', async ({ page }) => {
       // Singular
-      await page.route('**/api/gamification/impact/', (r) =>
+      await page.route('**/api/gamification/impact/', r =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -82,7 +82,7 @@ test.describe('HU-GAM-06: Eco Impact', () => {
 
       // Plural
       await page.unroute('**/api/gamification/impact/');
-      await page.route('**/api/gamification/impact/', (r) =>
+      await page.route('**/api/gamification/impact/', r =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -99,7 +99,7 @@ test.describe('HU-GAM-06: Eco Impact', () => {
     });
 
     test('6. CO2 value respects 2-decimal rounding from backend', async ({ page }) => {
-      await page.route('**/api/gamification/impact/', (r) =>
+      await page.route('**/api/gamification/impact/', r =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -116,9 +116,7 @@ test.describe('HU-GAM-06: Eco Impact', () => {
     });
 
     test('7. Backend error → retry button visible and clickable', async ({ page }) => {
-      await page.route('**/api/gamification/impact/', (r) =>
-        r.fulfill({ status: 500, body: '{}' }),
-      );
+      await page.route('**/api/gamification/impact/', r => r.fulfill({ status: 500, body: '{}' }));
       await page.goto('/profile', { waitUntil: 'networkidle' });
       await expect(page.getByTestId('eco-impact-error')).toBeVisible();
       const retry = page.getByTestId('eco-impact-retry');

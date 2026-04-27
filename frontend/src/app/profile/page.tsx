@@ -73,7 +73,7 @@ export default function ProfilePage() {
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch">
           <div className="space-y-6">
             <section className="rounded-lg border border-border bg-card p-7 shadow-sm lg:flex lg:min-h-44 lg:items-center">
-              {isEditing  ? (//w-full aspect-square flex items-center justify-center rounded-full overflow-hidden
+              {isEditing ? ( //w-full aspect-square flex items-center justify-center rounded-full overflow-hidden
                 <ProfileEditForm //relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary
                   user={displayUser}
                   onSave={handleSave}
@@ -81,7 +81,6 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="flex w-full items-center gap-6">
-                  
                   <div className="w-full aspect-square flex items-center justify-center rounded-full overflow-hidden">
                     <Avatar />
                   </div>
@@ -115,7 +114,7 @@ export default function ProfilePage() {
                         className="flex items-center justify-center gap-2 w-full max-w-[220px] rounded-xl bg-secondary text-white px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:bg-secondary-hover hover:scale-105 active:scale-95 shadow-md shadow-secondary/20"
                       >
                         <Palette className="h-5 w-5 shrink-0" />
-                        <span className='text-center'>Personalizar Avatar</span>
+                        <span className="text-center">Personalizar Avatar</span>
                       </Link>
                     </div>
                   </div>

@@ -26,15 +26,14 @@ export default function DesignTab() {
         border_type: 'design',
         border_name: borderPath,
       }));
-    } else
-    {
+    } else {
       // Deselect if already selected
       setAvatarData(prev => ({
         ...prev,
         border_type: 'custom',
         border_name: null,
       }));
-    } 
+    }
   };
 
   if (loading) return <div className="text-center p-4">Cargando diseños...</div>;

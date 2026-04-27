@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 import { useAvatar } from '@/hooks/profile/useAvatar';
@@ -46,10 +45,10 @@ export default function ProfilePictureDraft() {
           </button>
         </div>
       </div>
-      <SuccessModal 
-        isOpen={showSuccess} 
-        onClose={() => setShowSuccess(false)} 
-        message="Tu avatar ha sido actualizado correctamente en ReUseITESO." 
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        message="Tu avatar ha sido actualizado correctamente en ReUseITESO."
       />
     </article>
   );

@@ -53,18 +53,14 @@ test.describe('HU-GAM-08: Level Progression', () => {
     test('4. 300 pts → "Eco Champion", next is "Sustainability Leader"', async ({ page }) => {
       await page.goto('/profile', { waitUntil: 'networkidle' });
       await expect(page.getByTestId('level-current-name')).toHaveText('Eco Champion');
-      await expect(page.getByTestId('level-progress-label')).toContainText(
-        'Sustainability Leader',
-      );
+      await expect(page.getByTestId('level-progress-label')).toContainText('Sustainability Leader');
     });
   });
 
   test.describe('leader user (600 pts, max level)', () => {
     test.use({ storageState: storageStatePath('leader') });
 
-    test('5. Max level → "Nivel máximo alcanzado", no "points to next" text', async ({
-      page,
-    }) => {
+    test('5. Max level → "Nivel máximo alcanzado", no "points to next" text', async ({ page }) => {
       await page.goto('/profile', { waitUntil: 'networkidle' });
       await expect(page.getByTestId('level-current-name')).toHaveText('Sustainability Leader');
       await expect(page.getByTestId('level-progress-label')).toHaveText('Nivel máximo alcanzado');
@@ -79,7 +75,7 @@ test.describe('HU-GAM-08: Level Progression', () => {
 
     test('6. UI level name and points_to_next_level match API response', async ({ page }) => {
       let api: any = null;
-      page.on('response', async (res) => {
+      page.on('response', async res => {
         if (res.url().includes('/api/gamification/level-progression/') && res.ok()) {
           api = await res.json();
         }
@@ -105,7 +101,7 @@ test.describe('HU-GAM-08: Level Progression', () => {
       page,
     }) => {
       // Simulate a corrupted backend response with negative points
-      await page.route('**/api/gamification/level-progression/', (r) =>
+      await page.route('**/api/gamification/level-progression/', r =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',

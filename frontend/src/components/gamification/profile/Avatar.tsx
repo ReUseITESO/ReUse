@@ -25,7 +25,7 @@ function getProfilePictureStyle(avatarData: AvatarData) {
 }
 
 interface MovableAvatarProps {
-  movable?: boolean | null; 
+  movable?: boolean | null;
 }
 
 export default function Avatar({ movable = false }: MovableAvatarProps) {
