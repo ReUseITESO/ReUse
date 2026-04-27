@@ -117,7 +117,11 @@ def change_product_status(product, new_status, user):
 
     if new_status not in allowed:
         raise ValidationError(
-            {"status": (f"No se puede cambiar de '{product.status}' a '{new_status}'.")}
+            {
+                "status": (
+                    f"No se puede cambiar de '{product.status}' " f"a '{new_status}'."
+                )
+            }
         )
 
     product.status = new_status

@@ -56,7 +56,6 @@ services:
       - /app/__pycache__  # Prevents cache conflicts
       - ./backend/media:/app/media  # Maps local media directly to container root /media
     working_dir: /app
-    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       db:
         condition: service_healthy

@@ -5,9 +5,7 @@
 from django.urls import path
 
 from gamification.views.avatar import (
-    AvatarDataView,
-    # DesignTemplateListCreate,
-    # DesignTemplateDetail
+    AvatarDataView
 )
 from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
