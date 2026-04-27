@@ -102,11 +102,7 @@ export default function SwapProposalStatus({
             <XCircle className="mr-2 inline h-4 w-4" />
             Rechazar propuesta
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => onRespondProposal(true)}
-            disabled={isLoading}
-          >
+          <Button variant="primary" onClick={() => onRespondProposal(true)} disabled={isLoading}>
             <CheckCircle2 className="mr-2 inline h-4 w-4" />
             {isLoading ? 'Procesando...' : 'Aceptar propuesta'}
           </Button>
@@ -114,11 +110,7 @@ export default function SwapProposalStatus({
       )}
 
       {showAgendaForm && (
-        <SwapAgendaForm
-          isSubmitting={isLoading}
-          onCancel={() => {}}
-          onSubmit={onProposeAgenda}
-        />
+        <SwapAgendaForm isSubmitting={isLoading} onCancel={() => {}} onSubmit={onProposeAgenda} />
       )}
 
       {showAgendaActions && (
@@ -131,11 +123,7 @@ export default function SwapProposalStatus({
             <XCircle className="mr-2 inline h-4 w-4" />
             Rechazar agenda
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => onRespondAgenda(true)}
-            disabled={isLoading}
-          >
+          <Button variant="primary" onClick={() => onRespondAgenda(true)} disabled={isLoading}>
             <CheckCircle2 className="mr-2 inline h-4 w-4" />
             {isLoading ? 'Procesando...' : 'Aceptar agenda'}
           </Button>

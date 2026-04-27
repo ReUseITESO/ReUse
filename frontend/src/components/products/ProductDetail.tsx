@@ -86,7 +86,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     !product.has_active_transaction &&
     product.status === 'disponible';
 
-  async function handleCreateTransaction(deliveryLocation: string, deliveryDate: Date, swapProductId?: number) {
+  async function handleCreateTransaction(
+    deliveryLocation: string,
+    deliveryDate: Date,
+    swapProductId?: number,
+  ) {
     if (!product) {
       return;
     }

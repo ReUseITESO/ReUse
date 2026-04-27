@@ -132,7 +132,8 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
               </p>
               <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
                 <CalendarClock className="h-4 w-4 text-warning" />
-                Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
+                Límite:{' '}
+                {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
               </p>
             </div>
 
