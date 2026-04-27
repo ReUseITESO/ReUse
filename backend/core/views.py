@@ -734,4 +734,3 @@ class ShareItemView(APIView):
             {"message": f"Producto compartido con {len(friend_ids)} amigo(s)."},
             status=status.HTTP_201_CREATED,
         )
-

@@ -4,9 +4,7 @@
 # When ready, uncomment the path in config/urls.py to wire this in.
 from django.urls import path
 
-from gamification.views.avatar import (
-    AvatarDataView
-)
+from gamification.views.avatar import AvatarDataView
 from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
 from gamification.views.challenges import (
@@ -19,8 +17,8 @@ from gamification.views.deduct_points import DeductPointsView
 from gamification.views.impact import UserImpactView
 from gamification.views.point_history import PointsHistoryView
 from gamification.views.points import (
-    CurrentUserLevelProgressionView,
     CurrentUserPointsView,
+    CurrentUserLevelProgressionView,
     UserPointsView,
 )
 

@@ -50,7 +50,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
- 
     objects = CustomUserManager()  # type: ignore
 
     class Meta:
