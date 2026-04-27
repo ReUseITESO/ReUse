@@ -9,7 +9,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
 import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
-import LeaderBoard from '@/components/gamification/Leaderboard';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -238,7 +237,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               ))}
             </div>
           </div>
-          <LeaderBoard members={members} posts={posts} />
         </div>
 
         {/* Marketplace Section */}
