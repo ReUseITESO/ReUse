@@ -3,8 +3,8 @@
 import { Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryStyle, getConditionStyle, getConditionLabel, getTransactionTypeStyle } from '@/lib/productStyles';
-import { getTransactionTypeLabel } from '@/components/transactions/transactionsConfig';
 import type { Product } from '@/types/product';
+import { getTransactionTypeLabel } from '../transactionsConfig';
 
 interface SwapProductCardProps {
   product: Product;

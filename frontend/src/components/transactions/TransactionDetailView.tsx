@@ -9,6 +9,7 @@ import TransactionProductSection from '@/components/transactions/TransactionProd
 import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
 import SwapProposalStatus from '@/components/transactions/swap-transactions/SwapProposalStatus';
+import SwapProductPreview from '@/components/transactions/swap-transactions/SwapProductPreview';
 import {
   getDeliveryConfirmationLabel,
   getPendingCounterpartLabel,
@@ -104,41 +105,53 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           <TransactionStatusBadge status={transaction.status} />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-fg">
-            <p className="inline-flex items-center gap-2 font-medium">
-              <Package className="h-4 w-4 text-secondary" />
-              {transaction.product.title}
-            </p>
-            <p></p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
-              <MapPin className="h-4 w-4 text-info" />
-              <TransactionLocationHighlight
-                location={transaction.delivery_location}
-                deliveryDate={transaction.delivery_date}
-              />
-            </p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
-              <CalendarClock className="h-4 w-4 text-warning" />
-              Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
-            </p>
+        {transaction.transaction_type === 'swap' && transaction.swap_data ? (
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+            <SwapProductPreview
+              product={transaction.product}
+              label={`Producto solicitado (publicado por ${transaction.seller.first_name})`}
+            />
+            <SwapProductPreview
+              product={transaction.swap_data.proposed_product}
+              label={`Producto propuesto (publicado por ${transaction.buyer.first_name})`}
+            />
           </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-fg">
+              <p className="inline-flex items-center gap-2 font-medium">
+                <Package className="h-4 w-4 text-secondary" />
+                {transaction.product.title}
+              </p>
+              <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
+                <MapPin className="h-4 w-4 text-info" />
+                <TransactionLocationHighlight
+                  location={transaction.delivery_location}
+                  deliveryDate={transaction.delivery_date}
+                />
+              </p>
+              <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
+                <CalendarClock className="h-4 w-4 text-warning" />
+                Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
+              </p>
+            </div>
 
-          <div className="space-y-2">
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
-                <UserRound className="h-4 w-4 text-accent" />
-                Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
-                <UserRound className="h-4 w-4 text-secondary" />
-                Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
-              </p>
+            <div className="space-y-2">
+              <div className="rounded-lg border border-border bg-card p-2.5">
+                <p className="inline-flex items-center gap-2 text-muted-fg">
+                  <UserRound className="h-4 w-4 text-accent" />
+                  Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-2.5">
+                <p className="inline-flex items-center gap-2 text-muted-fg">
+                  <UserRound className="h-4 w-4 text-secondary" />
+                  Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {transaction.swap_data && (
           <SwapProposalStatus
