@@ -75,13 +75,18 @@ def create_swap_proposal(transaction_id, proposed_product_id, buyer):
         if proposed_product.status != "disponible":
             raise StateConflictError("El artículo propuesto debe estar disponible.")
 
-        if SwapTransaction.objects.filter(transaction=transaction).exists():
-            raise StateConflictError("Ya existe una propuesta de intercambio para esta transacción.")
-
-        swap = SwapTransaction.objects.create(
+        # Use update_or_create to handle re-use of cancelled transactions
+        # which might already have a SwapTransaction record.
+        swap, created = SwapTransaction.objects.update_or_create(
             transaction=transaction,
-            proposed_product=proposed_product,
-            stage=SwapTransaction.Stage.PROPOSAL_PENDING,
+            defaults={
+                "proposed_product": proposed_product,
+                "stage": SwapTransaction.Stage.PROPOSAL_PENDING,
+                "agenda_location": None,
+                "proposal_decided_at": None,
+                "agenda_decided_at": None,
+                "updated_at": timezone.now(),
+            },
         )
 
         # Set proposed product in progress
