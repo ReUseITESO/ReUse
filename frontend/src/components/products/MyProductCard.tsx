@@ -25,14 +25,6 @@ interface MyProductCardProps {
   onProductChanged: () => void;
 }
 
-const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
-  disponible: [],
-  pausado: [],
-  en_proceso: [],
-  completado: [],
-  cancelado: [],
-};
-
 export default function MyProductCard({ product, onProductChanged }: MyProductCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isPauseOpen, setIsPauseOpen] = useState(false);
@@ -42,7 +34,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
   const { changeStatus, isLoading: isChangingStatus } = useChangeProductStatus();
 
   const isDisponible = product.status === 'disponible';
-  const transitions = STATUS_TRANSITIONS[product.status];
   const categoryClass = getCategoryStyle(product.category.name);
   const priceColorClass = getPriceColor(product.transaction_type);
 
@@ -122,41 +113,10 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           </div>
 
           <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
-            {transitions.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {transitions.map(t => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    disabled={
-                      isChangingStatus ||
-                      (t.value === 'pausado' && Boolean(product.has_active_transaction))
-                    }
-                    title={
-                      t.value === 'pausado' && product.has_active_transaction
-                        ? 'No puedes pausar este articulo porque tiene una transaccion activa.'
-                        : undefined
-                    }
-                    onClick={() => {
-                      if (t.value === 'pausado') {
-                        setIsPauseOpen(true);
-                        return;
-                      }
-                      handleStatusChange(t.value);
-                    }}
-                    className="rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
             {statusFeedback && (
               <p
-                className={`text-xs ${
-                  statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
-                }`}
+                className={`text-xs ${statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
+                  }`}
               >
                 {statusFeedback}
               </p>
