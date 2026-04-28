@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 
 import ProductDetailContent from '@/components/products/ProductDetailContent';
 import CommentsSection from '@/components/products/comments/CommentsSection';
-import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 import ReportProductDialog from '@/components/products/ReportProductDialog';
 import CreateTransactionDialog from '@/components/transactions/CreateTransactionDialog';
 import { useAuth } from '@/hooks/useAuth';
@@ -104,10 +103,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     setProduct(previous =>
       previous
         ? {
-            ...previous,
-            has_active_transaction: true,
-            status: 'en_proceso',
-          }
+          ...previous,
+          has_active_transaction: true,
+          status: 'en_proceso',
+        }
         : previous,
     );
   }

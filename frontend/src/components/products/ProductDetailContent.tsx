@@ -19,6 +19,7 @@ import {
 import { formatPrice, formatTransactionLabel } from '@/lib/utils';
 
 import type { ProductDetail, ProductReactionSummary } from '@/types/product';
+import { DESCRIPTION_LIMIT } from '@/lib/constants';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
@@ -32,8 +33,6 @@ interface ProductDetailContentProps {
   onReport: () => void;
   onReactionChange: (summary: ProductReactionSummary) => void;
 }
-
-const DESCRIPTION_LIMIT = 200;
 
 export default function ProductDetailContent({
   product,
@@ -105,9 +104,9 @@ export default function ProductDetailContent({
                 <Badge className={getTransactionTypeStyle(product.transaction_type)}>
                   {product.transaction_type === 'sale'
                     ? (() => {
-                        const formattedPrice = formatPrice(product.price ?? null);
-                        return formattedPrice ? `Venta ${formattedPrice}` : 'Venta';
-                      })()
+                      const formattedPrice = formatPrice(product.price ?? null);
+                      return formattedPrice ? `Venta ${formattedPrice}` : 'Venta';
+                    })()
                     : formatTransactionLabel(product.transaction_type)}
                 </Badge>
               )}
