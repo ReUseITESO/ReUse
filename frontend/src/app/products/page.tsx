@@ -36,7 +36,6 @@ export default function ProductsPage() {
           )}
         </div>
       </div>
-
       <ProductList />
     </main>
   );

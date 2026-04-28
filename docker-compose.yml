@@ -52,6 +52,10 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - /app/.venv        # This "hides" the container's version from your host's version
+      - /app/__pycache__  # Prevents cache conflicts
+      - ./backend/media:/app/media  # Maps local media directly to container root /media
+    working_dir: /app
     depends_on:
       db:
         condition: service_healthy
@@ -67,6 +71,7 @@ services:
         NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}"
     container_name: reuse_iteso_frontend
     environment:
+      WATCHPACK_POLLING: true
       NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}"
     ports:
       - "3000:3000"
@@ -74,6 +79,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+    command: npm run dev  # This triggers nodemon/next dev
     depends_on:
       - backend
     networks:
@@ -96,6 +102,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  media_volume:
     driver: local
 
 networks:

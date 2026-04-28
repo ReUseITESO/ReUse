@@ -31,7 +31,7 @@ test.describe('HU-GAM-01: View Points', () => {
       // the component to useUserPoints. This test asserts that /points/ is
       // now called and that the UI matches its response.
       const pointsResponsePromise = page.waitForResponse(
-        (res) => /\/api\/gamification\/points\/(\?|$)/.test(res.url()) && res.ok(),
+        res => /\/api\/gamification\/points\/(\?|$)/.test(res.url()) && res.ok(),
       );
       await page.goto('/profile');
       const pointsResponse = await pointsResponsePromise;
@@ -72,9 +72,7 @@ test.describe('HU-GAM-01: View Points', () => {
     test.use({ storageState: storageStatePath('champion') });
 
     test('5. Backend 500 → "Reintentar" button visible', async ({ page }) => {
-      await page.route('**/api/gamification/points/', (r) =>
-        r.fulfill({ status: 500, body: '{}' }),
-      );
+      await page.route('**/api/gamification/points/', r => r.fulfill({ status: 500, body: '{}' }));
       await page.goto('/profile');
       await expect(page.getByTestId('points-balance-error')).toBeVisible();
       const retry = page.getByTestId('points-balance-retry');
@@ -83,7 +81,7 @@ test.describe('HU-GAM-01: View Points', () => {
     });
 
     test('6. es-MX localized number (thousands separator for >= 1000)', async ({ page }) => {
-      await page.route('**/api/gamification/points/', (r) =>
+      await page.route('**/api/gamification/points/', r =>
         r.fulfill({
           status: 200,
           contentType: 'application/json',

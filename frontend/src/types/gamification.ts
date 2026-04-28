@@ -91,6 +91,7 @@ export interface UserChallenge {
   end_date: string;
   is_expired: boolean;
 }
+
 export interface PointHistoryEntry {
   id: number;
   action: string;
@@ -107,4 +108,34 @@ export interface PointsHistoryFilters {
   end_date?: string;
   action?: string;
   ordering?: string;
+}
+
+export interface UserChallenge {
+  id: number;
+  challenge_id: number;
+  title: string;
+  description: string;
+  challenge_type: ChallengeType;
+  goal: number;
+  progress: number;
+  bonus_points: number;
+  is_completed: boolean;
+  joined_at: string;
+  completed_at: string | null;
+  start_date: string;
+  end_date: string;
+  is_expired: boolean;
+}
+
+export interface AvatarData {
+  image: string | null;
+  border_thickness: number;
+  border_color: string;
+  shadow_color: string;
+  shadow_thickness: number;
+  zoom_level: number;
+  offset_x: number;
+  offset_y: number;
+  border_type: string | null;
+  border_name: string | null;
 }
