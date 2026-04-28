@@ -104,9 +104,9 @@ export default function ProductDetailContent({
                 <Badge className={getTransactionTypeStyle(product.transaction_type)}>
                   {product.transaction_type === 'sale'
                     ? (() => {
-                      const formattedPrice = formatPrice(product.price ?? null);
-                      return formattedPrice ? `Venta ${formattedPrice}` : 'Venta';
-                    })()
+                        const formattedPrice = formatPrice(product.price ?? null);
+                        return formattedPrice ? `Venta ${formattedPrice}` : 'Venta';
+                      })()
                     : formatTransactionLabel(product.transaction_type)}
                 </Badge>
               )}

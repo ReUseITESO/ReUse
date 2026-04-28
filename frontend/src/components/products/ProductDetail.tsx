@@ -103,10 +103,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     setProduct(previous =>
       previous
         ? {
-          ...previous,
-          has_active_transaction: true,
-          status: 'en_proceso',
-        }
+            ...previous,
+            has_active_transaction: true,
+            status: 'en_proceso',
+          }
         : previous,
     );
   }

@@ -115,8 +115,9 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
             {statusFeedback && (
               <p
-                className={`text-xs ${statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
-                  }`}
+                className={`text-xs ${
+                  statusFeedbackKind === 'success' ? 'text-success' : 'text-error'
+                }`}
               >
                 {statusFeedback}
               </p>
