@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function NotFound() {
@@ -7,10 +8,12 @@ export default function NotFound() {
         <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">
           4
         </span>
-        <img
+        <Image
+          height={128}
+          width={128}
           src="/ReUseITESOLogo.png"
           alt="0"
-          className="h-32 w-32 object-contain sm:h-44 sm:w-44"
+          className="object-contain sm:h-44 sm:w-44"
         />
         <span className="text-numeral-hero font-bold leading-none text-primary sm:text-numeral-hero-lg">
           4

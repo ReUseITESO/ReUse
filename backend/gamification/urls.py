@@ -4,6 +4,9 @@
 # When ready, uncomment the path in config/urls.py to wire this in.
 from django.urls import path
 
+from gamification.views.avatar import (
+    AvatarDataView
+)
 from gamification.views.award_points import AwardPointsView
 from gamification.views.badges import UserBadgesStatusView
 from gamification.views.challenges import (
@@ -46,4 +49,6 @@ urlpatterns = [
         name="claim-challenge-reward",
     ),
     path("impact/", UserImpactView.as_view(), name="user-impact"),
+    path("avatar/data", AvatarDataView.as_view(), name="user-avatar-data"),
+    # path("avatar/template/borders", DesignTemplateView.as_view(), name="avatar-design-borders"),
 ]
