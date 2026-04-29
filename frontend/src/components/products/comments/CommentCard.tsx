@@ -7,6 +7,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { formatTimeAgo } from '@/lib/utils';
 
 import type { Comment } from '@/types/comment';
+import Image from 'next/image';
 
 interface CommentCardProps {
   comment: Comment;
@@ -24,10 +25,12 @@ function AuthorAvatar({ name, avatar }: { name: string; avatar: string | null })
 
   if (avatar) {
     return (
-      <img
+      <Image
+        height={36}
+        width={36}
         src={avatar}
         alt={name}
-        className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-border"
+        className="shrink-0 rounded-full object-cover ring-1 ring-border"
       />
     );
   }

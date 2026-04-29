@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card';
 import { getTransactionTypeStyle } from '@/lib/productStyles';
 import { formatPrice } from '@/lib/utils';
 import type { Transaction, TransactionReview } from '@/types/transaction';
+import Image from 'next/image';
 
 const TYPE_LABELS: Record<string, string> = {
   sale: 'Venta',
@@ -37,7 +38,9 @@ export default function TransactionHistoryCard({ transaction }: { transaction: T
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {transaction.product.image_url && (
-            <img
+            <Image
+              height={56}
+              width={56}
               src={transaction.product.image_url}
               alt={transaction.product.title}
               className="h-14 w-14 shrink-0 rounded-xl object-cover"

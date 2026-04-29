@@ -64,3 +64,24 @@ export function formatTimeAgo(isoDate: string): string {
     month: 'short',
   });
 }
+
+export function getImageUrl(imagePath: string | null | undefined): string {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  // Handle empty state or null
+  if (!imagePath || imagePath === '') {
+    return `${API_URL}/media/avatars/default.png`;
+  }
+
+  // Handle absolute URLs
+  if (imagePath.startsWith('http')) return imagePath;
+
+  // Normalize path to plural 'avatars' and include /media/ prefix
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+
+  if (cleanPath.startsWith('/media/')) {
+    return `${API_URL}${cleanPath}`;
+  }
+
+  return `${API_URL}/media${cleanPath}`;
+}
