@@ -11,7 +11,7 @@ export default function NotificationsPage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-h1 font-bold text-fg">Notificaciones</h1>
-          {data && data.results.some((n) => !n.is_read) && (
+          {data && data.results.some(n => !n.is_read) && (
             <button
               onClick={markAll}
               className="text-sm text-primary hover:text-primary/80 transition-colors"
@@ -30,7 +30,7 @@ export default function NotificationsPage() {
 
         {data && data.results.length > 0 && (
           <div className="space-y-2">
-            {data.results.map((n) => (
+            {data.results.map(n => (
               <NotificationItem key={n.id} notification={n} onMarkRead={markRead} />
             ))}
           </div>
