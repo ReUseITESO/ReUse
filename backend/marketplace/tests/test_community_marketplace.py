@@ -536,8 +536,8 @@ class EmptyStateTests(CommunityMarketplaceTestSetup):
             Products.objects.create(
                 seller=self.bob,
                 category=self.category,
-                title=f"Item {i+2} in Community 1",
-                description=f"Item {i+2}",
+                title=f"Item {i + 2} in Community 1",
+                description=f"Item {i + 2}",
                 condition="buen_estado",
                 transaction_type="sale",
                 price="100.00",

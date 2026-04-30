@@ -12,6 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test --config=playwright.config.ts",
     "test:e2e:headed": "playwright test --headed --config=playwright.config.ts",
+    "test:e2e:ui": "playwright test --ui --config=playwright.config.ts",
+    "test:e2e:report": "playwright show-report",
     "qa:agent": "node qa-agent/index.js",
     "qa:agent:headed": "node qa-agent/index.js --headed",
     "qa:agent:debug": "node qa-agent/index.js --headed --debug --slow 300",

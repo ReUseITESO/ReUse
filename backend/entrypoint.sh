@@ -16,10 +16,13 @@ done
 echo "Database ready"
 
 echo "Running migrations..."
-python manage.py migrate --noinput --fake-initial
+python manage.py migrate --noinput
 
-echo "Seeding development data..."
-python manage.py seed_dev_data || echo "WARNING: seed_dev_data failed (migrations may be missing). Server will still start."
+if [ "$DEBUG" = "True" ]; then
+  echo "Seeding development data..."
+  python manage.py seed_dev_data || echo "WARNING: seed_dev_data failed. Server will still start."
+fi
 
 echo "Starting server..."
-exec python manage.py runserver 0.0.0.0:8000
+PORT=${PORT:-8000}
+exec gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120

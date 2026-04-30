@@ -1,20 +1,21 @@
-
 # ERD - ReUseITESO
 
-**Date:** 12 March 2026
+**Date:** 22 April 2026
 **DBA:** Daniel
-**Version:** 1.3
+**Version:** 1.5
 
 ---
 
 ## Changelog
 
-| Version | Date        | Change                                                                                                                                                                                                                         |
-| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0     | 15 Feb 2026 | Initial ERD                                                                                                                                                                                                                    |
-| 1.1     | 5 Mar 2026  | User: name replaced by first_name/last_name, email verification fields. Products: updated_at. Badges: icon_url renamed to icon. Added PointRule, PointTransaction, EmailVerificationToken. All gamification tables now active. |
-| 1.2     | 11 Mar 2026 | Added Social module: UserConnection, FrequentContact, Community, CommunityMember. Fixed FK column names: Images/Transaction/ForumQuestion use products_id (verified against source code).                                      |
-| 1.3     | 12 Mar 2026 | Added CommunityPost. ForumQuestion: products_id made nullable, post_id added (FK to social_communitypost). A ForumQuestion must belong to exactly one target: product or post.                                                 |
+| Version | Date        | Change                                                                                                                                                                                                        |
+| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 15 Feb 2026 | Initial ERD                                                                                                                                                                                                   |
+| 1.1     | 5 Mar 2026  | User: name → first_name/last_name, email verification fields. Products: updated_at. Badges: icon_url → icon. Added PointRule, PointTransaction, EmailVerificationToken. All gamification tables now active. |
+| 1.2     | 11 Mar 2026 | Added Social module: UserConnection, FrequentContact, Community, CommunityMember. Fixed FK column names: Images/Transaction/ForumQuestion use products_id (verified against source code).                     |
+| 1.3     | 12 Mar 2026 | Added Social module: CommunityPost. ForumQuestion: products_id made nullable, post_id FK added, CHECK constraint enforces exactly one target.                                                                 |
+| 1.4     | 19 Mar 2026 | Added Marketplace module: ProductReaction, Report. Added Core module: Notification. Rejected denormalized counters (likes_count, dislikes_count, report_count) — counts via query with index.                |
+| 1.5     | 22 Apr 2026 | Added Marketplace module: SwapTransaction. Added updated_at to Transaction. Prerequisite for HU-MKT-12.                                                                                                       |
 
 ---
 
@@ -26,11 +27,15 @@ Django generates table names automatically as `{app}_{model}`. The actual table 
 | ------------------------------ | ---------------------------------- | ------ |
 | core.User                      | `core_user`                      | Active |
 | core.EmailVerificationToken    | `core_emailverificationtoken`    | Active |
+| core.Notification              | `core_notification`              | Active |
 | marketplace.Category           | `marketplace_category`           | Active |
 | marketplace.Products           | `marketplace_products`           | Active |
 | marketplace.Images             | `marketplace_images`             | Active |
 | marketplace.Transaction        | `marketplace_transaction`        | Active |
+| marketplace.SwapTransaction    | `marketplace_swaptransaction`    | Active |
 | marketplace.ForumQuestion      | `marketplace_forumquestion`      | Active |
+| marketplace.ProductReaction    | `marketplace_productreaction`    | Active |
+| marketplace.Report             | `marketplace_report`             | Active |
 | gamification.Badges            | `gamification_badges`            | Active |
 | gamification.UserBadges        | `gamification_userbadges`        | Active |
 | gamification.EnvironmentImpact | `gamification_environmentimpact` | Active |
@@ -93,6 +98,40 @@ CREATE TABLE core_emailverificationtoken (
 
 CREATE INDEX idx_core_emailverificationtoken_user ON core_emailverificationtoken(user_id);
 ```
+
+---
+
+### Notification
+
+> **v1.4:** New table. Stores in-app notifications for users. Triggered by badge awards, point transactions, reports, and reactions.
+
+```sql
+CREATE TABLE core_notification (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    body TEXT,
+    reference_id INTEGER,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    read_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_notif_user_unread ON core_notification(user_id, is_read) WHERE is_read = FALSE;
+```
+
+**Design note:** `reference_id` is a generic reference (no FK constraint) — it can point to different tables depending on `type`. The `type` field indicates which table `reference_id` belongs to (e.g. `badge_earned` → `gamification_badges`, `points_added` → `gamification_pointtransaction`). Integrity is enforced at the Django layer, not at the DB level.
+
+**Known `type` values:**
+
+| type                      | reference_id points to            |
+| ------------------------- | --------------------------------- |
+| `badge_earned`          | `gamification_badges`           |
+| `points_added`          | `gamification_pointtransaction` |
+| `transaction_confirmed` | `marketplace_transaction`       |
+| `product_reported`      | `marketplace_report`            |
+| `new_reaction`          | `marketplace_productreaction`   |
 
 ---
 
@@ -162,6 +201,8 @@ CREATE INDEX idx_marketplace_images_product ON marketplace_images(products_id, o
 
 ### Transaction
 
+> **v1.5:** `updated_at` added. `auto_now_add=True` on `created_at` replaced by `default=timezone.now` + `save()` override for `loaddata` compatibility.
+
 ```sql
 CREATE TABLE marketplace_transaction (
     id BIGSERIAL PRIMARY KEY,
@@ -177,6 +218,7 @@ CREATE TABLE marketplace_transaction (
     delivery_location VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'confirmada', 'completada', 'cancelada')),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK (seller_id != buyer_id)
 );
 
@@ -187,9 +229,59 @@ CREATE INDEX idx_marketplace_transaction_buyer ON marketplace_transaction(buyer_
 
 ---
 
+### SwapTransaction
+
+> **v1.5:** New table. Dedicated state machine for swap-type transactions. Linked 1:1 to Transaction. Tracks product proposal and meeting agenda negotiation stages. Prerequisite for HU-MKT-12.
+
+```sql
+CREATE TABLE marketplace_swaptransaction (
+    id BIGSERIAL PRIMARY KEY,
+    transaction_id BIGINT UNIQUE NOT NULL
+        REFERENCES marketplace_transaction(id) ON DELETE CASCADE,
+    proposed_product_id BIGINT NOT NULL
+        REFERENCES marketplace_products(id) ON DELETE RESTRICT,
+    stage VARCHAR(30) NOT NULL DEFAULT 'proposal_pending'
+        CHECK (stage IN (
+            'proposal_pending',
+            'proposal_rejected',
+            'proposal_accepted',
+            'agenda_pending',
+            'agenda_rejected',
+            'agenda_accepted'
+        )),
+    agenda_location VARCHAR(255),
+    proposal_decided_at TIMESTAMP,
+    agenda_decided_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX idx_swaptx_transaction
+    ON marketplace_swaptransaction(transaction_id);
+CREATE INDEX idx_swaptx_proposed_product
+    ON marketplace_swaptransaction(proposed_product_id);
+CREATE INDEX idx_swaptx_stage
+    ON marketplace_swaptransaction(stage);
+CREATE INDEX idx_swaptx_stage_created
+    ON marketplace_swaptransaction(stage, created_at);
+```
+
+**Stage flow:**
+
+* `proposal_pending` — buyer proposed a product, seller has not responded
+* `proposal_rejected` — seller rejected the proposed product
+* `proposal_accepted` — seller accepted the proposed product
+* `agenda_pending` — product accepted, meeting location/date proposed, pending acceptance
+* `agenda_rejected` — meeting proposal rejected
+* `agenda_accepted` — meeting confirmed, transaction proceeds to delivery confirmation
+
+**Design note:** `proposed_product_id` uses `ON DELETE RESTRICT` — a product that is part of an active swap proposal cannot be deleted. Cross-table constraint (`proposed_product_id != transaction.products_id`) is enforced at the Django layer via `clean()`. On `stage = agenda_accepted`, the service layer must sync `agenda_location` → `Transaction.delivery_location`.
+
+---
+
 ### ForumQuestion
 
-> **v1.3 change:** `products_id` is now nullable. `post_id` added as FK to `social_communitypost`. A ForumQuestion must belong to exactly one target (product or post) — enforced via `clean()` in Django. The `CHECK (id != parent_id)` constraint is preserved.
+> **v1.3:** `products_id` made nullable. `post_id` FK added. CHECK constraint enforces exactly one target (product or post, never both, never neither).
 
 ```sql
 CREATE TABLE marketplace_forumquestion (
@@ -208,10 +300,55 @@ CREATE TABLE marketplace_forumquestion (
 );
 
 CREATE INDEX idx_marketplace_forumquestion_product ON marketplace_forumquestion(products_id);
-CREATE INDEX idx_marketplace_forumquestion_post ON marketplace_forumquestion(post_id);
 CREATE INDEX idx_marketplace_forumquestion_user ON marketplace_forumquestion(user_id);
 CREATE INDEX idx_marketplace_forumquestion_parent ON marketplace_forumquestion(parent_id);
+CREATE INDEX idx_marketplace_forumquestion_post ON marketplace_forumquestion(post_id);
 ```
+
+---
+
+### ProductReaction
+
+> **v1.4:** New table. Stores individual like/dislike reactions per user per product. Reaction counts are obtained via query — no denormalized counters in Products.
+
+```sql
+CREATE TABLE marketplace_productreaction (
+    id BIGSERIAL PRIMARY KEY,
+    product_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    type VARCHAR(10) NOT NULL CHECK (type IN ('like', 'dislike')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_productreaction_product_user UNIQUE (product_id, user_id)
+);
+
+CREATE INDEX idx_pr_product_type ON marketplace_productreaction(product_id, type);
+CREATE INDEX idx_pr_user ON marketplace_productreaction(user_id);
+```
+
+**Design note:** The count query uses the composite index `(product_id, type)` — no full table scan needed. No `likes_count` / `dislikes_count` stored in `Products` to avoid drift from bulk operations that bypass Django signals.
+
+---
+
+### Report
+
+> **v1.4:** New table. Stores user-submitted reports on products. Report counts are obtained via query — no denormalized `report_count` in Products.
+
+```sql
+CREATE TABLE marketplace_report (
+    id BIGSERIAL PRIMARY KEY,
+    product_id BIGINT NOT NULL REFERENCES marketplace_products(id) ON DELETE CASCADE,
+    reporter_id BIGINT NOT NULL REFERENCES core_user(id) ON DELETE CASCADE,
+    reason VARCHAR(30) NOT NULL CHECK (reason IN ('prohibited_item', 'misleading_description', 'offensive_content', 'possible_scam', 'other')),
+    description VARCHAR(300),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_report_product_reporter UNIQUE (product_id, reporter_id)
+);
+
+CREATE INDEX idx_marketplace_report_product ON marketplace_report(product_id);
+CREATE INDEX idx_report_reporter ON marketplace_report(reporter_id);
+```
+
+**Design note:** `reporter_id` uses CASCADE — if a user is deleted their reports are removed. `product_id` uses CASCADE — if a product is deleted its reports are removed. No `report_count` in `Products` for the same reason as `likes_count`.
 
 ---
 
@@ -285,7 +422,7 @@ CREATE TABLE gamification_pointrule (
 | action                | points | description              |
 | --------------------- | ------ | ------------------------ |
 | `complete_sale`     | 50     | Completar una venta      |
-| `complete_donation` | 100    | Completar una donacion   |
+| `complete_donation` | 100    | Completar una donación  |
 | `complete_swap`     | 75     | Completar un intercambio |
 
 ---
@@ -312,7 +449,6 @@ CREATE INDEX idx_gamification_pointtransaction_user ON gamification_pointtransac
 ## Social Module
 
 > **v1.2:** New module added. Four tables to support user connections, frequent contacts, and communities.
-> **v1.3:** CommunityPost added.
 
 ### UserConnection
 
@@ -415,7 +551,7 @@ CREATE INDEX idx_social_communitymember_role ON social_communitymember(community
 
 ### CommunityPost
 
-> **v1.3:** New table. Posts published inside a community by its members. Supports pinned posts for announcements. ForumQuestion can reference a CommunityPost via `post_id` to enable threaded discussion on posts.
+> **v1.3:** New table. Posts published inside communities by their members. Supports pinned posts for announcements.
 
 ```sql
 CREATE TABLE social_communitypost (
@@ -430,12 +566,10 @@ CREATE TABLE social_communitypost (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_social_communitypost_community_created ON social_communitypost(community_id, created_at);
+CREATE INDEX idx_social_communitypost_community ON social_communitypost(community_id);
 CREATE INDEX idx_social_communitypost_user ON social_communitypost(user_id);
-CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(community_id, is_pinned);
+CREATE INDEX idx_social_communitypost_pinned ON social_communitypost(community_id, is_pinned) WHERE is_pinned = TRUE;
 ```
-
-**Design note:** Only community members can create posts — enforced at the serializer layer. The default ordering is pinned posts first, then newest. `ON DELETE CASCADE` on both FKs: if the community or the user is deleted, their posts are removed.
 
 ---
 
@@ -444,6 +578,7 @@ CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(c
 **Core**
 
 * User 1 → N EmailVerificationToken
+* User 1 → N Notification
 
 **Marketplace**
 
@@ -451,12 +586,17 @@ CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(c
 * Category 1 → N Products
 * Products 1 → N Images
 * Products 1 → 1 Transaction
+* Transaction 1 → 1 SwapTransaction
+* Products 1 → N SwapTransaction (as proposed_product)
 * User 1 → N Transactions (as seller)
 * User 1 → N Transactions (as buyer)
-* Products 1 → N ForumQuestions (via products_id, nullable)
-* CommunityPost 1 → N ForumQuestions (via post_id, nullable)
+* Products 1 → N ForumQuestions
 * User 1 → N ForumQuestions
 * ForumQuestion 1 → N ForumQuestion (self-referential, replies)
+* User 1 → N ProductReaction
+* Products 1 → N ProductReaction
+* User 1 → N Report (as reporter)
+* Products 1 → N Report
 
 **Gamification**
 
@@ -474,6 +614,7 @@ CREATE INDEX idx_social_communitypost_community_pinned ON social_communitypost(c
 * Community N → M User (through CommunityMember)
 * Community 1 → N CommunityPost
 * User 1 → N CommunityPost
+* CommunityPost 1 → N ForumQuestion (as post target)
 
 ---
 
@@ -495,11 +636,19 @@ The original ERD specified `icon_url`. The implementation uses `icon` (PR #64). 
 
 `UserConnection` uses a single row per pair (requester/addressee) to represent a bidirectional friendship once accepted. Querying friends requires checking both FK columns. `FrequentContact` is a unilateral personal mark — no notification or acceptance required from the contact. `Community` uses soft delete (`is_active`) to preserve history. `CommunityMember` governs all access via `role`; the `creator_id` on `Community` is audit-only.
 
-**ForumQuestion dual-target design**
+**Denormalized counter rejection (v1.4)**
 
-`ForumQuestion` can now belong to either a `Products` record or a `CommunityPost`. Exactly one of `products_id` / `post_id` must be non-null — enforced by a CHECK constraint at the DB level and by `clean()` in Django. Reply threads are validated to stay within the same target: a reply to a product thread cannot reference a post, and vice versa. This reuses the existing comment infrastructure rather than introducing a separate comments table for community posts.
+HU-DB-01 and the Report table proposal both requested denormalized counters (`likes_count`, `dislikes_count`, `report_count`) on `marketplace_products`. These were rejected. Django signals do not fire on bulk operations (`bulk_create`, `QuerySet.delete()`), which causes silent drift between the counter and the actual row count. All counts are obtained via `COUNT()` query with composite indexes on `(product_id, type)` for reactions and `(product_id)` for reports.
+
+**`core_notification.reference_id`**
+
+Generic reference with no FK constraint. The `type` field determines which table `reference_id` points to. Enforced at Django layer only. This is intentional — PostgreSQL does not support FK constraints pointing to multiple tables simultaneously.
+
+**`SwapTransaction.proposed_product_id` cross-table constraint (v1.5)**
+
+PostgreSQL does not support CHECK constraints that reference other tables. The constraint (`proposed_product_id != transaction.products_id`) is enforced at the Django layer via `clean()` on the `SwapTransaction` model. On `stage = agenda_accepted`, the service layer is responsible for syncing `agenda_location` → `Transaction.delivery_location` before proceeding to the delivery confirmation flow.
 
 ---
 
-**Last updated:** 12 March 2026
+**Last updated:** 22 April 2026
 **Responsible:** Daniel (DBA)

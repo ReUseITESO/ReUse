@@ -7,6 +7,7 @@ import ProductBasicDetails from '@/components/products/ProductBasicDetails';
 import { getCachedProductCondition, useProductDetail } from '@/hooks/useProductDetail';
 
 import type { TransactionProductSummary } from '@/types/transaction';
+import Image from 'next/image';
 
 interface TransactionProductSectionProps {
   product: TransactionProductSummary;
@@ -46,7 +47,9 @@ export default function TransactionProductSection({ product }: TransactionProduc
         <div className="grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
           <div className="overflow-hidden rounded-lg border border-border bg-card">
             {product.image_url ? (
-              <img
+              <Image
+                height={160}
+                width={160}
                 src={product.image_url}
                 alt={product.title}
                 className="h-40 w-full object-cover"

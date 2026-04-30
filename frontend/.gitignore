@@ -56,3 +56,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright e2e artifacts
+/tests/gamification/.auth/
+/tests/gamification/fixtures/.auth/
+/playwright-report/
+/test-results/

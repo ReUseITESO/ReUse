@@ -65,7 +65,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
             "price",
             "category",
             "community",
-            "images",
         ]
         read_only_fields = ["id"]
 

@@ -76,6 +76,7 @@ describe('ChallengesBoard', () => {
       signUp: vi.fn(),
       signOut: vi.fn(),
       signInWithMicrosoft: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(React.createElement(ChallengesBoard));
@@ -95,6 +96,7 @@ describe('ChallengesBoard', () => {
       signUp: vi.fn(),
       signOut: vi.fn(),
       signInWithMicrosoft: vi.fn(),
+      updateUser: vi.fn(),
     });
     mockedUseChallenges.mockReturnValue({
       challenges: [],
@@ -119,6 +121,7 @@ describe('ChallengesBoard', () => {
       signUp: vi.fn(),
       signOut: vi.fn(),
       signInWithMicrosoft: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     render(React.createElement(ChallengesBoard));
@@ -135,6 +138,7 @@ describe('ChallengesBoard', () => {
       signUp: vi.fn(),
       signOut: vi.fn(),
       signInWithMicrosoft: vi.fn(),
+      updateUser: vi.fn(),
     });
 
     const claimMock = vi.fn();

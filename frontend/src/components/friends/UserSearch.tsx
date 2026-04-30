@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Search, UserPlus, Check } from 'lucide-react';
 
 import type { SocialUser } from '@/types/friends';
+import Image from 'next/image';
 
 type FriendUser = SocialUser;
 
@@ -95,10 +96,12 @@ export default function UserSearch({
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
                     {user.profile_picture ? (
-                      <img
+                      <Image
+                        height={40}
+                        width={40}
                         src={user.profile_picture}
                         alt={user.first_name}
-                        className="h-10 w-10 rounded-full object-cover"
+                        className="rounded-full object-cover"
                       />
                     ) : (
                       user.first_name?.[0]?.toUpperCase()

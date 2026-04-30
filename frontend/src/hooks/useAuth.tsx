@@ -21,6 +21,7 @@ interface AuthContextValue {
   signUp: (payload: SignUpRequest) => Promise<void>;
   signOut: () => Promise<void>;
   signInWithMicrosoft: (code: string) => Promise<void>;
+  updateUser: (updated: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -63,6 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data.user);
   }, []);
 
+  const updateUser = useCallback((updated: User) => setUser(updated), []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -72,8 +75,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp,
       signOut,
       signInWithMicrosoft,
+      updateUser,
     }),
-    [user, isLoading, signIn, signUp, signOut, signInWithMicrosoft],
+    [user, isLoading, signIn, signUp, signOut, signInWithMicrosoft, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

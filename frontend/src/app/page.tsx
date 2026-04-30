@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import Dashboard from '@/components/dashboard/Dashboard';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -22,10 +23,12 @@ export default function HomePage() {
   return (
     <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-8 px-6 py-20 text-center">
       <div className="flex flex-col items-center gap-4">
-        <img
+        <Image
+          height={112}
+          width={112}
           src="/ReUseITESOLogo.png"
           alt="ReUseITESO"
-          className="h-28 w-28 object-contain drop-shadow-md"
+          className="object-contain drop-shadow-md"
         />
         <h1 className="text-4xl font-bold text-fg sm:text-5xl">
           ReUse<span className="text-primary">ITESO</span>

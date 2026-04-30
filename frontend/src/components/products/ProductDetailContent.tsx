@@ -1,13 +1,25 @@
+'use client';
+
+import { useState } from 'react';
 import { ArrowLeft, CircleCheckBig, Clock3, Flag, Mail, ShoppingBag } from 'lucide-react';
 
+import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import ProductBasicDetails from '@/components/products/ProductBasicDetails';
 import ImageGallery from '@/components/products/ImageGallery';
 import ShareButton from '@/components/products/ShareButton';
+import ProductReactionButtons from '@/components/products/ProductReactionButtons';
 
 import { formatTimeAgo } from '@/lib/utils';
+import {
+  getCategoryStyle,
+  getConditionLabel,
+  getConditionStyle,
+  getTransactionTypeStyle,
+} from '@/lib/productStyles';
+import { formatPrice, formatTransactionLabel } from '@/lib/utils';
 
-import type { ProductDetail } from '@/types/product';
+import type { ProductDetail, ProductReactionSummary } from '@/types/product';
+import { DESCRIPTION_LIMIT } from '@/lib/constants';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
@@ -19,6 +31,7 @@ interface ProductDetailContentProps {
   onBack: () => void;
   onMainAction: () => void;
   onReport: () => void;
+  onReactionChange: (summary: ProductReactionSummary) => void;
 }
 
 export default function ProductDetailContent({
@@ -31,7 +44,9 @@ export default function ProductDetailContent({
   onBack,
   onMainAction,
   onReport,
+  onReactionChange,
 }: ProductDetailContentProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const timeAgo = formatTimeAgo(product.created_at);
 
   const galleryImages = product.images.length > 0 ? product.images.map(img => img.image_url) : [];
@@ -56,15 +71,69 @@ export default function ProductDetailContent({
         </div>
 
         <div className="flex flex-col gap-6">
-          <ProductBasicDetails
-            title={product.title}
-            description={product.description}
-            categoryName={product.category.name}
-            condition={product.condition}
-            transactionType={product.transaction_type}
-            price={product.price}
-            showTransactionBadge={true}
-          />
+          <div className="space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-h1 font-bold text-fg">{product.title}</h1>
+              <ProductReactionButtons
+                productId={product.id}
+                sellerId={product.seller_id}
+                initialSummary={{
+                  likes_count: product.likes_count,
+                  dislikes_count: product.dislikes_count,
+                  user_reaction: product.user_reaction,
+                }}
+                onChange={onReactionChange}
+                className="shrink-0"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className={getCategoryStyle(product.category.name)}>
+                {product.category.name}
+              </Badge>
+              <Badge
+                className={
+                  product.condition
+                    ? getConditionStyle(product.condition)
+                    : 'bg-muted text-muted-fg border border-border'
+                }
+              >
+                {product.condition ? getConditionLabel(product.condition) : 'Sin condición'}
+              </Badge>
+              {product.transaction_type && (
+                <Badge className={getTransactionTypeStyle(product.transaction_type)}>
+                  {product.transaction_type === 'sale'
+                    ? (() => {
+                        const formattedPrice = formatPrice(product.price ?? null);
+                        return formattedPrice ? `Venta ${formattedPrice}` : 'Venta';
+                      })()
+                    : formatTransactionLabel(product.transaction_type)}
+                </Badge>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-body text-fg">
+                {product.description.length > DESCRIPTION_LIMIT && !isExpanded
+                  ? `${product.description.slice(0, DESCRIPTION_LIMIT).trimEnd()}...`
+                  : product.description}
+              </p>
+
+              {product.description.length > DESCRIPTION_LIMIT && (
+                <div className="relative flex items-center justify-center py-2">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="relative rounded-full border border-border bg-card px-4 py-1 text-xs font-medium text-info transition-colors hover:bg-muted hover:text-info/80"
+                  >
+                    {isExpanded ? 'Ver menos' : 'Ver más'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="rounded-lg border border-border bg-muted p-4">
             <h3 className="mb-2 text-sm font-semibold text-primary">Vendedor</h3>

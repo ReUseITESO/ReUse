@@ -10,10 +10,15 @@ if [ -f "$LOCK_HASH_FILE" ]; then
 fi
 
 # Keep dependencies in sync for bind-mounted dev volumes.
-if [ ! -d "node_modules" ] || [ "$CURRENT_HASH" != "$INSTALLED_HASH" ] || [ ! -d "node_modules/lucide-react" ]; then
+if [ ! -d "node_modules" ] || [ "$CURRENT_HASH" != "$INSTALLED_HASH" ]; then
   echo "Installing frontend dependencies..."
   npm install
   echo "$CURRENT_HASH" > "$LOCK_HASH_FILE"
 fi
 
-exec npm run dev
+# Execute based on dev/prod preference (defaulting to dev for QA testing)
+if [ "$NODE_ENV" = "production" ]; then
+  exec npm run start -- -p ${PORT:-3000}
+else
+  exec npm run dev -- -p ${PORT:-3000}
+fi

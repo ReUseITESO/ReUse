@@ -1,7 +1,10 @@
-import type { Metadata } from 'next';
 import './globals.css';
+import type { Metadata } from 'next';
+
 import { AuthProvider } from '@/hooks/useAuth';
 import GlobalChallengeToasts from '@/components/gamification/GlobalChallengeToasts';
+import { AvatarProvider } from '@/hooks/profile/useAvatar';
+
 import Navbar from '@/components/layout/Navbar';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
@@ -26,8 +29,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           <AuthProvider>
             <GlobalChallengeToasts />
-            <Navbar />
-            <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
+            <AvatarProvider>
+              <Navbar />
+              <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
+            </AvatarProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

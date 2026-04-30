@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect } from 'react';
+import Image from 'next/image';
 
 interface FormErrors {
   email?: string;
@@ -29,6 +30,7 @@ export default function SignUpPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState('');
+  const [emailAlreadyExists, setEmailAlreadyExists] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -135,6 +137,7 @@ export default function SignUpPage() {
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setEmailAlreadyExists(false);
     try {
       await signUp({
         email: form.email.trim().toLowerCase(),
@@ -146,7 +149,13 @@ export default function SignUpPage() {
       });
       router.push(`/auth/check-email?email=${encodeURIComponent(form.email.trim().toLowerCase())}`);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Error al crear la cuenta.');
+      const message = err instanceof Error ? err.message : 'Error al crear la cuenta.';
+      if (message.toLowerCase().includes('existe')) {
+        setEmailAlreadyExists(true);
+        setServerError('');
+      } else {
+        setServerError(message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -161,14 +170,33 @@ export default function SignUpPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <img
+          <Image
+            height={48}
+            width={48}
             src="/ReUseITESOLogo.png"
             alt="ReUseITESO logo"
-            className="mx-auto mb-3 h-12 w-12 object-contain"
+            className="mx-auto mb-3 object-contain"
           />
           <h1 className="text-h1 font-bold text-fg">ReUseITESO</h1>
           <p className="mt-2 text-muted-fg">Crea tu cuenta con tu correo ITESO</p>
         </div>
+
+        {emailAlreadyExists && (
+          <div className="mb-4 rounded-lg border border-info/30 bg-info/5 px-5 py-4">
+            <p className="font-semibold text-fg mb-1">Este correo ya está registrado</p>
+            <p className="text-sm text-muted-fg mb-3">
+              Si nunca te llegó el correo de verificación, inicia sesión con tu correo y contraseña
+              y te aparecerá la opción para reenviarlo.
+            </p>
+            <Link
+              href="/auth/signin"
+              className="inline-block rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium
+                         text-btn-primary-fg transition-colors hover:bg-primary-hover"
+            >
+              Ir a inicio de sesión
+            </Link>
+          </div>
+        )}
 
         {serverError && (
           <div className="mb-4 rounded-lg border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">

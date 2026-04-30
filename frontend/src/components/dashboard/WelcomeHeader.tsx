@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
+import Image from 'next/image';
 
 export default function WelcomeHeader() {
   const { user, isAuthenticated } = useAuth();
@@ -18,10 +19,12 @@ export default function WelcomeHeader() {
         </p>
         <div className="mt-3 h-0.5 w-16 rounded-full bg-error" />
       </div>
-      <img
+      <Image
+        height={160}
+        width={160}
         src="/ReUseITESOLogo.png"
         alt=""
-        className="absolute -bottom-6 -right-6 h-32 w-32 object-contain opacity-10 sm:h-40 sm:w-40"
+        className="absolute -bottom-6 -right-6 object-contain opacity-10 sm:h-40 sm:w-40"
       />
     </div>
   );
