@@ -12,7 +12,7 @@ fi
 # Keep dependencies in sync for bind-mounted dev volumes.
 if [ ! -d "node_modules" ] || [ "$CURRENT_HASH" != "$INSTALLED_HASH" ] || [ ! -d "node_modules/lucide-react" ]; then
   echo "Installing frontend dependencies..."
-  npm ci
+  npm install
   echo "$CURRENT_HASH" > "$LOCK_HASH_FILE"
 fi
 

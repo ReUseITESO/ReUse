@@ -1,0 +1,789 @@
+{
+  "runId": "2026-04-29T20-29-42",
+  "mode": "exploratory",
+  "generatedAt": "2026-04-29T20:35:03.070Z",
+  "summary": {
+    "durationMs": 320244,
+    "totalSteps": 40,
+    "urlsVisited": 16,
+    "uniqueActionsExec": 34,
+    "errorsDetected": 40,
+    "isAuthenticated": true,
+    "warnings": 123,
+    "errors": 0
+  },
+  "urlsVisited": {
+    "http://localhost:3000": 9,
+    "http://localhost:3000/products": 34,
+    "http://localhost:3000/products/my": 2,
+    "http://localhost:3000/products/new": 2,
+    "http://localhost:3000/auth/signin": 2,
+    "http://localhost:3000/friends": 2,
+    "http://localhost:3000/communities": 2,
+    "http://localhost:3000/notifications": 2,
+    "http://localhost:3000/products/84": 2,
+    "http://localhost:3000/products/29": 2,
+    "http://localhost:3000/products/28": 2,
+    "http://localhost:3000/products/26": 2,
+    "http://localhost:3000/products/25": 2,
+    "http://localhost:3000/products/24": 2,
+    "http://localhost:3000/products/23": 2,
+    "http://localhost:3000/profile": 1
+  },
+  "errorsDetected": [
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494626712
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494626712
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494629240
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494629241
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494646463
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494646463
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494660142
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494666669
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494666669
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494679691
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494679691
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494689310
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494689310
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494710547
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494710547
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494747373
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494747373
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494780980
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494780980
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "ts": 1777494781941
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494798507
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494798507
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494810472
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494810472
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494819106
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494819106
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494829224
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494829224
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494842029
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494842029
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494846244
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494846244
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494848755
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494848755
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494850055
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494850055
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494885270
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494885270
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494901065
+    },
+    {
+      "type": "js",
+      "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "ts": 1777494901065
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "button",
+      "target": "0",
+      "fingerprint": "button:/:0",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/",
+      "success": false,
+      "severity": "ok",
+      "notes": [
+        "Éxito: 0Transacciones activas"
+      ],
+      "formErrors": [],
+      "ts": "2026-04-29T20:29:54.110Z"
+    },
+    {
+      "step": 2,
+      "action": "button",
+      "target": "IIsaac",
+      "fingerprint": "button:/:IIsaac",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: 0Transacciones activas"
+      ],
+      "formErrors": [],
+      "ts": "2026-04-29T20:29:58.977Z"
+    },
+    {
+      "step": 3,
+      "action": "button",
+      "target": "Cerrar sesion",
+      "fingerprint": "button:/:Cerrar sesion",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:08.561Z"
+    },
+    {
+      "step": 4,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:25.442Z"
+    },
+    {
+      "step": 5,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/:1777494625831",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:26.712Z"
+    },
+    {
+      "step": 6,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products:1777494627234",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:27.956Z"
+    },
+    {
+      "step": 7,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/my:1777494628459",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/my",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:29.241Z"
+    },
+    {
+      "step": 8,
+      "action": "link",
+      "target": "Publicar artículo",
+      "fingerprint": "link:/products/new",
+      "urlBefore": "http://localhost:3000/products/my",
+      "urlAfter": "http://localhost:3000/products/new",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:31.489Z"
+    },
+    {
+      "step": 9,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/auth/signin",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:43.530Z"
+    },
+    {
+      "step": 10,
+      "action": "button",
+      "target": "Reintentar",
+      "fingerprint": "button:/products:Reintentar",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:30:46.463Z"
+    },
+    {
+      "step": 11,
+      "action": "button",
+      "target": "Buscar",
+      "fingerprint": "button:/products:Buscar",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:00.142Z"
+    },
+    {
+      "step": 12,
+      "action": "button",
+      "target": "Cualquier tipo",
+      "fingerprint": "button:/products:Cualquier tipo",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:04.180Z"
+    },
+    {
+      "step": 13,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/friends:1777494664731",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/friends",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:05.441Z"
+    },
+    {
+      "step": 14,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/communities:1777494665915",
+      "urlBefore": "http://localhost:3000/friends",
+      "urlAfter": "http://localhost:3000/communities",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:06.669Z"
+    },
+    {
+      "step": 15,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/communities",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:19.692Z"
+    },
+    {
+      "step": 16,
+      "action": "button",
+      "target": "Cualquier condición",
+      "fingerprint": "button:/products:Cualquier condición",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:29.310Z"
+    },
+    {
+      "step": 17,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:49.435Z"
+    },
+    {
+      "step": 18,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/new:1777494709794",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/new",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:31:50.547Z"
+    },
+    {
+      "step": 19,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/auth/signin",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:32:13.043Z"
+    },
+    {
+      "step": 20,
+      "action": "button",
+      "target": "Más recientes primero",
+      "fingerprint": "button:/products:Más recientes primero",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:32:27.373Z"
+    },
+    {
+      "step": 21,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:32:37.020Z"
+    },
+    {
+      "step": 22,
+      "action": "button",
+      "target": "Todas las categorías",
+      "fingerprint": "button:/products:Todas las categorías",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:00.980Z"
+    },
+    {
+      "step": 23,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/notifications:1777494781336",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/notifications",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:01.941Z"
+    },
+    {
+      "step": 24,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/84:1777494782285",
+      "urlBefore": "http://localhost:3000/notifications",
+      "urlAfter": "http://localhost:3000/products/84",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:03.125Z"
+    },
+    {
+      "step": 25,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/84:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/84",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:33:18.507Z"
+    },
+    {
+      "step": 26,
+      "action": "link",
+      "target": "ReUseITESO",
+      "fingerprint": "link:/",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:30.472Z"
+    },
+    {
+      "step": 27,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:38.071Z"
+    },
+    {
+      "step": 28,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/29:1777494818405",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/29",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:39.106Z"
+    },
+    {
+      "step": 29,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/29:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/29",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:33:49.224Z"
+    },
+    {
+      "step": 30,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/28:1777494829712",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/28",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:33:50.452Z"
+    },
+    {
+      "step": 31,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/28:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/28",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:34:02.029Z"
+    },
+    {
+      "step": 32,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/26:1777494842569",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/26",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:34:03.690Z"
+    },
+    {
+      "step": 33,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/26:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/26",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:34:06.244Z"
+    },
+    {
+      "step": 34,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/25:1777494846763",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/25",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:34:07.524Z"
+    },
+    {
+      "step": 35,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/25:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/25",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:34:08.755Z"
+    },
+    {
+      "step": 36,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/24:1777494849156",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/24",
+      "success": true,
+      "severity": "warn",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:34:10.055Z"
+    },
+    {
+      "step": 37,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/24:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/24",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:34:45.270Z"
+    },
+    {
+      "step": 38,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/23:1777494885874",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/23",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:34:46.789Z"
+    },
+    {
+      "step": 39,
+      "action": "button",
+      "target": "Volver al listado",
+      "fingerprint": "button:/products/23:Volver al listado",
+      "urlBefore": "http://localhost:3000/products/23",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "warn",
+      "notes": [
+        "Errores de formulario: ReUseITESO"
+      ],
+      "formErrors": [
+        "ReUseITESO"
+      ],
+      "ts": "2026-04-29T20:35:01.065Z"
+    },
+    {
+      "step": 40,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/profile:1777494901597",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/profile",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-04-29T20:35:02.612Z"
+    }
+  ]
+}

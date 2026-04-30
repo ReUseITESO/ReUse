@@ -217,6 +217,10 @@ __marimo__/
 node_modules/
 .next/
 out/
+frontend/playwright-report/
+frontend/test-results/
+frontend/.playwright/
+frontend/.env.playwright
 
 # Django migrations in backend (do not commit generated migration files)
 backend/**/migrations/*.py

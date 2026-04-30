@@ -1,0 +1,284 @@
+User can publish an item for sale, donation, or exchange
+Domain: Marketplace
+
+User Story
+As a authenticated ITESO user, I want to publish an item for sale, donation, or exchange so that other users in the marketplace after submission..
+
+Descripción detallada
+An authenticated user can create a new item listing by filling out a form with title, description, category, condition, images, and selecting the transaction type (sale, donation, or exchange). The item becomes visible to other users in the marketplace after submission.
+This feature is for the web platform. Priority: high.
+This story focuses on the core functionality. Advanced features, edge cases, and optimizations may be addressed in separate stories.
+
+Acceptance Criteria
+
+User can access the creation form
+
+All required fields are clearly marked
+
+Form validates input before submission
+
+Success message is shown after creation
+
+User is redirected to appropriate page after success
+
+Error messages are clear and actionable
+Implementation Details
+Backend
+POST endpoint for resource creation
+Input validation and sanitization
+Business logic for creation rules
+Response with created resource ID
+Frontend
+Component for main UI
+Form validation (if applicable)
+Loading and error states
+Success/error notifications
+Responsive design for mobile and desktop
+API integration with backend endpoints
+Database
+New table/entity for the resource
+Required fields: id, created_at, updated_at
+Foreign keys to related entities
+Indexes on frequently queried fields
+Testing Notes
+Test with valid data (happy path)
+Test with invalid/missing required data
+Test with edge cases (empty strings, special characters, very long inputs)
+Test error handling and error messages
+Test loading states and async behavior
+Test with authenticated and unauthenticated users
+Test Data Required
+Test user accounts (authenticated ITESO users)
+Sample items with various categories
+Items in different states (published, draft, deleted)
+Valid input data for all required fields
+Invalid input data for validation testing
+Edge case data (boundary values, special characters)
+Potential Mocks
+File storage service
+Dependencies & Duplication Check
+Dependencies: None identified
+
+Possible duplicates: None
+
+Assumptions
+User is authenticated as an ITESO community member
+Backend API follows RESTful conventions
+Frontend uses Next.js and TypeScript
+Database is PostgreSQL
+⚠️ Warnings
+Title seems generic. Consider being more specific about the action.
+This story has too many implementation items. Consider splitting into smaller stories.
+⚠️ STORY TOO LARGE: This story has too many implementation items. Consider splitting into smaller stories.
+
+User can leave comments on a published item
+Domain: Marketplace
+
+User Story
+As a authenticated ITESO user, I want to leave comments on marketplace items so that I can ask questions about the item, share opinions, or provide additional information that helps other potential buyers.
+
+Descripción detallada
+Users should be able to post comments on any published item in the marketplace. Comments are visible to all users viewing the item detail page. The item owner can respond to comments, creating a public Q&A thread. This is different from the private messaging system between buyer and seller — comments are public and visible to all visitors. The item owner can delete inappropriate comments on their own items. Each comment shows the author's name, avatar, timestamp, and content.
+
+This feature is for the web platform. Priority: medium.
+
+This story does NOT cover: private messaging (covered by existing messages system), comment editing, nested replies (threaded comments), or comment moderation by platform admins.
+
+Acceptance Criteria
+
+Authenticated user can post a comment on any published item
+
+Comments are displayed in chronological order on the item detail page
+
+Each comment shows: author name, author avatar, comment text, and timestamp
+
+Item owner can delete any comment on their own item
+
+Comment author can delete their own comment
+
+Comment text is validated (not empty, maximum length enforced)
+
+Comments section shows a counter with total number of comments
+
+Empty state is shown when an item has no comments ("Sé el primero en comentar")
+
+Loading state is shown while comments are being fetched
+
+Success feedback after posting a comment (comment appears immediately)
+
+Error messages are clear if posting fails
+Implementation Details
+Backend
+POST /api/marketplace/products/{id}/comments/ — Create a comment (body: {content})
+GET /api/marketplace/products/{id}/comments/ — List comments (paginated, chronological)
+DELETE /api/marketplace/products/{id}/comments/{comment_id}/ — Delete a comment
+Permissions:
+Any authenticated user can create a comment on a published product
+Comment author can delete their own comment
+Product owner can delete any comment on their product
+Non-authenticated users can read comments but not post
+Validation:
+content is required, non-empty, max 500 characters
+Product must exist and be in published or reserved status
+Response format per contracts.md (paginated list with count, next, previous, results)
+Frontend
+Comments section component at the bottom of the product detail page
+Comment input form with textarea and "Comentar" submit button
+Comment list component with individual comment cards
+Comment card: avatar, author name, relative timestamp ("hace 2 horas"), content text
+Delete button (trash icon) visible on own comments and for item owner
+Confirmation dialog before deleting a comment
+Comment count displayed next to section title ("Comentarios (12)")
+Character counter on input (0/500)
+Loading skeleton while fetching comments
+Empty state with illustration/icon
+Optimistic UI: show comment immediately after posting
+Responsive design for mobile and desktop
+Database
+New Comment model: id, product_id (FK → products), author_id (FK → users), content (text, max 500 chars), created_at
+Index on product_id and created_at for efficient chronological queries
+Soft delete not required (hard delete is fine for comments)
+Testing Notes
+Test posting a comment on a published item (happy path)
+Test posting a comment as unauthenticated user (should return 401)
+Test posting an empty comment (should fail with 400)
+Test posting a comment exceeding 500 characters (should fail with 400)
+Test listing comments in chronological order
+Test deleting own comment
+Test item owner deleting another user's comment
+Test non-owner, non-author trying to delete a comment (should fail with 403)
+Test comments on a non-existent product (should return 404)
+Test pagination with many comments
+Test empty comments list
+Test Data Required
+At least 2 authenticated users
+Published products with comments
+Products with no comments (empty state)
+Comments from different users on the same product
+Potential Mocks
+Auth tokens for multiple test users
+Database queries for unit tests
+Dependencies & Duplication Check
+Dependencies:
+
+HU-CORE-07 (HU-CORE-07-User-can-sign-in #7): User sign in — DONE
+HU-MKT-01 (HU-MKT-01-publish-item #23): Publish item — DONE
+HU-MKT-04 (HU-MKT-04-view-item-details #26): View item details — DONE (comments appear on detail page)
+Possible duplicates: None — existing messages system (#31 endpoint /api/messages/{product_id}/) is for private buyer-seller messaging, not public comments.
+
+Assumptions
+User is authenticated as an ITESO community member
+Backend API follows RESTful conventions per contracts.md
+Frontend uses Next.js and TypeScript
+Database is PostgreSQL
+Comments are flat (no nested replies) in this first iteration
+Comments are public and visible to all users (including unauthenticated for reading)
+
+User can react to a publication with like or dislike
+Domain: Marketplace
+
+User Story
+As a authenticated ITESO user, I want to react to marketplace items with "me gusta" or "no me gusta" so that I can express my opinion about a listing and help other users gauge the community's interest in an item.
+
+Descripción detallada
+Users can react to any published item with a thumbs up (me gusta) or thumbs down (no me gusta). Each user can only react once per item but can change their reaction. The total count of likes and dislikes is displayed on the item card and detail page. This provides social proof and helps surface quality listings. Items with more likes may be prioritized in sort options (see HU-MKT-10, #32 — sort by popularity). The reaction also serves as a lightweight feedback mechanism for the item owner.
+
+This feature is for the web platform. Priority: medium.
+
+This story does NOT cover: sorting by popularity (covered in #32), favoriting/wishlisting items, or reaction-based notifications to the item owner.
+
+Acceptance Criteria
+
+Authenticated user can click "Me gusta" (thumbs up) on any published item
+
+Authenticated user can click "No me gusta" (thumbs down) on any published item
+
+User can only have one active reaction per item (like OR dislike, not both)
+
+Clicking the same reaction again removes it (toggle behavior)
+
+Clicking the opposite reaction switches the reaction
+
+Like and dislike counts are displayed on the item card and detail page
+
+The user's active reaction is visually highlighted (filled icon, color change)
+
+Reactions update immediately (optimistic UI)
+
+Unauthenticated users can see counts but cannot react
+
+Item owner can see reactions on their own items
+Implementation Details
+Backend
+POST /api/marketplace/products/{id}/reactions/ — Create or update reaction (body: {type: "like" | "dislike"})
+DELETE /api/marketplace/products/{id}/reactions/ — Remove user's reaction
+GET /api/marketplace/products/{id}/ — Extend product detail response to include:
+{
+  "likes_count": 12,
+  "dislikes_count": 3,
+  "user_reaction": "like" | "dislike" | null
+}
+GET /api/marketplace/products/ — Extend product list items to include likes_count and dislikes_count
+Permissions:
+Any authenticated user can react to any published product
+Unauthenticated users can view counts (included in product response)
+Validation:
+type must be "like" or "dislike"
+Product must exist and be in published or reserved status
+Upsert logic: if reaction exists, update type; if same type, delete (toggle)
+Frontend
+Reaction buttons component (thumbs up + count, thumbs down + count)
+Placed on product card (compact) and product detail page (larger)
+Active state styling: filled icon with color (green for like, red for dislike)
+Inactive state: outlined icon with neutral color
+Optimistic UI: update count and visual state immediately, revert on error
+Click handlers:
+If no reaction → create reaction
+If same reaction → remove reaction (toggle off)
+If opposite reaction → switch reaction
+Counts displayed as numbers next to icons
+Disabled state for unauthenticated users (with tooltip: "Inicia sesión para reaccionar")
+Responsive design for mobile and desktop
+Database
+New Reaction model: id, product_id (FK → products), user_id (FK → users), type (enum: like, dislike), created_at
+Unique constraint on (product_id, user_id) — one reaction per user per product
+Index on product_id for count aggregation
+Counts can be denormalized on the product model (likes_count, dislikes_count) for performance, updated via signals
+Testing Notes
+Test liking a product (happy path)
+Test disliking a product
+Test toggling a like off (click like again → removes reaction)
+Test switching from like to dislike
+Test switching from dislike to like
+Test reacting as unauthenticated user (should return 401)
+Test reacting to non-existent product (should return 404)
+Test that product response includes correct counts
+Test that user_reaction is correct for the authenticated user
+Test that user_reaction is null for unauthenticated users
+Test reaction counts are accurate after multiple reactions from different users
+Test concurrent reactions (race conditions)
+Test Data Required
+At least 3 authenticated users
+Published products with no reactions
+Products with existing reactions from multiple users
+Potential Mocks
+Auth tokens for multiple test users
+Database queries for unit tests
+Dependencies & Duplication Check
+Dependencies:
+
+HU-CORE-07 (HU-CORE-07-User-can-sign-in #7): User sign in — DONE
+HU-MKT-01 (HU-MKT-01-publish-item #23): Publish item — DONE
+HU-MKT-04 (HU-MKT-04-view-item-details #26): View item details — DONE (reactions appear on detail page)
+Related issues:
+
+HU-MKT-10 (HU-MKT-10-sort-results #32): Sort results — OPEN (could sort by likes count in the future)
+Possible duplicates: None
+
+Assumptions
+User is authenticated as an ITESO community member
+Backend API follows RESTful conventions per contracts.md
+Frontend uses Next.js and TypeScript
+Database is PostgreSQL
+One reaction per user per product (toggle behavior)
+Denormalized counts are acceptable for performance

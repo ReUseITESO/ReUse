@@ -109,6 +109,7 @@ function ReactionButton({
       <span aria-hidden="true" className="inline-flex items-center">
         {icon}
       </span>
+      <span className="sr-only">{label}</span>
       <span className="text-xs font-semibold">{count}</span>
     </button>
   );
