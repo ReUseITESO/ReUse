@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 import ProductBasicDetails from '@/components/products/ProductBasicDetails';
 import { getCachedProductCondition, useProductDetail } from '@/hooks/useProductDetail';
+import { getImageUrl } from '@/lib/utils';
 
 import type { TransactionProductSummary } from '@/types/transaction';
 import Image from 'next/image';
@@ -50,7 +51,7 @@ export default function TransactionProductSection({ product }: TransactionProduc
               <Image
                 height={160}
                 width={160}
-                src={product.image_url}
+                src={getImageUrl(product.image_url)}
                 alt={product.title}
                 className="h-40 w-full object-cover"
               />
