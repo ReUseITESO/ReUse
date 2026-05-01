@@ -3,13 +3,12 @@
 import Link from 'next/link';
 import { ArrowLeft, CalendarClock, MapPin, UserRound } from 'lucide-react';
 
-import TransactionDeliveryConfirmations from '@/components/transactions/TransactionDeliveryConfirmations';
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
-import TransactionProductSection from '@/components/transactions/TransactionProductSection';
 import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
 import SwapProposalStatus from '@/components/transactions/swap-transactions/SwapProposalStatus';
 import SwapProductPreview from '@/components/transactions/swap-transactions/SwapProductPreview';
+import { cn } from '@/lib/utils';
 import {
   getDeliveryConfirmationLabel,
   getPendingCounterpartLabel,
@@ -33,6 +32,7 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   const { transaction, isLoading, error, refetch } = useTransactionDetail(transactionId);
   const { changeStatus, isLoading: isUpdating, error: updateError } = useTransactionStatus();
   const {
+    proposeSwap,
     respondProposal,
     proposeAgenda,
     respondAgenda,
@@ -67,23 +67,41 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   async function handleChangeStatus(status: UpdatableTransactionStatus) {
     const updated = await changeStatus(transactionIdValue, status);
     if (updated) {
+      // #TODO: CORE - Implementar notificaciones para cambio de estado de transacción (completada/confirmada/cancelada).
       refetch();
     }
   }
 
   async function handleRespondProposal(accept: boolean) {
     const updated = await respondProposal(transactionIdValue, accept);
-    if (updated) refetch();
+    if (updated) {
+      // #TODO: CORE - Implementar notificación para respuesta de propuesta de artículo de intercambio (aceptada/rechazada).
+      refetch();
+    }
+  }
+
+  async function handleProposeSwap(productId: number) {
+    const updated = await proposeSwap(transactionIdValue, productId);
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando el comprador vuelve a proponer un artículo tras un rechazo.
+      refetch();
+    }
   }
 
   async function handleProposeAgenda(location: string, date: Date) {
     const updated = await proposeAgenda(transactionIdValue, location, date.toISOString());
-    if (updated) refetch();
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando se propone una nueva fecha y lugar.
+      refetch();
+    }
   }
 
   async function handleRespondAgenda(accept: boolean) {
     const updated = await respondAgenda(transactionIdValue, accept);
-    if (updated) refetch();
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando se responde a la agenda propuesta (aceptada/rechazada).
+      refetch();
+    }
   }
 
   return (
@@ -121,15 +139,25 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3">
-              <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest mb-1">Vendedor</p>
+            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">Vendedor</p>
+                <span className={cn('text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border', transaction.seller_confirmation ? 'bg-success/10 text-success border-success/30' : 'bg-warning/10 text-warning border-warning/30')}>
+                  {transaction.seller_confirmation ? 'Confirmado' : 'Pendiente'}
+                </span>
+              </div>
               <p className="flex items-center gap-2 text-sm font-medium text-fg">
                 <UserRound className="h-4 w-4 text-accent" />
                 {transaction.seller.first_name} {transaction.seller.last_name}
               </p>
             </div>
-            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3">
-              <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest mb-1">Comprador</p>
+            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">Comprador</p>
+                <span className={cn('text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border', transaction.buyer_confirmation ? 'bg-success/10 text-success border-success/30' : 'bg-warning/10 text-warning border-warning/30')}>
+                  {transaction.buyer_confirmation ? 'Confirmado' : 'Pendiente'}
+                </span>
+              </div>
               <p className="flex items-center gap-2 text-sm font-medium text-fg">
                 <UserRound className="h-4 w-4 text-secondary" />
                 {transaction.buyer.first_name} {transaction.buyer.last_name}
@@ -144,11 +172,13 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             label={transaction.transaction_type === 'swap'
               ? `Producto solicitado (publicado por ${transaction.seller.first_name})`
               : `Producto publicado por ${transaction.seller.first_name} ${transaction.seller.last_name}`}
+            showDescription={true}
           />
           {transaction.transaction_type === 'swap' && transaction.swap_data && (
             <SwapProductPreview
               product={transaction.swap_data.proposed_product}
               label={`Producto propuesto (publicado por ${transaction.buyer.first_name})`}
+              showDescription={true}
             />
           )}
         </div>
@@ -157,18 +187,16 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           <SwapProposalStatus
             swapData={transaction.swap_data}
             actorRole={actorRole}
+            deliveryDate={transaction.delivery_date}
             isLoading={isSwapLoading}
             error={swapError}
             onRespondProposal={handleRespondProposal}
+            onProposeProduct={handleProposeSwap}
             onProposeAgenda={handleProposeAgenda}
             onRespondAgenda={handleRespondAgenda}
           />
         )}
 
-        <TransactionDeliveryConfirmations
-          sellerConfirmation={transaction.seller_confirmation}
-          buyerConfirmation={transaction.buyer_confirmation}
-        />
 
         <TransactionStatusActions
           canAccept={canAccept}
@@ -181,7 +209,6 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           onChangeStatus={handleChangeStatus}
         />
 
-        <TransactionProductSection product={transaction.product} />
 
         <p className="text-xs text-muted-fg">Notificación pendiente: integración con CORE.</p>
 
