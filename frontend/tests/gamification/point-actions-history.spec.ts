@@ -24,21 +24,22 @@
  *   Usuario: jose.chavez@iteso.mx / ReUse2026!
  */
 
+import fs from 'fs';
+import path from 'path';
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
+import { storageStatePath } from './fixtures/auth';
 
 const BASE_API = 'http://localhost:8000/api';
-const TEST_EMAIL = 'jose.chavez@iteso.mx';
-const TEST_PASSWORD = 'ReUse2026!';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function loginViaAPI(request: APIRequestContext) {
-  const res = await request.post(`${BASE_API}/auth/signin/`, {
-    data: { email: TEST_EMAIL, password: TEST_PASSWORD },
-  });
-  expect(res.ok(), `Login falló: ${res.status()}`).toBeTruthy();
-  const body = await res.json();
-  return body.tokens as { access: string; refresh: string };
+function readStoredTokens(userKey: string): { access: string; refresh: string } {
+  const state = JSON.parse(fs.readFileSync(storageStatePath(userKey), 'utf-8'));
+  const ls: { name: string; value: string }[] = state.origins[0].localStorage;
+  return {
+    access: ls.find(e => e.name === 'reuse_access_token')!.value,
+    refresh: ls.find(e => e.name === 'reuse_refresh_token')!.value,
+  };
 }
 
 async function injectTokens(page: Page, tokens: { access: string; refresh: string }) {
@@ -81,7 +82,7 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
   let userId: number;
 
   test.beforeAll(async ({ request }) => {
-    tokens = await loginViaAPI(request);
+    tokens = readStoredTokens('gam02a');
     userId = await getUserId(request, tokens);
     // Garantizar al menos transacciones de distintas acciones
     await awardPoints(request, tokens, 'publish_item', userId);
@@ -161,7 +162,7 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
       const rows = page.locator('tbody tr');
       const count = await rows.count();
       for (let i = 0; i < count; i++) {
-        await expect(rows.nth(i).getByText('Publicacion de articulo')).toBeVisible();
+        await expect(rows.nth(i).getByText('Publicar artículo')).toBeVisible();
       }
     });
 
@@ -178,7 +179,7 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
       const rows = page.locator('tbody tr');
       const count = await rows.count();
       for (let i = 0; i < count; i++) {
-        await expect(rows.nth(i).getByText('Donacion completada')).toBeVisible();
+        await expect(rows.nth(i).getByText('Donación completada')).toBeVisible();
       }
     });
 
@@ -330,7 +331,7 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
       await injectTokens(page, tokens);
       await page.goto('/profile/points-history');
 
-      await page.locator('select').filter({ hasText: 'Fecha: mas reciente' }).selectOption('created_at');
+      await page.locator('select').filter({ hasText: 'Fecha: más reciente' }).selectOption('created_at');
       await page.getByRole('button', { name: 'Aplicar filtros' }).click();
       await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 8000 });
     });
@@ -444,6 +445,142 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
     test('la API /points/history/ retorna 401 sin token', async ({ request }) => {
       const res = await request.get(`${BASE_API}/gamification/points/history/`);
       expect(res.status()).toBe(401);
+    });
+  });
+
+  // ── AC14: Etiquetas de acciones con acentos correctos ────────────────────
+  test.describe('AC14 – Etiquetas de acciones con ortografía correcta', () => {
+    test('las opciones del filtro tienen acentos correctos', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await injectTokens(page, tokens);
+      await page.goto('/profile/points-history');
+
+      const select = page.locator('select').filter({ hasText: 'Todas las acciones' });
+      await expect(select).toBeVisible({ timeout: 10000 });
+
+      await expect(select.locator('option', { hasText: 'Publicar artículo' })).toBeAttached();
+      await expect(select.locator('option', { hasText: 'Donación completada' })).toBeAttached();
+      await expect(select.locator('option', { hasText: 'Reseña positiva' })).toBeAttached();
+      await expect(select.locator('option', { hasText: 'Deducción de puntos' })).toBeAttached();
+    });
+
+    test('las etiquetas en la tabla tienen acentos correctos', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await awardPoints(await page.context().request, tokens, 'receive_positive_review', userId);
+      await injectTokens(page, tokens);
+      await page.goto('/profile/points-history');
+
+      await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10000 });
+      const bodyText = await page.locator('tbody').textContent();
+      expect(bodyText).toMatch(/Reseña/);
+    });
+
+    test('la etiqueta de la tabla coincide con la del filtro para publish_item', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await injectTokens(page, tokens);
+      await page.goto('/profile/points-history');
+
+      await page.locator('select').filter({ hasText: 'Todas las acciones' }).selectOption('publish_item');
+      await page.getByRole('button', { name: 'Aplicar filtros' }).click();
+      await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 8000 });
+
+      const filterLabel = await page.locator('select option[value="publish_item"]').textContent();
+      const tableLabel = await page.locator('tbody tr').first().locator('td').nth(1).textContent();
+
+      expect(tableLabel?.trim()).toBe(filterLabel?.trim());
+    });
+  });
+
+  // ── AC15: Parámetros enviados a la API ────────────────────────────────────
+  test.describe('AC15 – Filtros envían parámetros correctos a la API', () => {
+    test('filtrar por acción envía ?action= en el request', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+
+      let capturedUrl = '';
+      await page.route(`${BASE_API}/gamification/points/history/**`, async (route) => {
+        capturedUrl = route.request().url();
+        await route.continue();
+      });
+
+      await injectTokens(page, tokens);
+      await page.goto('/profile/points-history');
+      await page.waitForLoadState('networkidle');
+
+      await page.locator('select').filter({ hasText: 'Todas las acciones' }).selectOption('publish_item');
+      await page.getByRole('button', { name: 'Aplicar filtros' }).click();
+      await page.waitForTimeout(800);
+
+      expect(capturedUrl).toContain('action=publish_item');
+    });
+
+    test('filtrar por fechas envía start_date y end_date en el request', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+
+      let capturedUrl = '';
+      await page.route(`${BASE_API}/gamification/points/history/**`, async (route) => {
+        capturedUrl = route.request().url();
+        await route.continue();
+      });
+
+      await injectTokens(page, tokens);
+      await page.goto('/profile/points-history');
+      await page.waitForLoadState('networkidle');
+
+      const today = toIsoDate(new Date());
+      await page.locator('input[type="date"]').first().fill(today);
+      await page.locator('input[type="date"]').last().fill(today);
+      await page.getByRole('button', { name: 'Aplicar filtros' }).click();
+      await page.waitForTimeout(800);
+
+      expect(capturedUrl).toContain('start_date=');
+      expect(capturedUrl).toContain('end_date=');
+    });
+  });
+
+  // ── AC16: Consistencia de puntos ─────────────────────────────────────────
+  test.describe('AC16 – Consistencia entre total de puntos y suma del historial', () => {
+    test('la suma de puntos del historial es igual al total reportado por /points/', async ({ request }) => {
+      const pointsRes = await request.get(`${BASE_API}/gamification/points/`, {
+        headers: { Authorization: `Bearer ${tokens.access}` },
+      });
+      const { points: totalPoints } = await pointsRes.json();
+
+      let sumFromHistory = 0;
+      let nextUrl: string | null = `${BASE_API}/gamification/points/history/`;
+
+      while (nextUrl) {
+        const pageRes = await request.get(nextUrl, {
+          headers: { Authorization: `Bearer ${tokens.access}` },
+        });
+        const data = await pageRes.json();
+        for (const entry of data.results) {
+          sumFromHistory += entry.points;
+        }
+        nextUrl = data.next;
+      }
+
+      expect(sumFromHistory).toBe(totalPoints);
+    });
+  });
+
+  // ── AC17: Filtro por fecha mismo día ──────────────────────────────────────
+  test.describe('AC17 – Filtro por fecha mismo día', () => {
+    test('start_date y end_date iguales devuelve transacciones de ese día', async ({ request }) => {
+      await awardPoints(request, tokens, 'publish_item', userId);
+      const today = toIsoDate(new Date());
+
+      const res = await request.get(
+        `${BASE_API}/gamification/points/history/?start_date=${today}&end_date=${today}`,
+        { headers: { Authorization: `Bearer ${tokens.access}` } },
+      );
+      expect(res.ok()).toBeTruthy();
+      const data = await res.json();
+      expect(data.results.length).toBeGreaterThan(0);
+
+      for (const entry of data.results) {
+        const entryDate = entry.created_at.slice(0, 10);
+        expect(entryDate).toBe(today);
+      }
     });
   });
 

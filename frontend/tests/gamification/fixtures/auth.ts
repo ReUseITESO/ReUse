@@ -37,6 +37,12 @@ export const USERS: Record<string, TestUser> = {
     expectedPoints: 600,
     expectedLevel: 'Sustainability Leader',
   },
+  gam02a: {
+    email: 'jose.chavez@iteso.mx',
+    password: 'ReUse2026!',
+    expectedPoints: 350,
+    expectedLevel: 'Eco Champion',
+  },
 };
 
 export function storageStatePath(userKey: string): string {

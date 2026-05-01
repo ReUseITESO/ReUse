@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from core.models.notification import Notification
 from gamification.models.badges import Badges
+from gamification.models.point_transaction import PointTransaction
 from gamification.models.user_badges import UserBadges
 from marketplace.models.product import Products
 from marketplace.models.transaction import Transaction
@@ -43,6 +44,12 @@ def evaluate_milestones(user):
                         if created:
                             # Add points if badge has them
                             if badge.points > 0:
+                                PointTransaction.objects.create(
+                                    user=user,
+                                    action="badge_earned",
+                                    points=badge.points,
+                                    reference_id=badge.id,
+                                )
                                 user.points += badge.points
                                 user.save(update_fields=["points"])
 
