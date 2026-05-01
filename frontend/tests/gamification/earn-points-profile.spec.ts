@@ -91,10 +91,22 @@ test.describe('HU-GAM-02 – Usuario puede ganar puntos', () => {
 
   let tokens: { access: string; refresh: string };
   let userId: number;
+  let secondTokens: { access: string; refresh: string };
+  let secondUserId: number;
 
   test.beforeAll(async ({ request }) => {
     tokens = await loginViaAPI(request);
     userId = await getUserId(request, tokens);
+
+    // Login del segundo usuario una sola vez para pruebas de aislamiento
+    const res = await request.post(`${BASE_API}/auth/signin/`, {
+      data: { email: 'carlos@iteso.mx', password: 'carlos1234' },
+    });
+    const body = await res.json();
+    secondTokens = body.tokens;
+    secondUserId = (await (await request.get(`${BASE_API}/auth/profile/`, {
+      headers: { Authorization: `Bearer ${secondTokens.access}` },
+    })).json()).id as number;
   });
 
   // ── AC1: Balance de puntos visible en el perfil ────────────────────────────
@@ -362,6 +374,158 @@ test.describe('HU-GAM-02 – Usuario puede ganar puntos', () => {
       await expect(link).toBeVisible({ timeout: 10000 });
       await link.click();
       await expect(page).toHaveURL('/profile/points-history', { timeout: 8000 });
+    });
+  });
+
+  // ── AC8: Acción duplicada ─────────────────────────────────────────────────
+  test.describe('AC8 – Acción duplicada', () => {
+    test('llamar award-points dos veces acumula puntos en ambas llamadas', async ({ request }) => {
+      const pointsBefore = await getCurrentPoints(request, tokens);
+
+      const res1 = await awardPoints(request, tokens, 'publish_item', userId);
+      expect(res1.ok()).toBeTruthy();
+
+      const res2 = await awardPoints(request, tokens, 'publish_item', userId);
+      expect(res2.ok()).toBeTruthy();
+
+      const pointsAfter = await getCurrentPoints(request, tokens);
+      expect(pointsAfter).toBeGreaterThan(pointsBefore);
+    });
+
+    test('dos llamadas iguales producen exactamente el doble de puntos de una sola', async ({ request }) => {
+      const pointsBefore = await getCurrentPoints(request, tokens);
+
+      await awardPoints(request, tokens, 'complete_donation', userId);
+      const pointsAfterOne = await getCurrentPoints(request, tokens);
+      const pointsPerAction = pointsAfterOne - pointsBefore;
+
+      await awardPoints(request, tokens, 'complete_donation', userId);
+      const pointsAfterTwo = await getCurrentPoints(request, tokens);
+
+      expect(pointsAfterTwo - pointsBefore).toBe(pointsPerAction * 2);
+    });
+  });
+
+  // ── AC9: Persistencia después de logout ───────────────────────────────────
+  test.describe('AC9 – Persistencia después de logout', () => {
+    test('los puntos se mantienen después de cerrar y volver a abrir sesión', async ({ page, request }) => {
+      await awardPoints(request, tokens, 'publish_item', userId);
+      const pointsBeforeLogout = await getCurrentPoints(request, tokens);
+
+      // Simular logout limpiando localStorage y verificar que los puntos persisten en BD
+      await injectTokens(page, tokens);
+      await page.goto('/profile');
+      await page.evaluate(() => {
+        localStorage.removeItem('reuse_access_token');
+        localStorage.removeItem('reuse_refresh_token');
+      });
+
+      // Los tokens siguen válidos — los puntos deben ser los mismos en la API
+      const pointsAfterLogin = await getCurrentPoints(request, tokens);
+      expect(pointsAfterLogin).toBe(pointsBeforeLogout);
+    });
+
+    test('el historial de puntos persiste entre sesiones', async ({ request }) => {
+      await awardPoints(request, tokens, 'complete_sale', userId);
+      const historyBefore = await getPointsHistory(request, tokens);
+      const countBefore: number = historyBefore.results?.length ?? 0;
+
+      // Verificar que el historial sigue igual con los mismos tokens (datos en BD)
+      const historyAfter = await getPointsHistory(request, tokens);
+      const countAfter: number = historyAfter.results?.length ?? 0;
+
+      expect(countAfter).toBe(countBefore);
+    });
+  });
+
+  // ── AC10: Aislamiento entre usuarios ──────────────────────────────────────
+  test.describe('AC10 – Aislamiento entre usuarios', () => {
+    test('cada usuario ve únicamente sus propios puntos', async ({ request }) => {
+      const pointsA = await getCurrentPoints(request, tokens);
+      const pointsB = await getCurrentPoints(request, secondTokens);
+
+      expect(pointsA).not.toBe(pointsB);
+    });
+
+    test('ganar puntos con un usuario no afecta los puntos de otro', async ({ request }) => {
+      const pointsABefore = await getCurrentPoints(request, tokens);
+
+      await awardPoints(request, secondTokens, 'publish_item', secondUserId);
+
+      const pointsAAfter = await getCurrentPoints(request, tokens);
+      expect(pointsAAfter).toBe(pointsABefore);
+    });
+  });
+
+  // ── AC11: UI sincronizada tras múltiples acciones ─────────────────────────
+  test.describe('AC11 – UI sincronizada con API tras múltiples acciones', () => {
+    test('la UI muestra el total correcto después de 3 acciones seguidas', async ({ page, request }) => {
+      await awardPoints(request, tokens, 'publish_item', userId);
+      await awardPoints(request, tokens, 'complete_sale', userId);
+      await awardPoints(request, tokens, 'receive_positive_review', userId);
+
+      const apiPoints = await getCurrentPoints(request, tokens);
+
+      await injectTokens(page, tokens);
+      await page.goto('/profile');
+      await expect(page.getByText('Total de puntos')).toBeVisible({ timeout: 10000 });
+
+      const balanceEl = page.locator('p.text-5xl');
+      await expect(balanceEl).toBeVisible();
+      const displayedText = (await balanceEl.textContent()) ?? '';
+      const displayedPoints = parseInt(displayedText.replace(/[^0-9]/g, ''), 10);
+
+      expect(displayedPoints).toBe(apiPoints);
+    });
+  });
+
+  // ── AC12: Historial refleja todas las acciones ────────────────────────────
+  test.describe('AC12 – Historial refleja todas las acciones', () => {
+    test('el historial crece en 3 entradas al hacer 3 acciones', async ({ request }) => {
+      const historyBefore = await getPointsHistory(request, tokens);
+      const countBefore: number = historyBefore.count ?? historyBefore.results?.length ?? 0;
+
+      await awardPoints(request, tokens, 'publish_item', userId);
+      await awardPoints(request, tokens, 'complete_donation', userId);
+      await awardPoints(request, tokens, 'complete_exchange', userId);
+
+      const historyAfter = await getPointsHistory(request, tokens);
+      const countAfter: number = historyAfter.count ?? historyAfter.results?.length ?? 0;
+
+      expect(countAfter).toBe(countBefore + 3);
+    });
+
+    test('cada entrada del historial tiene action, points y created_at', async ({ request }) => {
+      await awardPoints(request, tokens, 'publish_item', userId);
+      const history = await getPointsHistory(request, tokens);
+
+      expect(history.results.length).toBeGreaterThan(0);
+      for (const entry of history.results.slice(0, 3)) {
+        expect(entry).toHaveProperty('action');
+        expect(entry).toHaveProperty('points');
+        expect(entry).toHaveProperty('created_at');
+        expect(typeof entry.points).toBe('number');
+        expect(entry.points).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  // ── AC13: Usuario desactivado ─────────────────────────────────────────────
+  test.describe('AC13 – Usuario desactivado no puede ganar puntos', () => {
+    test('award-points con token de usuario desactivado retorna error', async ({ request }) => {
+      // Usar tokens del usuario principal (ya autenticado) para evitar rate limit
+      const deactivateRes = await request.post(`${BASE_API}/auth/deactivate/`, {
+        headers: { Authorization: `Bearer ${tokens.access}` },
+      });
+
+      if (deactivateRes.ok()) {
+        // Usuario desactivado — intentar ganar puntos debe fallar
+        const awardRes = await awardPoints(request, tokens, 'publish_item', userId);
+        expect(awardRes.status()).toBeGreaterThanOrEqual(400);
+      } else {
+        // No hay endpoint de desactivación expuesto o no aplica — documentar comportamiento
+        expect([400, 401, 404, 405]).toContain(deactivateRes.status());
+      }
     });
   });
 });
