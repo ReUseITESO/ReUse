@@ -281,7 +281,7 @@ export default function PointsHistoryCard() {
               <thead className="bg-slate-100">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-slate-700">Fecha y hora</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Accion</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Acción</th>
                   <th className="px-4 py-3 text-left font-semibold text-slate-700">Asociado</th>
                   <th className="px-4 py-3 text-right font-semibold text-slate-700">Puntos</th>
                 </tr>
