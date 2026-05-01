@@ -13,12 +13,18 @@ SWAP_PROPOSAL_STAGE_TRANSITIONS = {
         SwapTransaction.Stage.PROPOSAL_ACCEPTED,
         SwapTransaction.Stage.PROPOSAL_REJECTED,
     ],
+    SwapTransaction.Stage.PROPOSAL_REJECTED: [
+        SwapTransaction.Stage.PROPOSAL_PENDING,
+    ],
     SwapTransaction.Stage.PROPOSAL_ACCEPTED: [
         SwapTransaction.Stage.AGENDA_PENDING,
     ],
     SwapTransaction.Stage.AGENDA_PENDING: [
         SwapTransaction.Stage.AGENDA_ACCEPTED,
         SwapTransaction.Stage.AGENDA_REJECTED,
+    ],
+    SwapTransaction.Stage.AGENDA_REJECTED: [
+        SwapTransaction.Stage.AGENDA_PENDING,
     ],
 }
 
