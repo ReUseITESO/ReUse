@@ -74,18 +74,19 @@ class SwapServiceTestCase(APITestCase):
         self.assertEqual(swap.stage, SwapTransaction.Stage.PROPOSAL_PENDING)
         self.assertEqual(swap.proposed_product_id, self.buyer_product.pk)
 
-    def test_create_duplicate_proposal_raises_state_conflict(self):
+    def test_create_duplicate_proposal_updates_existing(self):
         SwapTransaction.objects.create(
             transaction=self.transaction,
             proposed_product=self.buyer_product,
             stage=SwapTransaction.Stage.PROPOSAL_PENDING,
         )
-        with self.assertRaises(StateConflictError):
-            create_swap_proposal(
-                transaction_id=self.transaction.pk,
-                proposed_product_id=self.buyer_product.pk,
-                buyer=self.buyer,
-            )
+        # Should not raise exception, but update existing one (as per current service implementation)
+        swap = create_swap_proposal(
+            transaction_id=self.transaction.pk,
+            proposed_product_id=self.buyer_product.pk,
+            buyer=self.buyer,
+        )
+        self.assertEqual(swap.proposed_product_id, self.buyer_product.pk)
 
     def test_create_swap_proposal_with_non_owned_product_raises_permission_denied(self):
         from rest_framework.exceptions import PermissionDenied

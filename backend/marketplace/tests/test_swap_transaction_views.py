@@ -99,7 +99,7 @@ class SwapTransactionViewTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_duplicate_proposal_returns_409(self):
+    def test_duplicate_proposal_returns_201(self):
         SwapTransaction.objects.create(
             transaction=self.transaction,
             proposed_product=self.buyer_product,
@@ -111,7 +111,7 @@ class SwapTransactionViewTests(APITestCase):
             {"proposed_product_id": self.buyer_product.pk},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_seller_can_accept_proposal_returns_200(self):
         SwapTransaction.objects.create(

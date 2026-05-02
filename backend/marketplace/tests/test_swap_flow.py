@@ -41,7 +41,7 @@ class SwapFlowTests(APITestCase):
         data = {
             "product_id": self.product1.id,
             "delivery_location": "Biblioteca",
-            "delivery_date": "2026-05-01T12:00:00Z",
+            "delivery_date": "2026-06-01T12:00:00Z",
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
