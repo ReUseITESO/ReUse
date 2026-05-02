@@ -5,7 +5,6 @@ from rest_framework.test import APITestCase
 
 from core.models import User
 from marketplace.models import Category, Products, SwapTransaction, Transaction
-from marketplace.services.transaction_common import StateConflictError
 from marketplace.services.transaction_swap import (
     create_swap_proposal,
     propose_swap_agenda,
