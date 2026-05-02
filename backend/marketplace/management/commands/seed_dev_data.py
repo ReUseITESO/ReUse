@@ -16,6 +16,7 @@ from gamification.models.badges import Badges
 from gamification.models.challenge import Challenge, ChallengeType
 from gamification.models.environment_impact import EnvironmentImpact
 from gamification.models.point_rule import PointRule
+from gamification.models.point_transaction import PointTransaction
 from gamification.models.user_badges import UserBadges
 from marketplace.models import Category, Images, Products, Transaction
 
@@ -126,6 +127,12 @@ class Command(BaseCommand):
                 user.is_active = True
                 user.is_email_verified = True
                 user.save()
+                if user.points > 0:
+                    PointTransaction.objects.create(
+                        user=user,
+                        action="seed_balance",
+                        points=user.points,
+                    )
             else:
                 # Preserve earned points on existing users; only refresh profile metadata.
                 for k, v in data.items():
