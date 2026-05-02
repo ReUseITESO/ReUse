@@ -183,7 +183,9 @@ def update_transaction_status(transaction_id, new_status, actor):
                 product.save(update_fields=["status", "updated_at"])
 
             # If it's a swap, also release the proposed product
-            if transaction.transaction_type == "swap" and hasattr(transaction, "swap_data"):
+            if transaction.transaction_type == "swap" and hasattr(
+                transaction, "swap_data"
+            ):
                 proposed_product = transaction.swap_data.proposed_product
                 if proposed_product.status != "disponible":
                     proposed_product.status = "disponible"
@@ -220,7 +222,9 @@ def update_transaction_status(transaction_id, new_status, actor):
                 product.save(update_fields=["status", "updated_at"])
 
             # If it's a swap, also mark proposed product as completed
-            if transaction.transaction_type == "swap" and hasattr(transaction, "swap_data"):
+            if transaction.transaction_type == "swap" and hasattr(
+                transaction, "swap_data"
+            ):
                 proposed_product = transaction.swap_data.proposed_product
                 if proposed_product.status != "completado":
                     proposed_product.status = "completado"

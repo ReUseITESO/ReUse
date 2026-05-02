@@ -6,13 +6,13 @@ from rest_framework import serializers
 from core.models import User
 from marketplace.models import Products, Transaction, TransactionReview
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.transaction_flow import SwapTransactionSerializer
 from marketplace.serializers.transaction_review import TransactionReviewSerializer
 from marketplace.services.transaction_service import (
     UPDATABLE_TRANSACTION_STATUSES,
     get_expiration_datetime,
     is_transaction_expired,
 )
-from marketplace.serializers.transaction_flow import SwapTransactionSerializer
 
 
 class TransactionUserSerializer(serializers.ModelSerializer):

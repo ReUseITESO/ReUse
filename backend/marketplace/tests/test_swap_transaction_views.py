@@ -73,7 +73,11 @@ class SwapTransactionViewTests(APITestCase):
         return f"{self.BASE_URL}{self.transaction.pk}/swap/"
 
     def test_propose_without_auth_returns_401(self):
-        response = self.client.post(self._propose_url(), {"proposed_product_id": self.buyer_product.pk}, format="json")
+        response = self.client.post(
+            self._propose_url(),
+            {"proposed_product_id": self.buyer_product.pk},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_buyer_can_propose_swap_returns_201(self):

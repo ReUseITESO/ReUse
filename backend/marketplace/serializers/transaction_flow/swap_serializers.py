@@ -55,7 +55,9 @@ class SwapAgendaSerializer(serializers.Serializer):
             r"\s*·\s*Reuni[oó]n\s+.+$", "", value, flags=re.IGNORECASE
         ).strip()
         if not cleaned:
-            raise serializers.ValidationError("La ubicación de la agenda es obligatoria.")
+            raise serializers.ValidationError(
+                "La ubicación de la agenda es obligatoria."
+            )
         return cleaned
 
     def validate_delivery_date(self, value):

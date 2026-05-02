@@ -45,7 +45,9 @@ def get_swap_transaction(transaction_id):
             "proposed_product__category",
         ).get(transaction_id=transaction_id)
     except SwapTransaction.DoesNotExist as err:
-        raise NotFound("No existe una propuesta de intercambio para esta transacción.") from err
+        raise NotFound(
+            "No existe una propuesta de intercambio para esta transacción."
+        ) from err
 
 
 def create_swap_proposal(transaction_id, proposed_product_id, buyer):
@@ -60,7 +62,9 @@ def create_swap_proposal(transaction_id, proposed_product_id, buyer):
             raise NotFound("La transacción no existe.") from err
 
         if transaction.buyer_id != buyer.pk:
-            raise PermissionDenied("Solo el comprador puede proponer el artículo de intercambio.")
+            raise PermissionDenied(
+                "Solo el comprador puede proponer el artículo de intercambio."
+            )
 
         if transaction.transaction_type != "swap":
             raise StateConflictError("Esta transacción no es de tipo intercambio.")
@@ -71,7 +75,9 @@ def create_swap_proposal(transaction_id, proposed_product_id, buyer):
             )
 
         try:
-            proposed_product = Products.objects.select_for_update().get(pk=proposed_product_id)
+            proposed_product = Products.objects.select_for_update().get(
+                pk=proposed_product_id
+            )
         except Products.DoesNotExist as err:
             raise NotFound("El artículo propuesto no existe.") from err
 
@@ -117,7 +123,9 @@ def respond_to_proposal(transaction_id, accept, actor):
         actor_role = get_actor_role(transaction, actor)
 
         if actor_role != "seller":
-            raise PermissionDenied("Solo el vendedor puede responder a la propuesta de intercambio.")
+            raise PermissionDenied(
+                "Solo el vendedor puede responder a la propuesta de intercambio."
+            )
 
         swap = (
             SwapTransaction.objects.select_for_update()
@@ -160,11 +168,15 @@ def propose_swap_agenda(transaction_id, agenda_location, delivery_date, actor):
         actor_role = get_actor_role(transaction, actor)
 
         if actor_role != "buyer":
-            raise PermissionDenied("Solo el comprador puede proponer la fecha y lugar de encuentro.")
+            raise PermissionDenied(
+                "Solo el comprador puede proponer la fecha y lugar de encuentro."
+            )
 
         swap = SwapTransaction.objects.select_for_update().get(transaction=transaction)
 
-        _validate_swap_stage_transition(swap.stage, SwapTransaction.Stage.AGENDA_PENDING)
+        _validate_swap_stage_transition(
+            swap.stage, SwapTransaction.Stage.AGENDA_PENDING
+        )
 
         swap.stage = SwapTransaction.Stage.AGENDA_PENDING
         swap.agenda_location = agenda_location
@@ -191,7 +203,9 @@ def respond_to_agenda(transaction_id, accept, actor):
         actor_role = get_actor_role(transaction, actor)
 
         if actor_role != "seller":
-            raise PermissionDenied("Solo el vendedor puede responder a la propuesta de agenda.")
+            raise PermissionDenied(
+                "Solo el vendedor puede responder a la propuesta de agenda."
+            )
 
         swap = SwapTransaction.objects.select_for_update().get(transaction=transaction)
 
