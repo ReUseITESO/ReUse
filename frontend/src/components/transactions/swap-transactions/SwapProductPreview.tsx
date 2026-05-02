@@ -19,7 +19,12 @@ interface SwapProductPreviewProps {
   showDescription?: boolean;
 }
 
-export default function SwapProductPreview({ product, label, className, showDescription = false }: SwapProductPreviewProps) {
+export default function SwapProductPreview({
+  product,
+  label,
+  className,
+  showDescription = false,
+}: SwapProductPreviewProps) {
   const catStyle = getCategoryStyle(product.category.name);
   const condStyle = product.condition ? getConditionStyle(product.condition) : '';
   const typeStyle = getTransactionTypeStyle(product.transaction_type);
@@ -93,9 +98,7 @@ export default function SwapProductPreview({ product, label, className, showDesc
           </div>
 
           {showDescription && 'description' in product && product.description && (
-            <p className="mt-3 text-sm text-muted-fg line-clamp-3">
-              {product.description}
-            </p>
+            <p className="mt-3 text-sm text-muted-fg line-clamp-3">{product.description}</p>
           )}
 
           {/* Small Eye Button - Absolutely positioned to the top right of the text area */}

@@ -134,15 +134,27 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             </p>
             <p className="flex items-center gap-3 text-sm text-muted-fg">
               <CalendarClock className="h-4 w-4 text-warning" />
-              <span>Expira: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}</span>
+              <span>
+                Expira:{' '}
+                {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
+              </span>
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
               <div className="flex justify-between items-center mb-1">
-                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">Vendedor</p>
-                <span className={cn('text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border', transaction.seller_confirmation ? 'bg-success/10 text-success border-success/30' : 'bg-warning/10 text-warning border-warning/30')}>
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">
+                  Vendedor
+                </p>
+                <span
+                  className={cn(
+                    'text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border',
+                    transaction.seller_confirmation
+                      ? 'bg-success/10 text-success border-success/30'
+                      : 'bg-warning/10 text-warning border-warning/30',
+                  )}
+                >
                   {transaction.seller_confirmation ? 'Confirmado' : 'Pendiente'}
                 </span>
               </div>
@@ -153,8 +165,17 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
             </div>
             <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
               <div className="flex justify-between items-center mb-1">
-                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">Comprador</p>
-                <span className={cn('text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border', transaction.buyer_confirmation ? 'bg-success/10 text-success border-success/30' : 'bg-warning/10 text-warning border-warning/30')}>
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">
+                  Comprador
+                </p>
+                <span
+                  className={cn(
+                    'text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border',
+                    transaction.buyer_confirmation
+                      ? 'bg-success/10 text-success border-success/30'
+                      : 'bg-warning/10 text-warning border-warning/30',
+                  )}
+                >
                   {transaction.buyer_confirmation ? 'Confirmado' : 'Pendiente'}
                 </span>
               </div>
@@ -169,9 +190,11 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
         <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
           <SwapProductPreview
             product={transaction.product}
-            label={transaction.transaction_type === 'swap'
-              ? `Producto solicitado (publicado por ${transaction.seller.first_name})`
-              : `Producto publicado por ${transaction.seller.first_name} ${transaction.seller.last_name}`}
+            label={
+              transaction.transaction_type === 'swap'
+                ? `Producto solicitado (publicado por ${transaction.seller.first_name})`
+                : `Producto publicado por ${transaction.seller.first_name} ${transaction.seller.last_name}`
+            }
             showDescription={true}
           />
           {transaction.transaction_type === 'swap' && transaction.swap_data && (
@@ -197,7 +220,6 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           />
         )}
 
-
         <TransactionStatusActions
           canAccept={canAccept}
           canCancel={canCancel}
@@ -208,7 +230,6 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           isUpdating={isUpdating}
           onChangeStatus={handleChangeStatus}
         />
-
 
         <p className="text-xs text-muted-fg">Notificación pendiente: integración con CORE.</p>
 

@@ -52,14 +52,18 @@ export default function TransactionCard({
     <Card className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-2">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${categoryStyle}`}>
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${categoryStyle}`}
+          >
             <CategoryPlaceholderIcon
               categoryName={transaction.product.category.name}
               className="h-6 w-6"
             />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-fg tracking-tight">{transaction.product.title}</h3>
+            <h3 className="text-xl font-bold text-fg tracking-tight">
+              {transaction.product.title}
+            </h3>
             <p className="text-sm text-muted-fg font-medium">
               {transaction.transaction_type === 'sale'
                 ? formatPrice(transaction.product.price)
@@ -153,6 +157,6 @@ export default function TransactionCard({
           Ver detalle
         </Link>
       </div>
-    </Card >
+    </Card>
   );
 }

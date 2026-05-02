@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, MapPin, Package, RefreshCcw, XCircle, CalendarClock } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Package,
+  RefreshCcw,
+  XCircle,
+  CalendarClock,
+} from 'lucide-react';
 
 import SwapAgendaForm from '@/components/transactions/swap-transactions/SwapAgendaForm';
 import SwapProductPickerModal from '@/components/transactions/swap-transactions/SwapProductPickerModal';
@@ -52,7 +60,7 @@ export default function SwapProposalStatus({
 }: SwapProposalStatusProps) {
   const [isAgendaModalOpen, setIsAgendaModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  
+
   useEffect(() => {
     if (isAgendaModalOpen || isProductModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -71,7 +79,8 @@ export default function SwapProposalStatus({
   const showProposalActions = stage === 'proposal_pending' && actorRole === 'seller';
   const showAgendaForm = stage === 'proposal_accepted' && actorRole === 'buyer';
   const showAgendaActions = stage === 'agenda_pending' && actorRole === 'seller';
-  const isReProposalStage = (stage === 'proposal_rejected' || stage === 'agenda_rejected') && actorRole === 'buyer';
+  const isReProposalStage =
+    (stage === 'proposal_rejected' || stage === 'agenda_rejected') && actorRole === 'buyer';
 
   if (stage === 'agenda_accepted') {
     return null;
@@ -94,7 +103,14 @@ export default function SwapProposalStatus({
               </p>
               {deliveryDate && (
                 <p className="text-muted-fg font-medium">
-                  Fecha propuesta: <span className="text-fg">{new Date(deliveryDate).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short', hour12: false })}</span>
+                  Fecha propuesta:{' '}
+                  <span className="text-fg">
+                    {new Date(deliveryDate).toLocaleString('es-MX', {
+                      dateStyle: 'long',
+                      timeStyle: 'short',
+                      hour12: false,
+                    })}
+                  </span>
                 </p>
               )}
             </div>
@@ -139,7 +155,9 @@ export default function SwapProposalStatus({
               </Button>
 
               {stage === 'agenda_rejected' && (
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wider ${stageColor}`}>
+                <div
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wider ${stageColor}`}
+                >
                   <XCircle className="h-3 w-3" />
                   {stageLabel}
                 </div>
@@ -175,7 +193,9 @@ export default function SwapProposalStatus({
             </Button>
           </div>
 
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wider ${stageColor}`}>
+          <div
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wider ${stageColor}`}
+          >
             <XCircle className="h-3 w-3" />
             {stageLabel}
           </div>
