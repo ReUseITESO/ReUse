@@ -208,7 +208,8 @@ def respond_to_agenda(transaction_id, accept, actor):
 
         if accept:
             transaction.delivery_location = swap.agenda_location
-            transaction.save(update_fields=["delivery_location"])
+            transaction.status = "confirmada"
+            transaction.save(update_fields=["delivery_location", "status"])
 
         # TODO(core-team): Notificar al comprador el resultado de la propuesta de agenda.
         return swap

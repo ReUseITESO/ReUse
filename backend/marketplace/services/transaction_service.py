@@ -161,6 +161,12 @@ def update_transaction_status(transaction_id, new_status, actor):
             if actor_role != "seller":
                 raise PermissionDenied("Solo el vendedor puede aceptar la solicitud.")
 
+            if transaction.transaction_type == "swap":
+                raise StateConflictError(
+                    "Las transacciones de intercambio no pueden aceptarse manualmente. "
+                    "Deben seguir el flujo de propuesta y agenda."
+                )
+
             transaction.status = "confirmada"
             transaction.save(update_fields=["status"])
 
