@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  CheckCircle2,
-  Clock,
-  RefreshCcw,
-  XCircle,
-  CalendarClock,
-} from 'lucide-react';
+import { CheckCircle2, Clock, RefreshCcw, XCircle, CalendarClock } from 'lucide-react';
 
 import SwapAgendaForm from '@/components/transactions/swap-transactions/SwapAgendaForm';
 import SwapProductPickerModal from '@/components/transactions/swap-transactions/SwapProductPickerModal';
