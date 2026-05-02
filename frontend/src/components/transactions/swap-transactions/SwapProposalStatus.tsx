@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   CheckCircle2,
   Clock,
-  MapPin,
-  Package,
   RefreshCcw,
   XCircle,
   CalendarClock,

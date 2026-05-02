@@ -30,7 +30,7 @@ export default function SwapProductPreview({
   const typeStyle = getTransactionTypeStyle(product.transaction_type);
 
   const isSale = product.transaction_type === 'sale';
-  const price = isSale && 'price' in product ? (product as any).price : null;
+  const price = isSale && 'price' in product ? (product as TransactionProductSummary).price : null;
 
   const typeBadgeLabel = price
     ? formatPrice(price)
