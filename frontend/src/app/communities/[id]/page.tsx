@@ -1,18 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus, Crown } from 'lucide-react';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
 import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
+import LeaderBoard from '@/components/communities/LeaderBoard';
 
-export default function CommunityDetailPage({ params }: { params: { id: string } }) {
+// Helper for accessibility attributes
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+// Panel props interface
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+// The Panel wrapper
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+export default function CommunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useAuth();
   const router = useRouter();
+  const { id } = use(params);
   const {
     community,
     posts,
@@ -24,18 +66,23 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     leaveCommunity,
     joinCommunity,
     deleteCommunity,
-  } = useCommunityDetail(params.id);
+  } = useCommunityDetail(id);
 
   const {
     products,
     isLoading: productsLoading,
     error: productsError,
     refresh: refreshProducts,
-  } = useCommunityMarketplace(params.id);
+  } = useCommunityMarketplace(id);
 
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: Event, newValue: number) => {
+    setValue(newValue);
+  };
 
   const currentMembership = members.find(m => m.user.id === user?.id);
   const isAdmin = currentMembership?.role === 'admin';
@@ -215,41 +262,65 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
               </div>
             )}
           </div>
-          {/* Members sidebar */}
-          <div>
-            <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
-            <div className="space-y-2">
-              {members.map(m => (
-                <div
-                  key={m.id}
-                  className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {m.user.first_name?.[0]?.toUpperCase()}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {m.user.full_name}
-                    {m.role === 'admin' && (
-                      <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
-                    )}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        {/* Marketplace Section */}
-        <div className="mt-8">
-          <CommunityMarketplaceSection
-            products={products}
-            isLoading={productsLoading}
-            error={productsError}
-            communityName={community?.name || ''}
-            isAdmin={isAdmin}
-            communityId={Number(params.id)}
-            onProductRemoved={refreshProducts}
-          />
+          {/* Leaderboard and members sidebar */}
+          <div>
+
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                <Tab label="Miembros" {...a11yProps(0)} />
+                <Tab label="Leadeboard" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+
+            {/* Members tab section */}
+            
+            <CustomTabPanel value={value} index={0}>
+              <div>
+                {/* <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2> */}
+                <div className="space-y-2">
+                  {members.map(m => (
+                    <div
+                      key={m.id}
+                      className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {m.user.first_name?.[0]?.toUpperCase()}
+                      </div>
+                      <p className="text-sm font-medium text-foreground">
+                        {m.user.full_name}
+                        {m.role === 'admin' && (
+                          <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CustomTabPanel>
+
+            {/* Leaderboard tab section */}
+            
+            <CustomTabPanel value={value} index={1}>
+              <LeaderBoard members={members} posts={posts}/>
+            </CustomTabPanel>
+          
+          </div>
+
+          {/* Marketplace Section */}
+          <div className="mt-8">
+            <CommunityMarketplaceSection
+              products={products}
+              isLoading={productsLoading}
+              error={productsError}
+              communityName={community?.name || ''}
+              isAdmin={isAdmin}
+              communityId={Number(id)}
+              onProductRemoved={refreshProducts}
+            />
+          </div>
+
+        
         </div>
       </div>
     </main>
