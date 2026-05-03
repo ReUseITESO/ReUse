@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertCircle, ClipboardCheck, Mail, RefreshCcw, UserRound } from 'lucide-react';
+import { AlertCircle, ClipboardCheck, Mail, UserRound } from 'lucide-react';
 
+import SwapProductPickerModal from '@/components/transactions/swap-transactions/SwapProductPickerModal';
 import MeetingLocationFields from '@/components/transactions/MeetingLocationFields';
 import Button from '@/components/ui/Button';
 import {
@@ -47,14 +48,25 @@ export default function CreateTransactionDialog({
 
   if (!isOpen) return null;
 
-  async function handleSubmit() {
-    if (transactionType === 'swap') {
-      setValidationError('Intercambio pendiente de implementación completa en la issue #34.');
-      return;
-    }
+  // For swap items, open the product picker directly (location/date negotiated later)
+  if (transactionType === 'swap') {
+    return (
+      <SwapProductPickerModal
+        isOpen={isOpen}
+        isSubmitting={isLoading}
+        onCancel={onCancel}
+        onConfirm={async productId => {
+          // onSubmit signature: (deliveryLocation, deliveryDate) — for swap we pass placeholders;
+          // the real location/date is negotiated in the agenda stage.
+          await onSubmit('pendiente', new Date(Date.now() + 24 * 60 * 60 * 1000), productId);
+        }}
+      />
+    );
+  }
 
+  async function handleSubmit() {
     if (!buildingCode || !roomNumber || !meetingDateTime) {
-      setValidationError('Completa edificio, salon y fecha/hora para continuar.');
+      setValidationError('Completa edificio, salón y fecha/hora para continuar.');
       return;
     }
 
@@ -90,11 +102,7 @@ export default function CreateTransactionDialog({
     }
 
     setValidationError(null);
-    const deliveryLocation = formatMeetingLocation({
-      buildingCode,
-      roomNumber,
-    });
-
+    const deliveryLocation = formatMeetingLocation({ buildingCode, roomNumber });
     await onSubmit(deliveryLocation, meetingDateTime);
   }
 
@@ -144,18 +152,6 @@ export default function CreateTransactionDialog({
               />
             </div>
 
-            {transactionType === 'swap' && (
-              <div className="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning-fg">
-                <p className="font-medium">Flujo de intercambio parcial</p>
-                <p className="mt-1">
-                  La selección del artículo a intercambiar se implementará en la issue #34.
-                </p>
-                <Button variant="secondary" className="mt-2" disabled>
-                  <RefreshCcw className="mr-2 inline h-4 w-4" /> TODO issue #34
-                </Button>
-              </div>
-            )}
-
             {(validationError || error) && (
               <p className="mt-3 inline-flex items-center gap-2 text-sm text-error">
                 <AlertCircle className="h-4 w-4" />
@@ -164,6 +160,7 @@ export default function CreateTransactionDialog({
             )}
 
             <p className="mt-4 text-xs text-muted-fg">
+              {/* TODO(core-team): Notificar al vendedor cuando se inicie la solicitud. */}
               Notificación pendiente: integración con CORE.
             </p>
 

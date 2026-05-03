@@ -17,7 +17,7 @@ import type { TransactionStatus, UpdatableTransactionStatus } from '@/types/tran
 export default function TransactionsPanel() {
   const { user, isAuthenticated } = useAuth();
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
-  const [status, setStatus] = useState<TransactionStatus | undefined>(undefined);
+  const [status, setStatus] = useState<TransactionStatus | undefined>('pendiente');
   const [notice, setNotice] = useState<string | null>(null);
 
   const {
