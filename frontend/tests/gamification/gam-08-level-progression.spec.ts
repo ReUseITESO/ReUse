@@ -74,7 +74,17 @@ test.describe('HU-GAM-08: Level Progression', () => {
     test.use({ storageState: storageStatePath('champion') });
 
     test('6. UI level name and points_to_next_level match API response', async ({ page }) => {
-      let api: any = null;
+      interface LevelProgressionApiResponse {
+        points: number;
+        current_level: { name: string; min_points: number; icon: string };
+        next_level: { name: string; min_points: number; icon: string } | null;
+        progress_percent: number;
+        points_to_next_level: number | null;
+        is_max_level: boolean;
+      }
+
+      let api: LevelProgressionApiResponse | null = null;
+
       page.on('response', async res => {
         if (res.url().includes('/api/gamification/level-progression/') && res.ok()) {
           api = await res.json();
@@ -83,14 +93,17 @@ test.describe('HU-GAM-08: Level Progression', () => {
       await page.goto('/profile', { waitUntil: 'networkidle' });
       await expect(page.getByTestId('level-current-name')).toBeVisible();
 
-      expect(api).not.toBeNull();
-      await expect(page.getByTestId('level-current-name')).toHaveText(api.current_level.name);
+      const current_level_name = (api as LevelProgressionApiResponse | null)?.current_level.name ?? '';
+      const points_to_next_level = String((api as LevelProgressionApiResponse | null)?.points_to_next_level ?? '');
+      const progress_percent = (api as LevelProgressionApiResponse | null)?.progress_percent ?? 0;
+      
+      await expect(page.getByTestId('level-current-name')).toHaveText(current_level_name);
       await expect(page.getByTestId('level-points-to-next')).toHaveText(
-        String(api.points_to_next_level),
+        points_to_next_level,
       );
       // Progress is integer 0..100
-      expect(api.progress_percent).toBeGreaterThanOrEqual(0);
-      expect(api.progress_percent).toBeLessThanOrEqual(100);
+      expect(progress_percent).toBeGreaterThanOrEqual(0);
+      expect(progress_percent).toBeLessThanOrEqual(100);
     });
   });
 
