@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, CalendarClock, MapPin, Package, UserRound } from 'lucide-react';
+import { ArrowLeft, CalendarClock, MapPin, UserRound } from 'lucide-react';
 
-import TransactionDeliveryConfirmations from '@/components/transactions/TransactionDeliveryConfirmations';
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
-import TransactionProductSection from '@/components/transactions/TransactionProductSection';
 import TransactionStatusActions from '@/components/transactions/TransactionStatusActions';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
+import SwapProposalStatus from '@/components/transactions/swap-transactions/SwapProposalStatus';
+import SwapProductPreview from '@/components/transactions/swap-transactions/SwapProductPreview';
+import { cn } from '@/lib/utils';
 import {
   getDeliveryConfirmationLabel,
   getPendingCounterpartLabel,
@@ -19,6 +20,7 @@ import Spinner from '@/components/ui/Spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransactionDetail } from '@/hooks/useTransactionDetail';
 import { useTransactionStatus } from '@/hooks/useTransactionStatus';
+import { useSwapTransaction } from '@/hooks/useSwapTransaction';
 import type { UpdatableTransactionStatus } from '@/types/transaction';
 
 interface TransactionDetailViewProps {
@@ -29,6 +31,14 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   const { user } = useAuth();
   const { transaction, isLoading, error, refetch } = useTransactionDetail(transactionId);
   const { changeStatus, isLoading: isUpdating, error: updateError } = useTransactionStatus();
+  const {
+    proposeSwap,
+    respondProposal,
+    proposeAgenda,
+    respondAgenda,
+    isLoading: isSwapLoading,
+    error: swapError,
+  } = useSwapTransaction();
 
   if (isLoading) {
     return <Spinner />;
@@ -57,6 +67,39 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
   async function handleChangeStatus(status: UpdatableTransactionStatus) {
     const updated = await changeStatus(transactionIdValue, status);
     if (updated) {
+      // #TODO: CORE - Implementar notificaciones para cambio de estado de transacción (completada/confirmada/cancelada).
+      refetch();
+    }
+  }
+
+  async function handleRespondProposal(accept: boolean) {
+    const updated = await respondProposal(transactionIdValue, accept);
+    if (updated) {
+      // #TODO: CORE - Implementar notificación para respuesta de propuesta de artículo de intercambio (aceptada/rechazada).
+      refetch();
+    }
+  }
+
+  async function handleProposeSwap(productId: number) {
+    const updated = await proposeSwap(transactionIdValue, productId);
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando el comprador vuelve a proponer un artículo tras un rechazo.
+      refetch();
+    }
+  }
+
+  async function handleProposeAgenda(location: string, date: Date) {
+    const updated = await proposeAgenda(transactionIdValue, location, date.toISOString());
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando se propone una nueva fecha y lugar.
+      refetch();
+    }
+  }
+
+  async function handleRespondAgenda(accept: boolean) {
+    const updated = await respondAgenda(transactionIdValue, accept);
+    if (updated) {
+      // #TODO: CORE - Implementar notificación cuando se responde a la agenda propuesta (aceptada/rechazada).
       refetch();
     }
   }
@@ -80,46 +123,102 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           <TransactionStatusBadge status={transaction.status} />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-fg">
-            <p className="inline-flex items-center gap-2 font-medium">
-              <Package className="h-4 w-4 text-secondary" />
-              {transaction.product.title}
-            </p>
-            <p></p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
+            <p className="flex items-center gap-3 text-sm text-muted-fg">
               <MapPin className="h-4 w-4 text-info" />
               <TransactionLocationHighlight
                 location={transaction.delivery_location}
                 deliveryDate={transaction.delivery_date}
               />
             </p>
-            <p className="mt-2 inline-flex items-center gap-2 text-muted-fg">
+            <p className="flex items-center gap-3 text-sm text-muted-fg">
               <CalendarClock className="h-4 w-4 text-warning" />
-              Límite: {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
+              <span>
+                Expira:{' '}
+                {new Date(transaction.expires_at).toLocaleString('es-MX', { hour12: false })}
+              </span>
             </p>
           </div>
 
-          <div className="space-y-2">
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">
+                  Vendedor
+                </p>
+                <span
+                  className={cn(
+                    'text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border',
+                    transaction.seller_confirmation
+                      ? 'bg-success/10 text-success border-success/30'
+                      : 'bg-warning/10 text-warning border-warning/30',
+                  )}
+                >
+                  {transaction.seller_confirmation ? 'Confirmado' : 'Pendiente'}
+                </span>
+              </div>
+              <p className="flex items-center gap-2 text-sm font-medium text-fg">
                 <UserRound className="h-4 w-4 text-accent" />
-                Vendedor: {transaction.seller.first_name} {transaction.seller.last_name}
+                {transaction.seller.first_name} {transaction.seller.last_name}
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-card p-2.5">
-              <p className="inline-flex items-center gap-2 text-muted-fg">
+            <div className="flex flex-col justify-center rounded-xl border border-border bg-card p-3 shadow-sm">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-[10px] font-bold text-muted-fg uppercase tracking-widest">
+                  Comprador
+                </p>
+                <span
+                  className={cn(
+                    'text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border',
+                    transaction.buyer_confirmation
+                      ? 'bg-success/10 text-success border-success/30'
+                      : 'bg-warning/10 text-warning border-warning/30',
+                  )}
+                >
+                  {transaction.buyer_confirmation ? 'Confirmado' : 'Pendiente'}
+                </span>
+              </div>
+              <p className="flex items-center gap-2 text-sm font-medium text-fg">
                 <UserRound className="h-4 w-4 text-secondary" />
-                Comprador: {transaction.buyer.first_name} {transaction.buyer.last_name}
+                {transaction.buyer.first_name} {transaction.buyer.last_name}
               </p>
             </div>
           </div>
         </div>
 
-        <TransactionDeliveryConfirmations
-          sellerConfirmation={transaction.seller_confirmation}
-          buyerConfirmation={transaction.buyer_confirmation}
-        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+          <SwapProductPreview
+            product={transaction.product}
+            label={
+              transaction.transaction_type === 'swap'
+                ? `Producto solicitado (publicado por ${transaction.seller.first_name})`
+                : `Producto publicado por ${transaction.seller.first_name} ${transaction.seller.last_name}`
+            }
+            showDescription={true}
+          />
+          {transaction.transaction_type === 'swap' && transaction.swap_data && (
+            <SwapProductPreview
+              product={transaction.swap_data.proposed_product}
+              label={`Producto propuesto (publicado por ${transaction.buyer.first_name})`}
+              showDescription={true}
+            />
+          )}
+        </div>
+
+        {transaction.swap_data && (
+          <SwapProposalStatus
+            swapData={transaction.swap_data}
+            actorRole={actorRole}
+            deliveryDate={transaction.delivery_date}
+            isLoading={isSwapLoading}
+            error={swapError}
+            onRespondProposal={handleRespondProposal}
+            onProposeProduct={handleProposeSwap}
+            onProposeAgenda={handleProposeAgenda}
+            onRespondAgenda={handleRespondAgenda}
+          />
+        )}
 
         <TransactionStatusActions
           canAccept={canAccept}
@@ -131,8 +230,6 @@ export default function TransactionDetailView({ transactionId }: TransactionDeta
           isUpdating={isUpdating}
           onChangeStatus={handleChangeStatus}
         />
-
-        <TransactionProductSection product={transaction.product} />
 
         <p className="text-xs text-muted-fg">Notificación pendiente: integración con CORE.</p>
 
