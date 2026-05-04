@@ -1,9 +1,14 @@
 FROM node:20-alpine
 
+# Install compatibility libraries
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+
+# Clean install with legacy support
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 

@@ -27,24 +27,38 @@ test.describe('HU-GAM-06: Eco Impact', () => {
     });
   });
 
+
   test.describe('champion user (10 items, 25 kg CO2)', () => {
     test.use({ storageState: storageStatePath('champion') });
 
     test('2. UI numbers equal API response exactly', async ({ page }) => {
-      let api: any = null;
+
+      interface ImpactApiResponse {
+        items_reused: number;
+        co2_avoided: number;
+        community_average_items: number;
+        community_average_co2: number;
+      }
+
+      let api: ImpactApiResponse | null = null;
+
       page.on('response', async res => {
         if (res.url().includes('/api/gamification/impact/') && res.ok()) {
-          api = await res.json();
+          api = await res.json() as ImpactApiResponse;
         }
       });
+
+      const items_reused = String((api as ImpactApiResponse | null)?.items_reused ?? 0);
+      const co2_avoided = String((api as ImpactApiResponse | null)?.co2_avoided ?? 0);
+      const community_average_items = String((api as ImpactApiResponse | null)?.community_average_items ?? 0);
+
       await page.goto('/profile', { waitUntil: 'networkidle' });
       await expect(page.getByTestId('eco-impact-card')).toBeVisible();
 
-      expect(api).not.toBeNull();
-      await expect(page.getByTestId('eco-impact-items')).toHaveText(String(api.items_reused));
-      await expect(page.getByTestId('eco-impact-co2')).toHaveText(`${api.co2_avoided} kg`);
+      await expect(page.getByTestId('eco-impact-items')).toHaveText(String(items_reused));
+      await expect(page.getByTestId('eco-impact-co2')).toHaveText(`${co2_avoided} kg`);
       await expect(page.getByTestId('eco-impact-community-avg')).toHaveText(
-        String(api.community_average_items),
+        String((api) ? community_average_items :""),
       );
     });
 

@@ -278,21 +278,20 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
           {/* Leaderboard and members sidebar */}
           <div>
-
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs 
-                value={value} 
-                onChange={handleChange} 
+              <Tabs
+                value={value}
+                onChange={handleChange}
                 aria-label="basic tabs example"
                 sx={{
                   // Style for ALL tabs (unselected state)
                   '& .MuiTab-root': {
                     color: 'primary.main', // Automatically flips: Black in light, White in dark
-                    opacity: 0.6,          // Optional: makes unselected slightly muted
+                    opacity: 0.6, // Optional: makes unselected slightly muted
                   },
                   // Style for the ACTIVE tab
                   '& .Mui-selected': {
-                    color: 'primary.main', // Your theme's primary color 
+                    color: 'primary.main', // Your theme's primary color
                     opacity: 1,
                   },
                 }}
@@ -303,7 +302,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             </Box>
 
             {/* Members tab section */}
-            
+
             <CustomTabPanel value={value} index={0}>
               <div>
                 {/* <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2> */}
@@ -329,14 +328,11 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             </CustomTabPanel>
 
             {/* Leaderboard tab section */}
-            
-            <CustomTabPanel value={value} index={1}>
-              <LeaderBoard members={members} posts={posts}/>
-            </CustomTabPanel>
-          
-          </div>
 
-        
+            <CustomTabPanel value={value} index={1}>
+              <LeaderBoard members={members} posts={posts} />
+            </CustomTabPanel>
+          </div>
         </div>
       </div>
     </main>
