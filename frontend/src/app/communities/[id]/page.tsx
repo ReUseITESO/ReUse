@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus, Crown } from 'lucide-react';
 import Tabs from '@mui/material/Tabs';
@@ -51,10 +51,10 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-export default function CommunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
   const router = useRouter();
-  const { id } = use(params);
+  const { id } = params;
   const {
     community,
     posts,
@@ -80,7 +80,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
   const [postError, setPostError] = useState<string | null>(null);
   const [value, setValue] = useState(0);
 
-  const handleChange = (event: Event, newValue: number) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -261,13 +261,42 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
                 ))}
               </div>
             )}
+
+            {/* Marketplace Section */}
+            <div className="mt-8">
+              <CommunityMarketplaceSection
+                products={products}
+                isLoading={productsLoading}
+                error={productsError}
+                communityName={community?.name || ''}
+                isAdmin={isAdmin}
+                communityId={Number(id)}
+                onProductRemoved={refreshProducts}
+              />
+            </div>
           </div>
 
           {/* Leaderboard and members sidebar */}
           <div>
 
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+              <Tabs 
+                value={value} 
+                onChange={handleChange} 
+                aria-label="basic tabs example"
+                sx={{
+                  // Style for ALL tabs (unselected state)
+                  '& .MuiTab-root': {
+                    color: 'primary.main', // Automatically flips: Black in light, White in dark
+                    opacity: 0.6,          // Optional: makes unselected slightly muted
+                  },
+                  // Style for the ACTIVE tab
+                  '& .Mui-selected': {
+                    color: 'primary.main', // Your theme's primary color 
+                    opacity: 1,
+                  },
+                }}
+              >
                 <Tab label="Miembros" {...a11yProps(0)} />
                 <Tab label="Leadeboard" {...a11yProps(1)} />
               </Tabs>
@@ -305,19 +334,6 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
               <LeaderBoard members={members} posts={posts}/>
             </CustomTabPanel>
           
-          </div>
-
-          {/* Marketplace Section */}
-          <div className="mt-8">
-            <CommunityMarketplaceSection
-              products={products}
-              isLoading={productsLoading}
-              error={productsError}
-              communityName={community?.name || ''}
-              isAdmin={isAdmin}
-              communityId={Number(id)}
-              onProductRemoved={refreshProducts}
-            />
           </div>
 
         
