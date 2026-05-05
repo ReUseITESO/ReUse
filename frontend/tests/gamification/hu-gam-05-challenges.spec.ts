@@ -143,7 +143,10 @@ test.describe('HU-GAM-05: Participar en retos de sostenibilidad', () => {
       await expect(page.getByText('En curso')).toBeVisible();
       // Acotar al artículo del reto para evitar coincidir con otros spans de la página
       await expect(
-        page.locator('article').filter({ hasText: 'Publica 2 artículos hoy' }).getByText(/1\s*\/\s*2/),
+        page
+          .locator('article')
+          .filter({ hasText: 'Publica 2 artículos hoy' })
+          .getByText(/1\s*\/\s*2/),
       ).toBeVisible();
     });
 

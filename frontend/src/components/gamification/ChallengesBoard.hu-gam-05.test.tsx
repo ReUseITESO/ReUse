@@ -233,7 +233,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 1 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 1, progress: 3, is_completed: true, reward_claimed: false }),
+        buildUserChallenge({
+          challenge_id: 1,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: false,
+        }),
       ],
     });
 
@@ -247,7 +252,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 1 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 1, progress: 3, is_completed: true, reward_claimed: true }),
+        buildUserChallenge({
+          challenge_id: 1,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: true,
+        }),
       ],
     });
 
@@ -265,7 +275,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 42 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 42, progress: 3, is_completed: true, reward_claimed: false }),
+        buildUserChallenge({
+          challenge_id: 42,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: false,
+        }),
       ],
       claimChallengeReward: claimMock,
     });
@@ -285,7 +300,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 1 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 1, progress: 3, is_completed: true, reward_claimed: false }),
+        buildUserChallenge({
+          challenge_id: 1,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: false,
+        }),
       ],
       claimChallengeReward: claimMock,
     });
@@ -304,7 +324,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 1 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 1, progress: 3, is_completed: true, reward_claimed: false }),
+        buildUserChallenge({
+          challenge_id: 1,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: false,
+        }),
       ],
       claimChallengeReward: claimMock,
     });
@@ -323,7 +348,12 @@ describe('ChallengesBoard – HU-GAM-05: Participar en retos de sostenibilidad',
       ...emptyChallenges,
       challenges: [buildChallenge({ id: 1 })],
       myChallenges: [
-        buildUserChallenge({ challenge_id: 1, progress: 3, is_completed: true, reward_claimed: true }),
+        buildUserChallenge({
+          challenge_id: 1,
+          progress: 3,
+          is_completed: true,
+          reward_claimed: true,
+        }),
       ],
       claimChallengeReward: claimMock,
     });

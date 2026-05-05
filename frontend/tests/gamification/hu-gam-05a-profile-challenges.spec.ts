@@ -175,9 +175,7 @@ test.describe('HU-GAM-05A: Perfil – Retos vinculados a acciones del marketplac
 
       // Avanzar la fase y simular acción del marketplace que dispara un refetch
       phase = 1;
-      await page.evaluate(() =>
-        window.dispatchEvent(new CustomEvent('reuse:points-updated')),
-      );
+      await page.evaluate(() => window.dispatchEvent(new CustomEvent('reuse:points-updated')));
 
       await expect(page.locator('article').getByText(/2\s*\/\s*3/)).toBeVisible({ timeout: 5000 });
     });
@@ -198,7 +196,16 @@ test.describe('HU-GAM-05A: Perfil – Retos vinculados a acciones del marketplac
           contentType: 'application/json',
           body: JSON.stringify([
             mkUserChallenge({ challenge_id: 1, progress: 1, goal: 3 }),
-            mkUserChallenge({ id: 20, challenge_id: 2, progress: 2, goal: 2, title: 'Dona 2 artículos este mes', challenge_type: 'donation', start_date: '2026-05-01T00:00:00Z', end_date: '2026-06-01T00:00:00Z' }),
+            mkUserChallenge({
+              id: 20,
+              challenge_id: 2,
+              progress: 2,
+              goal: 2,
+              title: 'Dona 2 artículos este mes',
+              challenge_type: 'donation',
+              start_date: '2026-05-01T00:00:00Z',
+              end_date: '2026-06-01T00:00:00Z',
+            }),
           ]),
         }),
       );
@@ -357,7 +364,11 @@ test.describe('HU-GAM-05A: Perfil – Retos vinculados a acciones del marketplac
           .getByText(/Inicia sesión para ver y participar en retos/i)
           .isVisible()
           .catch(() => false)) ||
-        (await page.getByText(/Inicia sesion/i).first().isVisible().catch(() => false));
+        (await page
+          .getByText(/Inicia sesion/i)
+          .first()
+          .isVisible()
+          .catch(() => false));
 
       expect(redirected || hasWarning).toBeTruthy();
     });
