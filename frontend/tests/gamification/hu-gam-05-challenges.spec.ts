@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { storageStatePath } from './fixtures/auth';
-import { BASE_API } from './config';
+
+const BASE_API = 'http://localhost:8000/api';
 
 /**
  * HU-GAM-05 — Usuario puede participar en retos de sostenibilidad
