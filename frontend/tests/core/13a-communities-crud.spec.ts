@@ -35,11 +35,10 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
 
       // Wait for form to appear
       const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
-      await page.waitForTimeout(500);
       await expect(nameInput).toBeVisible();
 
       // Fill form fields
-      const communityName = 'Tech Reuse Community';
+      const communityName = `Tech Reuse Community ${Date.now()}`;
       await nameInput.fill(communityName);
       await page.locator('textarea[placeholder*="Descripcion"]').fill('A community for tech enthusiasts focused on sustainable reuse');
 
@@ -57,17 +56,27 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
     });
 
     test('2. Community appears in creator\'s list', async ({ page }) => {
-      // Test 1 already validates happy path with creation and list appearance
-      // This test verifies the same behavior with different assertions
+      // Actually create a community and verify it appears
       await page.goto('/communities', { waitUntil: 'networkidle' });
-
-      // Verify page heading exists
-      const heading = page.getByRole('heading', { name: 'Comunidades' });
-      await expect(heading).toBeVisible();
-
-      // Verify create button exists
       const createBtn = page.getByRole('button', { name: /Crear comunidad/i });
-      await expect(createBtn).toBeVisible();
+      await createBtn.click();
+
+      const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
+      await expect(nameInput).toBeVisible();
+      
+      const communityName = `List Verify Community ${Date.now()}`;
+      await nameInput.fill(communityName);
+      await page.locator('textarea[placeholder*="Descripcion"]').fill('Test description');
+
+      const crearFormBtn = page.locator('button:has-text("Crear")').last();
+      await crearFormBtn.click();
+
+      // Wait for community to be created
+      await page.waitForLoadState('networkidle');
+      
+      // Verify community actually appears in list
+      const communityLink = page.getByRole('link', { name: communityName });
+      await expect(communityLink).toBeVisible();
     });
   });
 
@@ -84,7 +93,7 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
       await createBtn.click();
 
       const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
-      await page.waitForTimeout(500);
+      await expect(nameInput).toBeVisible();
 
       // Leave name empty and fill description - button should be disabled
       await page.locator('textarea[placeholder*="Descripcion"]').fill('Description without name');
@@ -102,7 +111,7 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
       await createBtn.click();
 
       const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
-      await page.waitForTimeout(500);
+      await expect(nameInput).toBeVisible();
 
       // Fill with only spaces
       await nameInput.fill('   ');
@@ -135,20 +144,50 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
     test('6. Multiple communities can be created', async ({ page }) => {
       await page.goto('/communities', { waitUntil: 'networkidle' });
 
-      // Verify the communities page loads with expected content
-      const heading = page.getByRole('heading', { name: 'Comunidades' });
-      await expect(heading).toBeVisible();
+      // Create first community
+      let createBtn = page.getByRole('button', { name: /Crear comunidad/i });
+      await createBtn.click();
 
-      const createBtn = page.getByRole('button', { name: /Crear comunidad/i });
-      await expect(createBtn).toBeVisible();
+      let nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
+      await expect(nameInput).toBeVisible();
+      const community1 = `Community A ${Date.now()}`;
+      await nameInput.fill(community1);
+      await page.locator('textarea[placeholder*="Descripcion"]').fill('First community');
 
-      // Verify there are community elements on the page (from previous tests or initial data)
-      // Look for any heading text that appears to be a community
-      const communities = page.locator('h3.text-base.font-semibold');
-      const communityCount = await communities.count();
+      let crearFormBtn = page.locator('button:has-text("Crear")').last();
+      await crearFormBtn.click();
+      await page.waitForLoadState('networkidle');
       
-      // Should have at least one community from test 1
-      expect(communityCount).toBeGreaterThan(0);
+      // Refresh to ensure list is updated
+      await page.reload({ waitUntil: 'networkidle' });
+
+      // Verify first community appears
+      let communityLink = page.getByRole('link', { name: community1 });
+      await expect(communityLink).toBeVisible();
+
+      // Create second community
+      createBtn = page.getByRole('button', { name: /Crear comunidad/i });
+      await createBtn.click();
+
+      nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
+      await expect(nameInput).toBeVisible();
+      const community2 = `Community B ${Date.now()}`;
+      await nameInput.fill(community2);
+      await page.locator('textarea[placeholder*="Descripcion"]').fill('Second community');
+
+      crearFormBtn = page.locator('button:has-text("Crear")').last();
+      await crearFormBtn.click();
+      await page.waitForLoadState('networkidle');
+      
+      // Refresh to ensure list is updated
+      await page.reload({ waitUntil: 'networkidle' });
+
+      // Verify both communities appear
+      communityLink = page.getByRole('link', { name: community2 });
+      await expect(communityLink).toBeVisible();
+      
+      communityLink = page.getByRole('link', { name: community1 });
+      await expect(communityLink).toBeVisible();
     });
   });
 
@@ -186,7 +225,6 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
       await createBtn.click();
 
       const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
-      await page.waitForTimeout(500);
       await expect(nameInput).toBeVisible();
 
       const inputBox = await nameInput.boundingBox();
@@ -229,7 +267,6 @@ test.describe('TEST-CORE-13a - Community CRUD', () => {
       await createBtn.click();
 
       const nameInput = page.locator('input[placeholder*="Nombre de la comunidad"]');
-      await page.waitForTimeout(500);
       await expect(nameInput).toBeVisible();
 
       const descInput = page.locator('textarea[placeholder*="Descripcion"]');
