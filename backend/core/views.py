@@ -631,22 +631,7 @@ class ProfilePictureUploadView(APIView):
         return Response({"profile_picture": file_url}, status=status.HTTP_200_OK)
 
 
-class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by(
-            "-created_at"
-        )
-
-    @action(detail=True, methods=["patch"])
-    def mark_read(self, request, pk=None):
-        notification = self.get_object()
-        notification.is_read = True
-        notification.read_at = timezone.now()
-        notification.save(update_fields=["is_read", "read_at"])
-        return Response({"status": "notification marked as read"})
 
 
 # ── Share Item with Friends (HU-CORE-12) ─────────────────

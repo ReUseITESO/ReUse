@@ -92,8 +92,6 @@ urlpatterns = [
     ),
 ]
 
-
 router = DefaultRouter()
-router.register(r"notifications", views.NotificationViewSet, basename="notification")
 
 urlpatterns += router.urls

@@ -1,0 +1,32 @@
+{
+  "name": "reuse",
+  "version": "1.0.0",
+  "description": "**ReUseITESO** is a **responsive web application** designed for the ITESO university community to promote **reuse, donation, exchange, and responsible consumption** of items such as books, electronics, clothing, and school supplies.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReUseITESO/ReUse.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ReUseITESO/ReUse/issues"
+  },
+  "homepage": "https://github.com/ReUseITESO/ReUse#readme",
+  "dependencies": {
+    "@faker-js/faker": "^10.4.0",
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.2",
+    "fs": "^0.0.1-security",
+    "openai": "^6.36.0",
+    "playwright": "^1.59.1"
+  },
+  "type": "module"
+}

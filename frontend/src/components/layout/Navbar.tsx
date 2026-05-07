@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
 import { CelebratoryNotification } from '@/components/gamification/CelebratoryNotification';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import Avatar from '../gamification/profile/Avatar';
 import Image from 'next/image';
@@ -115,55 +116,51 @@ export default function Navbar() {
               </Link>
               <NotificationBell />
               <ThemeToggle />
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${profileOpen ? 'bg-muted' : 'hover:bg-muted'}`}
-                >
-                  <div className="relative h-8 w-8 rounded-full overflow-hidden">
-                    <Avatar />
-                  </div>
-                  <span className="hidden text-fg lg:inline">{user?.first_name}</span>
-                </button>
-                {profileOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                    <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg">
-                      <div className="border-b border-border px-4 py-3">
-                        <p className="text-sm font-medium text-fg">{user?.full_name}</p>
-                        <p className="text-xs text-muted-fg">{user?.email}</p>
-                      </div>
-                      <Link
-                        href="/profile"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
-                      >
-                        <User className="h-4 w-4 text-info" /> Mi perfil
-                      </Link>
-                      <Link
-                        href="/transactions"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
-                      >
-                        <ArrowLeftRight className="h-4 w-4 text-info" /> Transacciones
-                      </Link>
-                      <Link
-                        href="/transaction-history"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg transition-colors hover:bg-info/10"
-                      >
-                        <History className="h-4 w-4 text-info" /> Historial de transacciones
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-error/5"
-                      >
-                        <LogOut className="h-4 w-4" /> Cerrar sesion
-                      </button>
+              <Popover open={profileOpen} onOpenChange={setProfileOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors ${profileOpen ? 'bg-muted' : 'hover:bg-muted'}`}
+                  >
+                    <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                      <Avatar />
                     </div>
-                  </>
-                )}
-              </div>
+                    <span className="hidden text-fg lg:inline">{user?.first_name}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-56 p-1 gap-0 rounded-xl bg-card border-border shadow-lg">
+                  <div className="border-b border-border px-4 py-3 mb-1">
+                    <p className="text-sm font-medium text-fg">{user?.full_name}</p>
+                    <p className="text-xs text-muted-fg">{user?.email}</p>
+                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg rounded-md transition-colors hover:bg-info/10"
+                  >
+                    <User className="h-4 w-4 text-info" /> Mi perfil
+                  </Link>
+                  <Link
+                    href="/transactions"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg rounded-md transition-colors hover:bg-info/10"
+                  >
+                    <ArrowLeftRight className="h-4 w-4 text-info" /> Transacciones
+                  </Link>
+                  <Link
+                    href="/transaction-history"
+                    onClick={() => setProfileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-fg rounded-md transition-colors hover:bg-info/10"
+                  >
+                    <History className="h-4 w-4 text-info" /> Historial de transacciones
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-error rounded-md transition-colors hover:bg-error/5"
+                  >
+                    <LogOut className="h-4 w-4" /> Cerrar sesion
+                  </button>
+                </PopoverContent>
+              </Popover>
             </>
           ) : (
             <div className="flex items-center gap-2">
