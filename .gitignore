@@ -228,3 +228,4 @@ e2e_hu-mkt-08-09-10
 agents/botQA.js
 frontend/node_modules
 frontend/playwright-report
+frontend/check_playwright_request.js
