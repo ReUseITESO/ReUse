@@ -3,10 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus, Crown } from 'lucide-react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -14,42 +10,6 @@ import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
 import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
 import LeaderBoard from '@/components/communities/LeaderBoard';
-
-// Helper for accessibility attributes
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-// Panel props interface
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-// The Panel wrapper
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -79,10 +39,6 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
   const [value, setValue] = useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
 
   const currentMembership = members.find(m => m.user.id === user?.id);
   const isAdmin = currentMembership?.role === 'admin';
@@ -278,36 +234,35 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
 
           {/* Leaderboard and members sidebar */}
           <div>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                sx={{
-                  // Style for ALL tabs (unselected state)
-                  '& .MuiTab-root': {
-                    color: 'primary.main', // Automatically flips: Black in light, White in dark
-                    opacity: 0.6, // Optional: makes unselected slightly muted
-                  },
-                  // Style for the ACTIVE tab
-                  '& .Mui-selected': {
-                    color: 'primary.main', // Your theme's primary color
-                    opacity: 1,
-                  },
-                }}
+            {/* Tab Header */}
+            <div className="flex border-b border-border">
+              <button
+                onClick={() => setValue(0)}
+                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+                  value === 0
+                    ? "border-primary text-primary opacity-100"
+                    : "border-transparent text-foreground opacity-60 hover:opacity-100"
+                }`}
               >
-                <Tab label="Miembros" {...a11yProps(0)} />
-                <Tab label="Leadeboard" {...a11yProps(1)} />
-              </Tabs>
-            </Box>
+                Miembros
+              </button>
+              <button
+                onClick={() => setValue(1)}
+                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+                  value === 1
+                    ? "border-primary text-primary opacity-100"
+                    : "border-transparent text-foreground opacity-60 hover:opacity-100"
+                }`}
+              >
+                Leaderboard
+              </button>
+            </div>
 
-            {/* Members tab section */}
-
-            <CustomTabPanel value={value} index={0}>
-              <div>
-                {/* <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2> */}
+            {/* Members Tab Section */}
+            {value === 0 && (
+              <div className="py-4">
                 <div className="space-y-2">
-                  {members.map(m => (
+                  {members.map((m) => (
                     <div
                       key={m.id}
                       className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
@@ -317,7 +272,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                       </div>
                       <p className="text-sm font-medium text-foreground">
                         {m.user.full_name}
-                        {m.role === 'admin' && (
+                        {m.role === "admin" && (
                           <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
                         )}
                       </p>
@@ -325,13 +280,14 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                   ))}
                 </div>
               </div>
-            </CustomTabPanel>
+            )}
 
-            {/* Leaderboard tab section */}
-
-            <CustomTabPanel value={value} index={1}>
-              <LeaderBoard members={members} posts={posts} />
-            </CustomTabPanel>
+            {/* Leaderboard Tab Section */}
+            {value === 1 && (
+              <div className="py-4">
+                <LeaderBoard members={members} posts={posts} />
+              </div>
+            )}
           </div>
         </div>
       </div>
