@@ -229,3 +229,4 @@ agents/botQA.js
 frontend/node_modules
 frontend/playwright-report
 frontend/check_playwright_request.js
+frontend\tests\marketplace\hu-mkt-08-rate-transaction.spec.ts
