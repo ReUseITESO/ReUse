@@ -240,8 +240,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 onClick={() => setValue(0)}
                 className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
                   value === 0
-                    ? "border-primary text-primary opacity-100"
-                    : "border-transparent text-foreground opacity-60 hover:opacity-100"
+                    ? 'border-primary text-primary opacity-100'
+                    : 'border-transparent text-foreground opacity-60 hover:opacity-100'
                 }`}
               >
                 Miembros
@@ -250,8 +250,8 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 onClick={() => setValue(1)}
                 className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
                   value === 1
-                    ? "border-primary text-primary opacity-100"
-                    : "border-transparent text-foreground opacity-60 hover:opacity-100"
+                    ? 'border-primary text-primary opacity-100'
+                    : 'border-transparent text-foreground opacity-60 hover:opacity-100'
                 }`}
               >
                 Leaderboard
@@ -262,7 +262,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
             {value === 0 && (
               <div className="py-4">
                 <div className="space-y-2">
-                  {members.map((m) => (
+                  {members.map(m => (
                     <div
                       key={m.id}
                       className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
@@ -272,7 +272,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                       </div>
                       <p className="text-sm font-medium text-foreground">
                         {m.user.full_name}
-                        {m.role === "admin" && (
+                        {m.role === 'admin' && (
                           <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
                         )}
                       </p>
