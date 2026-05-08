@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import {
   getNotifications,
   getNotificationCount,
@@ -10,16 +11,18 @@ import type { PaginatedNotifications } from '@/types/notification';
 const POLL_INTERVAL = 30_000;
 
 export function useNotificationCount() {
+  const { isAuthenticated } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetch = useCallback(async () => {
+    if (!isAuthenticated) return;
     try {
       const data = await getNotificationCount();
       setUnreadCount(data.unread_count);
     } catch {
       // silencioso
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     fetch();

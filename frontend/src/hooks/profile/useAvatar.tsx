@@ -38,6 +38,7 @@ export function AvatarProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const fetchAvatar = useCallback(async () => {
+    if (!isAuthenticated) return;
     setIsLoading(true);
 
     try {
@@ -50,7 +51,7 @@ export function AvatarProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const updateAvatar = useCallback(async (newData: AvatarData) => {
     try {

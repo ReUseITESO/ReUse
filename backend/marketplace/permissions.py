@@ -8,7 +8,9 @@ class IsCommunityMember(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # All authenticated users can attempt to view/create
+        if request.method in SAFE_METHODS:
+            return True
+        # For creation/updates, must be authenticated
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):

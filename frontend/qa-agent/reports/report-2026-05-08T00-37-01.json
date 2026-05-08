@@ -1,0 +1,604 @@
+{
+  "runId": "2026-05-08T00-37-01",
+  "mode": "exploratory",
+  "generatedAt": "2026-05-08T00:42:59.038Z",
+  "summary": {
+    "durationMs": 357771,
+    "totalSteps": 40,
+    "urlsVisited": 18,
+    "uniqueActionsExec": 27,
+    "errorsDetected": 0,
+    "isAuthenticated": true,
+    "warnings": 0,
+    "errors": 0
+  },
+  "urlsVisited": {
+    "http://localhost:3000": 4,
+    "http://localhost:3000/products": 37,
+    "http://localhost:3000/products/my": 2,
+    "http://localhost:3000/friends": 2,
+    "http://localhost:3000/communities": 2,
+    "http://localhost:3000/products/new": 2,
+    "http://localhost:3000/notifications": 2,
+    "http://localhost:3000/products/35": 2,
+    "http://localhost:3000/products/34": 2,
+    "http://localhost:3000/products/33": 2,
+    "http://localhost:3000/products/32": 2,
+    "http://localhost:3000/products/31": 3,
+    "http://localhost:3000/products/30": 3,
+    "http://localhost:3000/products/29": 2,
+    "http://localhost:3000/products/28": 2,
+    "http://localhost:3000/products/26": 2,
+    "http://localhost:3000/products/25": 2,
+    "http://localhost:3000/products/24": 2
+  },
+  "errorsDetected": [],
+  "steps": [
+    {
+      "step": 1,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:28.912Z"
+    },
+    {
+      "step": 2,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:42.850Z"
+    },
+    {
+      "step": 3,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:50.561Z"
+    },
+    {
+      "step": 4,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/:1778200671445",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:52.383Z"
+    },
+    {
+      "step": 5,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products:1778200672819",
+      "urlBefore": "http://localhost:3000/",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:53.808Z"
+    },
+    {
+      "step": 6,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/my:1778200674446",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/my",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:37:56.141Z"
+    },
+    {
+      "step": 7,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/my",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:03.932Z"
+    },
+    {
+      "step": 8,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/friends:1778200684621",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/friends",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:05.983Z"
+    },
+    {
+      "step": 9,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/friends",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:07.945Z"
+    },
+    {
+      "step": 10,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/communities:1778200688880",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/communities",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:10.418Z"
+    },
+    {
+      "step": 11,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/communities",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $1,406"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:24.074Z"
+    },
+    {
+      "step": 12,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/new:1778200704869",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/new",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:26.720Z"
+    },
+    {
+      "step": 13,
+      "action": "form",
+      "target": "http://localhost:3000/products/new",
+      "fingerprint": "form:/products/new:description,price,select,select,title",
+      "urlBefore": "http://localhost:3000/products/new",
+      "urlAfter": "http://localhost:3000/products/new",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:38:47.572Z"
+    },
+    {
+      "step": 14,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:16.122Z"
+    },
+    {
+      "step": 15,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/notifications:1778200756863",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/notifications",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:18.482Z"
+    },
+    {
+      "step": 16,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/notifications",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:20.639Z"
+    },
+    {
+      "step": 17,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/35:1778200761294",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/35",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:26.201Z"
+    },
+    {
+      "step": 18,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/35",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:43.529Z"
+    },
+    {
+      "step": 19,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/34:1778200784344",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/34",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:39:45.264Z"
+    },
+    {
+      "step": 20,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/34",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:03.943Z"
+    },
+    {
+      "step": 21,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/33:1778200804632",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/33",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:05.401Z"
+    },
+    {
+      "step": 22,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/33",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:17.616Z"
+    },
+    {
+      "step": 23,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/32:1778200818469",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/32",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:19.346Z"
+    },
+    {
+      "step": 24,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/32",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:21.204Z"
+    },
+    {
+      "step": 25,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/31:1778200821942",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/31",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:22.778Z"
+    },
+    {
+      "step": 26,
+      "action": "form",
+      "target": "http://localhost:3000/products/31",
+      "fingerprint": "form:/products/31:textarea",
+      "urlBefore": "http://localhost:3000/products/31",
+      "urlAfter": "http://localhost:3000/products/31",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: Venta $147"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:40:46.668Z"
+    },
+    {
+      "step": 27,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/31",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:41:06.658Z"
+    },
+    {
+      "step": 28,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/30:1778200867538",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/30",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:41:08.352Z"
+    },
+    {
+      "step": 29,
+      "action": "form",
+      "target": "http://localhost:3000/products/30",
+      "fingerprint": "form:/products/30:textarea",
+      "urlBefore": "http://localhost:3000/products/30",
+      "urlAfter": "http://localhost:3000/products/30",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: Venta $6,092"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:41:37.469Z"
+    },
+    {
+      "step": 30,
+      "action": "link",
+      "target": "Marketplace",
+      "fingerprint": "link:/products",
+      "urlBefore": "http://localhost:3000/products/30",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:41:52.251Z"
+    },
+    {
+      "step": 31,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/29:1778200913051",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/29",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:41:53.922Z"
+    },
+    {
+      "step": 32,
+      "action": "button",
+      "target": "Volver",
+      "fingerprint": "button:/products/29:Volver",
+      "urlBefore": "http://localhost:3000/products/29",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:11.730Z"
+    },
+    {
+      "step": 33,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/28:1778200932618",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/28",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:13.478Z"
+    },
+    {
+      "step": 34,
+      "action": "button",
+      "target": "Volver",
+      "fingerprint": "button:/products/28:Volver",
+      "urlBefore": "http://localhost:3000/products/28",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:15.752Z"
+    },
+    {
+      "step": 35,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/26:1778200936474",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/26",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:17.497Z"
+    },
+    {
+      "step": 36,
+      "action": "button",
+      "target": "Volver",
+      "fingerprint": "button:/products/26:Volver",
+      "urlBefore": "http://localhost:3000/products/26",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:19.554Z"
+    },
+    {
+      "step": 37,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/25:1778200940233",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/25",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:21.020Z"
+    },
+    {
+      "step": 38,
+      "action": "button",
+      "target": "Volver",
+      "fingerprint": "button:/products/25:Volver",
+      "urlBefore": "http://localhost:3000/products/25",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:34.871Z"
+    },
+    {
+      "step": 39,
+      "action": "navigate",
+      "target": "URL pendiente",
+      "fingerprint": "nav:/products/24:1778200955720",
+      "urlBefore": "http://localhost:3000/products",
+      "urlAfter": "http://localhost:3000/products/24",
+      "success": true,
+      "severity": "ok",
+      "notes": [],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:36.408Z"
+    },
+    {
+      "step": 40,
+      "action": "button",
+      "target": "Volver",
+      "fingerprint": "button:/products/24:Volver",
+      "urlBefore": "http://localhost:3000/products/24",
+      "urlAfter": "http://localhost:3000/products",
+      "success": true,
+      "severity": "ok",
+      "notes": [
+        "Éxito: $6,943"
+      ],
+      "formErrors": [],
+      "ts": "2026-05-08T00:42:58.609Z"
+    }
+  ]
+}
