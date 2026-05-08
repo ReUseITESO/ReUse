@@ -29,6 +29,9 @@ next-env.d.ts
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/tests/gamification/.auth
 
 # next.js
 /.next/
