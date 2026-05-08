@@ -63,7 +63,7 @@ export default function HackedPage() {
         clearInterval(t);
         return;
       }
-      setTyped((prev) => [...prev, TERMINAL_LINES[idx]]);
+      setTyped(prev => [...prev, TERMINAL_LINES[idx]]);
       idx += 1;
       requestAnimationFrame(() => {
         if (containerRef.current) {
@@ -75,7 +75,7 @@ export default function HackedPage() {
   }, []);
 
   useEffect(() => {
-    const blink = setInterval(() => setCursorOn((v) => !v), 500);
+    const blink = setInterval(() => setCursorOn(v => !v), 500);
     return () => clearInterval(blink);
   }, []);
 
@@ -121,9 +121,7 @@ export default function HackedPage() {
         </div>
 
         <div className="flex flex-col items-center gap-2 pb-8">
-          <p className="text-xs uppercase tracking-[0.4em] text-green-500/70">
-            no hay salida
-          </p>
+          <p className="text-xs uppercase tracking-[0.4em] text-green-500/70">no hay salida</p>
           <p className="text-[10px] text-green-500/40">
             tip: tirale la del 1-100 y reza al numero perro
           </p>

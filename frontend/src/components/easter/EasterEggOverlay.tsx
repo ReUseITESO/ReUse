@@ -6,11 +6,17 @@ import { useRouter } from 'next/navigation';
 const ERROR_MESSAGES = [
   { title: 'System Error', body: 'Stack overflow en sistema_inmunologico.exe' },
   { title: 'Windows', body: 'Windows encontro un problema. Y tu novia tambien.' },
-  { title: 'Internet Explorer', body: 'No se puede mostrar la pagina. Igual que tus calificaciones.' },
+  {
+    title: 'Internet Explorer',
+    body: 'No se puede mostrar la pagina. Igual que tus calificaciones.',
+  },
   { title: 'Antivirus', body: 'Virus detectado: ferreira.dog (severidad: te la mete)' },
   { title: 'Update', body: 'Tu PC se reinicia en 3s. Tu vida tambien deberia.' },
   { title: 'Error', body: 'Demasiados errores. Igual que tu ex.' },
-  { title: 'Memoria insuficiente', body: 'Cierra Chrome. Si, las 47 pestañas. Si las del incognito tambien.' },
+  {
+    title: 'Memoria insuficiente',
+    body: 'Cierra Chrome. Si, las 47 pestañas. Si las del incognito tambien.',
+  },
   { title: 'Disco lleno', body: 'Espacio: -3 GB. Como tu autoestima.' },
   { title: 'Microsoft Office', body: 'Pagame la suscripcion o se lo cuento a tu mama.' },
   { title: 'Norton', body: 'Renueva la licencia, o renueva tu vida.' },
@@ -88,7 +94,7 @@ export default function EasterEggOverlay({ onClose }: { onClose: () => void }) {
       if (cancelledRef.current) return;
       const msg = ERROR_MESSAGES[Math.floor(Math.random() * ERROR_MESSAGES.length)];
       const id = idRef.current++;
-      setPopups((prev) => [
+      setPopups(prev => [
         ...prev,
         {
           id,
@@ -106,8 +112,10 @@ export default function EasterEggOverlay({ onClose }: { onClose: () => void }) {
     let beepCount = 0;
     let ctx: AudioContext | null = null;
     try {
-      ctx = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      ctx = new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      )();
       const beep = () => {
         if (cancelledRef.current || beepCount > 30 || !ctx) return;
         const osc = ctx.createOscillator();
@@ -139,7 +147,7 @@ export default function EasterEggOverlay({ onClose }: { onClose: () => void }) {
       onPointerDown={goToHacked}
       className="fixed inset-0 z-[9999] cursor-pointer overflow-hidden bg-black/40 backdrop-blur-[2px]"
     >
-      {popups.map((p) => (
+      {popups.map(p => (
         <div
           key={p.id}
           className="pointer-events-none absolute w-72 select-none border-2 border-[#0a4dcc] bg-[#ece9d8] font-mono shadow-2xl"
