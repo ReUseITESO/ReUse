@@ -12,6 +12,8 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN npm run build
 
+RUN chmod +x ./entrypoint.sh
+
 EXPOSE 3000
 
 CMD ["./entrypoint.sh"]
