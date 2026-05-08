@@ -732,10 +732,19 @@ class Command(BaseCommand):
         count = 0
 
         # E2E test users skip the welcome badge — tests asume strict point baselines (0/100/300/600)
-        e2e_emails = {"test@iteso.mx", "rodrigo@iteso.mx", "carlos@iteso.mx", "maria@iteso.mx"}
+        e2e_emails = {
+            "test@iteso.mx",
+            "rodrigo@iteso.mx",
+            "carlos@iteso.mx",
+            "maria@iteso.mx",
+        }
         assignments = [
             # Todos tienen el badge de bienvenida (excepto e2e users)
-            *[(u, badge_map["Bienvenido a ReUse"]) for u in users if u.email not in e2e_emails],
+            *[
+                (u, badge_map["Bienvenido a ReUse"])
+                for u in users
+                if u.email not in e2e_emails
+            ],
             # Algunos tienen badges extra
             (users[0], badge_map["Primera Venta"]),
             (users[0], badge_map["Perfil Completo"]),
@@ -762,7 +771,12 @@ class Command(BaseCommand):
     def _create_environment_impact(self, users):
         self.stdout.write("  Creando impacto ambiental...")
         # E2E test users start at 0 — tests asume zero state baseline
-        e2e_emails = {"test@iteso.mx", "rodrigo@iteso.mx", "carlos@iteso.mx", "maria@iteso.mx"}
+        e2e_emails = {
+            "test@iteso.mx",
+            "rodrigo@iteso.mx",
+            "carlos@iteso.mx",
+            "maria@iteso.mx",
+        }
         count = 0
         for user in users:
             if user.email in e2e_emails:
