@@ -1,9 +1,11 @@
 import './globals.css';
 import type { Metadata } from 'next';
 
+import { Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import GlobalChallengeToasts from '@/components/gamification/GlobalChallengeToasts';
 import { AvatarProvider } from '@/hooks/profile/useAvatar';
+import EasterEggDice from '@/components/easter/EasterEggDice';
 
 import Navbar from '@/components/layout/Navbar';
 import { Inter } from 'next/font/google';
@@ -32,6 +34,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <AvatarProvider>
               <Navbar />
               <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">{children}</main>
+              <Suspense fallback={null}>
+                <EasterEggDice />
+              </Suspense>
             </AvatarProvider>
           </AuthProvider>
         </ThemeProvider>
