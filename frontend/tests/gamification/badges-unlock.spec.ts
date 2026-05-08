@@ -111,7 +111,7 @@ test.describe('HU-GAM-04 – Desbloqueo de Medallas', () => {
       await page.goto('/profile');
       const section = badgesSection(page);
       await expect(section.getByText('Desbloqueados')).toBeVisible({ timeout: 10000 });
-      await expect(section.getByText('Bloqueados')).toBeVisible();
+      await expect(section.getByText('Bloqueados', { exact: true })).toBeVisible();
     });
 
     test('badge desbloqueado aparece con su nombre', async ({ page }) => {
