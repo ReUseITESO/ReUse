@@ -156,7 +156,7 @@ test.describe('MKT-05: Marketplace — manage listings', () => {
     await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
 
     // 3. Verify item is gone and empty state is visible
-    await expect(page.getByText('Item to Delete')).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Item to Delete' })).not.toBeVisible();
     await expect(page.getByText(/no se ha registrado/i)).toBeVisible();
   });
 
