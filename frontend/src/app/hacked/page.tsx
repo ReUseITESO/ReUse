@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 const TERMINAL_LINES = [
@@ -8,22 +7,48 @@ const TERMINAL_LINES = [
   'PORT     STATE SERVICE',
   '22/tcp   open  ssh',
   '443/tcp  open  https',
-  '6969/tcp open  ferreira-backdoor',
+  '6969/tcp open  ferreira-backdoor (siempre abierto)',
   '',
-  'root@reuse-iteso:~# sudo ./exploit.sh --target=user',
-  '[+] payload encriptado: panza_panza_panza.bin',
-  '[+] bypassing CSRF token... done',
-  '[+] dumping cookies... done (12 KB de chocolate)',
-  '[+] escalating privileges... root',
-  '[+] firewall: lol que es eso',
-  '[+] antivirus: comprado por ferreira',
-  '[+] backdoor instalado en /usr/bin/perro',
+  'root@reuse-iteso:~# sudo ./exploit.sh --target=$USER --no-lube',
+  '[+] payload listo: chiquito_pero_pica.bin',
+  '[+] bypassing CSRF... la dejaste abierta wey',
+  '[+] dumping cookies... 12 KB de Marinela',
+  '[+] escalando privilegios... yo arriba, tu abajo',
+  '[+] firewall: bajo igual que tu autoestima',
+  '[+] antivirus: te lo cambie por OnlyFans',
+  '[+] backdoor instalado: directo, sin tocar puerta',
+  '[+] base de datos: te metimos hasta el id_user=1',
+  '',
+  'root@reuse-iteso:~# cat /etc/passwd | grep $USER',
+  '$USER:x:1000:1000:doblegado por ferreira:/home/abajo',
+  '',
+  'root@reuse-iteso:~# locate historial_porno',
+  '/home/$USER/.cache/no_le_digas_a_nadie/',
+  '/home/$USER/Documents/tareas/(no_eran_tareas)/',
+  '/var/log/incognito_que_no_era_incognito.log',
+  '',
+  'root@reuse-iteso:~# ./medir.sh --del-ego',
+  '[!] tu ego: 27.4 cm',
+  '[!] tu codigo: 3 cm',
+  '[!] resultado: te falta callo',
   '',
   'root@reuse-iteso:~# whoami',
-  'ferreira_perro',
+  'ferreira_perro (el que te la metio)',
   '',
-  'root@reuse-iteso:~# echo "te tengo en la mira"',
-  'te tengo en la mira',
+  'root@reuse-iteso:~# echo "te lo dije panzon"',
+  'te lo dije panzon',
+  '',
+  'root@reuse-iteso:~# fortune',
+  '> el que se duerme en code review, amanece con backdoor',
+  '',
+  'root@reuse-iteso:~# shutdown -h now',
+  'shutdown: permission denied (te toca abajo)',
+  '',
+  'root@reuse-iteso:~# sudo shutdown -h now',
+  '[sudo] password for $USER: ********',
+  'sudo: la contraseña era 12345 wey, en serio?',
+  '',
+  'root@reuse-iteso:~# _',
 ];
 
 export default function HackedPage() {
@@ -95,14 +120,11 @@ export default function HackedPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-3 pb-8">
-          <Link
-            href="/"
-            className="rounded border border-green-400 px-5 py-2 text-sm uppercase tracking-widest text-green-300 transition-colors hover:bg-green-400 hover:text-black"
-          >
-            volver antes de que sea peor
-          </Link>
-          <p className="text-[10px] text-green-500/50">
+        <div className="flex flex-col items-center gap-2 pb-8">
+          <p className="text-xs uppercase tracking-[0.4em] text-green-500/70">
+            no hay salida
+          </p>
+          <p className="text-[10px] text-green-500/40">
             tip: tirale la del 1-100 y reza al numero perro
           </p>
         </div>
