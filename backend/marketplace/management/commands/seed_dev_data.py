@@ -113,17 +113,55 @@ class Command(BaseCommand):
                 "points": 75,
                 "profile_picture": "https://i.pravatar.cc/150?img=44",
             },
+            # E2E test users — used by frontend/tests/gamification/fixtures/auth.ts
+            {
+                "email": "test@iteso.mx",
+                "first_name": "Test",
+                "last_name": "Beginner",
+                "phone": "3300000001",
+                "points": 0,
+                "profile_picture": "https://i.pravatar.cc/150?img=50",
+                "_e2e_password": "test1234",
+            },
+            {
+                "email": "rodrigo@iteso.mx",
+                "first_name": "Rodrigo",
+                "last_name": "Active",
+                "phone": "3300000002",
+                "points": 100,
+                "profile_picture": "https://i.pravatar.cc/150?img=51",
+                "_e2e_password": "rodrigo1234",
+            },
+            {
+                "email": "carlos@iteso.mx",
+                "first_name": "Carlos",
+                "last_name": "Champion",
+                "phone": "3300000003",
+                "points": 300,
+                "profile_picture": "https://i.pravatar.cc/150?img=52",
+                "_e2e_password": "carlos1234",
+            },
+            {
+                "email": "maria@iteso.mx",
+                "first_name": "Maria",
+                "last_name": "Leader",
+                "phone": "3300000004",
+                "points": 600,
+                "profile_picture": "https://i.pravatar.cc/150?img=53",
+                "_e2e_password": "maria1234",
+            },
         ]
 
         created = []
         for data in users_data:
             email = data.pop("email")
+            password = data.pop("_e2e_password", "ReUse2026!")
             user, was_created = User.objects.get_or_create(
                 email=email,
                 defaults=data,
             )
             if was_created:
-                user.set_password("ReUse2026!")
+                user.set_password(password)
                 user.is_active = True
                 user.is_email_verified = True
                 user.save()
@@ -535,6 +573,72 @@ class Command(BaseCommand):
                 "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
                 "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400",
             ],
+            "Marketing de Kotler 16ta edición": [
+                "https://images.unsplash.com/photo-1589998059171-988d887df646?w=400",
+            ],
+            "Apuntes completos de Termodinámica": [
+                "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400",
+            ],
+            "Física Universitaria - Sears Zemansky": [
+                "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400",
+            ],
+            "Teclado mecánico Redragon Kumara": [
+                "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+            ],
+            "Cargador MacBook Pro 61W USB-C": [
+                "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400",
+            ],
+            "Calculadora Texas Instruments TI-84": [
+                "https://images.unsplash.com/photo-1632649068174-e80b32ecdfb9?w=400",
+            ],
+            "Sudadera oficial ITESO gris": [
+                "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400",
+            ],
+            "Playera polo ITESO azul marino": [
+                "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400",
+            ],
+            "Mochila Herschel negra": [
+                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
+            ],
+            "Escritorio plegable IKEA": [
+                "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400",
+            ],
+            "Librero de madera 4 niveles": [
+                "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400",
+            ],
+            "Raqueta de tenis Wilson": [
+                "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=400",
+            ],
+            "Balón de fútbol Adidas Tango": [
+                "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400",
+            ],
+            "Mat de yoga con correa": [
+                "https://images.unsplash.com/photo-1592432678016-e910b452f9a2?w=400",
+            ],
+            "Patineta eléctrica Xiaomi": [
+                "https://images.unsplash.com/photo-1572776685600-aca8c3456337?w=400",
+            ],
+            "Ukulele soprano Kala": [
+                "https://images.unsplash.com/photo-1619361283307-8d24aaca7445?w=400",
+            ],
+            "Set de marcadores Copic (24 pcs)": [
+                "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400",
+            ],
+            "Tableta gráfica Wacom Intuos S": [
+                "https://images.unsplash.com/photo-1574169208507-84376144848b?w=400",
+            ],
+            "Cafetera Nespresso Vertuo": [
+                "https://images.unsplash.com/photo-1610889556528-9a770e32642f?w=400",
+            ],
+            "Set de tuppers herméticos (10 pcs)": [
+                "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=400",
+            ],
+            "Control Xbox Series X/S negro": [
+                "https://images.unsplash.com/photo-1592840496694-26d035b52b48?w=400",
+            ],
+            "The Legend of Zelda: TOTK (Switch)": [
+                "https://images.unsplash.com/photo-1640955014216-75201056c829?w=400",
+            ],
         }
 
         for product in products:
@@ -627,9 +731,11 @@ class Command(BaseCommand):
         badge_map = {b.name: b for b in badges}
         count = 0
 
+        # E2E test users skip the welcome badge — tests asume strict point baselines (0/100/300/600)
+        e2e_emails = {"test@iteso.mx", "rodrigo@iteso.mx", "carlos@iteso.mx", "maria@iteso.mx"}
         assignments = [
-            # Todos tienen el badge de bienvenida
-            *[(u, badge_map["Bienvenido a ReUse"]) for u in users],
+            # Todos tienen el badge de bienvenida (excepto e2e users)
+            *[(u, badge_map["Bienvenido a ReUse"]) for u in users if u.email not in e2e_emails],
             # Algunos tienen badges extra
             (users[0], badge_map["Primera Venta"]),
             (users[0], badge_map["Perfil Completo"]),
@@ -655,14 +761,20 @@ class Command(BaseCommand):
 
     def _create_environment_impact(self, users):
         self.stdout.write("  Creando impacto ambiental...")
+        # E2E test users start at 0 — tests asume zero state baseline
+        e2e_emails = {"test@iteso.mx", "rodrigo@iteso.mx", "carlos@iteso.mx", "maria@iteso.mx"}
         count = 0
         for user in users:
-            _, created = EnvironmentImpact.objects.get_or_create(
-                user=user,
-                defaults={
+            if user.email in e2e_emails:
+                defaults = {"kg_co2_saved": 0, "reused_products": 0}
+            else:
+                defaults = {
                     "kg_co2_saved": round(random.uniform(0.5, 25.0), 2),
                     "reused_products": random.randint(0, 12),
-                },
+                }
+            _, created = EnvironmentImpact.objects.get_or_create(
+                user=user,
+                defaults=defaults,
             )
             if created:
                 count += 1
