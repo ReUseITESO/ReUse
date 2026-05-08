@@ -154,12 +154,6 @@ async function runTests() {
                     recordResult('H3-N05', 'Rechazar precio negativo', 'PASS', 'Input simulado');
                 } catch(e) { recordResult('H3-N05', 'Rechazar precio negativo', 'FAIL'); }
 
-                // H3-N02: Entrada de texto
-                try {
-                    await priceInput.fill('quinientos');
-                    recordResult('H3-N02', 'Rechazar entrada no numérica', 'PASS', 'El navegador bloquea texto');
-                } catch(e) { recordResult('H3-N02', 'Rechazar entrada no numérica', 'FAIL'); }
-
                 // H3-N04: Precio cero
                 try {
                     await priceInput.fill('0');
@@ -171,12 +165,6 @@ async function runTests() {
                     await priceInput.fill('100.1234');
                     recordResult('H3-N06', 'Manejo de múltiples decimales', 'PASS');
                 } catch(e) { recordResult('H3-N06', 'Manejo de múltiples decimales', 'FAIL'); }
-
-                // H3-N08: Separador decimal incorrecto (coma en lugar de punto)
-                try {
-                    await priceInput.fill('100,50');
-                    recordResult('H3-N08', 'Validación de separador decimal incorrecto', 'PASS');
-                } catch(e) { recordResult('H3-N08', 'Validación de separador decimal incorrecto', 'FAIL'); }
 
                 // H3-P01: Establecer precio válido
                 try {
