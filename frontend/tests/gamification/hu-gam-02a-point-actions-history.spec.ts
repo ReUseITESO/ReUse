@@ -104,7 +104,7 @@ test.describe('HU-GAM-02A – Historial de acciones de puntos', () => {
     test('la página muestra título "Historial de puntos" y contador de movimientos', async ({ page }) => {
       await injectTokens(page, tokens);
       await page.goto('/profile/points-history');
-      await expect(page.getByRole('heading', { name: /historial de puntos/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('heading', { name: /historial de puntos/i, level: 1 })).toBeVisible({ timeout: 10000 });
       await expect(page.getByText(/movimientos totales/i)).toBeVisible();
     });
 

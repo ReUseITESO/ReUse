@@ -52,10 +52,34 @@ export function storageStatePath(userKey: string): string {
 /**
  * Login via API, then build a Playwright storageState JSON with tokens
  * injected into localStorage (matches what src/lib/auth.ts does in the browser).
+ *
+ * Skips the login if the stored token is still valid (>60 s remaining),
+ * which avoids consuming auth throttle slots on rapid re-runs.
  */
 export async function createStorageStateForUser(userKey: string): Promise<void> {
   const user = USERS[userKey];
   if (!user) throw new Error(`Unknown user key: ${userKey}`);
+
+  // Reuse existing token when still valid to avoid auth rate-limit on rapid re-runs
+  const statePath = storageStatePath(userKey);
+  if (fs.existsSync(statePath)) {
+    try {
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf-8'));
+      const ls: { name: string; value: string }[] = state.origins[0].localStorage;
+      const accessToken = ls.find(e => e.name === 'reuse_access_token')?.value;
+      if (accessToken) {
+        const payload = JSON.parse(
+          Buffer.from(accessToken.split('.')[1], 'base64').toString(),
+        );
+        const secondsRemaining = payload.exp - Math.floor(Date.now() / 1000);
+        if (secondsRemaining > 60) {
+          return; // Token still good — skip login
+        }
+      }
+    } catch {
+      // Corrupted file — fall through to fresh login
+    }
+  }
 
   const ctx = await request.newContext();
   const response = await ctx.post(`${API_BASE}/auth/signin/`, {
