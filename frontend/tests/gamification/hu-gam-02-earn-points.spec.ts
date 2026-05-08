@@ -18,21 +18,21 @@
  *   Usuario: jose.chavez@iteso.mx / ReUse2026!
  */
 
+import fs from 'fs';
 import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
+import { storageStatePath } from './fixtures/auth';
 
 const BASE_API = 'http://localhost:8000/api';
-const TEST_EMAIL = 'jose.chavez@iteso.mx';
-const TEST_PASSWORD = 'ReUse2026!';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function loginViaAPI(request: APIRequestContext) {
-  const res = await request.post(`${BASE_API}/auth/signin/`, {
-    data: { email: TEST_EMAIL, password: TEST_PASSWORD },
-  });
-  expect(res.ok(), `Login falló: ${res.status()}`).toBeTruthy();
-  const body = await res.json();
-  return body.tokens as { access: string; refresh: string };
+function readStoredTokens(userKey: string): { access: string; refresh: string } {
+  const state = JSON.parse(fs.readFileSync(storageStatePath(userKey), 'utf-8'));
+  const ls: { name: string; value: string }[] = state.origins[0].localStorage;
+  return {
+    access: ls.find(e => e.name === 'reuse_access_token')!.value,
+    refresh: ls.find(e => e.name === 'reuse_refresh_token')!.value,
+  };
 }
 
 async function injectTokens(page: Page, tokens: { access: string; refresh: string }) {
@@ -95,18 +95,12 @@ test.describe('HU-GAM-02 – Usuario puede ganar puntos', () => {
   let secondUserId: number;
 
   test.beforeAll(async ({ request }) => {
-    tokens = await loginViaAPI(request);
+    tokens = readStoredTokens('gam02a');
     userId = await getUserId(request, tokens);
 
-    // Login del segundo usuario una sola vez para pruebas de aislamiento
-    const res = await request.post(`${BASE_API}/auth/signin/`, {
-      data: { email: 'carlos@iteso.mx', password: 'carlos1234' },
-    });
-    const body = await res.json();
-    secondTokens = body.tokens;
-    secondUserId = (await (await request.get(`${BASE_API}/auth/profile/`, {
-      headers: { Authorization: `Bearer ${secondTokens.access}` },
-    })).json()).id as number;
+    // Segundo usuario leído desde el estado guardado por el setup
+    secondTokens = readStoredTokens('champion');
+    secondUserId = await getUserId(request, secondTokens);
   });
 
   // ── AC1: Balance de puntos visible en el perfil ────────────────────────────
