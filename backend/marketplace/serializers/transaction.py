@@ -6,6 +6,7 @@ from rest_framework import serializers
 from core.models import User
 from marketplace.models import Products, Transaction, TransactionReview
 from marketplace.serializers.category import CategorySerializer
+from marketplace.serializers.transaction_flow import SwapTransactionSerializer
 from marketplace.serializers.transaction_review import TransactionReviewSerializer
 from marketplace.services.transaction_service import (
     UPDATABLE_TRANSACTION_STATUSES,
@@ -48,12 +49,20 @@ class TransactionSerializer(serializers.ModelSerializer):
     buyer = TransactionUserSerializer(read_only=True)
     expires_at = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField()
+    swap_data = serializers.SerializerMethodField()
 
     def get_expires_at(self, obj):
         return get_expiration_datetime(obj)
 
     def get_is_expired(self, obj):
         return is_transaction_expired(obj)
+
+    def get_swap_data(self, obj):
+        if obj.transaction_type != "swap":
+            return None
+        if hasattr(obj, "swap_data"):
+            return SwapTransactionSerializer(obj.swap_data).data
+        return None
 
     class Meta:
         model = Transaction
@@ -73,6 +82,7 @@ class TransactionSerializer(serializers.ModelSerializer):
             "created_at",
             "expires_at",
             "is_expired",
+            "swap_data",
         ]
 
 

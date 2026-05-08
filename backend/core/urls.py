@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from . import views, views_deactivation, views_notifications
+from . import views, views_deactivation, views_notifications, views_password_reset
 
 app_name = "auth"
 
@@ -57,6 +57,17 @@ urlpatterns = [
         "account/reactivate/confirm/",
         views_deactivation.AccountReactivateConfirmView.as_view(),
         name="account-reactivate-confirm",
+    ),
+    # HU-CORE-19: Restablecimiento de contraseña
+    path(
+        "password-reset/send/",
+        views_password_reset.PasswordResetSendView.as_view(),
+        name="password-reset-send",
+    ),
+    path(
+        "password-reset/confirm/",
+        views_password_reset.PasswordResetConfirmView.as_view(),
+        name="password-reset-confirm",
     ),
     # HU-CORE-14: Notifications
     path(

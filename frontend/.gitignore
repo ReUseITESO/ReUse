@@ -29,6 +29,9 @@ next-env.d.ts
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/tests/gamification/.auth
 
 # next.js
 /.next/
@@ -56,3 +59,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright e2e artifacts
+/tests/gamification/.auth/
+/tests/gamification/fixtures/.auth/
+/playwright-report/
+/test-results/

@@ -10,7 +10,6 @@ from marketplace.models.transaction import Transaction
 
 
 class BadgeServiceTest(TestCase):
-
     def setUp(self):
         self.user = User.objects.create(
             email="test.milestone@iteso.mx",

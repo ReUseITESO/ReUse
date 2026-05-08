@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Send, Users, LogOut, Trash2, Crown, UserPlus } from 'lucide-react';
+import { ArrowLeft, Send, Users, LogOut, Trash2, UserPlus, Crown } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useCommunityDetail } from '@/hooks/useCommunityDetail';
 import { useCommunityMarketplace } from '@/hooks/useCommunityMarketplace';
 import CommunityMarketplaceSection from '@/components/communities/CommunityMarketplaceSection';
+import LeaderBoard from '@/components/communities/LeaderBoard';
 
 export default function CommunityDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
   const router = useRouter();
+  const { id } = params;
   const {
     community,
     posts,
@@ -24,18 +26,19 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     leaveCommunity,
     joinCommunity,
     deleteCommunity,
-  } = useCommunityDetail(params.id);
+  } = useCommunityDetail(id);
 
   const {
     products,
     isLoading: productsLoading,
     error: productsError,
     refresh: refreshProducts,
-  } = useCommunityMarketplace(params.id);
+  } = useCommunityMarketplace(id);
 
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
+  const [value, setValue] = useState(0);
 
   const currentMembership = members.find(m => m.user.id === user?.id);
   const isAdmin = currentMembership?.role === 'admin';
@@ -214,43 +217,78 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Members sidebar */}
-          <div>
-            <h2 className="mb-4 text-lg font-semibold text-foreground">Miembros</h2>
-            <div className="space-y-2">
-              {members.map(m => (
-                <div
-                  key={m.id}
-                  className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {m.user.first_name?.[0]?.toUpperCase()}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {m.user.full_name}
-                    {m.role === 'admin' && (
-                      <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
-                    )}
-                  </p>
-                </div>
-              ))}
+            {/* Marketplace Section */}
+            <div className="mt-8">
+              <CommunityMarketplaceSection
+                products={products}
+                isLoading={productsLoading}
+                error={productsError}
+                communityName={community?.name || ''}
+                isAdmin={isAdmin}
+                communityId={Number(id)}
+                onProductRemoved={refreshProducts}
+              />
             </div>
           </div>
-        </div>
 
-        {/* Marketplace Section */}
-        <div className="mt-8">
-          <CommunityMarketplaceSection
-            products={products}
-            isLoading={productsLoading}
-            error={productsError}
-            communityName={community?.name || ''}
-            isAdmin={isAdmin}
-            communityId={Number(params.id)}
-            onProductRemoved={refreshProducts}
-          />
+          {/* Leaderboard and members sidebar */}
+          <div>
+            {/* Tab Header */}
+            <div className="flex border-b border-border">
+              <button
+                onClick={() => setValue(0)}
+                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+                  value === 0
+                    ? 'border-primary text-primary opacity-100'
+                    : 'border-transparent text-foreground opacity-60 hover:opacity-100'
+                }`}
+              >
+                Miembros
+              </button>
+              <button
+                onClick={() => setValue(1)}
+                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+                  value === 1
+                    ? 'border-primary text-primary opacity-100'
+                    : 'border-transparent text-foreground opacity-60 hover:opacity-100'
+                }`}
+              >
+                Leaderboard
+              </button>
+            </div>
+
+            {/* Members Tab Section */}
+            {value === 0 && (
+              <div className="py-4">
+                <div className="space-y-2">
+                  {members.map(m => (
+                    <div
+                      key={m.id}
+                      className="flex items-center gap-2 rounded-lg border border-border bg-card p-3"
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {m.user.first_name?.[0]?.toUpperCase()}
+                      </div>
+                      <p className="text-sm font-medium text-foreground">
+                        {m.user.full_name}
+                        {m.role === 'admin' && (
+                          <Crown className="ml-1 inline h-3.5 w-3.5 text-amber-500" />
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Leaderboard Tab Section */}
+            {value === 1 && (
+              <div className="py-4">
+                <LeaderBoard members={members} posts={posts} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>

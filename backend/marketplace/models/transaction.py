@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 
 class Transaction(models.Model):
@@ -46,7 +47,8 @@ class Transaction(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="pendiente"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ["-created_at"]
@@ -54,6 +56,11 @@ class Transaction(models.Model):
             models.Index(fields=["seller"]),
             models.Index(fields=["buyer"]),
         ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def clean(self):
         if self.seller_id and self.buyer_id and self.seller_id == self.buyer_id:

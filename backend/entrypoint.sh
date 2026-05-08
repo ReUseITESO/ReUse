@@ -15,6 +15,9 @@ psycopg2.connect(
 done
 echo "Database ready"
 
+echo "Generating migrations..."
+python manage.py makemigrations --noinput
+
 echo "Running migrations..."
 python manage.py migrate --noinput
 

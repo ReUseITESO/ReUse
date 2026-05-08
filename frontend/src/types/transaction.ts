@@ -48,6 +48,7 @@ export interface Transaction {
   created_at: string;
   expires_at: string;
   is_expired: boolean;
+  swap_data?: SwapTransactionData | null;
   // Present only from the /history/ endpoint
   can_review?: boolean;
   my_review?: TransactionReview | null;
@@ -73,7 +74,7 @@ export interface CreateTransactionDialogProps {
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
-  onSubmit: (deliveryLocation: string, deliveryDate: Date) => Promise<void>;
+  onSubmit: (deliveryLocation: string, deliveryDate: Date, swapProductId?: number) => Promise<void>;
 }
 
 // MeetingLocationFields
@@ -109,4 +110,49 @@ export interface TransactionFilters {
 export interface SubmitReviewPayload {
   rating: number;
   comment?: string;
+}
+
+// ── Swap Transaction Types ────────────────────────────────────────────────────
+
+export type SwapStage =
+  | 'proposal_pending'
+  | 'proposal_rejected'
+  | 'proposal_accepted'
+  | 'agenda_pending'
+  | 'agenda_rejected'
+  | 'agenda_accepted';
+
+export interface SwapProposedProduct {
+  id: number;
+  title: string;
+  description: string;
+  condition?: ProductCondition | null;
+  transaction_type: TransactionType;
+  status: ProductStatus;
+  image_url: string | null;
+  category: Category;
+}
+
+export interface SwapTransactionData {
+  id: number;
+  stage: SwapStage;
+  proposed_product: SwapProposedProduct;
+  agenda_location: string | null;
+  proposal_decided_at: string | null;
+  agenda_decided_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSwapProposalPayload {
+  proposed_product_id: number;
+}
+
+export interface ProposeSwapAgendaPayload {
+  agenda_location: string;
+  delivery_date: string;
+}
+
+export interface RespondSwapPayload {
+  accept: boolean;
 }

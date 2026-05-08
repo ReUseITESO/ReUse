@@ -3,6 +3,7 @@ __pycache__
 *.pyc
 *.pyo
 .env
+.git/
 app.log
 media/
 staticfiles/

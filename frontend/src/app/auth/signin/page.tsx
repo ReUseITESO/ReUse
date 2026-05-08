@@ -10,6 +10,7 @@ import {
   resendVerificationEmail,
   ApiError,
 } from '@/lib/auth';
+import Image from 'next/image';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -114,10 +115,12 @@ export default function SignInPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-lg">
         <div className="mb-8 text-center">
-          <img
+          <Image
+            height={96}
+            width={96}
             src="/ReUseITESOLogo.png"
             alt="ReUseITESO logo"
-            className="mx-auto mb-3 h-24 w-24 object-contain"
+            className="mx-auto mb-3 object-contain"
           />
           <h1 className="text-h1 font-bold text-fg">ReUseITESO</h1>
           <p className="mt-2 text-muted-fg">Inicia sesión con tu cuenta ITESO</p>
@@ -226,6 +229,16 @@ export default function SignInPage() {
                          focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring
                          disabled:opacity-50"
             />
+          </div>
+
+          {/* HU-CORE-19: link a recuperar contraseña */}
+          <div className="text-center">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-primary hover:text-primary-hover hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
 
           <button

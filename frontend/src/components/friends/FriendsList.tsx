@@ -1,6 +1,7 @@
 'use client';
 
 import type { SocialUser } from '@/types/friends';
+import Image from 'next/image';
 
 interface FriendsListProps {
   friends: SocialUser[];
@@ -26,10 +27,12 @@ export default function FriendsList({ friends }: FriendsListProps) {
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
               {friend.profile_picture ? (
-                <img
+                <Image
+                  height={40}
+                  width={40}
                   src={friend.profile_picture}
                   alt={friend.first_name}
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="rounded-full object-cover"
                 />
               ) : (
                 friend.first_name?.[0]?.toUpperCase()

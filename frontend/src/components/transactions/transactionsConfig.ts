@@ -35,7 +35,11 @@ export function shouldAllowStatusChange(
   }
 
   if (targetStatus === 'confirmada') {
-    return transaction.status === 'pendiente' && actorRole === 'seller';
+    return (
+      transaction.status === 'pendiente' &&
+      actorRole === 'seller' &&
+      transaction.transaction_type !== 'swap'
+    );
   }
 
   if (targetStatus === 'cancelada') {

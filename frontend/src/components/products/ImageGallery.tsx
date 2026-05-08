@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
+import Image from 'next/image';
 
 interface ImageGalleryProps {
   images: string[];
@@ -27,10 +28,11 @@ export default function ImageGallery({ images, productTitle, categoryName }: Ima
     <div className="flex flex-col gap-4">
       {/* Main image */}
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
-        <img
+        <Image
+          fill
           src={selectedImage}
           alt={`${productTitle} - imagen ${selectedIndex + 1}`}
-          className="h-full w-full object-cover"
+          className="object-cover"
         />
       </div>
 
@@ -47,10 +49,11 @@ export default function ImageGallery({ images, productTitle, categoryName }: Ima
                 }
               `}
             >
-              <img
+              <Image
+                fill
                 src={image}
                 alt={`${productTitle} - miniatura ${index + 1}`}
-                className="h-full w-full object-cover"
+                className="object-cover"
               />
             </button>
           ))}

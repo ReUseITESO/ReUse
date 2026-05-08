@@ -12,28 +12,28 @@ import Spinner from '@/components/ui/Spinner';
 
 const ACTION_OPTIONS = [
   { value: '', label: 'Todas las acciones' },
-  { value: 'publish_item', label: 'Publicar articulo' },
-  { value: 'complete_donation', label: 'Donacion completada' },
+  { value: 'publish_item', label: 'Publicar artículo' },
+  { value: 'complete_donation', label: 'Donación completada' },
   { value: 'complete_sale', label: 'Venta completada' },
   { value: 'complete_exchange', label: 'Intercambio completado' },
-  { value: 'receive_positive_review', label: 'Resena positiva' },
-  { value: 'points_deduction', label: 'Deduccion de puntos' },
+  { value: 'receive_positive_review', label: 'Reseña positiva' },
+  { value: 'points_deduction', label: 'Deducción de puntos' },
 ];
 
 const ORDER_OPTIONS = [
-  { value: '-created_at', label: 'Fecha: mas reciente' },
-  { value: 'created_at', label: 'Fecha: mas antigua' },
+  { value: '-created_at', label: 'Fecha: más reciente' },
+  { value: 'created_at', label: 'Fecha: más antigua' },
   { value: '-points', label: 'Puntos: mayor a menor' },
   { value: 'points', label: 'Puntos: menor a mayor' },
 ];
 
 const ACTION_LABELS: Record<string, string> = {
-  publish_item: 'Publicacion de articulo',
-  complete_donation: 'Donacion completada',
+  publish_item: 'Publicar artículo',
+  complete_donation: 'Donación completada',
   complete_sale: 'Venta completada',
   complete_exchange: 'Intercambio completado',
-  receive_positive_review: 'Resena positiva recibida',
-  points_deduction: 'Deduccion de puntos',
+  receive_positive_review: 'Reseña positiva recibida',
+  points_deduction: 'Deducción de puntos',
 };
 
 function toIsoDate(date: Date) {
@@ -281,7 +281,7 @@ export default function PointsHistoryCard() {
               <thead className="bg-slate-100">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-slate-700">Fecha y hora</th>
-                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Accion</th>
+                  <th className="px-4 py-3 text-left font-semibold text-slate-700">Acción</th>
                   <th className="px-4 py-3 text-left font-semibold text-slate-700">Asociado</th>
                   <th className="px-4 py-3 text-right font-semibold text-slate-700">Puntos</th>
                 </tr>

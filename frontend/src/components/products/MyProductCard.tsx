@@ -19,30 +19,12 @@ import {
 import { formatPrice, formatTimeAgo, formatTransactionLabel } from '@/lib/utils';
 
 import type { Product, ProductStatus } from '@/types/product';
+import Image from 'next/image';
 
 interface MyProductCardProps {
   product: Product;
   onProductChanged: () => void;
 }
-
-const STATUS_TRANSITIONS: Record<ProductStatus, { label: string; value: ProductStatus }[]> = {
-  disponible: [
-    { label: 'Pausar', value: 'pausado' },
-    { label: 'Marcar en proceso', value: 'en_proceso' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  pausado: [
-    { label: 'Reactivar', value: 'disponible' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  en_proceso: [
-    { label: 'Marcar disponible', value: 'disponible' },
-    { label: 'Marcar completado', value: 'completado' },
-    { label: 'Cancelar', value: 'cancelado' },
-  ],
-  completado: [],
-  cancelado: [],
-};
 
 export default function MyProductCard({ product, onProductChanged }: MyProductCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -53,7 +35,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
   const { changeStatus, isLoading: isChangingStatus } = useChangeProductStatus();
 
   const isDisponible = product.status === 'disponible';
-  const transitions = STATUS_TRANSITIONS[product.status];
   const categoryClass = getCategoryStyle(product.category.name);
   const priceColorClass = getPriceColor(product.transaction_type);
 
@@ -100,12 +81,13 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
   return (
     <>
       <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
-        <div className="flex h-36 items-center justify-center bg-muted">
+        <div className="relative flex h-36 items-center justify-center bg-muted">
           {product.images?.[0]?.image_url ? (
-            <img
+            <Image
+              fill
               src={product.images[0].image_url}
               alt={product.title}
-              className="h-full w-full object-cover"
+              className="object-cover"
             />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-fg">
@@ -133,36 +115,6 @@ export default function MyProductCard({ product, onProductChanged }: MyProductCa
           </div>
 
           <div className="mt-auto flex flex-col gap-2 border-t border-border pt-3">
-            {transitions.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {transitions.map(t => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    disabled={
-                      isChangingStatus ||
-                      (t.value === 'pausado' && Boolean(product.has_active_transaction))
-                    }
-                    title={
-                      t.value === 'pausado' && product.has_active_transaction
-                        ? 'No puedes pausar este articulo porque tiene una transaccion activa.'
-                        : undefined
-                    }
-                    onClick={() => {
-                      if (t.value === 'pausado') {
-                        setIsPauseOpen(true);
-                        return;
-                      }
-                      handleStatusChange(t.value);
-                    }}
-                    className="rounded-lg border border-input px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-muted disabled:opacity-50"
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
             {statusFeedback && (
               <p
                 className={`text-xs ${

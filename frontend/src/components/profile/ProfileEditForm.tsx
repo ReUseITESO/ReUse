@@ -1,11 +1,13 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Camera } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { getStoredTokens } from '@/lib/auth';
 import type { User } from '@/types/auth';
+import { useAvatar } from '@/hooks/profile/useAvatar';
+import Avatar from '../gamification/profile/Avatar';
 
 interface ProfileFormValues {
   first_name: string;
@@ -26,6 +28,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
   const [picturePreview, setPicturePreview] = useState<string | null>(user.profile_picture);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { avatarData, setAvatarData, updateAvatar } = useAvatar();
 
   const {
     register,
@@ -34,6 +37,15 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
   } = useForm<ProfileFormValues>({
     defaultValues: { first_name: user.first_name, last_name: user.last_name, phone: user.phone },
   });
+
+  useEffect(() => {
+    // Cleanup function to free memory
+    return () => {
+      if (picturePreview) {
+        URL.revokeObjectURL(picturePreview);
+      }
+    };
+  }, [picturePreview]);
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -47,7 +59,9 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
       return;
     }
     setPictureFile(file);
-    setPicturePreview(URL.createObjectURL(file));
+    setAvatarData(prev => ({ ...prev, image: URL.createObjectURL(file) })); // Update avatar context for immediate preview
+    const objectUrl = URL.createObjectURL(file);
+    setPicturePreview(objectUrl);
     setError(null);
   }
 
@@ -74,6 +88,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
     try {
       let pic = user.profile_picture;
       if (pictureFile) pic = await uploadPicture();
+      await updateAvatar({ ...avatarData, image: pic }); // Update avatar context immediately
       const updated = await apiClient<User>('/auth/profile/', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -104,13 +119,7 @@ export default function ProfileEditForm({ user, onSave, onCancel }: ProfileEditF
           className="relative flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary/10"
           onClick={() => fileInputRef.current?.click()}
         >
-          {picturePreview ? (
-            <img src={picturePreview} alt="Preview" className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-2xl font-bold text-primary">
-              {user.first_name?.charAt(0).toUpperCase()}
-            </span>
-          )}
+          <Avatar />
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
             <Camera className="h-6 w-6 text-white" />
           </div>

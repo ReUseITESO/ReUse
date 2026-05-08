@@ -161,6 +161,12 @@ def update_transaction_status(transaction_id, new_status, actor):
             if actor_role != "seller":
                 raise PermissionDenied("Solo el vendedor puede aceptar la solicitud.")
 
+            if transaction.transaction_type == "swap":
+                raise StateConflictError(
+                    "Las transacciones de intercambio no pueden aceptarse manualmente. "
+                    "Deben seguir el flujo de propuesta y agenda."
+                )
+
             transaction.status = "confirmada"
             transaction.save(update_fields=["status"])
 
@@ -175,6 +181,15 @@ def update_transaction_status(transaction_id, new_status, actor):
             if product.status != "disponible":
                 product.status = "disponible"
                 product.save(update_fields=["status", "updated_at"])
+
+            # If it's a swap, also release the proposed product
+            if transaction.transaction_type == "swap" and hasattr(
+                transaction, "swap_data"
+            ):
+                proposed_product = transaction.swap_data.proposed_product
+                if proposed_product.status != "disponible":
+                    proposed_product.status = "disponible"
+                    proposed_product.save(update_fields=["status", "updated_at"])
 
             # TODO: Integrar notificación de cancelación cuando CORE esté listo.
             return transaction
@@ -205,6 +220,15 @@ def update_transaction_status(transaction_id, new_status, actor):
             if product.status != "completado":
                 product.status = "completado"
                 product.save(update_fields=["status", "updated_at"])
+
+            # If it's a swap, also mark proposed product as completed
+            if transaction.transaction_type == "swap" and hasattr(
+                transaction, "swap_data"
+            ):
+                proposed_product = transaction.swap_data.proposed_product
+                if proposed_product.status != "completado":
+                    proposed_product.status = "completado"
+                    proposed_product.save(update_fields=["status", "updated_at"])
 
             award_completion_points(transaction)
 

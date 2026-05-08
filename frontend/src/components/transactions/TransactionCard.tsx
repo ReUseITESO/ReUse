@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { CalendarClock, MapPin, RefreshCcw, User, UserRoundCheck } from 'lucide-react';
+import { CalendarClock, MapPin, User, UserRoundCheck } from 'lucide-react';
+import CategoryPlaceholderIcon from '@/components/products/CategoryPlaceholderIcon';
 
 import TransactionLocationHighlight from '@/components/transactions/TransactionLocationHighlight';
 import TransactionStatusBadge from '@/components/transactions/TransactionStatusBadge';
@@ -13,8 +14,10 @@ import {
 } from '@/components/transactions/transactionsConfig';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { getTransactionTypeStyle } from '@/lib/productStyles';
+import ProductBadge from '@/components/ui/ProductBadge';
+import { getCategoryStyle, getTransactionTypeStyle } from '@/lib/productStyles';
 import { formatPrice } from '@/lib/utils';
+import SwapProductPreview from '@/components/transactions/swap-transactions/SwapProductPreview';
 
 import type { Transaction, UpdatableTransactionStatus } from '@/types/transaction';
 
@@ -43,22 +46,33 @@ export default function TransactionCard({
 
   const typeLabel = getTransactionTypeLabel(transaction.transaction_type);
   const typeClass = getTransactionTypeStyle(transaction.transaction_type);
+  const categoryStyle = getCategoryStyle(transaction.product.category.name);
 
   return (
     <Card className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 className="text-h3 font-semibold text-fg">{transaction.product.title}</h3>
-          <p className="text-sm text-muted-fg">
-            {transaction.transaction_type === 'sale'
-              ? formatPrice(transaction.product.price)
-              : typeLabel}
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-2">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${categoryStyle}`}
+          >
+            <CategoryPlaceholderIcon
+              categoryName={transaction.product.category.name}
+              className="h-6 w-6"
+            />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-fg tracking-tight">
+              {transaction.product.title}
+            </h3>
+            <p className="text-sm text-muted-fg font-medium">
+              {transaction.transaction_type === 'sale'
+                ? formatPrice(transaction.product.price)
+                : typeLabel}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-md border px-2 py-1 text-xs font-medium ${typeClass}`}>
-            {typeLabel}
-          </span>
+          <ProductBadge label={typeLabel} className={typeClass} />
           <TransactionStatusBadge status={transaction.status} />
         </div>
       </div>
@@ -86,12 +100,18 @@ export default function TransactionCard({
         </p>
       </div>
 
-      {transaction.transaction_type === 'swap' && (
-        <p className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-fg">
-          <RefreshCcw className="mr-2 inline h-3 w-3" />
-          TODO: flujo completo de intercambio pendiente (issue #34).
-        </p>
-      )}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+        <SwapProductPreview
+          product={transaction.product}
+          label={`Producto publicado por ${transaction.seller.first_name} ${transaction.seller.last_name}`}
+        />
+        {transaction.transaction_type === 'swap' && transaction.swap_data && (
+          <SwapProductPreview
+            product={transaction.swap_data.proposed_product}
+            label={`Producto propuesto por ${transaction.buyer.first_name} ${transaction.buyer.last_name}`}
+          />
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center gap-2">
         {canAccept && (
