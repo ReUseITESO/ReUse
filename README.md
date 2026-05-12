@@ -1,5 +1,38 @@
 # ♻️ ReUseITESO
 
+> **Status:** ✅ En producción desde 2026-05-08 · GCP Cloud Run · CI pipeline verde
+>
+> **Frontend prod:** https://frontend-dscgahxthq-uc.a.run.app
+> **Backend prod:** https://backend-674659739241.us-central1.run.app
+> **API docs:** [/api/docs/](https://backend-674659739241.us-central1.run.app/api/docs/)
+
+## Documentación clave
+
+| Para qué | Documento |
+|---|---|
+| Presentar el sistema | [`docs/DEMO.md`](docs/DEMO.md) — flujo paso a paso |
+| Resumen ejecutivo del sprint | [`docs/SPRINT-FINAL.md`](docs/SPRINT-FINAL.md) |
+| Métricas (PRs, LOC, tests, contributors) | [`docs/METRICS.md`](docs/METRICS.md) |
+| Qué cambió en este release | [`CHANGELOG.md`](CHANGELOG.md) |
+| Arquitectura + diagramas | [`docs/architecture/diagram.md`](docs/architecture/diagram.md) |
+| Cómo deployar | [`docs/deployment-strategy.md`](docs/deployment-strategy.md) |
+| Convención de tests | [`frontend/tests/README.md`](frontend/tests/README.md) |
+| Setup local | [`docs/local-setup.md`](docs/local-setup.md) |
+
+## Quickstart local
+
+```bash
+git clone https://github.com/ReUseITESO/ReUse.git
+cd ReUse
+docker compose up -d
+# espera ~30s a que backend aplique migrations + seed
+# frontend: http://localhost:3000
+# backend:  http://localhost:8000/api/
+# adminer:  http://localhost:8080 (host: db, user: reuse_dev, pass: local_dev_password, db: reuse_iteso_dev)
+```
+
+Login demo: `jose.chavez@iteso.mx` / `ReUse2026!`. Más usuarios listos en [`docs/DEMO.md`](docs/DEMO.md).
+
 ## Overview
 
 **ReUseITESO** is a **responsive web application** designed for the ITESO university community to promote **reuse, donation, exchange, and responsible consumption** of items such as books, electronics, clothing, and school supplies.

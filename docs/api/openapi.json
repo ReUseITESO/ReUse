@@ -1,0 +1,4886 @@
+openapi: 3.0.3
+info:
+  title: ReUseITESO API
+  version: 1.0.0
+  description: 'REST API for ReUseITESO — a second-hand marketplace platform for ITESO
+    students. Modules: <br> Core (auth, users), <br>Marketplace (products, categories,
+    transactions), <br>Gamification (points, badges, rankings).<br>'
+  contact:
+    name: ReUseITESO Team
+paths:
+  /api/auth/account/deactivate/:
+    post:
+      operationId: auth_account_deactivate_create
+      description: |-
+        POST /api/auth/account/deactivate/
+        Desactiva lógicamente la cuenta del usuario autenticado.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/account/reactivate/confirm/:
+    get:
+      operationId: auth_account_reactivate_confirm_retrieve
+      description: |-
+        GET /api/auth/account/reactivate/confirm/?token=...
+        Confirma el token y reactiva la cuenta.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/account/reactivate/send/:
+    post:
+      operationId: auth_account_reactivate_send_create
+      description: |-
+        POST /api/auth/account/reactivate/send/
+        Envía email con enlace de reactivación. Respuesta genérica para no filtrar existencia.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/dashboard/:
+    get:
+      operationId: auth_dashboard_retrieve
+      description: GET /api/auth/dashboard/ — aggregated home dashboard data.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/email-verification/confirm/:
+    get:
+      operationId: auth_email_verification_confirm_retrieve
+      description: |-
+        GET /api/auth/email-verification/confirm/?token=...
+        Verifica token one-time. Si es válido:
+        - marca usuario verificado y activo
+        - devuelve JWT tokens (login automático)
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/email-verification/send/:
+    post:
+      operationId: auth_email_verification_send_create
+      description: |-
+        POST /api/auth/email-verification/send/
+        Dispara (re)envío de correo de verificación.
+        Respuesta genérica para no filtrar si el email existe.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/microsoft/:
+    get:
+      operationId: auth_microsoft_retrieve
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/microsoft/callback/:
+    post:
+      operationId: auth_microsoft_callback_create
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/notifications/:
+    get:
+      operationId: auth_notifications_retrieve
+      description: GET /api/core/notifications/ — list notifications paginated, newest
+        first.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/notifications/{id}/:
+    get:
+      operationId: auth_notifications_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/auth/notifications/{id}/mark_read/:
+    patch:
+      operationId: auth_notifications_mark_read_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/auth/notifications/{id}/read/:
+    patch:
+      operationId: auth_notifications_read_partial_update
+      description: PATCH /api/core/notifications/{id}/read/ — mark single as read.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/notifications/count/:
+    get:
+      operationId: auth_notifications_count_retrieve
+      description: GET /api/core/notifications/count/ — unread count.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/notifications/read-all/:
+    post:
+      operationId: auth_notifications_read_all_create
+      description: POST /api/core/notifications/read-all/ — mark all as read.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/password-reset/confirm/:
+    post:
+      operationId: auth_password_reset_confirm_create
+      description: |-
+        POST /api/auth/password-reset/confirm/
+        Valida el token y actualiza la contraseña.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/password-reset/send/:
+    post:
+      operationId: auth_password_reset_send_create
+      description: |-
+        POST /api/auth/password-reset/send/
+        Envía email con enlace de restablecimiento. Respuesta genérica para no filtrar existencia.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: auth_profile_update
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: auth_profile_partial_update
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/auth/profile/upload-picture/:
+    post:
+      operationId: auth_profile_upload_picture_create
+      description: POST /api/auth/profile/upload-picture/ — upload profile image.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/auth/shares/:
+    post:
+      operationId: auth_shares_create
+      description: POST /api/auth/shares/ — share a product with friends via notifications.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/signin/:
+    post:
+      operationId: auth_signin_create
+      description: |-
+        POST /api/auth/signin/
+        Autentica al usuario con email y contraseña, devuelve tokens JWT.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/signout/:
+    post:
+      operationId: auth_signout_create
+      description: |-
+        POST /api/auth/signout/
+        Invalida el refresh token (blacklist) para cerrar sesión.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/signup/:
+    post:
+      operationId: auth_signup_create
+      description: |-
+        POST /api/auth/signup/
+        Registra un nuevo usuario ITESO. Requiere verificación de correo para activar la cuenta.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignUp'
+          description: ''
+  /api/auth/users/search/:
+    get:
+      operationId: auth_users_search_list
+      description: GET /api/auth/users/search/?q=query — search users by name or email.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserSearchList'
+          description: ''
+  /api/core/account/deactivate/:
+    post:
+      operationId: core_account_deactivate_create
+      description: |-
+        POST /api/auth/account/deactivate/
+        Desactiva lógicamente la cuenta del usuario autenticado.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/account/reactivate/confirm/:
+    get:
+      operationId: core_account_reactivate_confirm_retrieve
+      description: |-
+        GET /api/auth/account/reactivate/confirm/?token=...
+        Confirma el token y reactiva la cuenta.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/account/reactivate/send/:
+    post:
+      operationId: core_account_reactivate_send_create
+      description: |-
+        POST /api/auth/account/reactivate/send/
+        Envía email con enlace de reactivación. Respuesta genérica para no filtrar existencia.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/dashboard/:
+    get:
+      operationId: core_dashboard_retrieve
+      description: GET /api/auth/dashboard/ — aggregated home dashboard data.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/email-verification/confirm/:
+    get:
+      operationId: core_email_verification_confirm_retrieve
+      description: |-
+        GET /api/auth/email-verification/confirm/?token=...
+        Verifica token one-time. Si es válido:
+        - marca usuario verificado y activo
+        - devuelve JWT tokens (login automático)
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/email-verification/send/:
+    post:
+      operationId: core_email_verification_send_create
+      description: |-
+        POST /api/auth/email-verification/send/
+        Dispara (re)envío de correo de verificación.
+        Respuesta genérica para no filtrar si el email existe.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/microsoft/:
+    get:
+      operationId: core_microsoft_retrieve
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/microsoft/callback/:
+    post:
+      operationId: core_microsoft_callback_create
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/notifications/:
+    get:
+      operationId: core_notifications_retrieve
+      description: GET /api/core/notifications/ — list notifications paginated, newest
+        first.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/notifications/{id}/:
+    get:
+      operationId: core_notifications_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/core/notifications/{id}/mark_read/:
+    patch:
+      operationId: core_notifications_mark_read_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/core/notifications/{id}/read/:
+    patch:
+      operationId: core_notifications_read_partial_update
+      description: PATCH /api/core/notifications/{id}/read/ — mark single as read.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/notifications/count/:
+    get:
+      operationId: core_notifications_count_retrieve
+      description: GET /api/core/notifications/count/ — unread count.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/notifications/read-all/:
+    post:
+      operationId: core_notifications_read_all_create
+      description: POST /api/core/notifications/read-all/ — mark all as read.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/password-reset/confirm/:
+    post:
+      operationId: core_password_reset_confirm_create
+      description: |-
+        POST /api/auth/password-reset/confirm/
+        Valida el token y actualiza la contraseña.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/password-reset/send/:
+    post:
+      operationId: core_password_reset_send_create
+      description: |-
+        POST /api/auth/password-reset/send/
+        Envía email con enlace de restablecimiento. Respuesta genérica para no filtrar existencia.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/profile/:
+    get:
+      operationId: core_profile_retrieve
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: core_profile_update
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: core_profile_partial_update
+      description: |-
+        GET  /api/auth/profile/  – Obtener perfil del usuario autenticado.
+        PATCH /api/auth/profile/ – Actualizar perfil del usuario autenticado.
+      tags:
+      - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/core/profile/upload-picture/:
+    post:
+      operationId: core_profile_upload_picture_create
+      description: POST /api/auth/profile/upload-picture/ — upload profile image.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/refresh/:
+    post:
+      operationId: core_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/core/shares/:
+    post:
+      operationId: core_shares_create
+      description: POST /api/auth/shares/ — share a product with friends via notifications.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/signin/:
+    post:
+      operationId: core_signin_create
+      description: |-
+        POST /api/auth/signin/
+        Autentica al usuario con email y contraseña, devuelve tokens JWT.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/core/signout/:
+    post:
+      operationId: core_signout_create
+      description: |-
+        POST /api/auth/signout/
+        Invalida el refresh token (blacklist) para cerrar sesión.
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/core/signup/:
+    post:
+      operationId: core_signup_create
+      description: |-
+        POST /api/auth/signup/
+        Registra un nuevo usuario ITESO. Requiere verificación de correo para activar la cuenta.
+      tags:
+      - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignUp'
+          description: ''
+  /api/core/users/search/:
+    get:
+      operationId: core_users_search_list
+      description: GET /api/auth/users/search/?q=query — search users by name or email.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - core
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserSearchList'
+          description: ''
+  /api/gamification/avatar/data:
+    get:
+      operationId: gamification_avatar_data_retrieve
+      description: Get avatar data from user's avatar_data JSONField
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: gamification_avatar_data_create
+      description: Update avatar data in user's avatar_data JSONField
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/award-points/:
+    post:
+      operationId: gamification_award_points_create
+      description: Award points to a user based on a specific action.
+      tags:
+      - gamification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AwardPointsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AwardPointsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AwardPointsRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/badges/status/:
+    get:
+      operationId: gamification_badges_status_retrieve
+      description: Retrieves all system badges and annotates them with the user's
+        earned status.
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/challenges/:
+    get:
+      operationId: gamification_challenges_list
+      description: List rotative active challenges that change daily/weekly/monthly.
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Challenge'
+          description: ''
+  /api/gamification/challenges/{challenge_id}/claim/:
+    post:
+      operationId: gamification_challenges_claim_create
+      description: Claim reward for a completed challenge once.
+      parameters:
+      - in: path
+        name: challenge_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserChallenge'
+          description: ''
+  /api/gamification/challenges/{challenge_id}/join/:
+    post:
+      operationId: gamification_challenges_join_create
+      description: Join an active challenge and initialize user progress.
+      parameters:
+      - in: path
+        name: challenge_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserChallenge'
+          description: ''
+  /api/gamification/challenges/me/:
+    get:
+      operationId: gamification_challenges_me_list
+      description: List current user joined challenges with refreshed progress.
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserChallenge'
+          description: ''
+  /api/gamification/deduct-points/:
+    post:
+      operationId: gamification_deduct_points_create
+      description: Deduct points from a user.
+      tags:
+      - gamification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeductPointsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeductPointsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeductPointsRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/impact/:
+    get:
+      operationId: gamification_impact_retrieve
+      tags:
+      - gamification
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/level-progression/:
+    get:
+      operationId: gamification_level_progression_retrieve
+      description: Returns current level, next level, progress percent, and points
+        remaining to reach the next level for the authenticated user.
+      summary: Get current user level progression
+      tags:
+      - Gamification > Points
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/points/:
+    get:
+      operationId: gamification_points_retrieve
+      description: Returns current authenticated user point balance.
+      summary: Get current user points
+      tags:
+      - Gamification > Points
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/points/{user_id}/:
+    get:
+      operationId: gamification_points_retrieve_2
+      description: Returns point balance for a specific user ID.
+      summary: Get user points by id
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Gamification > Points
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/gamification/points/history/:
+    get:
+      operationId: gamification_points_history_list
+      description: Returns paginated points history for the authenticated user. Supports
+        filters by action type and date range.
+      summary: Get current user points history
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Filter by action value (e.g. publish_item, points_deduction).
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: Filter transactions created at or before this date (YYYY-MM-DD).
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: Sort by created_at, points, or action. Prefix with '-' for descending.
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number.
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Results per page.
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Filter transactions created at or after this date (YYYY-MM-DD).
+      tags:
+      - Gamification > Points
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPointHistoryList'
+          description: ''
+  /api/marketplace/categories/:
+    get:
+      operationId: marketplace_categories_list
+      description: Returns a list of all product categories available in the marketplace.
+      summary: List all categories
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Marketplace > Categories
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+  /api/marketplace/categories/{id}/:
+    get:
+      operationId: marketplace_categories_retrieve
+      description: Returns the detail of a single category by its ID.
+      summary: Retrieve a category
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - Marketplace > Categories
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/marketplace/community-products/:
+    get:
+      operationId: marketplace_community_products_list
+      description: Returns a paginated list of products from all communities the authenticated
+        user is a member of. <br>Requires JWT authentication. <br>Supports filtering
+        by community, category, condition and transaction type.
+      summary: List community marketplace items
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: integer
+        description: Filter by category ID.
+      - in: query
+        name: community
+        schema:
+          type: integer
+        description: Filter by specific community ID.
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: 'Order results. Options: `created_at`, `-created_at`, `price`,
+          `-price`, `title`, `-title`.'
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search by title, description, or category name.
+      tags:
+      - Marketplace > Community Items
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/marketplace/products/:
+    get:
+      operationId: marketplace_products_list
+      description: Returns a paginated list of products with status **disponible**.
+        <br>Supports filtering by category, condition, and transaction type via query
+        params. <br>Results can be searched by **title**, **description**, or **category**
+        name,and ordered by created_at, price, or title. <br><br>Use `?seller=me`
+        to list all products owned by the authenticated user (any status). Requires
+        JWT authentication. <br><br>Use `?community={id}` to filter by community (requires
+        membership). Use `?scope=communities` to list all items from your joined communities.
+      summary: List available products
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: integer
+        description: Filter by category ID.
+      - in: query
+        name: community
+        schema:
+          type: integer
+        description: Filter by community ID (requires membership to view community
+          items).
+      - in: query
+        name: condition
+        schema:
+          type: string
+          enum:
+          - buen_estado
+          - como_nuevo
+          - nuevo
+          - usado
+        description: 'Filter by product condition. Options: `nuevo`, `como_nuevo`,
+          `buen_estado`, `usado`.'
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: 'Order results. Options: `created_at`, `-created_at`, `price`,
+          `-price`, `title`, `-title`, `-likes_count`.'
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: scope
+        schema:
+          type: string
+          enum:
+          - communities
+        description: Use `communities` to show all items from your joined communities.
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search products by title, description, or category name.
+      - in: query
+        name: seller
+        schema:
+          type: string
+          enum:
+          - me
+        description: Use `me` to list the authenticated user's own products (all statuses).
+      - in: query
+        name: transaction_type
+        schema:
+          type: string
+          enum:
+          - donation
+          - sale
+          - swap
+        description: 'Filter by transaction type. Options: `donation`, `sale`, `swap`.'
+      tags:
+      - Marketplace > Products
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductListList'
+          description: ''
+    post:
+      operationId: marketplace_products_create
+      description: Creates a new product listing for the authenticated user. <br>Requires
+        JWT authentication. <br>Optionally set `community_id` to publish to a specific
+        community (must be a member).
+      summary: Publish a product
+      tags:
+      - Marketplace > Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCreate'
+          description: ''
+  /api/marketplace/products/{id}/:
+    get:
+      operationId: marketplace_products_retrieve
+      description: Returns the full detail of a single product by its ID.
+      summary: Retrieve a product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+    patch:
+      operationId: marketplace_products_partial_update
+      description: Partially updates a product owned by the authenticated user. <br>Only
+        products with status **disponible** can be edited. <br>Requires JWT authentication.
+      summary: Update a product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductUpdate'
+          description: ''
+    delete:
+      operationId: marketplace_products_destroy
+      description: Permanently deletes a product owned by the authenticated user.
+        <br>Only products with status **disponible** can be deleted. <br>Requires
+        JWT authentication.
+      summary: Delete a product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/marketplace/products/{id}/reactions/:
+    post:
+      operationId: marketplace_products_reactions_create
+      description: Creates, switches or toggles the authenticated user's reaction.
+        <br>- If reaction does not exist, it is created. <br>- If same type already
+        exists, it is removed (toggle). <br>- If opposite type exists, it is switched.
+        <br>Only products with status `disponible` or `en_proceso` accept reactions.
+      summary: Create or toggle product reaction
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductReactionRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductReactionRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductReactionRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReactionSummary'
+          description: ''
+    delete:
+      operationId: marketplace_products_reactions_destroy
+      description: Removes the authenticated user's active reaction from a product.
+        <br>Only products with status `disponible` or `en_proceso` accept this operation.
+      summary: Remove product reaction
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReactionSummary'
+          description: ''
+  /api/marketplace/products/{id}/report/:
+    post:
+      operationId: marketplace_products_report_create
+      description: Submits a report on a product. <br>A user cannot report their own
+        product. <br>Each user can only submit one report per product. <br>Requires
+        JWT authentication.
+      summary: Report a product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/marketplace/products/{id}/status/:
+    patch:
+      operationId: marketplace_products_status_partial_update
+      description: 'Changes the status of a product owned by the authenticated user.
+        <br>Valid transitions: `disponible` → `en_proceso` | `pausado` | `cancelado`,
+        `pausado` → `disponible` | `cancelado`, `en_proceso` → `disponible` | `completado`
+        | `cancelado`. <br>A product cannot be paused when it has an active transaction
+        (`pendiente` or `confirmada`). <br>Requires JWT authentication.'
+      summary: Change product status
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this products.
+        required: true
+      tags:
+      - Marketplace > Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductStatusRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductStatusRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/marketplace/products/{product_pk}/comments/:
+    get:
+      operationId: marketplace_products_comments_list
+      description: Returns a paginated list of public comments on a product, ordered
+        chronologically. Accessible to all users (no auth required).
+      summary: List comments for a product
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: product_pk
+        schema:
+          type: integer
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Marketplace > Comments
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
+    post:
+      operationId: marketplace_products_comments_create
+      description: Creates a new public comment on a published product. Requires JWT
+        authentication.
+      summary: Post a comment on a product
+      parameters:
+      - in: path
+        name: product_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentCreate'
+          description: ''
+  /api/marketplace/products/{product_pk}/comments/{id}/:
+    delete:
+      operationId: marketplace_products_comments_destroy
+      description: Deletes a comment. Only the comment author or the product owner
+        can delete a comment. Requires JWT authentication.
+      summary: Delete a comment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: product_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Comments
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/marketplace/transactions/:
+    get:
+      operationId: marketplace_transactions_list
+      description: Returns transactions where the authenticated user participates
+        as buyer or seller. Supports filtering by `role` and `status`.
+      summary: List my transactions
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          enum:
+          - buyer
+          - seller
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - cancelada
+          - completada
+          - confirmada
+          - pendiente
+      tags:
+      - Marketplace > Transactions
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionList'
+          description: ''
+    post:
+      operationId: marketplace_transactions_create
+      summary: Create transaction request
+      tags:
+      - Marketplace > Transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionCreate'
+          description: ''
+  /api/marketplace/transactions/{id}/:
+    get:
+      operationId: marketplace_transactions_retrieve
+      summary: Get transaction detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Marketplace > Transactions
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/marketplace/transactions/{id}/review/:
+    post:
+      operationId: marketplace_transactions_review_create
+      description: Submit a 1-5 star rating and optional comment for a completed transaction.
+        Each party can only submit one review per transaction.
+      summary: Rate a completed transaction
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Marketplace > Transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionReviewCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionReviewCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionReviewCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionReview'
+          description: ''
+  /api/marketplace/transactions/{id}/status/:
+    patch:
+      operationId: marketplace_transactions_status_partial_update
+      description: |-
+        Single status endpoint for transaction actions.
+        - `confirmada`: accept request (seller only).
+        - `cancelada`: cancel active request (buyer or seller).
+        - `completada`: actor confirms delivery; transaction is marked completed only after both parties confirm.
+      summary: Change transaction status
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Marketplace > Transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionStatusRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionStatusRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/marketplace/transactions/{id}/swap/:
+    get:
+      operationId: marketplace_transactions_swap_retrieve
+      summary: Get swap state
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Transactions > Swap
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapTransaction'
+          description: ''
+  /api/marketplace/transactions/{id}/swap/propose/:
+    post:
+      operationId: marketplace_transactions_swap_propose_create
+      summary: Propose an item for swap
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Transactions > Swap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwapProposalCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SwapProposalCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SwapProposalCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapTransaction'
+          description: ''
+  /api/marketplace/transactions/{id}/swap/propose-agenda/:
+    patch:
+      operationId: marketplace_transactions_swap_propose_agenda_partial_update
+      summary: Buyer proposes meeting date and location
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Transactions > Swap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapAgendaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapAgendaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapAgendaRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapTransaction'
+          description: ''
+  /api/marketplace/transactions/{id}/swap/respond-agenda/:
+    patch:
+      operationId: marketplace_transactions_swap_respond_agenda_partial_update
+      summary: Seller responds to meeting agenda
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Transactions > Swap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapTransaction'
+          description: ''
+  /api/marketplace/transactions/{id}/swap/respond-proposal/:
+    patch:
+      operationId: marketplace_transactions_swap_respond_proposal_partial_update
+      summary: Seller responds to swap proposal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Marketplace > Transactions > Swap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSwapRespondRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapTransaction'
+          description: ''
+  /api/marketplace/transactions/history/:
+    get:
+      operationId: marketplace_transactions_history_list
+      description: Returns completed transactions for the authenticated user. Supports
+        filtering by transaction_type, date_from, and date_to.
+      summary: Transaction history
+      parameters:
+      - in: query
+        name: date_from
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_to
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: transaction_type
+        schema:
+          type: string
+          enum:
+          - donation
+          - sale
+          - swap
+      tags:
+      - Marketplace > Transactions
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionHistoryList'
+          description: ''
+  /api/social/communities/:
+    get:
+      operationId: social_communities_list
+      summary: List active communities
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Social > Communities
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommunityListList'
+          description: ''
+    post:
+      operationId: social_communities_create
+      summary: Create a community
+      tags:
+      - Social > Communities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityCreate'
+          description: ''
+  /api/social/communities/{id}/:
+    get:
+      operationId: social_communities_retrieve
+      summary: Retrieve a community
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - Social > Communities
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityDetail'
+          description: ''
+    put:
+      operationId: social_communities_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - social
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityList'
+          description: ''
+    patch:
+      operationId: social_communities_partial_update
+      summary: Update a community
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - Social > Communities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityUpdate'
+          description: ''
+  /api/social/communities/{id}/join/:
+    post:
+      operationId: social_communities_join_create
+      summary: Join a public community
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - Social > Communities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityList'
+          description: ''
+  /api/social/communities/{id}/leave/:
+    post:
+      operationId: social_communities_leave_create
+      summary: Leave a community
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - Social > Communities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityListRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityList'
+          description: ''
+  /api/social/communities/{id}/products/:
+    get:
+      operationId: social_communities_products_retrieve
+      description: Returns paginated list of products published in this community.
+        Members can view, non-members get 403.
+      summary: List community marketplace items
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      tags:
+      - Social > Communities > Marketplace
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityList'
+          description: ''
+  /api/social/communities/{id}/products/{product_id}/:
+    delete:
+      operationId: social_communities_products_destroy
+      description: Community admin or moderator can remove a product from the community
+        marketplace.
+      summary: Remove product from community
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this community.
+        required: true
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Social > Communities > Marketplace
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/social/connections/:
+    get:
+      operationId: social_connections_list
+      summary: List my social connections
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Social > Connections
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserConnectionList'
+          description: ''
+    post:
+      operationId: social_connections_create
+      summary: Send a connection request
+      tags:
+      - Social > Connections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserConnectionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserConnectionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserConnectionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserConnectionCreate'
+          description: ''
+  /api/social/connections/{id}/:
+    get:
+      operationId: social_connections_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserConnection'
+          description: ''
+  /api/social/connections/{id}/respond/:
+    patch:
+      operationId: social_connections_respond_partial_update
+      summary: Respond to a connection request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Social > Connections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserConnectionResponseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserConnectionResponseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserConnectionResponseRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserConnectionResponse'
+          description: ''
+  /api/social/frequent-contacts/:
+    get:
+      operationId: social_frequent_contacts_list
+      summary: List my frequent contacts
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Social > Frequent Contacts
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFrequentContactList'
+          description: ''
+    post:
+      operationId: social_frequent_contacts_create
+      summary: Mark a frequent contact
+      tags:
+      - Social > Frequent Contacts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrequentContactCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FrequentContactCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FrequentContactCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrequentContactCreate'
+          description: ''
+  /api/social/frequent-contacts/{id}/:
+    delete:
+      operationId: social_frequent_contacts_destroy
+      summary: Remove a frequent contact
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Social > Frequent Contacts
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/social/posts/:
+    get:
+      operationId: social_posts_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommunityPostListList'
+          description: ''
+    post:
+      operationId: social_posts_create
+      tags:
+      - social
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostWrite'
+          description: ''
+  /api/social/posts/{id}/:
+    get:
+      operationId: social_posts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostDetail'
+          description: ''
+    put:
+      operationId: social_posts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - social
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommunityPostWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostWrite'
+          description: ''
+    patch:
+      operationId: social_posts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - social
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommunityPostWriteRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostWrite'
+          description: ''
+    delete:
+      operationId: social_posts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    ActionEnum:
+      enum:
+      - publish_item
+      - complete_donation
+      - complete_sale
+      - complete_exchange
+      - receive_positive_review
+      type: string
+      description: |-
+        * `publish_item` - Publish item
+        * `complete_donation` - Complete donation
+        * `complete_sale` - Complete sale
+        * `complete_exchange` - Complete exchange
+        * `receive_positive_review` - Receive positive review
+    AwardPointsRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        reference_id:
+          type: integer
+      required:
+      - action
+    Category:
+      type: object
+      description: Serializer for product categories.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+      required:
+      - id
+      - name
+    Challenge:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 120
+        description:
+          type: string
+        challenge_type:
+          $ref: '#/components/schemas/ChallengeTypeEnum'
+        goal:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        bonus_points:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        joined:
+          type: string
+          readOnly: true
+      required:
+      - challenge_type
+      - description
+      - end_date
+      - goal
+      - id
+      - joined
+      - start_date
+      - title
+    ChallengeTypeEnum:
+      enum:
+      - donation
+      - exchange
+      - sale
+      - publish
+      - review
+      type: string
+      description: |-
+        * `donation` - Donation
+        * `exchange` - Exchange
+        * `sale` - Sale
+        * `publish` - Publish
+        * `review` - Review
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/CommentAuthor'
+          readOnly: true
+        content:
+          type: string
+          maxLength: 500
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - content
+      - created_at
+      - id
+    CommentAuthor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        avatar:
+          type: string
+          nullable: true
+      required:
+      - avatar
+      - id
+      - name
+    CommentCreate:
+      type: object
+      properties:
+        content:
+          type: string
+          maxLength: 500
+      required:
+      - content
+    CommentCreateRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+      required:
+      - content
+    CommunityCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+      required:
+      - description
+      - id
+      - name
+    CommunityCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+      required:
+      - description
+      - name
+    CommunityDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+        is_active:
+          type: boolean
+        creator:
+          allOf:
+          - $ref: '#/components/schemas/SocialUserSummary'
+          readOnly: true
+        members_count:
+          type: integer
+          readOnly: true
+        members:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - created_at
+      - creator
+      - description
+      - id
+      - members
+      - members_count
+      - name
+    CommunityList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+        is_active:
+          type: boolean
+        creator:
+          allOf:
+          - $ref: '#/components/schemas/SocialUserSummary'
+          readOnly: true
+        members_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - created_at
+      - creator
+      - description
+      - id
+      - members_count
+      - name
+    CommunityListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+        is_active:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - description
+      - name
+    CommunityPostDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        community:
+          type: integer
+        user:
+          type: integer
+          readOnly: true
+        author_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+        is_pinned:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_name
+      - community
+      - content
+      - created_at
+      - id
+      - title
+      - updated_at
+      - user
+    CommunityPostList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        community:
+          type: integer
+        user:
+          type: integer
+          readOnly: true
+        author_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+        is_pinned:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_name
+      - community
+      - content
+      - created_at
+      - id
+      - title
+      - updated_at
+      - user
+    CommunityPostWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        community:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+        is_pinned:
+          type: boolean
+      required:
+      - community
+      - content
+      - id
+      - title
+    CommunityPostWriteRequest:
+      type: object
+      properties:
+        community:
+          type: integer
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        content:
+          type: string
+          minLength: 1
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+        is_pinned:
+          type: boolean
+      required:
+      - community
+      - content
+      - title
+    CommunityUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+        is_active:
+          type: boolean
+      required:
+      - description
+      - name
+    ConditionEnum:
+      enum:
+      - nuevo
+      - como_nuevo
+      - buen_estado
+      - usado
+      type: string
+      description: |-
+        * `nuevo` - New
+        * `como_nuevo` - Like New
+        * `buen_estado` - Good Condition
+        * `usado` - Used
+    DeductPointsRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        points:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - points
+    FrequentContact:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contact:
+          allOf:
+          - $ref: '#/components/schemas/SocialUserSummary'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contact
+      - created_at
+      - id
+    FrequentContactCreate:
+      type: object
+      properties:
+        contact_id:
+          type: integer
+          minimum: 1
+      required:
+      - contact_id
+    FrequentContactCreateRequest:
+      type: object
+      properties:
+        contact_id:
+          type: integer
+          minimum: 1
+      required:
+      - contact_id
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        image_url:
+          type: string
+          readOnly: true
+        order_number:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - id
+      - image_url
+      - order_number
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/NotificationTypeEnum'
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+          nullable: true
+        reference_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - reference_id
+      - title
+      - type
+    NotificationTypeEnum:
+      enum:
+      - badge_earned
+      - points_added
+      - transaction_confirmed
+      - product_reported
+      - new_reaction
+      - shared_item
+      type: string
+      description: |-
+        * `badge_earned` - Badge Earned
+        * `points_added` - Points Added
+        * `transaction_confirmed` - Transaction Confirmed
+        * `product_reported` - Product Reported
+        * `new_reaction` - New Reaction
+        * `shared_item` - Shared Item
+    NullEnum:
+      enum:
+      - null
+    PaginatedCategoryList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedCommentList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    PaginatedCommunityListList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityList'
+    PaginatedCommunityPostListList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityPostList'
+    PaginatedFrequentContactList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrequentContact'
+    PaginatedPointHistoryList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointHistory'
+    PaginatedProductListList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductList'
+    PaginatedTransactionHistoryList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionHistory'
+    PaginatedTransactionList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    PaginatedUserConnectionList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserConnection'
+    PaginatedUserSearchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSearch'
+    PatchedCommunityPostWriteRequest:
+      type: object
+      properties:
+        community:
+          type: integer
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        content:
+          type: string
+          minLength: 1
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+        is_pinned:
+          type: boolean
+    PatchedCommunityUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+          nullable: true
+          maxLength: 500
+        is_private:
+          type: boolean
+        is_active:
+          type: boolean
+    PatchedNotificationRequest:
+      type: object
+      properties:
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+    PatchedProductStatusRequest:
+      type: object
+      description: Serializer for validating status change input.
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+    PatchedProductUpdateRequest:
+      type: object
+      description: Serializer for updating products (PATCH).
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        category:
+          type: integer
+        community:
+          type: integer
+          nullable: true
+          description: If set, this item is only visible to community members. If
+            null, item is public.
+    PatchedSwapAgendaRequest:
+      type: object
+      properties:
+        agenda_location:
+          type: string
+          minLength: 1
+          maxLength: 255
+        delivery_date:
+          type: string
+          format: date-time
+    PatchedSwapRespondRequest:
+      type: object
+      properties:
+        accept:
+          type: boolean
+    PatchedTransactionStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/TransactionStatusStatusEnum'
+    PatchedUserConnectionResponseRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/UserConnectionResponseStatusEnum'
+    PatchedUserProfileRequest:
+      type: object
+      description: |-
+        Serializer público del perfil de usuario.
+        HU-CORE-17: si el usuario tiene is_deactivated=True, retorna un perfil
+        anónimo ("cuenta desactivada") sin exponer datos personales ni foto.
+      properties:
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        profile_picture:
+          type: string
+          nullable: true
+          maxLength: 500
+    PointHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          maxLength: 50
+        action_display:
+          type: string
+          readOnly: true
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        reference_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        reference_type:
+          type: string
+          readOnly: true
+        reference_label:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - action_display
+      - created_at
+      - id
+      - points
+      - reference_label
+      - reference_type
+    ProductCreate:
+      type: object
+      description: Serializador para crear productos (JSON -> Obj).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        category:
+          type: integer
+        community:
+          type: integer
+          nullable: true
+          description: If set, this item is only visible to community members. If
+            null, item is public.
+      required:
+      - category
+      - condition
+      - description
+      - id
+      - title
+      - transaction_type
+    ProductCreateRequest:
+      type: object
+      description: Serializador para crear productos (JSON -> Obj).
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        category:
+          type: integer
+        community:
+          type: integer
+          nullable: true
+          description: If set, this item is only visible to community members. If
+            null, item is public.
+      required:
+      - category
+      - condition
+      - description
+      - title
+      - transaction_type
+    ProductDetail:
+      type: object
+      description: Serializer for product detail view with full information including
+        images.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        seller_name:
+          type: string
+          readOnly: true
+        seller_id:
+          type: integer
+          readOnly: true
+        seller_email:
+          type: string
+          readOnly: true
+        has_active_transaction:
+          type: string
+          readOnly: true
+        has_reported:
+          type: string
+          readOnly: true
+        likes_count:
+          type: string
+          readOnly: true
+        dislikes_count:
+          type: string
+          readOnly: true
+        user_reaction:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - condition
+      - created_at
+      - description
+      - dislikes_count
+      - has_active_transaction
+      - has_reported
+      - id
+      - images
+      - likes_count
+      - seller_email
+      - seller_id
+      - seller_name
+      - title
+      - transaction_type
+      - user_reaction
+    ProductList:
+      type: object
+      description: Serializer for the product list (Object -> JSON).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        community:
+          allOf:
+          - $ref: '#/components/schemas/CommunityList'
+          readOnly: true
+        seller_name:
+          type: string
+          readOnly: true
+        seller_id:
+          type: integer
+          readOnly: true
+        has_active_transaction:
+          type: string
+          readOnly: true
+        likes_count:
+          type: string
+          readOnly: true
+        dislikes_count:
+          type: string
+          readOnly: true
+        user_reaction:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - category
+      - community
+      - condition
+      - created_at
+      - description
+      - dislikes_count
+      - has_active_transaction
+      - id
+      - images
+      - likes_count
+      - seller_id
+      - seller_name
+      - title
+      - transaction_type
+      - user_reaction
+    ProductReactionRequestRequest:
+      type: object
+      description: Serializer for validating reaction create/update payload.
+      properties:
+        type:
+          $ref: '#/components/schemas/Type463Enum'
+      required:
+      - type
+    ProductReactionSummary:
+      type: object
+      description: Serializer for returning reaction counters and current user state.
+      properties:
+        likes_count:
+          type: integer
+        dislikes_count:
+          type: integer
+        user_reaction:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/UserReactionEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - dislikes_count
+      - likes_count
+      - user_reaction
+    ProductUpdate:
+      type: object
+      description: Serializer for updating products (PATCH).
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        condition:
+          $ref: '#/components/schemas/ConditionEnum'
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        category:
+          type: integer
+        community:
+          type: integer
+          nullable: true
+          description: If set, this item is only visible to community members. If
+            null, item is public.
+      required:
+      - category
+      - condition
+      - description
+      - title
+      - transaction_type
+    ReasonEnum:
+      enum:
+      - prohibited_item
+      - misleading_description
+      - offensive_content
+      - possible_scam
+      - other
+      type: string
+      description: |-
+        * `prohibited_item` - Prohibited item
+        * `misleading_description` - Misleading description
+        * `offensive_content` - Offensive content
+        * `possible_scam` - Possible scam
+        * `other` - Other
+    ReportCreateRequest:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        description:
+          type: string
+          nullable: true
+          maxLength: 300
+      required:
+      - reason
+    SignUp:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: ^[^@]+@iteso\.mx$
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+          minLength: 2
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+          minLength: 2
+        phone:
+          type: string
+          maxLength: 20
+      required:
+      - email
+      - first_name
+      - last_name
+      - phone
+    SignUpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          pattern: ^[^@]+@iteso\.mx$
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+          minLength: 2
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+          minLength: 2
+        phone:
+          type: string
+          maxLength: 20
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+      - password_confirm
+      - phone
+    SocialUserSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          pattern: ^[^@]+@iteso\.mx$
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        profile_picture:
+          type: string
+          nullable: true
+          maxLength: 500
+      required:
+      - email
+      - full_name
+      - id
+    SocialUserSummaryRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          pattern: ^[^@]+@iteso\.mx$
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        profile_picture:
+          type: string
+          nullable: true
+          maxLength: 500
+      required:
+      - email
+    StageEnum:
+      enum:
+      - proposal_pending
+      - proposal_rejected
+      - proposal_accepted
+      - agenda_pending
+      - agenda_rejected
+      - agenda_accepted
+      type: string
+      description: |-
+        * `proposal_pending` - Proposal Pending
+        * `proposal_rejected` - Proposal Rejected
+        * `proposal_accepted` - Proposal Accepted
+        * `agenda_pending` - Agenda Pending
+        * `agenda_rejected` - Agenda Rejected
+        * `agenda_accepted` - Agenda Accepted
+    Status7a6Enum:
+      enum:
+      - pendiente
+      - confirmada
+      - completada
+      - cancelada
+      type: string
+      description: |-
+        * `pendiente` - Pending
+        * `confirmada` - Confirmed
+        * `completada` - Completed
+        * `cancelada` - Cancelled
+    StatusEnum:
+      enum:
+      - disponible
+      - pausado
+      - en_proceso
+      - completado
+      - cancelado
+      type: string
+      description: |-
+        * `disponible` - Available
+        * `pausado` - Paused
+        * `en_proceso` - In Progress
+        * `completado` - Completed
+        * `cancelado` - Cancelled
+    SwapProposalCreateRequest:
+      type: object
+      properties:
+        proposed_product_id:
+          type: integer
+          minimum: 1
+      required:
+      - proposed_product_id
+    SwapProposedProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        image_url:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+      required:
+      - category
+      - description
+      - id
+      - image_url
+      - title
+    SwapTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stage:
+          $ref: '#/components/schemas/StageEnum'
+        proposed_product:
+          allOf:
+          - $ref: '#/components/schemas/SwapProposedProduct'
+          readOnly: true
+        agenda_location:
+          type: string
+          nullable: true
+          maxLength: 255
+        proposal_decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        agenda_decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - created_at
+      - id
+      - proposed_product
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          allOf:
+          - $ref: '#/components/schemas/TransactionProduct'
+          readOnly: true
+        seller:
+          allOf:
+          - $ref: '#/components/schemas/TransactionUser'
+          readOnly: true
+        buyer:
+          allOf:
+          - $ref: '#/components/schemas/TransactionUser'
+          readOnly: true
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        status:
+          $ref: '#/components/schemas/Status7a6Enum'
+        seller_confirmation:
+          type: boolean
+        seller_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        buyer_confirmation:
+          type: boolean
+        buyer_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        delivery_date:
+          type: string
+          format: date-time
+          nullable: true
+        delivery_location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        expires_at:
+          type: string
+          readOnly: true
+        is_expired:
+          type: string
+          readOnly: true
+        swap_data:
+          type: string
+          readOnly: true
+      required:
+      - buyer
+      - created_at
+      - delivery_location
+      - expires_at
+      - id
+      - is_expired
+      - product
+      - seller
+      - swap_data
+      - transaction_type
+    TransactionCreate:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          minimum: 1
+        delivery_location:
+          type: string
+          maxLength: 255
+        delivery_date:
+          type: string
+          format: date-time
+      required:
+      - delivery_date
+      - delivery_location
+      - product_id
+    TransactionCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          minimum: 1
+        delivery_location:
+          type: string
+          minLength: 1
+          maxLength: 255
+        delivery_date:
+          type: string
+          format: date-time
+      required:
+      - delivery_date
+      - delivery_location
+      - product_id
+    TransactionHistory:
+      type: object
+      description: TransactionSerializer extended with review fields for the history
+        endpoint.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          allOf:
+          - $ref: '#/components/schemas/TransactionProduct'
+          readOnly: true
+        seller:
+          allOf:
+          - $ref: '#/components/schemas/TransactionUser'
+          readOnly: true
+        buyer:
+          allOf:
+          - $ref: '#/components/schemas/TransactionUser'
+          readOnly: true
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        status:
+          $ref: '#/components/schemas/Status7a6Enum'
+        seller_confirmation:
+          type: boolean
+        seller_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        buyer_confirmation:
+          type: boolean
+        buyer_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        delivery_date:
+          type: string
+          format: date-time
+          nullable: true
+        delivery_location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        expires_at:
+          type: string
+          readOnly: true
+        is_expired:
+          type: string
+          readOnly: true
+        swap_data:
+          type: string
+          readOnly: true
+        can_review:
+          type: string
+          readOnly: true
+        my_review:
+          type: string
+          readOnly: true
+      required:
+      - buyer
+      - can_review
+      - created_at
+      - delivery_location
+      - expires_at
+      - id
+      - is_expired
+      - my_review
+      - product
+      - seller
+      - swap_data
+      - transaction_type
+    TransactionProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        image_url:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+      required:
+      - category
+      - description
+      - id
+      - image_url
+      - title
+      - transaction_type
+    TransactionReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        reviewer_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - rating
+      - reviewer_name
+    TransactionReviewCreateRequest:
+      type: object
+      properties:
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+      required:
+      - rating
+    TransactionStatusStatusEnum:
+      enum:
+      - confirmada
+      - cancelada
+      - completada
+      type: string
+      description: |-
+        * `confirmada` - confirmada
+        * `cancelada` - cancelada
+        * `completada` - completada
+    TransactionTypeEnum:
+      enum:
+      - donation
+      - sale
+      - swap
+      type: string
+      description: |-
+        * `donation` - Donation
+        * `sale` - Sale
+        * `swap` - Swap
+    TransactionUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          pattern: ^[^@]+@iteso\.mx$
+          maxLength: 254
+      required:
+      - email
+      - id
+    Type463Enum:
+      enum:
+      - like
+      - dislike
+      type: string
+      description: |-
+        * `like` - like
+        * `dislike` - dislike
+    UserChallenge:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        challenge_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        challenge_type:
+          type: string
+          readOnly: true
+        goal:
+          type: integer
+          readOnly: true
+        progress:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        bonus_points:
+          type: integer
+          readOnly: true
+        is_completed:
+          type: boolean
+        reward_claimed:
+          type: boolean
+        reward_claimed_at:
+          type: string
+          format: date-time
+          nullable: true
+        joined_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        start_date:
+          type: string
+          format: date-time
+          readOnly: true
+        end_date:
+          type: string
+          format: date-time
+          readOnly: true
+        is_expired:
+          type: string
+          readOnly: true
+      required:
+      - bonus_points
+      - challenge_id
+      - challenge_type
+      - description
+      - end_date
+      - goal
+      - id
+      - is_expired
+      - joined_at
+      - start_date
+      - title
+    UserConnection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requester:
+          allOf:
+          - $ref: '#/components/schemas/SocialUserSummary'
+          readOnly: true
+        addressee:
+          allOf:
+          - $ref: '#/components/schemas/SocialUserSummary'
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/UserConnectionStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - addressee
+      - created_at
+      - id
+      - requester
+    UserConnectionCreate:
+      type: object
+      properties:
+        addressee_id:
+          type: integer
+          minimum: 1
+      required:
+      - addressee_id
+    UserConnectionCreateRequest:
+      type: object
+      properties:
+        addressee_id:
+          type: integer
+          minimum: 1
+      required:
+      - addressee_id
+    UserConnectionResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/UserConnectionResponseStatusEnum'
+      required:
+      - status
+    UserConnectionResponseStatusEnum:
+      enum:
+      - accepted
+      - rejected
+      - blocked
+      type: string
+      description: |-
+        * `accepted` - accepted
+        * `rejected` - rejected
+        * `blocked` - blocked
+    UserConnectionStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - rejected
+      - blocked
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `rejected` - Rejected
+        * `blocked` - Blocked
+    UserProfile:
+      type: object
+      description: |-
+        Serializer público del perfil de usuario.
+        HU-CORE-17: si el usuario tiene is_deactivated=True, retorna un perfil
+        anónimo ("cuenta desactivada") sin exponer datos personales ni foto.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          maxLength: 20
+        points:
+          type: integer
+          readOnly: true
+        profile_picture:
+          type: string
+          nullable: true
+          maxLength: 500
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último ingreso
+        is_deactivated:
+          type: boolean
+          readOnly: true
+      required:
+      - date_joined
+      - email
+      - full_name
+      - id
+      - is_deactivated
+      - last_login
+      - points
+    UserProfileRequest:
+      type: object
+      description: |-
+        Serializer público del perfil de usuario.
+        HU-CORE-17: si el usuario tiene is_deactivated=True, retorna un perfil
+        anónimo ("cuenta desactivada") sin exponer datos personales ni foto.
+      properties:
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellido
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        profile_picture:
+          type: string
+          nullable: true
+          maxLength: 500
+    UserReactionEnum:
+      enum:
+      - like
+      - dislike
+      type: string
+      description: |-
+        * `like` - like
+        * `dislike` - dislike
+    UserSearch:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+          title: Nombre
+        last_name:
+          type: string
+          readOnly: true
+          title: Apellido
+        full_name:
+          type: string
+          readOnly: true
+        profile_picture:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - email
+      - first_name
+      - full_name
+      - id
+      - last_name
+      - profile_picture
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from POST /api/auth/signin/
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: Core > Auth
+  description: Authentication endpoints (register, login, token refresh).
+- name: Marketplace > Products
+  description: Product listing and detail endpoints.
+- name: Marketplace > Categories
+  description: Product category endpoints.
+- name: Marketplace > Transactions
+  description: Transaction flow endpoints for buyer and seller actions.
