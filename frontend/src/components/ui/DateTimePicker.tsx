@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CalendarDays, Clock3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -91,6 +92,7 @@ export default function DateTimePicker({
   maxHour = 22,
   onInvalidTimeChange,
 }: DateTimePickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const selectedTime = toTimeInputValue(value);
   const selectedTimeLabel = toDisplayTimeLabel(value);
   const weekScheduleLabel = `Disponibilidad de Lunes a viernes · ${String(minHour).padStart(2, '0')}:00 a ${String(maxHour).padStart(2, '0')}:00`;
@@ -103,7 +105,7 @@ export default function DateTimePicker({
 
   return (
     <div className="space-y-2">
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger
           className="flex h-10 w-full items-center justify-between rounded-lg border border-input bg-card px-3 text-sm text-fg cursor-pointer transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           disabled={disabled}
@@ -131,23 +133,17 @@ export default function DateTimePicker({
                     selectedTime || `${String(minHour).padStart(2, '0')}:00`,
                   ),
                 );
-                return;
+              } else {
+                onChange(mergeDateAndTime(selected, `${String(minHour).padStart(2, '0')}:00`));
+                emitValidation(null);
               }
 
-              onChange(mergeDateAndTime(selected, `${String(minHour).padStart(2, '0')}:00`));
-              emitValidation(null);
+              // 4. CLOSE the calendar after selection
+              setIsOpen(false);
             }}
             locale={es}
             disabled={date => isPastDay(date) || isWeekendFutureDay(date)}
-            modifiers={{
-              pastDay: date => isPastDay(date),
-              weekendClosed: date => isWeekendFutureDay(date),
-            }}
-            modifiersClassNames={{
-              pastDay: '[&>button]:!text-muted-fg [&>button]:!opacity-45',
-              weekendClosed:
-                '[&>button]:!bg-error/10 [&>button]:!text-error [&>button]:line-through',
-            }}
+            // ... props
             initialFocus
           />
         </PopoverContent>
