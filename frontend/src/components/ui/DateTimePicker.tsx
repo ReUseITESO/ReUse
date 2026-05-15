@@ -92,7 +92,6 @@ export default function DateTimePicker({
   maxHour = 22,
   onInvalidTimeChange,
 }: DateTimePickerProps) {
-
   const [isOpen, setIsOpen] = useState(false);
   const selectedTime = toTimeInputValue(value);
   const selectedTimeLabel = toDisplayTimeLabel(value);
